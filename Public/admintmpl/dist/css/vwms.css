@@ -1,0 +1,16 @@
+/*!
+ */
+.tab-clo{
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  z-index: 1;
+  color: #FF6600;
+}
+.tab-clo:hover{
+  color: #FF0000;
+  cursor:pointer;
+}
+.none{
+  display:none;
+}

@@ -20,7 +20,7 @@ class Sqlsrv extends Driver{
     protected $selectSql  =     'SELECT T1.* FROM (SELECT thinkphp.*, ROW_NUMBER() OVER (%ORDER%) AS ROW_NUMBER FROM (SELECT %DISTINCT% %FIELD% FROM %TABLE%%JOIN%%WHERE%%GROUP%%HAVING% %UNION%) AS thinkphp) AS T1 %LIMIT%%COMMENT%';
     // PDO连接参数
     protected $options = array(
-        PDO::ATTR_CASE              =>  PDO::CASE_LOWER,
+        PDO::ATTR_CASE              =>  PDO::CASE_NATURAL,
         PDO::ATTR_ERRMODE           =>  PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_STRINGIFY_FETCHES =>  false,
         PDO::SQLSRV_ATTR_ENCODING   =>  PDO::SQLSRV_ENCODING_UTF8,

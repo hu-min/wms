@@ -19,7 +19,7 @@ class Cx extends TagLib {
     protected $tags   =  array(
         // 标签定义： attr 属性列表 close 是否闭合（0 或者1 默认1） alias 标签别名 level 嵌套层次
         'php'       =>  array(),
-        'volist'    =>  array('attr'=>'name,id,offset,length,key,mod','level'=>3,'alias'=>'iterate'),
+        'volist'    =>  array('attr'=>'name,id,offset,length,key,mod','level'=>4,'alias'=>'iterate'),
         'foreach'   =>  array('attr'=>'name,item,key','level'=>3),
         'if'        =>  array('attr'=>'condition','level'=>2),
         'elseif'    =>  array('attr'=>'condition','close'=>0),
