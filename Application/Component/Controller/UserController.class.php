@@ -63,10 +63,16 @@ class UserController extends BaseController{
         $res=$this->initRes();
         
         $nodeName='userNode_'.$userId;
-        $menus=$this->Redis->get($nodeName);
+        $nodeRefre='refre';
+        $authority=[];
+        $refre=$this->Redis->get($nodeRefre);
+        if($refre && $refre!=1){
+            $menus=$this->Redis->get($nodeName);
+        }
+        
         if($menus){
-            $res->errCode=10001;
-            $res->error=getError(10001);
+            $res->errCode=0;
+            $res->error=getError(0);
             $res->data=$menus;
             return $res;
         }
@@ -77,8 +83,12 @@ class UserController extends BaseController{
         if($mNodeResult) {
             foreach ($mNodeResult AS $nodeInfo) {
                 $newAllNodes[$nodeInfo['nodeId']] = $nodeInfo;
+                if($nodeInfo['controller']!=""){
+                    $authority[$nodeInfo['controller']]=$nodeInfo['nodeType'];
+                }
+                
                 if($nodeInfo['nodePid']==0){
-                    array_push($mNodes,$nodeInfo['nodeId']);
+                    array_push($mNodes,['nodeId'=>$nodeInfo['nodeId'],'showType'=>$nodeInfo['showType']]);
                 }
             }
             $mNodeResult = &$newAllNodes;
@@ -88,27 +98,32 @@ class UserController extends BaseController{
             return $res;
         }
         foreach ($mNodes as $node1) {
-            $menus['node'][$node1]=$mNodeResult[$node1];
-            unset($mNodeResult[$node1]);
-            foreach ($mNodeResult as $node2) {
-                if($node1==$node2['nodePid']){
-                    $menus['node'][$node1]['node'][$node2['nodeId']]=$node2;
-                    unset($mNodeResult[$node2['nodeId']]);
-                    foreach ($mNodeResult as $node3) {
-                        if($node2['nodeId']==$node3['nodePid']){
-                            $menus['node'][$node1]['node'][$node2['nodeId']]['node'][$node3['nodeId']]=$node3;
-                            unset($mNodeResult[$node3['nodeId']]);
-                            foreach ($mNodeResult as $node4) {
-                                if($node3['nodeId']==$node4['nodePid']){
-                                    $menus['node'][$node1]['node'][$node2['nodeId']]['node'][$node3['nodeId']]['node'][$node4['nodeId']]=$node4;
-                                    unset($mNodeResult[$node2['nodeId']]);
+            if($node1['showType']==1){
+                $menus['node'][$node1['nodeId']]=$mNodeResult[$node1['nodeId']];
+                unset($mNodeResult[$node1['nodeId']]);
+                foreach ($mNodeResult as $node2) {
+                    if($node1['nodeId']==$node2['nodePid'] && $node2['showType']==1){
+                        $menus['node'][$node1['nodeId']]['node'][$node2['nodeId']]=$node2;
+                        unset($mNodeResult[$node2['nodeId']]);
+                        foreach ($mNodeResult as $node3) {
+                            if($node2['nodeId']==$node3['nodePid'] && $node3['showType']==1){
+                                $menus['node'][$node1['nodeId']]['node'][$node2['nodeId']]['node'][$node3['nodeId']]=$node3;
+                                unset($mNodeResult[$node3['nodeId']]);
+                                foreach ($mNodeResult as $node4) {
+                                    if($node3['nodeId']==$node4['nodePid']  && $node4['showType']==1){
+                                        $menus['node'][$node1['nodeId']]['node'][$node2['nodeId']]['node'][$node3['nodeId']]['node'][$node4['nodeId']]=$node4;
+                                        unset($mNodeResult[$node2['nodeId']]);
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            } 
+            }
         }
+        session('nodeAuth',$authority);
+        // print_r($menus);
+        $this->Redis->set($nodeRefre,2,3600);
         $this->Redis->set($nodeName,$menus,3600);
         $res->errCode=10001;
         $res->error=getError(10001);

@@ -537,11 +537,16 @@
             breadcrumb(el,title,level);
             if(nodeid>0){
                 var controller=$(this).attr("href");
-                get(controller,{a:"s"},function(result){
-                    alert("a")
-                    console.log(result);
-                });
-                createTab(title,"vtabs"+nodeid,title);
+                var SUFFIX="{:C('TMPL_TEMPLATE_SUFFIX')}";
+                if(controller!='/Admin/Index/Main'+SUFFIX){
+                    get(controller,{},function(result){
+                        createTab(title,"vtabs"+nodeid,result.html);
+                        return;
+                    });
+                    createTab(title,"vtabs"+nodeid,'');
+                }
+                
+                
             }
         })
         //标签删除显示和隐藏
@@ -597,6 +602,7 @@
         if(tab.length>0){
             nav_tabs.find("[href='#"+id+"']").parents("li").addClass("active");
             $("#"+id).addClass('active');
+            $("#"+id).html(content);
         }else{
             var tab="<li class='active'><i class='fa fa-fw fa-times-circle tab-clo none'></i><a href='#"+id+"' data-toggle='tab'>"+title+"</a></li>";
             var tabContent="<div class='active tab-pane' id='"+id+"'>"+content+"</div>";
@@ -606,12 +612,18 @@
     }
     //删除tab
     function delTab(el,id){
-        var tabPrev=el.prev()
-        var conPrev=$(id).prev()
+        if(el.index()==0){
+            var tabPrev=el.next()
+            var conPrev=$(id).next()
+        }else{
+            var tabPrev=el.prev()
+            var conPrev=$(id).prev()
+        }
+        $('.nav-tabs-custom .tabs-head').children("li").removeClass("active");
+        $('.nav-tabs-custom .tab-content').children('div').removeClass("active");
         el.remove();
         $(id).remove();
         var tab_content=$('.nav-tabs-custom .tab-content')
-        tab_content.children('div').removeClass('active');
         tabPrev.addClass('active');
         conPrev.addClass('active');
         var id=tabPrev.children("a").attr("href");

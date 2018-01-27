@@ -8,7 +8,14 @@ class UserController extends BaseController{
      * @Date: 2018-01-23 00:31:36 
      * @Desc: 用户列表 
      */    
-    function userList(){
-        $this->ajaxReturn(["errCode"=>0]);
+    function userRead(){
+        $userType=C("userType");
+        $userStatus=C("userStatus");
+        $regFrom=C("regFrom");
+        $this->assign('userType',$userType);
+        $this->assign('userStatus',$userStatus);
+        $this->assign('regFrom',$regFrom);
+        // $this->ajaxReturn(['html'=>$this->fetch()]);
+        $this->returnHtml();
     }
 }

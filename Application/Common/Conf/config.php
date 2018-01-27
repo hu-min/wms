@@ -1,11 +1,14 @@
 <?php
 $CONFIG=array(
     'DB_TYPE'   => 'mysql',
-    'DB_USER'   => 'vwms', // 用户名
-    'DB_PWD'    => 'Vwms2018#23', // 密码
+    // 'DB_USER'   => 'vwms', // 用户名
+    'DB_USER'   => 'root', // 用户名
+    // 'DB_PWD'    => 'Vwms2018#23', // 密码
+    'DB_PWD'    => 'root', // 密码
     'DB_PREFIX' => 'v_', // 数据库表前缀 
     'URL_MODEL'=> 2,//伪静态
-    'DB_HOST' => '47.52.132.90',
+    // 'DB_HOST' => '47.52.132.90',
+    'DB_HOST' => '127.0.0.1',
     'DB_NAME' => 'wmstest', // 数据库名
     'DB_PORT' => 3306, // 端口
     'DB_CHARSET'=> 'utf8', // 字符集
