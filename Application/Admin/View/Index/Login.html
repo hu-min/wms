@@ -98,6 +98,8 @@
             success:function(result){
                 if(result.errCode==0){
                   window.location.href="{:U('Index/Index')}";
+                }else{
+                  alert(result.error)
                 }
             }
         })

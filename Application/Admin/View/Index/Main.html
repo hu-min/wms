@@ -217,7 +217,7 @@
       <!-- /.search form -->
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu" data-widget="tree">
-        <li class="header">MAIN NAVIGATION</li>
+        <li class="header">主菜单导航</li>
         <volist name="nodeList" id="node">
             <if condition="is_array($node['node']) neq true">
                 <li><a href="{:U($node['controller'])}" class="nodeOn" data-level='1' data-nodeid="{$node['nodeId']}"><i class="{$node['nodeIcon']}"></i> <span class="title">{$node['nodeTitle']}</span></a></li>
@@ -521,6 +521,9 @@
 <script src="__ADMINT__/bower_components/fastclick/lib/fastclick.js"></script>
 <!-- AdminLTE App -->
 <script src="__ADMINT__/dist/js/adminlte.min.js"></script>
+
+<script src="__ADMINT__/dist/js/vwms.js"></script>
+
 <!-- AdminLTE for demo purposes -->
 
 <script>
@@ -633,20 +636,6 @@
             $('.breadcrumb').html("")
         }
         delete breadData[id];
-    }
-    /** 
-     * @Author: vition 
-     * @Date: 2018-01-23 00:41:37 
-     * @Desc: get方式获取数据 
-     */    
-    function get(url,datas,callBack){
-        $.ajax({
-            url:url,
-            type:'get',
-            dataType:'json',
-            data:datas,
-            success:callBack,
-        })
     }
 </script>
 </body>

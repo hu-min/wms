@@ -8,11 +8,6 @@ class IndexController extends BaseController{
      * 后台管理入口
      */
     function Index(){
-        print_r($_SESSION);
-        // echo getError(10000);
-        // $userCom=new \Component\Controller\UserController();
-        // $userCom=getComponent('user');
-        // echo $userCom->getUser();
         if($this->isLogin()){
             $this->redirect('Index/Main');
         }else{

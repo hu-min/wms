@@ -23,7 +23,7 @@ class BaseController extends \Common\Controller\BaseController{
         $this->userCom=getComponent('User');
         $this->authority=C('authority');
         $this->nodeAuth=session('nodeAuth');
-        $this->exemption=[
+        $this->exemption=[//排除的控制器
             'Admin/Index/Login',
             'Admin/Index/Main',
             'Admin/Index/logOut',
@@ -39,6 +39,7 @@ class BaseController extends \Common\Controller\BaseController{
                 $this->redirect('Index/Main');
             }
         }else{
+            
             $conAct=CONTROLLER_NAME.'/'.ACTION_NAME;
             preg_match("/\S([A-Z]+[\S]*)$/",$conAct,$match);
             if(!$match[1] || !in_array($match[1],$this->authority[$this->nodeAuth[$conAct]])){
@@ -47,24 +48,6 @@ class BaseController extends \Common\Controller\BaseController{
             }  
             
         }
-
-        // if(!$this->isLogin() && $login!='Admin/Index/Login'){
-        //     if(IS_POST && ACTION_NAME=='checkLogin'){
-
-        //     }else{
-        //         $this->redirect('Index/Login');
-        //     }
-        // }else{
-        //     // 对控制器做权限判断;
-        //     $conAct=CONTROLLER_NAME.'/'.ACTION_NAME;
-        //     if($conAct!=='Index/Main'){
-        //         preg_match("/\S([A-Z]+[\S]*)$/",$conAct,$match);
-        //         if(!$match[1] || !in_array($match[1],$this->authority[$this->nodeAuth[$conAct]])){
-        //             $this->prompt(1,'警告!','您不具备访问此页面的权限，如果您认为值得拥有，请联系管理员！');
-        //             exit;
-        //         }  
-        //     }
-        // }
     }
     /** 
      * @Author: vition 

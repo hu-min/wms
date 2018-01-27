@@ -1,6 +1,8 @@
 <?php
-/**
- * 获取错误信息
+/** 
+ * @Author: vition 
+ * @Date: 2018-01-28 00:22:32 
+ * @Desc: 获取错误信息 
  */
 function getError($errCode){
     if($errCode<0){
@@ -17,8 +19,10 @@ function getError($errCode){
     }
     return $errCodeList[$errCode];
 }
-/**
- * 获取组件
+/** 
+ * @Author: vition 
+ * @Date: 2018-01-28 00:22:25 
+ * @Desc: 获取组件 
  */
 function getComponent($conName,$arrParam=[]){
     $conName=ucfirst($conName).'Controller';
@@ -30,4 +34,37 @@ function getComponent($conName,$arrParam=[]){
     }
     $className= '\\Component\\Controller\\'.$conName;
    return new $className();
+}
+/** 
+ * @Author: vition 
+ * @Date: 2018-01-28 00:24:29 
+ * @Desc: ip转成长整型 ,修正ip2long可能返回负数
+ */
+function ipTolong($ip){
+   return sprintf("%u", ip2long($ip));
+}
+/** 
+ * @Author: vition 
+ * @Date: 2018-01-28 00:31:10 
+ * @Desc: 返回真实ip地址 
+ */
+function getIp(){
+    $arr_ip_header = array(
+        'HTTP_CDN_SRC_IP',
+        'HTTP_PROXY_CLIENT_IP',
+        'HTTP_WL_PROXY_CLIENT_IP',
+        'HTTP_CLIENT_IP',
+        'HTTP_X_FORWARDED_FOR',
+        'REMOTE_ADDR',
+    );
+    $client_ip = 'unknown';
+    foreach ($arr_ip_header as $key)
+    {
+        if (!empty($_SERVER[$key]) && strtolower($_SERVER[$key]) != 'unknown')
+        {
+            $client_ip = $_SERVER[$key];
+            break;
+        }
+    }
+    return $client_ip;
 }

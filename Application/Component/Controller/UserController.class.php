@@ -11,19 +11,6 @@ class UserController extends BaseController{
     }
     /** 
      * @Author: vition 
-     * @Date: 2018-01-14 21:49:32 
-     * @Desc: 获取用户信息，除了密码 
-     */    
-    protected function getUser($parameter=[]){
-        $res=$this->initRes();
-        if(empty($parameter)){
-            $res->errCode=110;
-            $res->error=getError(110);
-            return $res;
-        }
-    }
-    /** 
-     * @Author: vition 
      * @Date: 2018-01-14 22:08:13 
      * @Desc: 检查用户 
      */    
@@ -44,6 +31,12 @@ class UserController extends BaseController{
         $userResult=$this->userDB->getOne($parArray);
         $this->log($this->userDB->_sql());
         if($userResult){
+            if($userResult['status']!=1){
+                $res->errCode=10002;
+                $res->error=getError(10002);
+                return $res;
+
+            }
             $this->getUserNode($userResult['userId']);
             $res->errCode=0;
             $res->error=getError(0);
@@ -69,7 +62,6 @@ class UserController extends BaseController{
         if($refre && $refre!=1){
             $menus=$this->Redis->get($nodeName);
         }
-        
         if($menus){
             $res->errCode=0;
             $res->error=getError(0);
@@ -129,5 +121,50 @@ class UserController extends BaseController{
         $res->error=getError(10001);
         $res->data=$menus;
         return $res;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-01-27 14:50:51 
+     * @Desc: 获取用户列表 
+     */    
+    function getUserList($parameter=[]){
+        $res=$this->initRes();
+        $where=$parameter['where']?$parameter['where']:true;
+        $fields=$parameter['fields']?$parameter['fields']:true;
+        $orderStr=$parameter['orderStr']?$parameter['orderStr']:null;
+        $page=$parameter['page']?$parameter['page']:0;
+        $pageNum=$parameter['pageSize']?$parameter['pageSize']:0;
+        $groupBy=$parameter['groupBy']?$parameter['groupBy']:null;
+        $userList=$this->userDB->getList($where , $fields, $orderStr, $page, $pageNum, $groupBy);
+        $count=$this->userDB->countList($where);
+        if($userList){
+            return ['list'=>$userList,'count'=>$count];
+        }
+        return false;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-01-14 21:49:32 
+     * @Desc: 获取用户信息，除了密码 
+     */    
+    function getUser($parameter=[]){
+        $res=$this->initRes();
+        if(empty($parameter)){
+            $res->errCode=110;
+            $res->error=getError(110);
+            return $res;
+        }
+        $where=[];
+        if($parameter['userId']){
+            $where['userId']=$parameter['userId'];
+        }
+        $userResult=$this->userDB->getOne(['where'=>$where,'fields'=>'password','noField'=>true]);
+        if($userResult){
+            $res->errCode=0;
+            $res->error=getError(0);
+            $res->data=$userResult;
+            return $res;
+        }
+        
     }
 }

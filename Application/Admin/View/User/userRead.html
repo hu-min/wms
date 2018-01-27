@@ -8,39 +8,42 @@
     <eq name="load" value="true">
         <include file="Index/Heads" /> 
     </eq>
+    <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
 </head>
 <body>
     <section class="content">
         <div class="row">
             <div class="col-md-12">
                 <div class="box box-info">
-                    <div class="box-body">
+                    <div class="box-body search-body">
                         <div class="col-md-12">
                             <div class="form-inline">
                                 <label for="loginName" class="control-label">登录名称：</label>
                                 <div class="form-group">
-                                    <input class="form-control" id="loginName" name="loginName" placeholder="登录名" type="text">
+                                    <input class="form-control search-info" id="loginName" name="loginName" placeholder="登录名" type="text">
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                 <label for="userName" class="control-label">用户名：</label>
                                 <div class="form-group">
-                                    <input class="form-control" id="userName" name="userName" placeholder="用户名" type="text">
+                                    <input class="form-control search-info" id="userName" name="userName" placeholder="用户名" type="text">
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                 <div class="form-group">
                                     <label for="gender" class="control-label">性别：</label>
-                                    <select class="form-control" id="gender">
+                                    <select class="form-control search-info" name="gender" id="gender">
                                         <option value="">全部</option>
                                         <option value="1">男性</option>
                                         <option value="2">女性</option>
                                     </select>
                                 </div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <button type="button" data-reqtype="add" data-toggle="modal" data-title="添加用户" data-target="#modal-userInfo" data-con="user" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus"></i> 添加用户</button>
                             </div>
                             <br>
                             <div class="form-inline">
                                 <div class="form-group">
                                     <label for="userType" class="control-label">用户类型：</label>
-                                    <select class="form-control" id="userType" name="userType">
+                                    <select class="form-control search-info" id="userType" name="userType">
                                         <option value="">全部</option>
                                         <volist name="userType" id="item">
                                             <option value="{$key}">{$item}</option>
@@ -50,7 +53,7 @@
                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                 <div class="form-group">
                                     <label for="status" class="control-label">状态：</label>
-                                    <select class="form-control" id="status">
+                                    <select class="form-control search-info" name="status" id="status">
                                         <option value="">全部</option>
                                         <volist name="userStatus" id="item">
                                             <option value="{$key}">{$item}</option>
@@ -60,13 +63,16 @@
                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                 <div class="form-group">
                                     <label for="regFrom" class="control-label">注册来源：</label>
-                                    <select class="form-control" id="regFrom">
+                                    <select class="form-control search-info" name="regFrom" id="regFrom">
                                         <option value="">全部</option>
                                         <volist name="regFrom" id="item">
                                             <option value="{$key}">{$item}</option>
                                         </volist>
                                     </select>
                                 </div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <button type="button" data-url="{:U('User/userRead')}" data-reqtype="userList" data-con="user" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                <button type="button" class="btn bg-teal search-refresh" data-con="user"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                             </div>
                         </div>
                     </div>
@@ -92,15 +98,130 @@
                             <th>操作</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="userTable">
                         {$tables}
                     </tbody>
                 </table>
             </div>
         </div>
-        <div class="row">
-            {$pages}
+        <div class="dataTables_wrapper">
+            <div id="userPage" class="row page-div" data-url="{:U('User/userRead')}" data-reqtype="userList" data-con="user">
+                {$pages}
+            </div>
         </div>
     </section>
+    <div class="modal fade" id="modal-userInfo">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Default Modal</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label for="info-loginName">登录名：</label>
+                            <input id="info-userId" name="userId" type="hidden">
+                            <input class="form-control modal-info" id="info-loginName" name="loginName" placeholder="登录名" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-userName">用户名：</label>
+                            <input class="form-control modal-info" id="info-userName" name="userName" placeholder="用户名" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-avatar">头像：</label>
+                            <input class="form-control modal-info" id="info-avatar" name="avatar" placeholder="头像" type="text">
+                            <input id="exampleInputFile" type="file">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="info-password">密码：</label>
+                            <input class="form-control modal-info" id="info-password" name="password" placeholder="密码" type="password">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-phone">手机号码：</label>
+                            <input class="form-control modal-info" id="info-phone" name="phone" placeholder="手机号码" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-gender">性别：</label>
+                            <select class="form-control modal-info" name="gender" id="info-gender">
+                                <option value="">全部</option>
+                                <option value="1">男性</option>
+                                <option value="2">女性</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="info-userType">用户类型：</label>
+                            <select class="form-control modal-info" id="info-userType" name="userType">
+                                <option value="">全部</option>
+                                <volist name="userType" id="item">
+                                    <option value="{$key}">{$item}</option>
+                                </volist>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="btn-group user-status status-group" data-toggle="btn-toggle">
+                                <input class="modal-info" id="info-status" value="1" name="status" type="hidden">
+                                <button type="button" name="0" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-default"></i> 未激活 </button>
+                                <button type="button" name="1" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-green"> 激活 </i>
+                                </button>
+                                <button type="button" name="2" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-info"></i> 冻结 </button>
+                                <button type="button" name="3" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-red"></i> 删除 </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>            
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary save-info" data-con="user" data-reqtype="Add" data-url="{:U('User/userEdit')}">Save changes</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        /*查询列表函数*/
+        function userSearchFuns(){
+            datas['data']={}
+            $(".search-info").each(function(){
+                var name=$(this).attr("name");
+                var val=$(this).val();
+                if(val!=""){
+                    datas['data'][name]=val
+                }
+            })
+        }
+        function userReFuns(){
+            $(".user-status .status-btn").removeClass("active");
+            $(".user-status .status-btn[name='1']").addClass("active");
+            $("#info-status").val("1");
+        }
+        /*设置编辑用户信息*/
+        function userShowFuns(info){
+            $("#info-userId").val(info['userId']);
+            $("#info-loginName").val(info['loginName']);
+            $("#info-userName").val(info['userName']);
+            $("#info-avatar").val(info['avatar']);
+            $("#info-phone").val(info['phone']);
+            $("#info-status").val(info['status']);
+            $("#info-gender").find("option[value='"+info['gender']+"']").prop("selected",true);
+            $("#info-userType").find("option[value='"+info['userType']+"']").prop("selected",true);
+            $(".user-status .status-btn").removeClass("active");
+            $(".user-status .status-btn[name='"+info['status']+"']").addClass("active");
+        }
+        /*用户信息*/
+        function userInfoFuns(){
+            datas.data={}
+            $(".modal-info").each(function(){
+                var name=$(this).attr("name");
+                var val=$(this).val();
+                if(val!=""){
+                    datas.data[name]=val
+                }
+            })
+        }
+    </script>
 </body>
 </html>
