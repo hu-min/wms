@@ -20,6 +20,7 @@ $CONFIG=array(
     'TMPL_PARSE_STRING'=>[
         '__ADMINT__'=>__ROOT__.'/Public'.'/admintmpl',
         '__TEMPLATE__'=>__ROOT__.'/Public'.'/template',
+        '__UPLOADS__'=>__ROOT__.'/Public'.'/Uploads',
     ],
 );
 

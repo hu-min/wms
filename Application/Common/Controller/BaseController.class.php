@@ -13,6 +13,7 @@ use Think\Cache\Driver\Redis;
 class BaseController extends Controller{
     protected $logDebug=true;
     protected $Redis;
+    protected $refreNode='refreNode';
     protected $baseLogPath = MODULE_NAME."/".CONTROLLER_NAME."/";//seasLog 日志目录
 
     public function _initialize() {

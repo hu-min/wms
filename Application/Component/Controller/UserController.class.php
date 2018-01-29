@@ -56,9 +56,9 @@ class UserController extends BaseController{
         $res=$this->initRes();
         
         $nodeName='userNode_'.$userId;
-        $nodeRefre='refre';
+
         $authority=[];
-        $refre=$this->Redis->get($nodeRefre);
+        $refre=$this->Redis->get($this->refreNode);
         if($refre && $refre!=1){
             $menus=$this->Redis->get($nodeName);
         }
@@ -115,7 +115,7 @@ class UserController extends BaseController{
         }
         session('nodeAuth',$authority);
         // print_r($menus);
-        $this->Redis->set($nodeRefre,2,3600);
+        $this->Redis->set($refreNode,2,3600);
         $this->Redis->set($nodeName,$menus,3600);
         $res->errCode=10001;
         $res->error=getError(10001);
@@ -165,6 +165,22 @@ class UserController extends BaseController{
             $res->data=$userResult;
             return $res;
         }
-        
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-01-30 00:42:29 
+     * @Desc:  
+     */    
+    function insertUser($userInfo){
+        $res=$this->initRes();
+        $insertResult=$this->userDB->insert($userInfo);
+        if($insertResult){
+            $res->errCode=0;
+            $res->error=getError(0);
+            return $res;
+        }
+        $res->errCode=111;
+        $res->error=getError(111);
+        return $res;
     }
 }

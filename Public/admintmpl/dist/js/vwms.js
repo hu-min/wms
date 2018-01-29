@@ -27,7 +27,8 @@ function post(url,datas,callBack){
     })
 }
 
-var datas={}
+var datas={};
+var filesData={};
 /** 
  * javascript comment 
  * @Author: vition 
@@ -51,7 +52,11 @@ $(document).on("click",".search-list,.vpage",function(){
     var page=con+"Page";
     datas.reqType=reqtype;
     eval(con+"SearchFuns()");//对不同的id设置不同的发送数据
+    searchFun(url,datas,table,page);
     
+})
+
+function searchFun(url,datas,table,page){
     get(url,datas,function(result){
         if(result.errCode==0){
             $("#"+table).html(result.table);
@@ -60,7 +65,7 @@ $(document).on("click",".search-list,.vpage",function(){
             alert(result.error);
         }
     })
-})
+}
 /** 
  * javascript comment 
  * @Author: vition 
@@ -74,6 +79,7 @@ $(document).on("click",".info-edit",function(){
     var reqtype=$(this).data("reqtype");
     var show=$(this).data("show");
     var con=$(this).data("con");
+    
     $(target).find('.modal-title').text(title)
     $(target).find('.save-info').text(title)
     $(target).find('.save-info').data("reqtype",reqtype)
@@ -131,8 +137,47 @@ $(document).on("click",'.save-info',function(){
     var url=$(this).data("url");
     var reqtype=$(this).data("reqtype");
     var con=$(this).data("con");
+    var search=con+"-search";
+    var parent=$(this).parents(".modal").attr("id")
+    console.log(parent);
     datas.reqType=reqtype;
     eval(con+"InfoFuns()");//对不同的id设置不同的发送数据
-    console.log(datas)
-    // post(url,datas,callBack);
+    
+    if(JSON.stringify(filesData)!="{}"){
+        datas['filesData']=filesData
+    }
+    post(url,datas,function(result){
+        if(result.errCode==0){
+            datas={}
+            var url=$("#"+search).data("url");
+            var con=$("#"+search).data("con");
+            var reqtype=$("#"+search).data("reqtype");
+            var table=con+"Table";
+            var page=con+"Page";
+            datas.reqType=reqtype;
+            eval(con+"SearchFuns()");//对不同的id设置不同的发送数据
+            searchFun(url,datas,table,page)
+            $("#"+parent).modal('toggle')
+        }else{
+            alert(result.error)
+        }
+        
+    });
+})
+/** 
+ * javascript comment 
+ * @Author: vition 
+ * @Date: 2018-01-28 22:28:38 
+ * @Desc: 上传文件到files 
+ */
+$(document).on("change",".fileupdate",function(){
+    var input=$(this).data("input");
+    var imgName=this.files[0].name
+    var slefs=$(this)
+    var reader = new FileReader();
+    reader.readAsDataURL(this.files[0])
+    reader.onloadend = function () {  
+        $(input).val(imgName);
+        filesData[encodeURI(imgName)]=this.result
+    };
 })
