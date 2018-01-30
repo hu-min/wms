@@ -30,6 +30,36 @@ class UserController extends BaseController{
      */    
     function userEdit(){
         $reqType=I("reqType");
+        $datas=I("data");
+        $userInfo=[];
+        if($reqType=="add"){
+            $userInfo=[
+                'userId'=>$datas['userId'],
+                'loginName'=>$datas['loginName'],
+                'userName'=>$datas['userName'],
+                'avatar'=>$datas['avatar'],
+                'password'=>sha1($datas['password']),
+                'phone'=>$datas['phone']?$datas['phone']:0,
+                'gender'=>$datas['gender'],
+                'userType'=>$datas['userType'],
+                'regFrom'=>1,
+                'regTime'=>time(),
+                'openId'=>'',
+                'lastIp'=>ipTolong(getIp()),
+                'lastTime'=>time(),
+                'loginNum'=>0,
+                'status'=>$datas['status'],
+            ];
+            $insertResult=$this->userCom->insertUser($userInfo);
+            if($insertResult->errCode==0){
+                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+            }
+            $this->ajaxReturn(['errCode'=>$insertResult->errCode,'error'=>$insertResult->error]);
+        }elseif($reqType=="edit"){
+
+        }else{
+            $this->ajaxReturn(['errCode'=>100,'error'=>getError(100),'reqType'=>$reqType]);
+        }
     }
     /** 
      * @Author: vition 

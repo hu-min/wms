@@ -30,6 +30,8 @@ class BaseController extends \Common\Controller\BaseController{
             'Admin/Index/checkLogin',
             'Admin/Index/Index',
         ];
+        // $this->refreNode();
+        // print_r($this->nodeAuth);
         // $this->setLogin();
         $nowConAct=MODULE_NAME."/".CONTROLLER_NAME.'/'.ACTION_NAME;
         if(in_array($nowConAct,$this->exemption)){
@@ -119,7 +121,7 @@ class BaseController extends \Common\Controller\BaseController{
         $this->assign("content",$content);
         $this->assign("icon",$icon);
         if(IS_AJAX){
-            $this->ajaxReturn(['html'=>$this->fetch("Index/Prompt")]);
+            $this->ajaxReturn(['html'=>$this->fetch("Index/Prompt"),'errCode'=>404,'error'=>getError(404)]);
         }
         $this->assign("load",true);
         $this->display("Index/Prompt");
@@ -136,6 +138,14 @@ class BaseController extends \Common\Controller\BaseController{
             $this->assign("load",true);
             $this->display($view);
         }
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-01-29 23:05:00 
+     * @Desc: 更新node 
+     */    
+    function refreNode(){
+        $this->Redis->set($this->refreNode,1,3600);
     }
 
 }

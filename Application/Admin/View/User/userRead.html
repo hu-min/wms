@@ -71,7 +71,7 @@
                                     </select>
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <button type="button" data-url="{:U('User/userRead')}" data-reqtype="userList" data-con="user" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                <button type="button" data-url="{:U('User/userRead')}" id="user-search" data-reqtype="userList" data-con="user" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
                                 <button type="button" class="btn bg-teal search-refresh" data-con="user"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                             </div>
                         </div>
@@ -124,29 +124,29 @@
                         <div class="form-group">
                             <label for="info-loginName">登录名：</label>
                             <input id="info-userId" name="userId" type="hidden">
-                            <input class="form-control modal-info" id="info-loginName" name="loginName" placeholder="登录名" type="text">
+                            <input class="form-control modal-info" id="info-loginName" name="loginName" title="登录名" placeholder="登录名" type="text">
                         </div>
                         <div class="form-group">
                             <label for="info-userName">用户名：</label>
-                            <input class="form-control modal-info" id="info-userName" name="userName" placeholder="用户名" type="text">
+                            <input class="form-control modal-info" id="info-userName" name="userName" title="用户名" placeholder="用户名" type="text">
                         </div>
                         <div class="form-group">
                             <label for="info-avatar">头像：</label>
-                            <input class="form-control modal-info" id="info-avatar" name="avatar" placeholder="头像" type="text">
-                            <input id="exampleInputFile" type="file">
+                            <input class="form-control modal-info" id="info-avatar" name="avatar" title="头像" placeholder="头像" type="text">
+                            <input id="exampleInputFile" class="fileupdate" data-input="#info-avatar" type="file">
                         </div>
 
                         <div class="form-group">
                             <label for="info-password">密码：</label>
-                            <input class="form-control modal-info" id="info-password" name="password" placeholder="密码" type="password">
+                            <input class="form-control modal-info" id="info-password" title="密码" name="password" placeholder="密码" type="password">
                         </div>
                         <div class="form-group">
                             <label for="info-phone">手机号码：</label>
-                            <input class="form-control modal-info" id="info-phone" name="phone" placeholder="手机号码" type="text">
+                            <input class="form-control modal-info" id="info-phone" title="手机号码" name="phone" placeholder="手机号码" type="text">
                         </div>
                         <div class="form-group">
                             <label for="info-gender">性别：</label>
-                            <select class="form-control modal-info" name="gender" id="info-gender">
+                            <select class="form-control modal-info" title="性别" name="gender" id="info-gender">
                                 <option value="">全部</option>
                                 <option value="1">男性</option>
                                 <option value="2">女性</option>
@@ -154,7 +154,7 @@
                         </div>
                         <div class="form-group">
                             <label for="info-userType">用户类型：</label>
-                            <select class="form-control modal-info" id="info-userType" name="userType">
+                            <select class="form-control modal-info" title="用户类型" id="info-userType" name="userType">
                                 <option value="">全部</option>
                                 <volist name="userType" id="item">
                                     <option value="{$key}">{$item}</option>
@@ -217,9 +217,14 @@
             $(".modal-info").each(function(){
                 var name=$(this).attr("name");
                 var val=$(this).val();
-                if(val!=""){
-                    datas.data[name]=val
+                if(name=="avatar" || name=="phone"){                    
+                }else{
+                    if(val==""){
+                        alert($(this).attr("title")+"不能为空")
+                        throw "字段不能为空"
+                    }
                 }
+                datas.data[name]=val
             })
         }
     </script>
