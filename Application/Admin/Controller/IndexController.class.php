@@ -44,7 +44,7 @@ class IndexController extends BaseController{
         $data=I('data');
         $userResult=$this->userCom->checkUser($data);
         if($userResult->errCode==0){
-           $this->setLogin($userResult->data);
+            $this->setLogin($userResult->data);
         }
         $this->ajaxReturn($userResult);
     }

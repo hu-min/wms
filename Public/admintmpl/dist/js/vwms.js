@@ -4,11 +4,13 @@
  * @Desc: get方式获取数据 
  */    
 function get(url,datas,callBack){
+    asyncs=arguments[3]!=undefined?arguments[3]:true;
     $.ajax({
         url:url,
         type:'get',
         dataType:'json',
         data:datas,
+        async:asyncs,
         success:callBack,
     })
 /** 
@@ -18,11 +20,13 @@ function get(url,datas,callBack){
  * @Desc: post发送 
  */}
 function post(url,datas,callBack){
+    asyncs=arguments[3]!=undefined?arguments[3]:true;
     $.ajax({
         url:url,
         type:'post',
         dataType:'json',
         data:datas,
+        async:asyncs,
         success:callBack,
     })
 }
@@ -180,4 +184,12 @@ $(document).on("change",".fileupdate",function(){
         $(input).val(imgName);
         filesData[encodeURI(imgName)]=this.result
     };
+})
+$(document).on("click",'.tree-plus',function(){
+    var treeId=$(this).data("id")
+    $(treeId).treeview('collapseAll', { silent: true });
+})
+$(document).on("click",'.tree-minus',function(){
+    var treeId=$(this).data("id")
+    $(treeId).treeview('expandAll', { silent: true });
 })

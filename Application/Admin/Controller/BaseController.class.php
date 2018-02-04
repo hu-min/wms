@@ -30,7 +30,7 @@ class BaseController extends \Common\Controller\BaseController{
             'Admin/Index/checkLogin',
             'Admin/Index/Index',
         ];
-        // $this->refreNode();
+        $this->refreNode();
         // print_r($this->nodeAuth);
         // $this->setLogin();
         $nowConAct=MODULE_NAME."/".CONTROLLER_NAME.'/'.ACTION_NAME;
@@ -42,14 +42,53 @@ class BaseController extends \Common\Controller\BaseController{
             }
         }else{
             
+            // 
+            
+            // $reqType=I("reqType");
+            // preg_match("/\S([A-Z]+[\S]*)$/",$reqType,$match);
+            // print_r($match);
+            // if(count($match)<1){
+            //     $reqType="List";
+            // }else{
+            //     $reqType=$match[1];
+            // }
+            // echo $reqType;
+            // if(!in_array($reqType,$this->authority[$this->nodeAuth[$conAct]]) && $this->nodeAuth[$conAct]<7){
+            //     $this->prompt(1,'警告!','您不具备访问此页面的权限，如果您认为值得拥有，请联系管理员！');
+            //     exit;
+            // }  
             $conAct=CONTROLLER_NAME.'/'.ACTION_NAME;
-            preg_match("/\S([A-Z]+[\S]*)$/",$conAct,$match);
-            if(!$match[1] || !in_array($match[1],$this->authority[$this->nodeAuth[$conAct]])){
+            $auth=$this->authVerify($conAct);
+            if(!$auth){
                 $this->prompt(1,'警告!','您不具备访问此页面的权限，如果您认为值得拥有，请联系管理员！');
                 exit;
-            }  
-            
+            }
         }
+        // exit;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-04 00:39:38 
+     * @Desc: 权限验证 
+     */    
+    private function authVerify($conAct){
+        $reqType=I("reqType");
+        if($this->nodeAuth[$conAct]>=7){
+            return true;
+        }
+        if(!in_array($reqType,C("authority.6"))){
+            preg_match("/\S([A-Z]+[\S]*)$/",$reqType,$match);
+            if(count($match)<1){
+                $reqType="List";
+                I("reqType",$reqType);
+            }else{
+                $reqType=$match[1];
+            }
+        }
+        if(in_array($reqType,$this->authority[$this->nodeAuth[$conAct]])){
+            return true;
+        }
+        return false;
     }
     /** 
      * @Author: vition 
@@ -90,6 +129,7 @@ class BaseController extends \Common\Controller\BaseController{
             session('roleId',$userInfo['loginName']);
             session('avatar',$userInfo['avatar']);
             session('usertype',$userInfo['usertype']);
+            $this->userCom->logIORec($userInfo['userId']);
         }
     }
     /** 

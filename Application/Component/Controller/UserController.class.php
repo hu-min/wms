@@ -69,14 +69,14 @@ class UserController extends BaseController{
             return $res;
         }
         $menus=[];
-        $mNodeResult=$this->nodeDB->query("SELECT * FROM v_node WHERE nodeId IN (SELECT nodeId FROM v_role_node WHERE roleId IN (SELECT roleId FROM v_user_role WHERE userId={$userId})) ORDER BY nodePid ASC, `level` ASC, `sort` ASC");
+        $mNodeResult=$this->nodeDB->query("SELECT * FROM v_node n LEFT JOIN (SELECT nodeId,authority FROM v_role_node WHERE roleId IN (SELECT roleId FROM v_user WHERE userId={$userId})) nr ON nr.nodeId=n.nodeId ORDER BY n.nodePid ASC, n.`level` ASC, n.`sort` ASC");
         $newAllNodes = array();
         $mNodes=[];
         if($mNodeResult) {
             foreach ($mNodeResult AS $nodeInfo) {
                 $newAllNodes[$nodeInfo['nodeId']] = $nodeInfo;
                 if($nodeInfo['controller']!=""){
-                    $authority[$nodeInfo['controller']]=$nodeInfo['nodeType'];
+                    $authority[$nodeInfo['controller']]=$nodeInfo['authority'];
                 }
                 
                 if($nodeInfo['nodePid']==0){
@@ -182,5 +182,31 @@ class UserController extends BaseController{
         $res->errCode=111;
         $res->error=getError(111);
         return $res;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-03 00:42:15 
+     * @Desc:  
+     */    
+    function updateUser($userInfo){
+        $res=$this->initRes();
+        $insertResult=$this->userDB->save($userInfo);
+        if($insertResult){
+            $res->errCode=0;
+            $res->error=getError(0);
+            return $res;
+        }
+        $res->errCode=111;
+        $res->error=getError(111);
+        return $res;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-04 00:15:49 
+     * @Desc: 登录退出记录 
+     */    
+    function logIORec($userId){
+        $this->userDB->where(['userId'=>$userId])->setInc("loginNum");
+        $this->userDB->modify(['userId'=>$userId],['lastTime'=>time(),'lastIp'=>ipTolong(getIp())]);
     }
 }
