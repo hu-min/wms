@@ -15,7 +15,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="box box-info">
-                    <div class="box-body search-body">
+                    <div class="box-body search-body" id="user-search-box">
                         <div class="col-md-12">
                             <div class="form-inline">
                                 <label for="loginName" class="control-label">登录名称：</label>
@@ -196,7 +196,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary save-info" data-con="user" data-reqtype="Add" data-url="{$url}">Save changes</button>
+                <button type="button" class="btn btn-primary save-info" data-con="user" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
             </div>
             </div>
         </div>
@@ -205,7 +205,7 @@
         /*查询列表函数*/
         function userSearchFuns(){
             datas['data']={}
-            $(".search-info").each(function(){
+            $(tabId+" .search-info").each(function(){
                 var name=$(this).attr("name");
                 var val=$(this).val();
                 if(val!=""){
@@ -214,28 +214,28 @@
             })
         }
         function userReFuns(){
-            $(".user-status .status-btn").removeClass("active");
-            $(".user-status .status-btn[name='1']").addClass("active");
-            $("#info-status").val("1");
+            $(tabId+" .user-status .status-btn").removeClass("active");
+            $(tabId+" .user-status .status-btn[name='1']").addClass("active");
+            $(tabId+" #info-status").val("1");
         }
         /*设置编辑用户信息*/
         function userShowFuns(info){
-            $("#info-userId").val(info['userId']);
-            $("#info-loginName").val(info['loginName']);
-            $("#info-userName").val(info['userName']);
-            $("#info-avatar").val(info['avatar']);
-            $("#info-phone").val(info['phone']);
-            $("#info-status").val(info['status']);
-            $("#info-gender").find("option[value='"+info['gender']+"']").prop("selected",true);
-            $("#info-userType").find("option[value='"+info['userType']+"']").prop("selected",true);
-            $("#info-roleId").find("option[value='"+info['roleId']+"']").prop("selected",true);
-            $(".user-status .status-btn").removeClass("active");
-            $(".user-status .status-btn[name='"+info['status']+"']").addClass("active");
+            $(tabId+" #info-userId").val(info['userId']);
+            $(tabId+" #info-loginName").val(info['loginName']);
+            $(tabId+" #info-userName").val(info['userName']);
+            $(tabId+" #info-avatar").val(info['avatar']);
+            $(tabId+" #info-phone").val(info['phone']);
+            $(tabId+" #info-status").val(info['status']);
+            $(tabId+" #info-gender").find("option[value='"+info['gender']+"']").prop("selected",true);
+            $(tabId+" #info-userType").find("option[value='"+info['userType']+"']").prop("selected",true);
+            $(tabId+" #info-roleId").find("option[value='"+info['roleId']+"']").prop("selected",true);
+            $(tabId+" .user-status .status-btn").removeClass("active");
+            $(tabId+" .user-status .status-btn[name='"+info['status']+"']").addClass("active");
         }
         /*用户信息*/
         function userInfoFuns(){
             datas.data={}
-            $(".modal-info").each(function(){
+            $(tabId+" .modal-info").each(function(){
                 var name=$(this).attr("name");
                 var val=$(this).val();
                 if(name=="avatar" || name=="phone" || name=='password' || name=="userId"){                    
@@ -247,6 +247,7 @@
                 }
                 datas.data[name]=val
             })
+            atas.data.status=$(tabId+" .status-group .active").attr("name")
         }
     </script>
 </body>

@@ -528,6 +528,7 @@
 
 <script>
     var breadData={};//定义breadcrumb数据
+    var tabId="";//定义当前tab指定的id
     $(document).ready(function () {
         $('.sidebar-menu').tree()
         //菜单点击事件
@@ -598,6 +599,7 @@
     //新建tab    
     function createTab(title,id,content){
         var tab=$("#"+id);
+        tabId="#"+id;
         var nav_tabs=$('.nav-tabs-custom .nav-tabs')
         var tab_content=$('.nav-tabs-custom .tab-content')
         nav_tabs.children('li').removeClass('active');
@@ -630,6 +632,7 @@
         tabPrev.addClass('active');
         conPrev.addClass('active');
         var id=tabPrev.children("a").attr("href");
+        tabId=id;
         if(breadData[id]!=undefined){
             $('.breadcrumb').html(breadData[id])
         }else{
@@ -637,6 +640,10 @@
         }
         delete breadData[id];
     }
+    //切换tab    
+    $(document).on('shown.bs.tab','a[data-toggle="tab"]', function (e) {
+      tabId=$(e.target).attr("href")
+    })
 </script>
 </body>
 </html>

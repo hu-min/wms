@@ -28,4 +28,38 @@ class RoleController extends BaseController{
         }
         return false;
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-06 22:20:42 
+     * @Desc: 添加角色 
+     */    
+    function inserRole($parameter){
+        $res=$this->initRes();
+        $insertResult=$this->roleDB->insert($parameter);
+        if($insertResult){
+            $res->errCode=0;
+            $res->error=getError(0);
+            return $res;
+        }
+        $res->errCode=111;
+        $res->error=getError(111);
+        return $res;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-06 22:39:09 
+     * @Desc: 修改数据 
+     */    
+    function updateRole($parameter){
+        $res=$this->initRes();
+        $insertResult=$this->roleDB->modify($parameter["where"],$parameter["data"]);
+        if($insertResult){
+            $res->errCode=0;
+            $res->error=getError(0);
+            return $res;
+        }
+        $res->errCode=114;
+        $res->error=getError(114);
+        return $res;
+    }
 }

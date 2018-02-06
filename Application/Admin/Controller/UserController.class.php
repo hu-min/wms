@@ -50,7 +50,7 @@ class UserController extends BaseController{
      * @Date: 2018-02-03 00:24:54 
      * @Desc: 处理添加和修改 
      */    
-    function manageInfo(){
+    function manageUserInfo(){
         $reqType=I("reqType");
         $datas=I("data");
         $userInfo=[];
@@ -97,8 +97,8 @@ class UserController extends BaseController{
      * @Date: 2018-01-27 22:45:23 
      * @Desc: 添加、修改用户信息 
      */    
-    function Edit(){
-        $userInfo=$this->manageInfo();
+    function userEdit(){
+        $userInfo=$this->manageUserInfo();
         $updateResult=$this->userCom->updateUser($userInfo);
         if($updateResult->errCode==0){
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
@@ -110,8 +110,8 @@ class UserController extends BaseController{
      * @Date: 2018-02-03 00:25:06 
      * @Desc: 执行添加 
      */    
-    function Add(){
-        $userInfo=$this->manageInfo();
+    function userAdd(){
+        $userInfo=$this->manageUserInfo();
         $insertResult=$this->userCom->insertUser($userInfo);
         if($insertResult->errCode==0){
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
@@ -234,11 +234,64 @@ class UserController extends BaseController{
             $color=$value["status"]!=1?"#FFFF00":null;
             if($value["rolePid"]==0){
                 array_push($level1,$value["roleId"]);
-                array_push($roleTree,["text"=>$value["roleName"],"icon"=>"fa fa-users",'nodes'=>[],"data-id"=>$value["roleId"],"data-status"=>$value["status"],"backColor"=>$backColor,"color"=>$color]);
+                array_push($roleTree,["text"=>$value["roleName"],"icon"=>"fa fa-users",'nodes'=>[],"id"=>$value["roleId"],"status"=>$value["status"],"backColor"=>$backColor,"color"=>$color,"remark"=>$value["remark"]]);
             }else{
-                array_push($roleTree[array_search($value["rolePid"],$level1)]['nodes'],["text"=>$value["roleName"],"icon"=> "fa fa-user","data-id"=>$value["roleId"],"data-status"=>$value["status"],"backColor"=>$backColor,"color"=>$color]);
+                array_push($roleTree[array_search($value["rolePid"],$level1)]['nodes'],["text"=>$value["roleName"],"icon"=> "fa fa-user","id"=>$value["roleId"],"status"=>$value["status"],"backColor"=>$backColor,"color"=>$color,"remark"=>$value["remark"]]);
             }
         }
         $this->ajaxReturn(["tree"=>$roleTree]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-06 18:01:33 
+     * @Desc: 添加角色 
+     */    
+    function roleAdd(){
+        $roleInfo=$this->manageRoleInfo();
+        $insertResult=$this->roleCom->inserRole($roleInfo);
+        if($insertResult->errCode==0){
+            $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-06 21:34:36 
+     * @Desc: 编辑角色 
+     */    
+    function roleEdit(){
+        $roleInfo=$this->manageRoleInfo();
+        $insertResult=$this->roleCom->updateRole($roleInfo);
+        $this->ajaxReturn(['errCode'=>$insertResult->errCode,'error'=>$insertResult->error]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-06 18:03:02 
+     * @Desc: 处理添加和修改角色的数据 
+     */    
+    function manageRoleInfo(){
+        $reqType=I("reqType");
+        $datas=I("data");
+        if($reqType=="roleAdd"){
+            unset($datas['roleId']);
+            return $datas;
+        }else if($reqType=="roleEdit"){
+            $where=["roleId"=>$datas['roleId']];
+            $data=[];
+            if(isset($datas['remark'])){
+                $data['remark']=$datas['remark'];
+            }
+            if(isset($datas['roleName'])){
+                $data['roleName']=$datas['roleName'];
+            }
+            if(isset($datas['rolePid'])){
+                $data['rolePid']=$datas['rolePid'];
+            }
+            if(isset($datas['status'])){
+                $data['status']=$datas['status'];
+            }
+            return ["where"=>$where,"data"=>$data];
+        }
+        
     }
 }

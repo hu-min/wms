@@ -13,146 +13,200 @@
 <body>
     <section class="content">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="box box-success">
                     <div class="box-header">
-                      <i class="fa fa-user-secret"></i>
+                        <i class="fa fa-user-secret"></i>
         
-                      <h3 class="box-title">角色管理</h3>
+                        <h4 class="box-title">角色列表</h4>
         
-                      <div class="box-tools pull-right" data-toggle="tooltip" title="" data-original-title="Status">
+                        <div class="box-tools pull-right" data-toggle="tooltip" title="" data-original-title="Status">
                             <span class="tree-plus handle" data-id="#tree"><i class="fa fa-fw fa-plus-square"></i>收起</span>
                             <span class="tree-minus handle" data-id="#tree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
-                      </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <input class="form-control" id="input-expand-node" placeholder="搜索角色" value="" type="input">
-                    </div>
+                        <div class="form-group">
+                            <input class="form-control" id="input-expand-node" placeholder="搜索角色" value="" type="input">
+                        </div>
                     <div>
                         <div id="tree"></div>
                     </div>
-                    <div class="box-footer">
+                        <div class="box-footer">
                     </div>
-                  </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                    <div class="box box-info"  data-url="{$url}" id="role-search" data-reqtype="roleList" data-con="role">
+                        <div class="box-header">
+                            <i class="fa fa-cog"></i>
+            
+                            <h4 class="box-title">角色管理</h4>
+            
+                            <div class="box-tools pull-right" data-toggle="tooltip" title="" data-original-title="Status">
+                                <span class="tree-plus handle" data-id="#tree"><i class="fa fa-fw fa-plus-square"></i>收起</span>
+                                <span class="tree-minus handle" data-id="#tree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
+                            </div>
+                        </div>
+                        <form class="form-horizontal" id="role-info">
+                            <div class="box-body">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">上级</label>
+                    
+                                    <div class="col-sm-9">
+                                        <input class="form-control superior"  readonly placeholder="上级名称" type="text">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">原名称</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control rolename" readonly  placeholder="角色名称" type="text">
+                                        <input class="role-info" name="roleId"  title="角色id" type="hidden">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">新名称</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control nrolename role-info" name="roleName" title="角色名称" type="text">
+                                        
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">目标上级</label>
+                                    <div class="col-sm-9">
+                                        <select class="form-control role-info" title="目标上级" id="nsuperior" name="rolePid">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">备注</label>
+                                    <div class="col-sm-9">
+                                        <textarea class="form-control  role-info" rows="2" title="备注"  name="remark"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">角色状态</label>
+                                    <div class="btn-group role-status status-group col-sm-9" data-toggle="btn-toggle">
+                                        <button type="button" name="0" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-default"></i> 未激活 </button>
+                                        <button type="button" name="1" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-green"> 激活 </i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.box-body -->
+                            <div class="box-footer">
+                                <button type="button" class="btn btn-success save-info" data-con="role" data-reqtype="Add" data-url="{$url}" data-modal="false">新增</button>
+                                <button type="button" class="btn btn-info pull-right save-info" data-con="role" data-reqtype="Edit" data-url="{$url}" data-modal="false">修改</button>
+                            </div>
+                            <!-- /.box-footer -->
+                        </form>
+                        <div>
+                        </div>
+                            <div class="box-footer">
+                        </div>
+                    </div>
             </div>
             <div class="col-md-3">
-                
-            </div>
-            <div class="col-md-8">
 
             </div>
         </div>
     </section>
-    <div class="modal fade" id="modal-userInfo">
-        <div class="modal-dialog">
-            <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Default Modal</h4>
-            </div>
-            <div class="modal-body">
-                <form role="form">
-                    <div class="box-body">
-                        <div class="form-group">
-                            <label for="info-loginName">登录名：</label>
-                            <input id="info-userId" class="modal-info" title="userId" name="userId" type="hidden">
-                            <input class="form-control modal-info" id="info-loginName" name="loginName" title="登录名" placeholder="登录名" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-userName">用户名：</label>
-                            <input class="form-control modal-info" id="info-userName" name="userName" title="用户名" placeholder="用户名" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-avatar">头像：</label>
-                            <input class="form-control modal-info" id="info-avatar" name="avatar" title="头像" placeholder="头像" type="text">
-                            <input id="exampleInputFile" class="fileupdate" data-input="#info-avatar" type="file">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="info-password">密码：</label>
-                            <input class="form-control modal-info" id="info-password" title="密码" name="password" placeholder="密码" type="password">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-phone">手机号码：</label>
-                            <input class="form-control modal-info" id="info-phone" title="手机号码" name="phone" placeholder="手机号码" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-gender">性别：</label>
-                            <select class="form-control modal-info" title="性别" name="gender" id="info-gender">
-                                <option value="">全部</option>
-                                <option value="1">男性</option>
-                                <option value="2">女性</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="info-userType">用户类型：</label>
-                            <select class="form-control modal-info" title="用户类型" id="info-userType" name="userType">
-                                <option value="">全部</option>
-                                <volist name="userType" id="item">
-                                    <option value="{$key}">{$item}</option>
-                                </volist>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="info-role">角色：</label>
-                            <select class="form-control modal-info" title="角色" name="roleId" id="info-roleId">
-                                <option value="">全部</option>
-                                <volist name="roleList" id="item">
-                                    <option value="{$item['roleId']}">{$item['roleName']}</option>
-                                </volist>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <div class="btn-group user-status status-group" data-toggle="btn-toggle">
-                                <input class="modal-info" id="info-status" value="1" name="status" type="hidden">
-                                <button type="button" name="0" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-default"></i> 未激活 </button>
-                                <button type="button" name="1" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-green"> 激活 </i>
-                                </button>
-                                <button type="button" name="2" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-info"></i> 冻结 </button>
-                                <button type="button" name="3" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-red"></i> 删除 </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>            
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary save-info" data-con="user" data-reqtype="Add" data-url="{$url}">Save changes</button>
-            </div>
-            </div>
-        </div>
-    </div>
     <script src="__ADMINT__/bower_components/bootstrap-treeview/js/bootstrap-treeview.min.js"></script>
     <script>
         var prve=-1;
+        //获取角色数据
         function getTree() {
             var tree=[]
             datas["reqType"]="roleList";
             get("{$url}",datas,function(result){
                 tree=result.tree
             },false)
-            // console.log(tree);
+            var html='<option value="">无</option><option value="0">root</option>';
+            for (const key in tree){
+                html+='<option value="'+tree[key].id+'">'+tree[key].text+'</option>';
+            }
+            $(tabId+" #nsuperior").html(html);
             return tree;
         }
         $(function(){
-            
-            $('#tree').treeview({data: getTree(),levels:1,color: "#428bca",onNodeSelected:function(event, node){
-                
-                console.log(event)
-                console.log(node)
-            }});
-            $('#input-expand-node').on("input",function(){
-                $('#tree').treeview('collapseAll', { silent: true });
+            createTree()
+            //搜索角色
+            $(tabId+' #input-expand-node').on("input",function(){
+                $(tabId+' #tree').treeview('collapseAll', { silent: true });
                 var prveNode=$('#tree').treeview('search', [$('#input-expand-node').val(), {
                     ignoreCase: false,     // case insensitive
                     exactMatch: false,    // like or equals
                     revealResults: true,  // reveal matching nodes
                 }]);
             })
-            
+            $("#nsuperior").on("change",function(){
+                if($(this).val()==0){
+                    $(tabId+' #role-info .superior').val('')
+                    $(tabId+' #role-info .rolename').val('')
+                }
+            })
         })
-        
+        //新增修改信息处理
+        function roleInfoFuns(){
+            datas.data={}
+            $(tabId+" #role-info .role-info").each(function(){
+                var name=$(this).attr("name");
+                var val=$(this).val();
+                var title=$(this).attr("title");
+                if(datas.reqType=="roleAdd" && (name=='roleName' || name=='rolePid') && val==""){
+                    alert(title+"不能为空");
+                    throw title+"不能为空"
+                }else{
+                    if(name=='roleId' && val==""){
+                        alert("没有选中角色");
+                        throw "没有选中角色"
+                    }
+                }
+                if(val!==""){
+                    datas.data[name]=val
+                }
+            })
+            datas.data.status=$(tabId+" .status-group .active").attr("name")
+            console.log(datas)
+        }
+        function roleSearchFuns(){
+            createTree()
+            clearRoleInfo()
+        }
+        //生成角色树和角色树选中的事件
+        function createTree(){
+            $(tabId+' #tree').treeview({data: getTree(),levels:1,color: "#428bca",onNodeSelected:function(event, node){
+                if(node.parentId==undefined){
+                    var superior=node.text
+                }else{
+                    var parent= $('#tree').treeview('getNode', node.parentId);
+                    var superior=parent.text
+                    
+                }
+                $(tabId+" #role-info .rolename").val(node.text)
+                $(tabId+" #role-info .superior").val(superior)
+                var id=node.id
+                var status=node.status
+                var remark=node.remark
+                $(tabId+" .role-info[name='remark']").val(remark);
+                $(tabId+" #role-info input[name='roleId']").val(id);
+                $(tabId+" #role-info .role-status .status-btn").removeClass("active");
+                $(tabId+" #role-info .role-status .status-btn[name='"+status+"']").addClass("active");
+                
+                // console.log(id);
+                // console.log(status);
+                // console.log(node.parentId);
+                // console.log(event)
+                // console.log(node)
+            },onNodeUnselected:function(){
+                clearRoleInfo()
+            }});
+        }
+        //清空角色数据
+        function clearRoleInfo(){
+            $(tabId+" #role-info .role-info").val("")
+            $(tabId+" #role-info input").val("")
+            $(tabId+" #role-info input").val("")
+        }
     </script>
 </body>
 </html>
