@@ -8,6 +8,8 @@ class UserController extends BaseController{
     public function _initialize() {
         parent::_initialize();
         $this->roleCom=getComponent('Role');
+        $this->nodeCom=getComponent('Node');
+        $this->rNodeCom=getComponent('RoleNode');
     }
     /*用户管理*/
     /** 
@@ -264,6 +266,24 @@ class UserController extends BaseController{
         $insertResult=$this->roleCom->updateRole($roleInfo);
         $this->ajaxReturn(['errCode'=>$insertResult->errCode,'error'=>$insertResult->error]);
     }
+    function rnodeOne(){
+        $roleId=I("roleId",0,'int');
+        $parameter=[
+            'where'=>['roleId'=>$roleId],
+            'page'=>0,
+            'pageSize'=>9999,
+            'orderStr'=>'rnId ASC',
+        ];
+        $rNodeResult=$this->rNodeCom->getRNodeList($parameter);
+        $authList=[];
+        if($rNodeResult){
+            $authList=$rNodeResult['list'];
+        }
+        $this->assign("nodeTree",$this->getNodeTree());
+        $this->assign("auth",json_encode($authList));
+        $this->log($authList);
+        $this->ajaxReturn(['errCode'=>0,'info'=>$this->fetch("User/roleNodeControl")]);
+    }
     /** 
      * @Author: vition 
      * @Date: 2018-02-06 18:03:02 
@@ -292,6 +312,200 @@ class UserController extends BaseController{
             }
             return ["where"=>$where,"data"=>$data];
         }
+    }
+    /*节点控制*/
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-06 23:24:00 
+     * @Desc: 节点控制 
+     */    
+    function nodeControl(){
+        $regFrom=C("regFrom");
+        $reqType=I('reqType');
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            $this->returnHtml();
+        }
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-06 23:24:11 
+     * @Desc: 节点列表 
+     */    
+    function nodeList(){
+        $this->ajaxReturn(["tree"=>$this->getNodeTree()]);
+    }
+    function getNodeTree(){
+        $parameter=[
+            'page'=>0,
+            'pageSize'=>9999,
+            'orderStr'=>'level DESC,sort ASC',
+        ];
+        $nodeResult=$this->nodeCom->getNodeList($parameter);
+        $nodeTree=[];
+        $level=[];
+        $newAllNodes=[];
         
+        $nodeArray=$nodeResult["list"];
+        foreach ($nodeArray AS $key => $nodeInfo) {
+            $level[$nodeInfo["level"]][$nodeInfo["nodePid"]][]= $nodeInfo;
+            unset($nodeArray[$key]);
+        }
+        $this->Redis->set("nodeArray",json_encode($nodeResult["list"]),3600);
+        asort($level);
+        foreach ($level[1] as $key => $node) {
+            foreach ($node as $key1 => $node1) {
+                $temp1=["text"=>$node1["nodeTitle"],"icon"=>$node1["nodeIcon"],"id"=>$node1["nodeId"]];
+                if($level[2][$node1["nodeId"]]){
+                    $temp1['nodes']=[];
+                }
+                array_push($nodeTree,$temp1);
+                if($level[2]){
+                    foreach ($level[2] as $key2 => $node2) {
+                        foreach ($node2 as $key22 => $node22) {
+                            if($node1['nodeId']==$node22["nodePid"]){
+                                $temp2=["text"=>$node22["nodeTitle"],"icon"=>$node22["nodeIcon"],"id"=>$node22["nodeId"]];
+                                if($level[3][$node22["nodeId"]]){
+                                    $temp2['nodes']=[];
+                                }
+                                array_push($nodeTree[$key1]['nodes'],$temp2);
+                                if($level[3]){
+                                    foreach ($level[3] as $key3 => $node3) {
+                                        foreach ($node3 as $key33 => $node33) {
+                                            if($node22['nodeId']==$node33["nodePid"]){
+                                                $temp3=["text"=>$node33["nodeTitle"],"icon"=>$node33["nodeIcon"],"id"=>$node33["nodeId"]];
+                                                if($level[4][$node33["nodeId"]]){
+                                                    $temp3['nodes']=[];
+                                                }
+                                                array_push($nodeTree[$key1]['nodes'][$key22]['nodes'],$temp3);
+                                                if($level[4]){
+                                                    foreach ($level[4] as $key4 => $node4) {
+                                                        foreach ($node4 as $key44 => $node44) {
+                                                            if($node22['nodeId']==$node44["nodePid"]){
+                                                                array_push($nodeTree[$key1]['nodes'][$key22]['nodes'][$key33]['nodes'],["text"=>$node44["nodeTitle"],"icon"=>$node44["nodeIcon"],"id"=>$node44["nodeId"]]);
+                                                            }                         
+                                                        }
+                                                    }
+                                                }
+                                            }                         
+                                        }
+                                    }
+                                }
+                            }                         
+                        }
+                    }
+                }
+            }
+        }
+        return $nodeTree;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-22 18:42:35 
+     * @Desc: 获取单个节点信息 
+     */    
+    function nodeOne(){
+        $nodeId	=I("nodeId");
+        $nodeInfo=$this->getNodeOne($nodeId);
+        if(!empty($nodeInfo)){
+            $this->ajaxReturn(['errCode'=>0,'info'=>$nodeInfo]);
+        }
+        $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-22 23:21:29 
+     * @Desc: get单条节点信息 
+     */    
+    function getNodeOne($nodeId){
+        $parameter=[
+            'nodeId'=>$nodeId,
+        ];
+        $nListRed="nodeArray";
+        $nodeList=$this->Redis->get($nListRed);
+        if($nodeList){
+            foreach ($nodeList as $node) {
+                if($node['nodeId']==$nodeId){
+                    return $node;
+                }
+            }
+        }
+        $nodeResult=$this->nodeCom->getNodeOne($parameter);
+        if($nodeResult->errCode==0){
+            return $nodeResult->data['list'];
+        }
+        return [];
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-22 22:43:55 
+     * @Desc: 添加节点 
+     */    
+    function nodeAdd(){
+        $nodeInfo=$this->manageNodeInfo();
+        $insertResult=$this->nodeCom->inserNode($nodeInfo);
+        if($insertResult->errCode==0){
+            $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-22 23:11:49 
+     * @Desc: 编辑节点 
+     */    
+    function nodeEdit(){
+        $nodeInfo=$this->manageNodeInfo();
+        $updateResult=$this->nodeCom->updateNode($nodeInfo);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-23 10:05:33 
+     * @Desc: 节点数据处理 
+     */    
+    function manageNodeInfo(){
+        $reqType=I("reqType");
+        $datas=I("data");
+        $nodePInfo=$this->getNodeOne($datas['nodePid']);
+        $datas['level']=$nodePInfo['level']+1;
+        if($reqType=="nodeAdd"){
+            unset($datas['nodeId']);
+            return $datas;
+        }else if($reqType=="nodeEdit"){
+            $where=["nodeId"=>$datas['nodeId']];
+            $data=[];
+
+            if(isset($datas['controller'])){
+                $data['controller']=$datas['controller'];
+            }
+            if(isset($datas['nodeIcon'])){
+                $data['nodeIcon']=$datas['nodeIcon'];
+            }
+            if(isset($datas['nodePid'])){
+                $data['nodePid']=$datas['nodePid'];
+            }
+            if(isset($datas['nodeTitle'])){
+                $data['nodeTitle']=$datas['nodeTitle'];
+            }
+            if(isset($datas['sort'])){
+                $data['sort']=$datas['sort'];
+            }
+            $data['level']=$datas['level'];
+            if(isset($datas['status'])){
+                $data['status']=$datas['status'];
+            }
+            return ["where"=>$where,"data"=>$data];
+        }
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-23 10:07:12 
+     * @Desc: 获取iconlist 
+     */    
+    function iconList(){
+        $this->ajaxReturn(['errCode'=>0,'info'=>$this->fetch("Index/Icons")]);
     }
 }

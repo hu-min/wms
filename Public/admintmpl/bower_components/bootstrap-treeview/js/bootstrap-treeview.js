@@ -605,6 +605,17 @@
 						);
 				});
 			}
+			// Add edit button
+			if (_this.options.showButton) {
+				if(_this.options.butTitle){
+					var butTitle=_this.options.butTitle
+				}else{
+					var butTitle="编辑"
+				}
+				treeItem
+					.append($(_this.template.button).text(butTitle)
+					);
+			}
 
 			// Add item to the tree
 			_this.$wrapper.append(treeItem);
@@ -692,7 +703,8 @@
 		indent: '<span class="indent"></span>',
 		icon: '<span class="icon"></span>',
 		link: '<a href="#" style="color:inherit;"></a>',
-		badge: '<span class="badge"></span>'
+		badge: '<span class="badge"></span>',
+		button: '<button type="button" style="float:right;background-color: #00c0ef;border: 1px solid transparent;border-radius: 3px;box-shadow: none;color: #fff;">编辑</button>',
 	};
 
 	Tree.prototype.css = '.treeview .list-group-item{cursor:pointer}.treeview span.indent{margin-left:10px;margin-right:10px}.treeview span.icon{width:12px;margin-right:5px}.treeview .node-disabled{color:silver;cursor:not-allowed}'

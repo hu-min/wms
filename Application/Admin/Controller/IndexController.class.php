@@ -28,7 +28,6 @@ class IndexController extends BaseController{
             $this->redirect('Index/LogOut');
         }
         $nodeResult=$this->userCom->getUserNode($this->userId);
-        // print_r($nodeResult->data);
         // $this->createNode($nodeResult->data);
         $this->assign('nodeList',$nodeResult->data['node']);
         $logout="Index/logOut";

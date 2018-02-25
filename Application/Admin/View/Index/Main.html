@@ -8,6 +8,7 @@
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.7 -->
   <link rel="stylesheet" href="__ADMINT__/bower_components/bootstrap/dist/css/bootstrap.min.css">
+  
   <!-- Font Awesome -->
   <link rel="stylesheet" href="__ADMINT__/bower_components/font-awesome/css/font-awesome.min.css">
   <!-- Ionicons -->
@@ -294,10 +295,10 @@
 
     <!-- Main content -->
     <section class="content">
-        <div class="nav-tabs-custom">
-            <ul class="nav nav-tabs tabs-head">
+        <div id="main-navs" class="nav-tabs-custom">
+            <ul class="nav nav-tabs tabs-head main-tabs">
             </ul>
-            <div class="tab-content">
+            <div class="main-tabs-content tab-content">
             </div>
             <!-- /.tab-content -->
         </div>
@@ -524,6 +525,9 @@
 
 <script src="__ADMINT__/dist/js/vwms.js"></script>
 
+<script src="__ADMINT__/bower_components/bootstrap-treeview/js/bootstrap-treeview.js"></script>
+<script src="__ADMINT__/bower_components/chosen/js/chosen.jquery.js"></script>
+
 <!-- AdminLTE for demo purposes -->
 
 <script>
@@ -545,12 +549,10 @@
                 if(controller!='/Admin/Index/Main'+SUFFIX){
                     get(controller,{},function(result){
                         createTab(title,"vtabs"+nodeid,result.html);
-                        return;
                     });
-                    createTab(title,"vtabs"+nodeid,'');
+                }else{
+                  createTab(title,"vtabs"+nodeid,'');
                 }
-                
-                
             }
         })
         //标签删除显示和隐藏
@@ -560,12 +562,12 @@
         $(".content").on("mouseout",".tabs-head li",function(){
             $(this).children('.tab-clo').addClass('none');
         })
-        $('.nav-tabs-custom').on("click",".tab-clo",function(){
+        $('#main-navs').on("click",".tab-clo",function(){
             var id=$(this).next("a").attr("href");
             var el=$(this).parents("li");
             delTab(el,id);
         })
-        $('.nav-tabs-custom').on("click","a",function(){
+        $('#main-navs').on("click","a",function(){
             var nodeid=$(this).attr("href");
             breadHtml=breadData[nodeid];
             $('.breadcrumb').html(breadHtml)
@@ -600,8 +602,8 @@
     function createTab(title,id,content){
         var tab=$("#"+id);
         tabId="#"+id;
-        var nav_tabs=$('.nav-tabs-custom .nav-tabs')
-        var tab_content=$('.nav-tabs-custom .tab-content')
+        var nav_tabs=$("#main-navs .main-tabs")
+        var tab_content=$('#main-navs .main-tabs-content')
         nav_tabs.children('li').removeClass('active');
         tab_content.children('div').removeClass('active');
         if(tab.length>0){
@@ -624,11 +626,11 @@
             var tabPrev=el.prev()
             var conPrev=$(id).prev()
         }
-        $('.nav-tabs-custom .tabs-head').children("li").removeClass("active");
-        $('.nav-tabs-custom .tab-content').children('div').removeClass("active");
+        $('#main-navs .tabs-head').children("li").removeClass("active");
+        $('#main-navs .tab-content').children('div').removeClass("active");
         el.remove();
         $(id).remove();
-        var tab_content=$('.nav-tabs-custom .tab-content')
+        var tab_content=$('#main-navs .tab-content')
         tabPrev.addClass('active');
         conPrev.addClass('active');
         var id=tabPrev.children("a").attr("href");
@@ -641,8 +643,10 @@
         delete breadData[id];
     }
     //切换tab    
-    $(document).on('shown.bs.tab','a[data-toggle="tab"]', function (e) {
+    $("#main-navs").on('shown.bs.tab','.main-tabs a[data-toggle="tab"]', function (e) {
       tabId=$(e.target).attr("href")
+      console.log($(tabId).hasClass("active"));
+      $(tabId).addClass("active");
     })
 </script>
 </body>

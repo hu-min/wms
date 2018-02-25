@@ -69,7 +69,7 @@ class UserController extends BaseController{
             return $res;
         }
         $menus=[];
-        $mNodeResult=$this->nodeDB->query("SELECT * FROM v_node n LEFT JOIN (SELECT nodeId,authority FROM v_role_node WHERE roleId IN (SELECT roleId FROM v_user WHERE userId={$userId})) nr ON nr.nodeId=n.nodeId ORDER BY n.nodePid ASC, n.`level` ASC, n.`sort` ASC");
+        $mNodeResult=$this->nodeDB->query("SELECT * FROM v_node n INNER JOIN (SELECT nodeId,authority FROM v_role_node WHERE roleId IN (SELECT roleId FROM v_user WHERE userId={$userId} AND authority>0)) nr ON nr.nodeId=n.nodeId ORDER BY n.nodePid ASC, n.`level` ASC, n.`sort` ASC");
         $newAllNodes = array();
         $mNodes=[];
         if($mNodeResult) {
@@ -78,7 +78,6 @@ class UserController extends BaseController{
                 if($nodeInfo['controller']!=""){
                     $authority[$nodeInfo['controller']]=$nodeInfo['authority'];
                 }
-                
                 if($nodeInfo['nodePid']==0){
                     array_push($mNodes,['nodeId'=>$nodeInfo['nodeId'],'showType'=>$nodeInfo['showType']]);
                 }

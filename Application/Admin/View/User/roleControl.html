@@ -8,6 +8,11 @@
     <eq name="load" value="true">
         <include file="Index/Heads" /> 
     </eq>
+    <style>
+        #modal-role-node .modal-dialog {position: absolute;top: 0;bottom: 0;left: 0;right: 0;} 
+        #modal-role-node .modal-content {position: absolute;top: 0;bottom: 0;width: 100%;} 
+        #modal-role-node .modal-body {overflow-y: scroll;position: absolute;top: 55px;bottom: 65px;width: 100%;} 
+    </style>
     <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
 </head>
 <body>
@@ -21,15 +26,15 @@
                         <h4 class="box-title">角色列表</h4>
         
                         <div class="box-tools pull-right" data-toggle="tooltip" title="" data-original-title="Status">
-                            <span class="tree-plus handle" data-id="#tree"><i class="fa fa-fw fa-plus-square"></i>收起</span>
-                            <span class="tree-minus handle" data-id="#tree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
+                            <span class="tree-plus handle" data-id="#roletree"><i class="fa fa-fw fa-plus-square"></i>收起</span>
+                            <span class="tree-minus handle" data-id="#roletree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
                         </div>
                     </div>
                         <div class="form-group">
                             <input class="form-control" id="input-expand-node" placeholder="搜索角色" value="" type="input">
                         </div>
                     <div>
-                        <div id="tree"></div>
+                        <div id="roletree"></div>
                     </div>
                         <div class="box-footer">
                     </div>
@@ -43,8 +48,8 @@
                             <h4 class="box-title">角色管理</h4>
             
                             <div class="box-tools pull-right" data-toggle="tooltip" title="" data-original-title="Status">
-                                <span class="tree-plus handle" data-id="#tree"><i class="fa fa-fw fa-plus-square"></i>收起</span>
-                                <span class="tree-minus handle" data-id="#tree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
+                                <span class="tree-plus handle" data-id="#roletree"><i class="fa fa-fw fa-plus-square"></i>收起</span>
+                                <span class="tree-minus handle" data-id="#roletree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
                             </div>
                         </div>
                         <form class="form-horizontal" id="role-info">
@@ -110,11 +115,23 @@
             </div>
         </div>
     </section>
-    <script src="__ADMINT__/bower_components/bootstrap-treeview/js/bootstrap-treeview.min.js"></script>
+    <div class="modal fade" id="modal-role-node">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary save-info" data-con="role" data-reqtype="Edit" data-url="{$url}" data-modal="true">修改</button>
+            </div>
+            </div>
+        </div>
+    </div>
     <script>
         var prve=-1;
         //获取角色数据
-        function getTree() {
+        function getRoleTree() {
             var tree=[]
             datas["reqType"]="roleList";
             get("{$url}",datas,function(result){
@@ -128,11 +145,11 @@
             return tree;
         }
         $(function(){
-            createTree()
+            createRoleTree()
             //搜索角色
             $(tabId+' #input-expand-node').on("input",function(){
-                $(tabId+' #tree').treeview('collapseAll', { silent: true });
-                var prveNode=$('#tree').treeview('search', [$('#input-expand-node').val(), {
+                $(tabId+' #roletree').treeview('collapseAll', { silent: true });
+                var prveNode=$('#roletree').treeview('search', [$('#input-expand-node').val(), {
                     ignoreCase: false,     // case insensitive
                     exactMatch: false,    // like or equals
                     revealResults: true,  // reveal matching nodes
@@ -166,19 +183,19 @@
                 }
             })
             datas.data.status=$(tabId+" .status-group .active").attr("name")
-            console.log(datas)
+            // console.log(datas)
         }
         function roleSearchFuns(){
-            createTree()
+            createRoleTree()
             clearRoleInfo()
         }
         //生成角色树和角色树选中的事件
-        function createTree(){
-            $(tabId+' #tree').treeview({data: getTree(),levels:1,color: "#428bca",onNodeSelected:function(event, node){
+        function createRoleTree(){
+            $(tabId+' #roletree').treeview({showButton: true,butTitle:'权限',data: getRoleTree(),levels:1,color: "#428bca",onNodeSelected:function(event, node){
                 if(node.parentId==undefined){
                     var superior=node.text
                 }else{
-                    var parent= $('#tree').treeview('getNode', node.parentId);
+                    var parent= $(tabId+' #roletree').treeview('getNode', node.parentId);
                     var superior=parent.text
                     
                 }
@@ -191,15 +208,21 @@
                 $(tabId+" #role-info input[name='roleId']").val(id);
                 $(tabId+" #role-info .role-status .status-btn").removeClass("active");
                 $(tabId+" #role-info .role-status .status-btn[name='"+status+"']").addClass("active");
-                
-                // console.log(id);
-                // console.log(status);
-                // console.log(node.parentId);
-                // console.log(event)
-                // console.log(node)
             },onNodeUnselected:function(){
                 clearRoleInfo()
             }});
+            $(tabId+' #roletree').on("click",'li button',function(){
+                var roleData= $(tabId+' #roletree').treeview('getNode', $(this).parent(".node-roletree").data("nodeid"));
+                datas["roleId"]=roleData.id;
+                datas["reqType"]='rnodeOne';
+                get("{$url}",datas,function(result){
+                    if(result.errCode==0){
+                        $(tabId+" #modal-role-node .modal-body").html(result.info);
+                        $(tabId+" #modal-role-node").modal("show");
+                    }
+                    
+                })
+            })
         }
         //清空角色数据
         function clearRoleInfo(){

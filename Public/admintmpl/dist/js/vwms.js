@@ -149,20 +149,24 @@ $(document).on("click",'.save-info',function(){
     if(JSON.stringify(filesData)!="{}"){
         datas['filesData']=filesData
     }
+    console.log(datas);
     post(url,datas,function(result){
         if(result.errCode==0){
             datas={}
             var url=$("#"+search).data("url");
-            var con=$("#"+search).data("con");
+            var con2=$("#"+search).data("con");
+            if(con2==undefined){
+                con2=con;
+            }
             // console.log(search);
             var reqtype=$("#"+search).data("reqtype");
-            var table=con+"Table";
-            var page=con+"Page";
+            var table=con2+"Table";
+            var page=con2+"Page";
             datas.reqType=reqtype;
-            eval(con+"SearchFuns()");//对不同的id设置不同的发送数据
+            eval(con2+"SearchFuns()");//对不同的id设置不同的发送数据
             if(isModal){
                 searchFun(url,datas,table,page)
-                $("#"+parent).modal('toggle')
+                $(tabId+" #"+parent).modal('toggle')
             }
         }else{
             alert(result.error)
