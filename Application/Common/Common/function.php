@@ -103,3 +103,40 @@ function base64Img($data,$scr="",$name=""){
         return ['errCode'=>110,'error'=>"文件保存失败"];
     }
 }
+/** 
+ * @Author: vition 
+ * @Date: 2018-02-26 22:38:16 
+ * @Desc: 设置节点树 
+ */
+function setNodeTree($param=[]){
+    if(!$param["nodeList"]){
+        return [];
+    }
+    $level=$param["level"]?$param["level"]:"level";
+    $id=$param["id"]?$param["id"]:"id";
+    $pid=$param["pid"]?$param["pid"]:"pid";
+    $nodes=$param["nodes"]?$param["nodes"]:"nodes";
+    $nodeLevel=[];
+    foreach ($param["nodeList"] as $value) {
+        $nodeLevel[$value[$level]][]=$value;
+    }
+    //内部设置树    
+    function _setTree($nodeLevel,$i,$id,$pid,$nodes){
+        if(isset($nodeLevel[$i+1])){
+            $temp=_setTree($nodeLevel,$i+1,$id,$pid,$nodes);
+            $tempArr=[];
+            foreach ($nodeLevel[$i] as $key => $value) {
+                foreach ($temp as $keySub => $valueSub) { 
+                    if($value[$id]==$valueSub[$pid]){
+                        $value[$nodes][$valueSub[$id]]=$valueSub;
+                    }
+                }
+                $tempArr[$value[$id]]=$value;
+            }
+            return $tempArr;
+        }else{
+            return $nodeLevel[$i];
+        }
+    }
+    return [$nodes=>_setTree($nodeLevel,1,$id,$pid,$nodes)];
+}

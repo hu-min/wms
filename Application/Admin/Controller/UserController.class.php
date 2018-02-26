@@ -266,6 +266,14 @@ class UserController extends BaseController{
         $insertResult=$this->roleCom->updateRole($roleInfo);
         $this->ajaxReturn(['errCode'=>$insertResult->errCode,'error'=>$insertResult->error]);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-25 16:56:20 
+     * @Desc: 角色节点权限 
+     */    
+    function rolerNodeEdit(){
+        $this->ajaxReturn(['errCode'=>1,'error'=>""]);
+    }
     function rnodeOne(){
         $roleId=I("roleId",0,'int');
         $parameter=[

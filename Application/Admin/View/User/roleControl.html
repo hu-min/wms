@@ -123,7 +123,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary save-info" data-con="role" data-reqtype="Edit" data-url="{$url}" data-modal="true">修改</button>
+                <button type="button" class="btn btn-primary save-info" data-con="role" data-reqtype="rNodeEdit" data-url="{$url}" data-modal="true">修改</button>
             </div>
             </div>
         </div>
@@ -172,7 +172,7 @@
                 if(datas.reqType=="roleAdd" && (name=='roleName' || name=='rolePid') && val==""){
                     alert(title+"不能为空");
                     throw title+"不能为空"
-                }else{
+                }else if(datas.reqType=="roleEdit"){
                     if(name=='roleId' && val==""){
                         alert("没有选中角色");
                         throw "没有选中角色"
@@ -183,6 +183,14 @@
                 }
             })
             datas.data.status=$(tabId+" .status-group .active").attr("name")
+            if(datas.reqType=="rolerNodeEdit"){
+                datas.roleId=datas.data.roleId
+                datas.data={}
+                $("#modal-role-node .modal-body .auth-val").each(function(){
+                    datas.data[$(this).data("id")]=$(this).val()
+                })
+                console.log(datas)
+            }
             // console.log(datas)
         }
         function roleSearchFuns(){

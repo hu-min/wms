@@ -40,23 +40,7 @@ class BaseController extends \Common\Controller\BaseController{
             }elseif($this->isLogin() && ACTION_NAME=='Login'){
                 $this->redirect('Index/Main');
             }
-        }else{
-            
-            // 
-            
-            // $reqType=I("reqType");
-            // preg_match("/\S([A-Z]+[\S]*)$/",$reqType,$match);
-            // print_r($match);
-            // if(count($match)<1){
-            //     $reqType="List";
-            // }else{
-            //     $reqType=$match[1];
-            // }
-            // echo $reqType;
-            // if(!in_array($reqType,$this->authority[$this->nodeAuth[$conAct]]) && $this->nodeAuth[$conAct]<7){
-            //     $this->prompt(1,'警告!','您不具备访问此页面的权限，如果您认为值得拥有，请联系管理员！');
-            //     exit;
-            // }  
+        }else{ 
             $conAct=CONTROLLER_NAME.'/'.ACTION_NAME;
             $auth=$this->authVerify($conAct);
             if(!$auth){
@@ -77,7 +61,7 @@ class BaseController extends \Common\Controller\BaseController{
             return true;
         }
         if(!in_array($reqType,C("authority.6"))){
-            preg_match("/\S([A-Z]+[\S]*)$/",$reqType,$match);
+            preg_match("/\S([A-Z]+[^[A-Z]*\S]*)$/",$reqType,$match);
             if(count($match)<1){
                 $reqType="List";
                 I("reqType",$reqType);

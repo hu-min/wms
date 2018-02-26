@@ -69,51 +69,24 @@ class UserController extends BaseController{
             return $res;
         }
         $menus=[];
-        $mNodeResult=$this->nodeDB->query("SELECT * FROM v_node n INNER JOIN (SELECT nodeId,authority FROM v_role_node WHERE roleId IN (SELECT roleId FROM v_user WHERE userId={$userId} AND authority>0)) nr ON nr.nodeId=n.nodeId ORDER BY n.nodePid ASC, n.`level` ASC, n.`sort` ASC");
+        $mNodeResult=$this->nodeDB->query("SELECT * FROM v_node n INNER JOIN (SELECT nodeId,authority FROM v_role_node WHERE roleId IN (SELECT roleId FROM v_user WHERE userId={$userId} AND authority>0)) nr ON nr.nodeId=n.nodeId WHERE n.showType=1 ORDER BY n.nodePid ASC, n.`level` ASC, n.`sort` ASC");
         $newAllNodes = array();
         $mNodes=[];
+        $menus=setNodeTree(["nodeList"=>$mNodeResult,"id"=>"nodeId","pid"=>"nodePid","nodes"=>"node"]);
+
         if($mNodeResult) {
             foreach ($mNodeResult AS $nodeInfo) {
                 $newAllNodes[$nodeInfo['nodeId']] = $nodeInfo;
                 if($nodeInfo['controller']!=""){
                     $authority[$nodeInfo['controller']]=$nodeInfo['authority'];
                 }
-                if($nodeInfo['nodePid']==0){
-                    array_push($mNodes,['nodeId'=>$nodeInfo['nodeId'],'showType'=>$nodeInfo['showType']]);
-                }
             }
-            $mNodeResult = &$newAllNodes;
         }else{
             $res->errCode=10001;
             $res->error=getError(10001);
             return $res;
         }
-        foreach ($mNodes as $node1) {
-            if($node1['showType']==1){
-                $menus['node'][$node1['nodeId']]=$mNodeResult[$node1['nodeId']];
-                unset($mNodeResult[$node1['nodeId']]);
-                foreach ($mNodeResult as $node2) {
-                    if($node1['nodeId']==$node2['nodePid'] && $node2['showType']==1){
-                        $menus['node'][$node1['nodeId']]['node'][$node2['nodeId']]=$node2;
-                        unset($mNodeResult[$node2['nodeId']]);
-                        foreach ($mNodeResult as $node3) {
-                            if($node2['nodeId']==$node3['nodePid'] && $node3['showType']==1){
-                                $menus['node'][$node1['nodeId']]['node'][$node2['nodeId']]['node'][$node3['nodeId']]=$node3;
-                                unset($mNodeResult[$node3['nodeId']]);
-                                foreach ($mNodeResult as $node4) {
-                                    if($node3['nodeId']==$node4['nodePid']  && $node4['showType']==1){
-                                        $menus['node'][$node1['nodeId']]['node'][$node2['nodeId']]['node'][$node3['nodeId']]['node'][$node4['nodeId']]=$node4;
-                                        unset($mNodeResult[$node2['nodeId']]);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
         session('nodeAuth',$authority);
-        // print_r($menus);
         $this->Redis->set($refreNode,2,3600);
         $this->Redis->set($nodeName,$menus,3600);
         $res->errCode=10001;

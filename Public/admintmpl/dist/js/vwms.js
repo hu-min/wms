@@ -149,7 +149,7 @@ $(document).on("click",'.save-info',function(){
     if(JSON.stringify(filesData)!="{}"){
         datas['filesData']=filesData
     }
-    console.log(datas);
+    // console.log(datas);
     post(url,datas,function(result){
         if(result.errCode==0){
             datas={}
