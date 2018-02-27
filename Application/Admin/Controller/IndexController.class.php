@@ -28,7 +28,6 @@ class IndexController extends BaseController{
             $this->redirect('Index/LogOut');
         }
         $nodeResult=$this->userCom->getUserNode($this->userId);
-        // print_r($nodeResult->data);
         // $this->createNode($nodeResult->data);
         $this->assign('nodeList',$nodeResult->data['node']);
         $logout="Index/logOut";
@@ -44,7 +43,7 @@ class IndexController extends BaseController{
         $data=I('data');
         $userResult=$this->userCom->checkUser($data);
         if($userResult->errCode==0){
-           $this->setLogin($userResult->data);
+            $this->setLogin($userResult->data);
         }
         $this->ajaxReturn($userResult);
     }

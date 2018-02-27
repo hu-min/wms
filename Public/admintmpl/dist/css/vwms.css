@@ -14,3 +14,9 @@
 .none{
   display:none;
 }
+.handle{
+  cursor:pointer;
+}
+.handle:hover{
+  color: #428BCA;
+}

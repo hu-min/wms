@@ -4,11 +4,13 @@
  * @Desc: get方式获取数据 
  */    
 function get(url,datas,callBack){
+    asyncs=arguments[3]!=undefined?arguments[3]:true;
     $.ajax({
         url:url,
         type:'get',
         dataType:'json',
         data:datas,
+        async:asyncs,
         success:callBack,
     })
 /** 
@@ -18,11 +20,13 @@ function get(url,datas,callBack){
  * @Desc: post发送 
  */}
 function post(url,datas,callBack){
+    asyncs=arguments[3]!=undefined?arguments[3]:true;
     $.ajax({
         url:url,
         type:'post',
         dataType:'json',
         data:datas,
+        async:asyncs,
         success:callBack,
     })
 }
@@ -112,8 +116,6 @@ $(document).on("click",".info-edit",function(){
 $(document).on("click",'.status-btn',function(){
     $(this).parents(".status-group").children(".status-btn").removeClass("active");
     $(this).addClass("active");
-    var status=$(this).attr("name");
-    $(this).parents(".status-group").children("input[name='status']").val(status);
 })
 /** 
  * javascript comment 
@@ -137,27 +139,35 @@ $(document).on("click",'.save-info',function(){
     var url=$(this).data("url");
     var reqtype=$(this).data("reqtype");
     var con=$(this).data("con");
+    var isModal=$(this).data("modal");
     var search=con+"-search";
     var parent=$(this).parents(".modal").attr("id")
-    console.log(parent);
-    datas.reqType=reqtype;
+    
+    datas.reqType=con+reqtype;
     eval(con+"InfoFuns()");//对不同的id设置不同的发送数据
     
     if(JSON.stringify(filesData)!="{}"){
         datas['filesData']=filesData
     }
+    // console.log(datas);
     post(url,datas,function(result){
         if(result.errCode==0){
             datas={}
             var url=$("#"+search).data("url");
-            var con=$("#"+search).data("con");
+            var con2=$("#"+search).data("con");
+            if(con2==undefined){
+                con2=con;
+            }
+            // console.log(search);
             var reqtype=$("#"+search).data("reqtype");
-            var table=con+"Table";
-            var page=con+"Page";
+            var table=con2+"Table";
+            var page=con2+"Page";
             datas.reqType=reqtype;
-            eval(con+"SearchFuns()");//对不同的id设置不同的发送数据
-            searchFun(url,datas,table,page)
-            $("#"+parent).modal('toggle')
+            eval(con2+"SearchFuns()");//对不同的id设置不同的发送数据
+            if(isModal){
+                searchFun(url,datas,table,page)
+                $(tabId+" #"+parent).modal('toggle')
+            }
         }else{
             alert(result.error)
         }
@@ -180,4 +190,12 @@ $(document).on("change",".fileupdate",function(){
         $(input).val(imgName);
         filesData[encodeURI(imgName)]=this.result
     };
+})
+$(document).on("click",'.tree-plus',function(){
+    var treeId=$(this).data("id")
+    $(treeId).treeview('collapseAll', { silent: true });
+})
+$(document).on("click",'.tree-minus',function(){
+    var treeId=$(this).data("id")
+    $(treeId).treeview('expandAll', { silent: true });
 })

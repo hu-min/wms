@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="__ADMINT__/bower_components/chosen/css/chosen.min.css">
+    <style>
+        #modal-icon .modal-dialog {position: absolute;top: 0;bottom: 0;left: 0;right: 0;} 
+        #modal-icon .modal-content {position: absolute;top: 0;bottom: 0;width: 100%;} 
+        #modal-icon .modal-body {overflow-y: scroll;position: absolute;top: 55px;bottom: 65px;width: 100%;} 
+    </style>
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="box box-success">
+                <div class="box-header">
+                    <i class="fa fa-plus-square"></i>
+                    <h4 class="box-title">节点列表</h4>
+                    <button type="button" class="btn btn-info margin pull-right" data-toggle="modal" data-title="新建节点" data-target="#modal-nodeInfo">新建节点</button>
+                </div>
+                <div class='box-body'>
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <input class="form-control input-expand-node" placeholder="搜索节点" value="" type="input">
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <span class="tree-plus handle" data-id="#nodetree"><i class="fa fa-fw fa-plus-square"></i>收起</span>
+                            <span class="tree-minus handle" data-id="#nodetree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div id="nodetree"></div>
+                    </div>
+                    <div class="box-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="modal fade" id="modal-nodeInfo">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Default Modal</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label >节点名称：</label>
+                            <input class="modal-info" title="节点Id" name="nodeId" type="hidden">
+                            <input class="form-control modal-info"  name="nodeNames" title="节点名称" placeholder="节点名称" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label >节点标题：</label>
+                            <input class="form-control modal-info" name="nodeTitle" title="节点标题" placeholder="节点标题" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label >节点控制：</label>
+                            <input class="form-control modal-info" name="controller" title="节点控制" placeholder="控制器/方法" type="text">
+                        </div>
+
+                        <div class="form-group">
+                            <label style="cursor:pointer;" data-toggle="modal" class="showIcons" data-target="#modal-icon">节点图标：<i class="fa fa-puzzle-piece text-red"></i></label>
+                            <input class="form-control modal-info" title="节点图标" name="nodeIcon" placeholder="fa fa-dashboard" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label >节点排序：</label>
+                            <input class="form-control modal-info" title="节点排序" name="sort" placeholder="节点排序" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label >上级节点：</label>
+                            <select class="form-control modal-info" id="nodePid" title="上级节点" name="nodePid">
+                                
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="btn-group user-status status-group" data-toggle="btn-toggle">
+                                <button type="button" name="0" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-default"></i> 未激活 </button>
+                                <button type="button" name="1" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-green"> 激活 </i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>            
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary save-info" data-con="node" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-icon">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        //获取节点数据
+        function getNodeTree() {
+            var tree=[]
+            datas["reqType"]="nodeList";
+            get("{$url}",datas,function(result){
+                // console.log(result);
+                tree=result.tree
+            },false)
+            intPnodeSelect(tree);
+            return tree;
+        }
+         //生成节点树和节点树选中的事件
+         function createNodeTree(){
+            $(tabId+' #nodetree').treeview({showButton: true,highlightSelected:false,data: getNodeTree(),levels:1,color: "#428bca",});
+            //节点编辑
+            $(tabId+' #nodetree').on("click",'li button',function(){
+                $(tabId+" #modal-nodeInfo h4").text("节点编辑");
+                $(tabId+" #modal-nodeInfo .save-info").data("reqtype","Edit");
+                $(tabId+" #modal-nodeInfo .save-info").text("节点编辑");
+                var nodeData= $(tabId+' #nodetree').treeview('getNode', $(this).parent(".node-nodetree").data("nodeid"));
+                datas["nodeId"]=nodeData.id;
+                datas["reqType"]='nodeOne';
+                get("{$url}",datas,function(result){
+                    if(result.errCode==0){
+                        $(tabId+" .modal-info[name='nodeNames']").val(result.info['nodeNames']);
+                        $(tabId+" .modal-info[name='nodeTitle']").val(result.info['nodeTitle']);
+                        $(tabId+" .modal-info[name='nodeId']").val(result.info['nodeId']);
+                        $(tabId+" .modal-info[name='controller']").val(result.info['controller']);
+                        $(tabId+" .modal-info[name='nodeIcon']").val(result.info['nodeIcon']);
+                        $(tabId+" .modal-info[name='sort']").val(result.info['sort']);
+                        $(tabId+" .modal-info[name='nodePid']").val(result.info['nodePid']);
+                        $(tabId+" .status-btn").removeClass("active");
+                        $(tabId+" .status-btn[name='"+result.info['status']+"']").addClass("active");
+                        $(tabId+" #nodePid").find("option[value='"+result.info['nodePid']+"']").prop("selected",true);
+                        $(tabId+" #nodePid").trigger('chosen:updated');
+                    }
+                })
+                $(tabId+" #modal-nodeInfo").modal('show')
+                
+            })
+        }
+        $(function(){
+            createNodeTree()
+            //搜索节点
+            $(tabId+' .input-expand-node').on("input",function(){
+                $(tabId+' #nodetree').treeview('collapseAll', { silent: true });
+                var prveNode=$('#nodetree').treeview('search', [$(tabId+' .input-expand-node').val(), {
+                    ignoreCase: false,     // case insensitive
+                    exactMatch: false,    // like or equals
+                    revealResults: true,  // reveal matching nodes
+                }]);
+            })
+            //上级节点chosen
+            $(tabId+" #nodePid").chosen({search_contains:true,width: '100%'});
+            //新增节点
+            $(tabId+" .box-header button").on("click",function(){
+                $(tabId+" .modal-info").val("");
+                $(tabId+" #modal-nodeInfo h4").text("新增节点");
+                $(tabId+" #modal-nodeInfo .save-info").data("reqtype","Add");
+                $(tabId+" #modal-nodeInfo .save-info").text("新增节点");
+                $(tabId+" #nodePid").find("option[value='0']").prop("selected",true);
+                $(tabId+" #nodePid").trigger('chosen:updated');
+                $(tabId+" .status-btn").removeClass("active");
+                $(tabId+" .status-btn[name='1']").addClass("active");
+            })
+            //获取iconlist
+            $(tabId+" .showIcons").on("click",function(){
+                datas={}
+                datas["reqType"]='iconList';
+                get("{$url}",datas,function(result){
+                    if(result.errCode==0){
+                        $(tabId+" #modal-icon .modal-body").html(result.info);
+                    }
+                })
+            })
+            $(tabId+" #modal-icon .modal-body").on("click",".icon-select",function(){
+                var icon=$(this).text().replace(/(^\s*)|(\s*$)/g, "")
+                $(tabId+" #modal-nodeInfo .modal-info[name='nodeIcon']").val(icon);
+                // console.log($(tabId+" #modal-nodeInfo .modal-info[name='nodeIcon']"));
+                $(tabId+" #modal-icon").modal('hide')
+            })
+        })
+        //初始化父节点的select数据
+        function intPnodeSelect(data){
+            var option='<option value="0">根Root</option>';
+            data.forEach(ele => {
+                option+=getNode(ele,0);
+            });
+            $(tabId+" #nodePid").html(option);
+        }
+        //递归获取节点
+        function getNode(element,level){
+            var option=""
+            var strs="";
+            for (let index = 0; index < level; index++) {
+                strs+="——";
+            }
+            if(typeof(element.nodes)=='object'){
+                level++
+                element.nodes.forEach(elementSub => {
+                    option+=getNode(elementSub,level);
+                });
+            }
+            return '<option value="'+element.id+'">'+strs+element.text+'</option>'+option;
+        }
+        //节点信息
+        function nodeInfoFuns(){
+            datas["data"]={}
+            $(tabId+" .modal-info").each(function(){
+                var name =$(this).attr("name");
+                var val =$(this).val();
+                if(name=="nodeTitle" && val==""){
+                    alert("节点标题不能为空");
+                    throw "节点标题不能为空";
+                }else if(val!=""){
+                    datas["data"][name]=val;
+                }
+                
+            })
+            datas["data"].status=$(tabId+" .status-group .active").attr("name")
+        }
+        /** 
+         * @Author: vition 
+         * @Date: 2018-02-23 10:08:52 
+         * @Desc: 刷新节点 
+         */        
+        function nodeSearchFuns(){
+            createNodeTree()
+        }
+    </script>
+</body>
+</html>

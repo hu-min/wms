@@ -14,16 +14,17 @@ return [
         "3"=>'删除',
     ],
     'regFrom'=>[
+        "0"=>'未知',
         "1"=>'前端',
         "2"=>'微信',
     ],
     'authority'=>[
-        '1'=>['Read'],
-        '2'=>['Read','Add'],
-        '3'=>['Read','Add','Edit'],
-        '4'=>['Read','Add','Edit','Del'],
-        '5'=>['Read','Add','Edit','Del','Export'],
-        '6'=>['Read','Add','Edit','Del','Export','Import'],
+        '1'=>['List','One'],
+        '2'=>['List','One','Add'],
+        '3'=>['List','One','Add','Edit'],
+        '4'=>['List','One','Add','Edit','Del'],
+        '5'=>['List','One','Add','Edit','Del','Export'],
+        '6'=>['List','One','Add','Edit','Del','Export','Import'],
         '7'=>['All'],
     ],
 ];

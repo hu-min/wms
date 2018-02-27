@@ -15,7 +15,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="box box-info">
-                    <div class="box-body search-body">
+                    <div class="box-body search-body" id="user-search-box">
                         <div class="col-md-12">
                             <div class="form-inline">
                                 <label for="loginName" class="control-label">登录名称：</label>
@@ -37,7 +37,7 @@
                                     </select>
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <button type="button" data-reqtype="add" data-toggle="modal" data-title="添加用户" data-target="#modal-userInfo" data-con="user" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus"></i> 添加用户</button>
+                                <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加用户" data-target="#modal-userInfo" data-con="user" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus"></i> 添加用户</button>
                             </div>
                             <br>
                             <div class="form-inline">
@@ -71,7 +71,17 @@
                                     </select>
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <button type="button" data-url="{:U('User/userRead')}" id="user-search" data-reqtype="userList" data-con="user" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                <div class="form-group">
+                                    <label for="info-roleId">角色：</label>
+                                    <select class="form-control search-info" title="角色" name="roleId" id="roleId">
+                                        <option value="">全部</option>
+                                        <volist name="roleList" id="item">
+                                            <option value="{$item['roleId']}">{$item['roleName']}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <button type="button" data-url="{$url}" id="user-search" data-reqtype="userList" data-con="user" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
                                 <button type="button" class="btn bg-teal search-refresh" data-con="user"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                             </div>
                         </div>
@@ -91,6 +101,7 @@
                             <th>电话号码</th>
                             <th>用户类型</th>
                             <th>注册来源</th>
+                            <th>角色</th>
                             <th>注册时间</th>
                             <th>上次登录ip</th>
                             <th>登录次数</th>
@@ -105,7 +116,7 @@
             </div>
         </div>
         <div class="dataTables_wrapper">
-            <div id="userPage" class="row page-div" data-url="{:U('User/userRead')}" data-reqtype="userList" data-con="user">
+            <div id="userPage" class="row page-div" data-url="{$url}" data-reqtype="userList" data-con="user">
                 {$pages}
             </div>
         </div>
@@ -123,7 +134,7 @@
                     <div class="box-body">
                         <div class="form-group">
                             <label for="info-loginName">登录名：</label>
-                            <input id="info-userId" name="userId" type="hidden">
+                            <input id="info-userId" class="modal-info" title="userId" name="userId" type="hidden">
                             <input class="form-control modal-info" id="info-loginName" name="loginName" title="登录名" placeholder="登录名" type="text">
                         </div>
                         <div class="form-group">
@@ -162,6 +173,15 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="info-role">角色：</label>
+                            <select class="form-control modal-info" title="角色" name="roleId" id="info-roleId">
+                                <option value="">全部</option>
+                                <volist name="roleList" id="item">
+                                    <option value="{$item['roleId']}">{$item['roleName']}</option>
+                                </volist>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <div class="btn-group user-status status-group" data-toggle="btn-toggle">
                                 <input class="modal-info" id="info-status" value="1" name="status" type="hidden">
                                 <button type="button" name="0" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-default"></i> 未激活 </button>
@@ -176,7 +196,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary save-info" data-con="user" data-reqtype="Add" data-url="{:U('User/userEdit')}">Save changes</button>
+                <button type="button" class="btn btn-primary save-info" data-con="user" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
             </div>
             </div>
         </div>
@@ -185,7 +205,7 @@
         /*查询列表函数*/
         function userSearchFuns(){
             datas['data']={}
-            $(".search-info").each(function(){
+            $(tabId+" .search-info").each(function(){
                 var name=$(this).attr("name");
                 var val=$(this).val();
                 if(val!=""){
@@ -194,30 +214,31 @@
             })
         }
         function userReFuns(){
-            $(".user-status .status-btn").removeClass("active");
-            $(".user-status .status-btn[name='1']").addClass("active");
-            $("#info-status").val("1");
+            $(tabId+" .user-status .status-btn").removeClass("active");
+            $(tabId+" .user-status .status-btn[name='1']").addClass("active");
+            $(tabId+" #info-status").val("1");
         }
         /*设置编辑用户信息*/
         function userShowFuns(info){
-            $("#info-userId").val(info['userId']);
-            $("#info-loginName").val(info['loginName']);
-            $("#info-userName").val(info['userName']);
-            $("#info-avatar").val(info['avatar']);
-            $("#info-phone").val(info['phone']);
-            $("#info-status").val(info['status']);
-            $("#info-gender").find("option[value='"+info['gender']+"']").prop("selected",true);
-            $("#info-userType").find("option[value='"+info['userType']+"']").prop("selected",true);
-            $(".user-status .status-btn").removeClass("active");
-            $(".user-status .status-btn[name='"+info['status']+"']").addClass("active");
+            $(tabId+" #info-userId").val(info['userId']);
+            $(tabId+" #info-loginName").val(info['loginName']);
+            $(tabId+" #info-userName").val(info['userName']);
+            $(tabId+" #info-avatar").val(info['avatar']);
+            $(tabId+" #info-phone").val(info['phone']);
+            $(tabId+" #info-status").val(info['status']);
+            $(tabId+" #info-gender").find("option[value='"+info['gender']+"']").prop("selected",true);
+            $(tabId+" #info-userType").find("option[value='"+info['userType']+"']").prop("selected",true);
+            $(tabId+" #info-roleId").find("option[value='"+info['roleId']+"']").prop("selected",true);
+            $(tabId+" .user-status .status-btn").removeClass("active");
+            $(tabId+" .user-status .status-btn[name='"+info['status']+"']").addClass("active");
         }
         /*用户信息*/
         function userInfoFuns(){
             datas.data={}
-            $(".modal-info").each(function(){
+            $(tabId+" .modal-info").each(function(){
                 var name=$(this).attr("name");
                 var val=$(this).val();
-                if(name=="avatar" || name=="phone"){                    
+                if(name=="avatar" || name=="phone" || name=='password' || name=="userId"){                    
                 }else{
                     if(val==""){
                         alert($(this).attr("title")+"不能为空")
@@ -226,6 +247,7 @@
                 }
                 datas.data[name]=val
             })
+            atas.data.status=$(tabId+" .status-group .active").attr("name")
         }
     </script>
 </body>

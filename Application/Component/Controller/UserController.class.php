@@ -69,52 +69,24 @@ class UserController extends BaseController{
             return $res;
         }
         $menus=[];
-        $mNodeResult=$this->nodeDB->query("SELECT * FROM v_node WHERE nodeId IN (SELECT nodeId FROM v_role_node WHERE roleId IN (SELECT roleId FROM v_user_role WHERE userId={$userId})) ORDER BY nodePid ASC, `level` ASC, `sort` ASC");
+        $mNodeResult=$this->nodeDB->query("SELECT * FROM v_node n INNER JOIN (SELECT nodeId,authority FROM v_role_node WHERE roleId IN (SELECT roleId FROM v_user WHERE userId={$userId} AND authority>0)) nr ON nr.nodeId=n.nodeId WHERE n.showType=1 ORDER BY n.nodePid ASC, n.`level` ASC, n.`sort` ASC");
         $newAllNodes = array();
         $mNodes=[];
+        $menus=setNodeTree(["nodeList"=>$mNodeResult,"id"=>"nodeId","pid"=>"nodePid","nodes"=>"node"]);
+
         if($mNodeResult) {
             foreach ($mNodeResult AS $nodeInfo) {
                 $newAllNodes[$nodeInfo['nodeId']] = $nodeInfo;
                 if($nodeInfo['controller']!=""){
-                    $authority[$nodeInfo['controller']]=$nodeInfo['nodeType'];
-                }
-                
-                if($nodeInfo['nodePid']==0){
-                    array_push($mNodes,['nodeId'=>$nodeInfo['nodeId'],'showType'=>$nodeInfo['showType']]);
+                    $authority[$nodeInfo['controller']]=$nodeInfo['authority'];
                 }
             }
-            $mNodeResult = &$newAllNodes;
         }else{
             $res->errCode=10001;
             $res->error=getError(10001);
             return $res;
         }
-        foreach ($mNodes as $node1) {
-            if($node1['showType']==1){
-                $menus['node'][$node1['nodeId']]=$mNodeResult[$node1['nodeId']];
-                unset($mNodeResult[$node1['nodeId']]);
-                foreach ($mNodeResult as $node2) {
-                    if($node1['nodeId']==$node2['nodePid'] && $node2['showType']==1){
-                        $menus['node'][$node1['nodeId']]['node'][$node2['nodeId']]=$node2;
-                        unset($mNodeResult[$node2['nodeId']]);
-                        foreach ($mNodeResult as $node3) {
-                            if($node2['nodeId']==$node3['nodePid'] && $node3['showType']==1){
-                                $menus['node'][$node1['nodeId']]['node'][$node2['nodeId']]['node'][$node3['nodeId']]=$node3;
-                                unset($mNodeResult[$node3['nodeId']]);
-                                foreach ($mNodeResult as $node4) {
-                                    if($node3['nodeId']==$node4['nodePid']  && $node4['showType']==1){
-                                        $menus['node'][$node1['nodeId']]['node'][$node2['nodeId']]['node'][$node3['nodeId']]['node'][$node4['nodeId']]=$node4;
-                                        unset($mNodeResult[$node2['nodeId']]);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
         session('nodeAuth',$authority);
-        // print_r($menus);
         $this->Redis->set($refreNode,2,3600);
         $this->Redis->set($nodeName,$menus,3600);
         $res->errCode=10001;
@@ -182,5 +154,31 @@ class UserController extends BaseController{
         $res->errCode=111;
         $res->error=getError(111);
         return $res;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-03 00:42:15 
+     * @Desc:  
+     */    
+    function updateUser($userInfo){
+        $res=$this->initRes();
+        $insertResult=$this->userDB->save($userInfo);
+        if($insertResult){
+            $res->errCode=0;
+            $res->error=getError(0);
+            return $res;
+        }
+        $res->errCode=111;
+        $res->error=getError(111);
+        return $res;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-04 00:15:49 
+     * @Desc: 登录退出记录 
+     */    
+    function logIORec($userId){
+        $this->userDB->where(['userId'=>$userId])->setInc("loginNum");
+        $this->userDB->modify(['userId'=>$userId],['lastTime'=>time(),'lastIp'=>ipTolong(getIp())]);
     }
 }

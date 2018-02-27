@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <style>
+        #modal-role-node .modal-dialog {position: absolute;top: 0;bottom: 0;left: 0;right: 0;} 
+        #modal-role-node .modal-content {position: absolute;top: 0;bottom: 0;width: 100%;} 
+        #modal-role-node .modal-body {overflow-y: scroll;position: absolute;top: 55px;bottom: 65px;width: 100%;} 
+    </style>
+    <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="box box-success">
+                    <div class="box-header">
+                        <i class="fa fa-user-secret"></i>
+        
+                        <h4 class="box-title">角色列表</h4>
+        
+                        <div class="box-tools pull-right" data-toggle="tooltip" title="" data-original-title="Status">
+                            <span class="tree-plus handle" data-id="#roletree"><i class="fa fa-fw fa-plus-square"></i>收起</span>
+                            <span class="tree-minus handle" data-id="#roletree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
+                        </div>
+                    </div>
+                        <div class="form-group">
+                            <input class="form-control" id="input-expand-node" placeholder="搜索角色" value="" type="input">
+                        </div>
+                    <div>
+                        <div id="roletree"></div>
+                    </div>
+                        <div class="box-footer">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                    <div class="box box-info"  data-url="{$url}" id="role-search" data-reqtype="roleList" data-con="role">
+                        <div class="box-header">
+                            <i class="fa fa-cog"></i>
+            
+                            <h4 class="box-title">角色管理</h4>
+            
+                            <div class="box-tools pull-right" data-toggle="tooltip" title="" data-original-title="Status">
+                                <span class="tree-plus handle" data-id="#roletree"><i class="fa fa-fw fa-plus-square"></i>收起</span>
+                                <span class="tree-minus handle" data-id="#roletree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
+                            </div>
+                        </div>
+                        <form class="form-horizontal" id="role-info">
+                            <div class="box-body">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">上级</label>
+                    
+                                    <div class="col-sm-9">
+                                        <input class="form-control superior"  readonly placeholder="上级名称" type="text">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">原名称</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control rolename" readonly  placeholder="角色名称" type="text">
+                                        <input class="role-info" name="roleId"  title="角色id" type="hidden">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">新名称</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control nrolename role-info" name="roleName" title="角色名称" type="text">
+                                        
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">目标上级</label>
+                                    <div class="col-sm-9">
+                                        <select class="form-control role-info" title="目标上级" id="nsuperior" name="rolePid">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">备注</label>
+                                    <div class="col-sm-9">
+                                        <textarea class="form-control  role-info" rows="2" title="备注"  name="remark"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">角色状态</label>
+                                    <div class="btn-group role-status status-group col-sm-9" data-toggle="btn-toggle">
+                                        <button type="button" name="0" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-default"></i> 未激活 </button>
+                                        <button type="button" name="1" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-green"> 激活 </i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.box-body -->
+                            <div class="box-footer">
+                                <button type="button" class="btn btn-success save-info" data-con="role" data-reqtype="Add" data-url="{$url}" data-modal="false">新增</button>
+                                <button type="button" class="btn btn-info pull-right save-info" data-con="role" data-reqtype="Edit" data-url="{$url}" data-modal="false">修改</button>
+                            </div>
+                            <!-- /.box-footer -->
+                        </form>
+                        <div>
+                        </div>
+                            <div class="box-footer">
+                        </div>
+                    </div>
+            </div>
+            <div class="col-md-3">
+
+            </div>
+        </div>
+    </section>
+    <div class="modal fade" id="modal-role-node">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary save-info" data-con="role" data-reqtype="rNodeEdit" data-url="{$url}" data-modal="true">修改</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var prve=-1;
+        //获取角色数据
+        function getRoleTree() {
+            var tree=[]
+            datas["reqType"]="roleList";
+            get("{$url}",datas,function(result){
+                tree=result.tree
+            },false)
+            var html='<option value="">无</option><option value="0">root</option>';
+            for (const key in tree){
+                html+='<option value="'+tree[key].id+'">'+tree[key].text+'</option>';
+            }
+            $(tabId+" #nsuperior").html(html);
+            return tree;
+        }
+        $(function(){
+            createRoleTree()
+            //搜索角色
+            $(tabId+' #input-expand-node').on("input",function(){
+                $(tabId+' #roletree').treeview('collapseAll', { silent: true });
+                var prveNode=$('#roletree').treeview('search', [$('#input-expand-node').val(), {
+                    ignoreCase: false,     // case insensitive
+                    exactMatch: false,    // like or equals
+                    revealResults: true,  // reveal matching nodes
+                }]);
+            })
+            $("#nsuperior").on("change",function(){
+                if($(this).val()==0){
+                    $(tabId+' #role-info .superior').val('')
+                    $(tabId+' #role-info .rolename').val('')
+                }
+            })
+        })
+        //新增修改信息处理
+        function roleInfoFuns(){
+            datas.data={}
+            $(tabId+" #role-info .role-info").each(function(){
+                var name=$(this).attr("name");
+                var val=$(this).val();
+                var title=$(this).attr("title");
+                if(datas.reqType=="roleAdd" && (name=='roleName' || name=='rolePid') && val==""){
+                    alert(title+"不能为空");
+                    throw title+"不能为空"
+                }else if(datas.reqType=="roleEdit"){
+                    if(name=='roleId' && val==""){
+                        alert("没有选中角色");
+                        throw "没有选中角色"
+                    }
+                }
+                if(val!==""){
+                    datas.data[name]=val
+                }
+            })
+            datas.data.status=$(tabId+" .status-group .active").attr("name")
+            if(datas.reqType=="rolerNodeEdit"){
+                datas.roleId=datas.data.roleId
+                datas.data={}
+                $("#modal-role-node .modal-body .auth-val").each(function(){
+                    datas.data[$(this).data("id")]=$(this).val()
+                })
+                console.log(datas)
+            }
+            // console.log(datas)
+        }
+        function roleSearchFuns(){
+            createRoleTree()
+            clearRoleInfo()
+        }
+        //生成角色树和角色树选中的事件
+        function createRoleTree(){
+            $(tabId+' #roletree').treeview({showButton: true,butTitle:'权限',data: getRoleTree(),levels:1,color: "#428bca",onNodeSelected:function(event, node){
+                if(node.parentId==undefined){
+                    var superior=node.text
+                }else{
+                    var parent= $(tabId+' #roletree').treeview('getNode', node.parentId);
+                    var superior=parent.text
+                    
+                }
+                $(tabId+" #role-info .rolename").val(node.text)
+                $(tabId+" #role-info .superior").val(superior)
+                var id=node.id
+                var status=node.status
+                var remark=node.remark
+                $(tabId+" .role-info[name='remark']").val(remark);
+                $(tabId+" #role-info input[name='roleId']").val(id);
+                $(tabId+" #role-info .role-status .status-btn").removeClass("active");
+                $(tabId+" #role-info .role-status .status-btn[name='"+status+"']").addClass("active");
+            },onNodeUnselected:function(){
+                clearRoleInfo()
+            }});
+            $(tabId+' #roletree').on("click",'li button',function(){
+                var roleData= $(tabId+' #roletree').treeview('getNode', $(this).parent(".node-roletree").data("nodeid"));
+                datas["roleId"]=roleData.id;
+                datas["reqType"]='rnodeOne';
+                get("{$url}",datas,function(result){
+                    if(result.errCode==0){
+                        $(tabId+" #modal-role-node .modal-body").html(result.info);
+                        $(tabId+" #modal-role-node").modal("show");
+                    }
+                    
+                })
+            })
+        }
+        //清空角色数据
+        function clearRoleInfo(){
+            $(tabId+" #role-info .role-info").val("")
+            $(tabId+" #role-info input").val("")
+            $(tabId+" #role-info input").val("")
+        }
+    </script>
+</body>
+</html>
