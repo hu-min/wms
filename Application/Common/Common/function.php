@@ -108,7 +108,7 @@ function base64Img($data,$scr="",$name=""){
  * @Date: 2018-02-26 22:38:16 
  * @Desc: 设置节点树 
  */
-function setNodeTree($param=[]){
+function setLevelTree($param=[]){
     if(!$param["nodeList"]){
         return [];
     }
