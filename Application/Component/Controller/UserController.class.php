@@ -72,7 +72,12 @@ class UserController extends BaseController{
         $mNodeResult=$this->nodeDB->query("SELECT * FROM v_node n INNER JOIN (SELECT nodeId,authority FROM v_role_node WHERE roleId IN (SELECT roleId FROM v_user WHERE userId={$userId} AND authority>0)) nr ON nr.nodeId=n.nodeId WHERE n.showType=1 ORDER BY n.nodePid ASC, n.`level` ASC, n.`sort` ASC");
         $newAllNodes = array();
         $mNodes=[];
-        $menus=setLevelTree(["nodeList"=>$mNodeResult,"id"=>"nodeId","pid"=>"nodePid","nodes"=>"node"]);
+        Vendor("levelTree.levelTree");
+        $levelTree=new \levelTree();
+        $levelTree->setKeys(["idName"=>"nodeId","pidName"=>"nodePid","nodeName"=>"node"]);
+        // $levelTree->setReplace(["roleid"=>"nodeId","roleTitle"=>"nodeTitle","rolePid"=>"nodePid"]);
+        $menus=$levelTree->createTree($mNodeResult);
+        // $menus=setLevelTree(["nodeList"=>$mNodeResult,"id"=>"nodeId","pid"=>"nodePid","nodes"=>"node"]);
 
         if($mNodeResult) {
             foreach ($mNodeResult AS $nodeInfo) {

@@ -10,6 +10,8 @@ class UserController extends BaseController{
         $this->roleCom=getComponent('Role');
         $this->nodeCom=getComponent('Node');
         $this->rNodeCom=getComponent('RoleNode');
+        Vendor("levelTree.levelTree");
+        $this->levelTree=new \levelTree();
     }
     /*用户管理*/
     /** 
@@ -230,7 +232,6 @@ class UserController extends BaseController{
         $roleTree=[];
         $roleResult=$this->roleCom->getRoleList($parameter);
         $level1=[];
-
         foreach ($roleResult["list"] as $key => $value) {
             $backColor=$value["status"]!=1?"#FF8C00":null;
             $color=$value["status"]!=1?"#FFFF00":null;
@@ -363,50 +364,11 @@ class UserController extends BaseController{
         }
         $this->Redis->set("nodeArray",json_encode($nodeResult["list"]),3600);
         asort($level);
-        foreach ($level[1] as $key => $node) {
-            foreach ($node as $key1 => $node1) {
-                $temp1=["text"=>$node1["nodeTitle"],"icon"=>$node1["nodeIcon"],"id"=>$node1["nodeId"]];
-                if($level[2][$node1["nodeId"]]){
-                    $temp1['nodes']=[];
-                }
-                array_push($nodeTree,$temp1);
-                if($level[2]){
-                    foreach ($level[2] as $key2 => $node2) {
-                        foreach ($node2 as $key22 => $node22) {
-                            if($node1['nodeId']==$node22["nodePid"]){
-                                $temp2=["text"=>$node22["nodeTitle"],"icon"=>$node22["nodeIcon"],"id"=>$node22["nodeId"]];
-                                if($level[3][$node22["nodeId"]]){
-                                    $temp2['nodes']=[];
-                                }
-                                array_push($nodeTree[$key1]['nodes'],$temp2);
-                                if($level[3]){
-                                    foreach ($level[3] as $key3 => $node3) {
-                                        foreach ($node3 as $key33 => $node33) {
-                                            if($node22['nodeId']==$node33["nodePid"]){
-                                                $temp3=["text"=>$node33["nodeTitle"],"icon"=>$node33["nodeIcon"],"id"=>$node33["nodeId"]];
-                                                if($level[4][$node33["nodeId"]]){
-                                                    $temp3['nodes']=[];
-                                                }
-                                                array_push($nodeTree[$key1]['nodes'][$key22]['nodes'],$temp3);
-                                                if($level[4]){
-                                                    foreach ($level[4] as $key4 => $node4) {
-                                                        foreach ($node4 as $key44 => $node44) {
-                                                            if($node22['nodeId']==$node44["nodePid"]){
-                                                                array_push($nodeTree[$key1]['nodes'][$key22]['nodes'][$key33]['nodes'],["text"=>$node44["nodeTitle"],"icon"=>$node44["nodeIcon"],"id"=>$node44["nodeId"]]);
-                                                            }                         
-                                                        }
-                                                    }
-                                                }
-                                            }                         
-                                        }
-                                    }
-                                }
-                            }                         
-                        }
-                    }
-                }
-            }
-        }
+        
+        $this->levelTree->setKeys(["idName"=>"nodeId","pidName"=>"nodePid"]);
+        $this->levelTree->setReplace(["nodeTitle"=>"text","nodeIcon"=>"icon","nodeId"=>"id"]);
+        $this->levelTree->switchOption(["beNode"=>false,"idAsKey"=>false]);
+        $nodeTree=$this->levelTree->createTree($nodeResult["list"]);
         return $nodeTree;
     }
     /** 

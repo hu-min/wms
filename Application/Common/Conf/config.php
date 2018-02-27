@@ -1,8 +1,10 @@
 <?php
 $CONFIG=array(
     'DB_TYPE'   => 'mysql',
-    'DB_USER'   => 'vwms', // 用户名
-    'DB_PWD'    => 'Vwms2018#23', // 密码
+    // 'DB_USER'   => 'vwms', // 用户名
+    // 'DB_PWD'    => 'Vwms2018#23', // 密码
+    'DB_USER'   => 'root', // 用户名
+    'DB_PWD'    => 'root', // 密码
     'DB_PREFIX' => 'v_', // 数据库表前缀 
     'URL_MODEL'=> 2,//伪静态
     // 'DB_HOST' => '47.52.132.90',
