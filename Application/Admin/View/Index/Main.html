@@ -219,6 +219,7 @@
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header">主菜单导航</li>
+        {$nodeHtml}
         <volist name="nodeList" id="node">
             <if condition="is_array($node['node']) neq true">
                 <li><a href="{:U($node['controller'])}" class="nodeOn" data-level='1' data-nodeid="{$node['nodeId']}"><i class="{$node['nodeIcon']}"></i> <span class="title">{$node['nodeTitle']}</span></a></li>

@@ -1,8 +1,8 @@
 <?php
 $CONFIG=array(
     'DB_TYPE'   => 'mysql',
-     'DB_USER'   => ($_SERVER["HTTP_HOST"]='wms.vitionst.com')?'vwms':'root', // 用户名
-     'DB_PWD'    => ($_SERVER["HTTP_HOST"]='wms.vitionst.com')?'Vwms2018#23':'root', // 密码
+     'DB_USER'   => ($_SERVER["HTTP_HOST"]=='wms.vitionst.com')?'vwms':'root', // 用户名
+     'DB_PWD'    => ($_SERVER["HTTP_HOST"]=='wms.vitionst.com')?'Vwms2018#23':'root', // 密码
     'DB_PREFIX' => 'v_', // 数据库表前缀 
     'URL_MODEL'=> 2,//伪静态
     // 'DB_HOST' => '47.52.132.90',

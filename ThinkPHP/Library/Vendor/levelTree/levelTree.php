@@ -36,7 +36,7 @@ class levelTree{
         foreach ($Datalist as $value) {
             $LevelList[$value[$this->keys["levelName"]]][]=$this->_replaceKey($value);
         }
-        if(!isset($LevelList[1][0][$this->keys["idName"]]) || !isset($LevelList[1][0][$this->keys["pidName"]])){
+        if(!array_key_exists($this->keys["idName"],$LevelList[1][0]) || !array_key_exists($this->keys["pidName"],$LevelList[1][0])){
             $this->errorInfo="数据中的key不存在";
             return [$this->keys["nodeName"]=>[]];
         }
@@ -54,7 +54,7 @@ class levelTree{
      * @Example: 
      */    
     private function _createTree($Datalist,$level=1){
-        if(isset($Datalist[$level+1])){
+        if(array_key_exists($level+1,$Datalist)){
             $temp=$this->_createTree($Datalist,$level+1);
             $tempArr=[];
             foreach ($Datalist[$level] as $key => $value) {
@@ -119,7 +119,7 @@ class levelTree{
     private function _replaceKey($array){
         if(!empty($this->replaceData)){
             foreach ($this->replaceData as $oKey => $nKey) {
-                if(isset($array[$oKey]) && !isset($array[$nKey])){
+                if(array_key_exists($oKey,$array) && !array_key_exists($nKey,$array)){
                     $array[$nKey]=$array[$oKey];
                     unset($array[$oKey]);
                 }
@@ -161,10 +161,11 @@ class levelTree{
      * @Params:  
      */    
     private function _tree2Html($nodes){
-        if(isset($nodes["nodes"])){
+        
+        if(array_key_exists($this->keys["nodeName"],$nodes)){
             $html="";
-            foreach ($nodes["nodes"] as $key => $nodeSub) {
-                if(!isset($nodeSub["nodes"])){
+            foreach ($nodes[$this->keys["nodeName"]] as $key => $nodeSub) {
+                if(!array_key_exists($this->keys["nodeName"],$nodeSub)){
                     $html.='<li '.$this->_replaceVal($this->htmlAttr["aLiAttr"],$nodeSub).'><a '.$this->_replaceVal($this->htmlAttr["aAAttr"],$nodeSub).'><i '.$this->_replaceVal($this->htmlAttr["aIAttr"],$nodeSub).'></i> <span  '.$this->_replaceVal($this->htmlAttr["aSpanAttr"],$nodeSub).'>'.$nodeSub["nodeTitle"].'</span></a></li>';
                 }else{
                     $html.='<li '.$this->_replaceVal($this->htmlAttr["nLiAttr"],$nodeSub).'>
@@ -181,6 +182,8 @@ class levelTree{
                 
             }
             return $html;
+        }else{
+            $this->errorInfo="节点中不存在".$this->keys["nodeName"]."键名";
         }
     }
     /** 
@@ -203,21 +206,37 @@ class levelTree{
      * @Params:  
      */    
     private function _replaceVal($Attrs,$nodes){
-        preg_match_all("/{([\S]+)}/",$Attrs,$match);
+        
+        preg_match_all("/{\[([\S]+)\]}/",$Attrs,$match);
         if(!empty($match[0])){
             foreach ($match[1] as $key=>$value) {
-                if(isset($nodes[$value])){
-                    $match[0][$key]="'\{".$value."\}'";
-                    $match[1][$key]=$nodes[$value];
+                $exp=explode("|",$value);
+                if(count($exp)>1){
+                    $value=$exp[0];
+                }
+                if(array_key_exists($value,$nodes)){
+                    if(count($exp)>1){
+                        
+                        if($nodes[$value]==""){
+                            
+                            $match[1][$key]="#";
+                        }else{
+                            $match[1][$key]=eval("return ".$exp[1]."('{$nodes[$value]}');");
+                        }
+                        
+                        $match[0][$key]="'\{\[".$value."\|".$exp[1]."\]\}'";
+                    }else{
+                        $match[0][$key]="'\{\[".$value."\]\}'";
+                        $match[1][$key]=$nodes[$value];
+                    }
+                    
                 }else{
+                    
                     $this->errorInfo="节点中不存在".$value."键名";
                     unset($match[0][$key]);
                     unset($match[1][$key]);
-                    $Attrs=preg_replace("/[\S]+=['\"]+{".$value."}['\"]+/","",$Attrs);
+                    $Attrs=preg_replace("/[\S]+=['\"]+{[".$value."]}['\"]+/","",$Attrs);
                 }
-            }
-            if(empty($match[0][0])){
-                return "";
             }
             return preg_replace($match[0],$match[1],$Attrs);
         }

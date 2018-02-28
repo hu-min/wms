@@ -3,6 +3,12 @@ namespace Admin\Controller;
 
 
 class IndexController extends BaseController{
+
+    public function _initialize() {
+        parent::_initialize();
+        Vendor("levelTree.levelTree");
+        $this->levelTree=new \levelTree();
+    }
     
     /**
      * 后台管理入口
@@ -28,8 +34,13 @@ class IndexController extends BaseController{
             $this->redirect('Index/LogOut');
         }
         $nodeResult=$this->userCom->getUserNode($this->userId);
-        // $this->createNode($nodeResult->data);
-        $this->assign('nodeList',$nodeResult->data['node']);
+
+        $this->levelTree->setKeys(["nodeName"=>"node"]);
+
+        $this->levelTree->setHtmlAttr(["uAttr"=>" class='treeview-menu' ","aLiAttr"=>"","aAAttr"=>" class='nodeOn' data-level='{[level]}' data-nodeid='{[nodeId]}' href='{[controller|U]}'","aIAttr"=>" class='{[nodeIcon]}'","aSpanAttr"=>"","nLiAttr"=>" class='treeview'","nAAttr"=>" href='{[controller|U]}' class='nodeOn' data-level='{[level]}'","nIAttr"=>" class='{[nodeIcon]}'","nSpanAttr"=>" class='title'","nArAttr"=>" class='pull-right-container'","nArIAttr"=>" class='fa fa-angle-left pull-right'"]);
+        $nodeHtml=$this->levelTree->tree2Html($nodeResult->data);
+        $this->assign('nodeHtml',$nodeHtml);
+
         $logout="Index/logOut";
         $this->assign('logout',$logout);
         $this->display();
