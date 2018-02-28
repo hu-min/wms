@@ -236,7 +236,7 @@
                                 <li><a class="nodeOn" data-level='2' data-nodeid="{$node1['nodeId']}" href="{:U($node1['controller'])}"><i class="{$node1['nodeIcon']}"></i> <span class="title">{$node1['nodeTitle']}</span></a></li>
                             <else/>
                                 <li class="treeview">
-                                    <a href="#" class="nodeOn" data-level='2'>
+                                    <a href="{:U($node1['controller'])}" data-nodeid="{$node['nodeId']}" class="nodeOn" data-level='2'>
                                         <i class="{$node1['nodeIcon']}"></i> <span class="title">{$node1['nodeTitle']}</span>
                                         <span class="pull-right-container">
                                             <i class="fa fa-angle-left pull-right"></i>

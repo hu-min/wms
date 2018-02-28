@@ -2,6 +2,20 @@
 class levelTree{
     protected $keys=["levelName"=>"level","idName"=>"id","pidName"=>"pid","nodeName"=>"nodes"];
     protected $replaceData=[];
+    /** 
+     * uAttr 子ul的属性
+     * aLiAttr      独立（无下级）li的属性
+     * aAAttr       独立（无下级）li a的属性
+     * aIAttr       独立（无下级）li i的属性
+     * aSpanAttr    独立（无下级）li span的属性
+     * nLiAttr      节点（有下级）li 的属性
+     * nAAttr       节点（有下级）li a的属性
+     * nIAttr       节点（有下级）li i的属性
+     * nSpanAttr    节点（有下级）li span的属性
+     * nArAttr      节点（有下级）li span 箭头的属性
+     * nArIAttr     节点（有下级）li i 箭头的属性
+     */    
+    protected $htmlAttr=["uAttr"=>"","aLiAttr"=>"","aAAttr"=>"","aIAttr"=>"","aSpanAttr"=>"","nLiAttr"=>"","nAAttr"=>"","nIAttr"=>"","nSpanAttr"=>"","nArAttr"=>"","nArIAttr"=>""];
     protected $errorInfo="";
     protected $beNode=true;
     protected $idAsKey=true;
@@ -124,6 +138,90 @@ class levelTree{
                 $this->$key=$value;
             }
         }
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-28 15:36:10 
+     * @Desc: tree转换成html ul 结构 
+     * @Return:  
+     * @Params:  
+     * @Example: 
+     */    
+    function tree2Html($nodes,$outerUl=false){
+        if($outerUl){
+            return "<ul>".$this->_tree2Html($nodes)."</ul>";
+        }
+        return $this->_tree2Html($nodes);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-28 18:31:49 
+     * @Desc: 内部 tree2Html
+     * @Return:  
+     * @Params:  
+     */    
+    private function _tree2Html($nodes){
+        if(isset($nodes["nodes"])){
+            $html="";
+            foreach ($nodes["nodes"] as $key => $nodeSub) {
+                if(!isset($nodeSub["nodes"])){
+                    $html.='<li '.$this->_replaceVal($this->htmlAttr["aLiAttr"],$nodeSub).'><a '.$this->_replaceVal($this->htmlAttr["aAAttr"],$nodeSub).'><i '.$this->_replaceVal($this->htmlAttr["aIAttr"],$nodeSub).'></i> <span  '.$this->_replaceVal($this->htmlAttr["aSpanAttr"],$nodeSub).'>'.$nodeSub["nodeTitle"].'</span></a></li>';
+                }else{
+                    $html.='<li '.$this->_replaceVal($this->htmlAttr["nLiAttr"],$nodeSub).'>
+                    <a '.$this->_replaceVal($this->htmlAttr["nAAttr"],$nodeSub).'>
+                        <i '.$this->_replaceVal($this->htmlAttr["nIAttr"],$nodeSub).'></i> <span '.$this->_replaceVal($this->htmlAttr["nSpanAttr"],$nodeSub).'>'.$nodeSub["nodeTitle"].'</span>
+                        <span '.$this->_replaceVal($this->htmlAttr["nArAttr"],$nodeSub).'>
+                            <i '.$this->_replaceVal($this->htmlAttr["nArIAttr"],$nodeSub).'></i>
+                        </span>
+                    </a>';
+                    $html.='<ul '.$this->_replaceVal($this->htmlAttr["uAttr"],$nodeSub).'>';
+                    $html.=$this->_tree2Html($nodeSub);
+                    $html.='</ul>';
+                }
+                
+            }
+            return $html;
+        }
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-28 15:56:10 
+     * @Desc: 设置treeHtml里 标签的属性值 
+     * @Return:  
+     * @Params:  
+     * @Example: 
+     */    
+    function setHtmlAttr($attr=[]){
+        foreach ($attr as $key => $value) {
+            $this->htmlAttr[$key]=$value;
+        }
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-02-28 15:49:49 
+     * @Desc:  替换 htmlAttr 中可能存在的键名对应当前节点键名的值
+     * @Params:  
+     */    
+    private function _replaceVal($Attrs,$nodes){
+        preg_match_all("/{([\S]+)}/",$Attrs,$match);
+        if(!empty($match[0])){
+            foreach ($match[1] as $key=>$value) {
+                if(isset($nodes[$value])){
+                    $match[0][$key]="'\{".$value."\}'";
+                    $match[1][$key]=$nodes[$value];
+                }else{
+                    $this->errorInfo="节点中不存在".$value."键名";
+                    unset($match[0][$key]);
+                    unset($match[1][$key]);
+                    $Attrs=preg_replace("/[\S]+=['\"]+{".$value."}['\"]+/","",$Attrs);
+                }
+            }
+            if(empty($match[0][0])){
+                return "";
+            }
+            return preg_replace($match[0],$match[1],$Attrs);
+        }
+        return $Attrs;
     }
     /** 
      * @Author: vition 
