@@ -38,7 +38,7 @@ class IndexController extends BaseController{
         $this->levelTree->setKeys(["nodeName"=>"node"]);
 
         $this->levelTree->setHtmlAttr(["uAttr"=>" class='treeview-menu' ","aLiAttr"=>"","aAAttr"=>" class='nodeOn' data-level='{[level]}' data-nodeid='{[nodeId]}' href='{[controller|U]}'","aIAttr"=>" class='{[nodeIcon]}'","aSpanAttr"=>"","nLiAttr"=>" class='treeview'","nAAttr"=>" href='{[controller|U]}' class='nodeOn' data-level='{[level]}'","nIAttr"=>" class='{[nodeIcon]}'","nSpanAttr"=>" class='title'","nArAttr"=>" class='pull-right-container'","nArIAttr"=>" class='fa fa-angle-left pull-right'"]);
-        $nodeHtml=$this->levelTree->tree2Html($nodeResult->data);
+        $nodeHtml=$this->levelTree->tree2Html($nodeResult->data,'nodeTitle');
         $this->assign('nodeHtml',$nodeHtml);
 
         $logout="Index/logOut";

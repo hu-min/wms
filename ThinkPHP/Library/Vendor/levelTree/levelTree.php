@@ -147,11 +147,11 @@ class levelTree{
      * @Params:  
      * @Example: 
      */    
-    function tree2Html($nodes,$outerUl=false){
+    function tree2Html($nodes,$title,$outerUl=false){
         if($outerUl){
-            return "<ul>".$this->_tree2Html($nodes)."</ul>";
+            return "<ul>".$this->_tree2Html($nodes,$title)."</ul>";
         }
-        return $this->_tree2Html($nodes);
+        return $this->_tree2Html($nodes,$title);
     }
     /** 
      * @Author: vition 
@@ -160,26 +160,25 @@ class levelTree{
      * @Return:  
      * @Params:  
      */    
-    private function _tree2Html($nodes){
+    private function _tree2Html($nodes,$title){
         
         if(array_key_exists($this->keys["nodeName"],$nodes)){
             $html="";
             foreach ($nodes[$this->keys["nodeName"]] as $key => $nodeSub) {
                 if(!array_key_exists($this->keys["nodeName"],$nodeSub)){
-                    $html.='<li '.$this->_replaceVal($this->htmlAttr["aLiAttr"],$nodeSub).'><a '.$this->_replaceVal($this->htmlAttr["aAAttr"],$nodeSub).'><i '.$this->_replaceVal($this->htmlAttr["aIAttr"],$nodeSub).'></i> <span  '.$this->_replaceVal($this->htmlAttr["aSpanAttr"],$nodeSub).'>'.$nodeSub["nodeTitle"].'</span></a></li>';
+                    $html.='<li '.$this->_replaceVal($this->htmlAttr["aLiAttr"],$nodeSub).'><a '.$this->_replaceVal($this->htmlAttr["aAAttr"],$nodeSub).'><i '.$this->_replaceVal($this->htmlAttr["aIAttr"],$nodeSub).'></i> <span  '.$this->_replaceVal($this->htmlAttr["aSpanAttr"],$nodeSub).'>'.$this->_replaceVal($title,$nodeSub).'</span></a></li>';
                 }else{
                     $html.='<li '.$this->_replaceVal($this->htmlAttr["nLiAttr"],$nodeSub).'>
                     <a '.$this->_replaceVal($this->htmlAttr["nAAttr"],$nodeSub).'>
-                        <i '.$this->_replaceVal($this->htmlAttr["nIAttr"],$nodeSub).'></i> <span '.$this->_replaceVal($this->htmlAttr["nSpanAttr"],$nodeSub).'>'.$nodeSub["nodeTitle"].'</span>
+                        <i '.$this->_replaceVal($this->htmlAttr["nIAttr"],$nodeSub).'></i> <span '.$this->_replaceVal($this->htmlAttr["nSpanAttr"],$nodeSub).'>'.$this->_replaceVal($title,$nodeSub).'</span>
                         <span '.$this->_replaceVal($this->htmlAttr["nArAttr"],$nodeSub).'>
                             <i '.$this->_replaceVal($this->htmlAttr["nArIAttr"],$nodeSub).'></i>
                         </span>
                     </a>';
                     $html.='<ul '.$this->_replaceVal($this->htmlAttr["uAttr"],$nodeSub).'>';
-                    $html.=$this->_tree2Html($nodeSub);
+                    $html.=$this->_tree2Html($nodeSub,$title);
                     $html.='</ul>';
                 }
-                
             }
             return $html;
         }else{
@@ -216,20 +215,38 @@ class levelTree{
                 }
                 if(array_key_exists($value,$nodes)){
                     if(count($exp)>1){
-                        
                         if($nodes[$value]==""){
-                            
                             $match[1][$key]="#";
                         }else{
-                            $match[1][$key]=eval("return ".$exp[1]."('{$nodes[$value]}');");
+                            $param=explode("=",$exp[1]);
+                            $firstParam="";
+                            $endParam="";
+                            if(count($param)>1){
+                                $exp[1]=$param[0];
+                                $paramPos=explode(",",$param[1]);
+                                if(count($paramPos)>1){
+                                    if($paramPos[count($paramPos)-1]=="###"){
+                                        for ($k=0; $k < (count($paramPos)-1); $k++) { 
+                                            $firstParam.=$paramPos[$k].",";
+                                        }
+                                    }else{
+                                        for ($k=0; $k < (count($paramPos)); $k++) { 
+                                            $endParam.=",".$paramPos[$k];
+                                        }
+                                    }
+                                }
+                            }
+                            if(is_array($nodes[$value])){
+                                $midlParam=json_encode($nodes[$value]);
+                            }else{
+                                $midlParam="'".$nodes[$value]."'";
+                            }
+                            $match[1][$key]=eval("return ".$exp[1]."({$firstParam}".$midlParam."{$endParam});");
                         }
-                        
-                        $match[0][$key]="'\{\[".$value."\|".$exp[1]."\]\}'";
                     }else{
-                        $match[0][$key]="'\{\[".$value."\]\}'";
                         $match[1][$key]=$nodes[$value];
                     }
-                    
+                    $match[0][$key]='/'.preg_quote($match[0][$key]).'/';
                 }else{
                     
                     $this->errorInfo="节点中不存在".$value."键名";
@@ -239,6 +256,10 @@ class levelTree{
                 }
             }
             return preg_replace($match[0],$match[1],$Attrs);
+        }else{
+            if(array_key_exists($Attrs,$nodes)){
+                return $nodes[$Attrs];
+            }
         }
         return $Attrs;
     }
