@@ -92,9 +92,11 @@ function base64Img($data,$scr="",$name=""){
     if(!file_exists($url)){
         mkdir($url, 0755,true);
     }
+    // \SeasLog::setLogger(MODULE_NAME."/".CONTROLLER_NAME."/");
+    // \SeasLog::info($file);
     if (file_put_contents($file, base64_decode(str_replace($match[1], '', $data)))){
         if($scr==""){
-            return ['errCode'=>0,'fileName'=>$name,"url"=>$url,"url2"=>'Uploads/arena/'.date('Ymd',time())."/".$name];
+            return ['errCode'=>0,'fileName'=>$name,"url"=>$url,"url2"=>''.date('Ymd',time())."/".$name];
         }else{
             return ['errCode'=>0,'fileName'=>$name,"url"=>$file];
         }

@@ -202,54 +202,7 @@
         </div>
     </div>
     <script>
-        /*查询列表函数*/
-        function userSearchFuns(){
-            datas['data']={}
-            $(tabId+" .search-info").each(function(){
-                var name=$(this).attr("name");
-                var val=$(this).val();
-                if(val!=""){
-                    datas['data'][name]=val
-                }
-            })
-        }
-        function userReFuns(){
-            $(tabId+" .user-status .status-btn").removeClass("active");
-            $(tabId+" .user-status .status-btn[name='1']").addClass("active");
-            $(tabId+" #info-status").val("1");
-        }
-        /*设置编辑用户信息*/
-        function userShowFuns(info){
-            $(tabId+" #info-userId").val(info['userId']);
-            $(tabId+" #info-loginName").val(info['loginName']);
-            $(tabId+" #info-userName").val(info['userName']);
-            $(tabId+" #info-avatar").val(info['avatar']);
-            $(tabId+" #info-phone").val(info['phone']);
-            $(tabId+" #info-status").val(info['status']);
-            $(tabId+" #info-password").val('');
-            $(tabId+" #info-gender").find("option[value='"+info['gender']+"']").prop("selected",true);
-            $(tabId+" #info-userType").find("option[value='"+info['userType']+"']").prop("selected",true);
-            $(tabId+" #info-roleId").find("option[value='"+info['roleId']+"']").prop("selected",true);
-            $(tabId+" .user-status .status-btn").removeClass("active");
-            $(tabId+" .user-status .status-btn[name='"+info['status']+"']").addClass("active");
-        }
-        /*用户信息*/
-        function userInfoFuns(){
-            datas.data={}
-            $(tabId+" .modal-info").each(function(){
-                var name=$(this).attr("name");
-                var val=$(this).val();
-                if(name=="avatar" || name=="phone" || name=='password' || name=="userId"){                    
-                }else{
-                    if(val==""){
-                        alert($(this).attr("title")+"不能为空")
-                        throw "字段不能为空"
-                    }
-                }
-                datas.data[name]=val
-            })
-            datas.data.status=$(tabId+" .status-group .active").attr("name")
-        }
+       
     </script>
 </body>
 </html>

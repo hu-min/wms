@@ -34,11 +34,12 @@ class RoleNodeController extends BaseController{
      * @Desc: 获取单独一条节点信息 
      */    
     function getRNodeOne($parameter=[]){
+        
         $res=$this->initRes();
         $where=$parameter['where']?$parameter['where']:true;
         $fields=$parameter['fields']?$parameter['fields']:true;
         $orderStr=$parameter['orderStr']?$parameter['orderStr']:null;
-        $nodeList=$this->RoleNodeDB->getOne($where , $fields, $orderStr);
+        $nodeList=$this->RoleNodeDB->getOne(['where'=>$where]);
         if($nodeList){
             return ['list'=>$nodeList];
         }

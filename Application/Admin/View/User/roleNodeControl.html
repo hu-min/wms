@@ -135,10 +135,13 @@
                 element.val(0)
             }
             if(element.parents("ul").length>0){
-                if(element.parents("ul").eq(0).find("ul").length>0){
-                    element.parents("ul").eq(0).find("ul").find("input").val(element.val())
+                // if(element.parents("ul").eq(0).find("ul").length>0){
+                //     element.parents("ul").eq(0).find("ul").find("input").val(element.val())
+                // }
+                level2=element.parents("li").next("li").children("ul");
+                if(level2.length>0){
+                    level2.find("input").val(element.val())
                 }
-
                 var level2=element.parents("ul").eq(0).parent().prev().find("input")
                 if(level2.val()==0 && element.val()>0){
                     level2.val(1)

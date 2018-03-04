@@ -102,6 +102,7 @@ class BaseController extends \Common\Controller\BaseController{
             session('isLogin',NULL);
             session('loginName',NULL);
             session('roleId',NULL);
+            session('avatar',NULL);
             session('nodeAuth',[]);
             $this->redirect('Index/Login');
         }else{
@@ -111,6 +112,11 @@ class BaseController extends \Common\Controller\BaseController{
             session('loginName',$userInfo['loginName']);
             session('userName',$userInfo['userName']);
             session('roleId',$userInfo['loginName']);
+            if($userInfo['avatar']==""){
+                $userInfo['avatar']=U(__ROOT__.'/Public'.'/admintmpl'."/dist/img/avatar/avatar".rand(1,5).".png",'','');
+            }else{
+                $userInfo['avatar']=U('Uploads/'.$userInfo['avatar'],'','');
+            }
             session('avatar',$userInfo['avatar']);
             session('usertype',$userInfo['usertype']);
             $this->userCom->logIORec($userInfo['userId']);

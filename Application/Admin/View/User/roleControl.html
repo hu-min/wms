@@ -123,13 +123,14 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary save-info" data-con="role" data-reqtype="rNodeEdit" data-url="{$url}" data-modal="true">修改</button>
+                <button type="button" class="btn btn-primary save-info" data-con="role" data-reqtype="rNodeEdit" data-url="{$url}" data-modal="false">修改</button>
             </div>
             </div>
         </div>
     </div>
     <script>
         var prve=-1;
+        var roleId=0;
         //获取角色数据
         function getRoleTree() {
             var tree=[]
@@ -184,12 +185,11 @@
             })
             datas.data.status=$(tabId+" .status-group .active").attr("name")
             if(datas.reqType=="rolerNodeEdit"){
-                datas.roleId=datas.data.roleId
+                datas.roleId=roleId;
                 datas.data={}
                 $("#modal-role-node .modal-body .auth-val").each(function(){
                     datas.data[$(this).data("id")]=$(this).val()
                 })
-                console.log(datas)
             }
             // console.log(datas)
         }
@@ -219,10 +219,13 @@
             },onNodeUnselected:function(){
                 clearRoleInfo()
             }});
+            //权限编辑按钮事件
             $(tabId+' #roletree').on("click",'li button',function(){
                 var roleData= $(tabId+' #roletree').treeview('getNode', $(this).parent(".node-roletree").data("nodeid"));
                 datas["roleId"]=roleData.id;
+                roleId=roleData.id;
                 datas["reqType"]='rnodeOne';
+
                 get("{$url}",datas,function(result){
                     if(result.errCode==0){
                         $(tabId+" #modal-role-node .modal-body").html(result.info);

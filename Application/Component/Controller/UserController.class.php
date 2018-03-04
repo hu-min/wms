@@ -168,6 +168,7 @@ class UserController extends BaseController{
     function updateUser($userInfo){
         $res=$this->initRes();
         $insertResult=$this->userDB->save($userInfo);
+        $this->log($userInfo);
         if($insertResult){
             $res->errCode=0;
             $res->error=getError(0);

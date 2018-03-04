@@ -38,7 +38,7 @@ class NodeController extends BaseController{
         $where=$parameter['where']?$parameter['where']:true;
         $fields=$parameter['fields']?$parameter['fields']:true;
         $orderStr=$parameter['orderStr']?$parameter['orderStr']:null;
-        $nodeList=$this->NodeDB->getOne($where , $fields, $orderStr);
+        $nodeList=$this->NodeDB->getOne(['where'=>$where]);
         if($nodeList){
             return ['list'=>$nodeList];
         }

@@ -30,7 +30,12 @@ function post(url,datas,callBack){
         success:callBack,
     })
 }
-
+//enter-input class的输入框键盘回车事件
+$(document).on("keypress",".enter-input",function(e){
+    if(e.keyCode == 13){
+        $($(this).data("btn")).click();
+    }
+})
 var datas={};
 var filesData={};
 /** 
@@ -151,6 +156,7 @@ $(document).on("click",'.save-info',function(){
     }
     // console.log(datas);
     post(url,datas,function(result){
+        console.log(result);
         if(result.errCode==0){
             datas={}
             var url=$("#"+search).data("url");
@@ -165,7 +171,11 @@ $(document).on("click",'.save-info',function(){
             datas.reqType=reqtype;
             eval(con2+"SearchFuns()");//对不同的id设置不同的发送数据
             if(isModal){
+                // console.log(isModal);
                 searchFun(url,datas,table,page)
+                
+            }
+            if($('body').hasClass('modal-open')){
                 $(tabId+" #"+parent).modal('toggle')
             }
         }else{
@@ -199,3 +209,74 @@ $(document).on("click",'.tree-minus',function(){
     var treeId=$(this).data("id")
     $(treeId).treeview('expandAll', { silent: true });
 })
+$(function(){
+    /** 
+     * javascript comment 
+     * @Author: vition 
+     * @Date: 2018-03-04 13:42:18 
+     * @Desc:  url 中参数响应自动展开level 例如参数 ?action=Article/articleControl
+     * action 活动的key
+     * Article/articleControl 表示Article控制器的articleControl方法
+     */    
+    paramMatch=getUrlAction()
+    // if(search!="" && search.search(/\?action\=\S/)>=0){
+        // var paramMatch=search.match(/\=([\S\/]*)/);
+        if(paramMatch){
+            var splitArr=paramMatch.split("/");
+            var match= window.document.body.innerHTML.match(new RegExp("\/Admin\/"+splitArr[0]+"\/"+splitArr[1]+"[\.a-zA-Z]*","gim"))
+            if(match[0]){
+                $(document).find(".nodeOn").each(function(){
+                    if($(this).attr("href")==match[0]){
+                        var result=$(this).parents(".treeview-menu").css("display","block");
+                        var nodeOn=$(this);
+                        setTimeout(function(){nodeOn.click();},0);
+                        return false
+                    }
+                })
+            }
+        }
+        
+    // }
+})
+/** 
+ * javascript comment 
+ * @Author: vition 
+ * @Date: 2018-03-04 15:22:16 
+ * @Desc: 获取浏览器action的值 
+ */
+function getUrlAction(){
+    var clSearch=window.location.search
+    if(clSearch!="" && clSearch.search(/\?action\=/)>=0){
+        return clSearch.match(/\=([\S\/]*)/)[1];
+    }
+    return false;
+}
+/** 
+ * javascript comment 
+ * @Author: vition 
+ * @Date: 2018-03-04 15:26:33 
+ * @Desc: 设置浏览器的url 不刷新 
+ */
+function setUrlAction(title,newUrl){
+    var stateObject = {};
+    history.pushState(stateObject,title,"?action="+newUrl);
+}
+/** 
+ * javascript comment 
+ * @Author: vition 
+ * @Date: 2018-03-04 15:40:28 
+ * @Desc: 通过nodeId更改url action 
+ */
+function chUrlAction(nodelId){
+    $(document).find(".nodeOn").each(function(elem){
+        if(parseInt(nodelId)==parseInt($(this).data("nodeid"))){
+            var tController=$(this).attr("href")
+            var tMatch=tController.match(/\/Admin\/([\S\/]*)\./)
+            urlParam=getUrlAction()
+            if(tMatch!=null && tMatch[1]!=urlParam){
+                setUrlAction(tMatch[1],tMatch[1])
+            }
+            return false;
+        }
+    })
+}

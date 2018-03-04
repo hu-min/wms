@@ -20,3 +20,13 @@
 .handle:hover{
   color: #428BCA;
 }
+.users-avatar-td{
+  text-align: center;
+  padding: 0!important;
+}
+#userTable tr td{
+  vertical-align:middle;
+}
+.users-avatar-td img{
+  height:50px;
+}

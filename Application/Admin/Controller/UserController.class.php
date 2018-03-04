@@ -57,6 +57,12 @@ class UserController extends BaseController{
     function manageUserInfo(){
         $reqType=I("reqType");
         $datas=I("data");
+        $filesData=I("filesData");
+        if($filesData[urlencode($datas['avatar'])]){
+            $datas['avatar']=base64Img($filesData[urlencode($datas['avatar'])])["url2"];
+        }
+        preg_match("/\S([A-Z]+[^[A-Z]*\S]*)$/",$reqType,$match);
+        $reqType=$match[1];
         $userInfo=[];
         if($reqType=="Add"){
             $userInfo=[
@@ -64,7 +70,7 @@ class UserController extends BaseController{
                 'loginName'=>$datas['loginName'],
                 'userName'=>$datas['userName'],
                 'avatar'=>$datas['avatar'],
-                'password'=>sha1($datas['password']),
+                'password'=>sha1(sha1($datas['password'])),
                 'phone'=>$datas['phone']?$datas['phone']:0,
                 'gender'=>$datas['gender'],
                 'userType'=>$datas['userType'],
@@ -273,7 +279,24 @@ class UserController extends BaseController{
      * @Desc: 角色节点权限 
      */    
     function rolerNodeEdit(){
-        $this->ajaxReturn(['errCode'=>1,'error'=>""]);
+        $roleId=I("roleId",0,'int');
+        $authData=I("data");
+        // $this->log($authData);
+        foreach ($authData as $nodeId => $authority) {
+            $parameter=[
+                'where'=>['roleId'=>$roleId,"nodeId"=>$nodeId],
+            ];
+            $rnodeResult=$this->rNodeCom->getRNodeOne($parameter);
+            if($rnodeResult){
+                $rnodeResult["list"]["authority"]=$authority;
+                // $this->log($rnodeResult["list"]);
+                $result=$this->rNodeCom->updateRNode(["where"=>["rnId"=>$rnodeResult["list"]["rnId"]],"data"=>$rnodeResult["list"]]);
+            }else{
+                $result=$this->rNodeCom->inserRNode(["roleId"=>$roleId,"nodeId"=>$nodeId,"authority"=>$authority]);
+            }
+        }
+        $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+        
     }
     function rnodeOne(){
         $roleId=I("roleId",0,'int');
@@ -290,7 +313,7 @@ class UserController extends BaseController{
         }
         $this->assign("nodeTree",$this->getNodeTree());
         $this->assign("auth",json_encode($authList));
-        $this->log($authList);
+        // $this->log($authList);
         $this->ajaxReturn(['errCode'=>0,'info'=>$this->fetch("User/roleNodeControl")]);
     }
     /** 
