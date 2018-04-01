@@ -1,0 +1,139 @@
+/*颜色表*/
+/*red color 红色系列*/
+.indian-red{color:#CD5C5C;}
+.light-salmon{color:#FFA07A;}
+.crimson{color:#DC143C;}
+.red{color:#FF0000;}
+.dark-red{color:rgb(139, 16, 0);}
+/*red background 红色系列*/
+.bg-indian-red{background:#CD5C5C;}
+.bg-light-salmon{background:#FFA07A;}
+.bg-crimson{background:#DC143C;}
+.bg-red{background:#FF0000;}
+.bg-dark-red{background:#8B0000;}
+
+/*pink color 粉色系列*/
+.pink{color:#FFC0CB;}
+.hot-pink{color:#FF69B4;}
+.deep-pink{color:#FF1493;}
+.mv-red{color:#C71585;}
+.pv-red{color:#DB7093;}
+/*pink background 粉色系列*/
+.bg-pink{background:#FFC0CB;}
+.bg-hot-pink{background:#FF69B4;}
+.bg-deep-pink{background:#FF1493;}
+.bg-mv-red{background:#C71585;}
+.bg-pv-red{background:#DB7093;}
+
+/*orange color 橙色系列*/
+.coral{color:#FF7F50;}
+.tomato{color:#FF6347;}
+.orange-red{color:#FF4500;}
+.dark-orange{color:#FF8C00;}
+.orange{color:#FFA500;}
+/*orange background 橙色系列*/
+.bg-coral{background:#FF7F50;}
+.bg-tomato{background:#FF6347;}
+.bg-orange-red{background:#FF4500;}
+.bg-dark-orange{background:#FF8C00;}
+.bg-orange{background:#FFA500;}
+
+/*purple color 紫色系列*/
+.plum{color:#DDA0DD;}
+.orchid{color:#DA70D6;}
+.magenta{color:#FF00FF;}
+.med-orchid{color:#BA55D3;}
+.light-purple{color:#6600CC;}
+.purple{color:#800080;}
+.indigo{color:#4B0082;}
+/*purple background 紫色系列*/
+.bg-plum{background:#DDA0DD;}
+.bg-orchid{background:#DA70D6;}
+.bg-magenta{background:#FF00FF;}
+.bg-med-orchid{background:#BA55D3;}
+.bg-light-purple{background:#6600CC;}
+.bg-purple{background:#800080;}
+.bg-indigo{background:#4B0082;}
+
+/*green color 绿色系列*/
+.green-yellow{color:#ADFF2F;}
+.lime-green{color:#32CD32;}
+.light-green{color:#B0D869;}
+.PaleGreen{color:#98FB98;}
+.ms-green{color:#00FA9A;}
+.sea-green{color:#2E8B57;}
+.green{color:#008000;}
+.dark-green{color:#006400;}
+.yellow-green{color:#9ACD32;}
+.ls-green{color:#20B2AA;}
+
+/*green background 绿色系列*/
+.bg-green-yellow{background:#ADFF2F;}
+.bg-lime-green{background:#32CD32;}
+.bg-light-green{background:#B0D869;}
+.bg-PaleGreen{background:#98FB98;}
+.bg-ms-green{background:#00FA9A;}
+.bg-sea-green{background:#2E8B57;}
+.bg-green{background:#008000;}
+.bg-dark-green{background:#006400;}
+.bg-yellow-green{background:#9ACD32;}
+.bg-ls-green{background:#20B2AA;}
+
+
+/*blue color 蓝色系列*/
+.dark-cyan{color:#008B8B;}
+.cyan{color:#00FFFF;}
+.light-cyan{color:#E0FFFF;}
+.steel-blue{color:#4682B4;}
+.ls-blue{color:#B0C4DE;}
+.deepsky-blue{color:#00BFFF;}
+.dodger-blue{color:#1E90FF;}
+.blue{color:#0000FF;}
+.dark-blue{color:#00008B;}
+.midnight-blue{color:#191970;}
+.light-blue{color:#93CBF9;}
+/*blue background 蓝色系列*/
+.bg-dark-cyan{background:#008B8B;}
+.bg-cyan{background:#00FFFF;}
+.bg-light-cyan{background:#E0FFFF;}
+.bg-steel-blue{background:#4682B4;}
+.bg-ls-blue{background:#B0C4DE;}
+.bg-deepsky-blue{background:#00BFFF;}
+.bg-dodger-blue{background:#1E90FF;}
+.bg-blue{background:#0000FF;}
+.bg-dark-blue{background:#00008B;}
+.bg-midnight-blue{background:#191970;}
+.bg-light-blue{background:#93CBF9;}
+/*yellow color 黄色系列*/
+.gold{color:#FFD700;}
+.yellow{color:#FFFF00;}
+.papaya-whip{color:#FFEFD5;}
+.pale-goldenrod{color:#EEE8AA;}
+.khaki{color:#F0E68C;}
+.dark-khaki{color:#BDB76B;}
+/*yellow background 黄色系列*/
+.bg-gold{background:#FFD700;}
+.bg-yellow{background:#FFFF00;}
+.bg-papaya-whip{background:#FFEFD5;}
+.bg-pale-goldenrod{background:#EEE8AA;}
+.bg-khaki{background:#F0E68C;}
+.bg-dark-khaki{background:#BDB76B;}
+
+/*其他color*/
+.white{color:#FFFFFF;}
+.light-gray{color:#D3D3D3;}
+.silver{color:#C0C0C0;}
+.gray{color:#808080;}
+.black{color:#000000;}
+
+/*其他background*/
+.bg-white{background:#FFFFFF;}
+.bg-light-gray{background:#D3D3D3;}
+.bg-silver{background:#C0C0C0;}
+.bg-gray{background:#808080;}
+.bg-black{background:#000000;}
+
+/*table 相关样式*/
+/*table list */
+.table-list-3{table-layout: auto;}
+.table-list-3 td{padding: 5px 10px!important;}

@@ -193,8 +193,10 @@
             $(tabId+" #modal-icon .modal-body").on("click",".icon-select",function(){
                 var icon=$(this).text().replace(/(^\s*)|(\s*$)/g, "")
                 $(tabId+" #modal-nodeInfo .modal-info[name='nodeIcon']").val(icon);
-                // console.log($(tabId+" #modal-nodeInfo .modal-info[name='nodeIcon']"));
+                var ic=$(tabId+" #modal-nodeInfo .modal-info[name='nodeIcon']").prev().children("i");
+                $(tabId+" #modal-nodeInfo .modal-info[name='nodeIcon']").prev().children("i").attr("class",icon+" text-red")
                 $(tabId+" #modal-icon").modal('hide')
+                $('body').addClass('modal-open')
             })
         })
         //初始化父节点的select数据

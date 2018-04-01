@@ -156,7 +156,6 @@ $(document).on("click",'.save-info',function(){
     }
     // console.log(datas);
     post(url,datas,function(result){
-        console.log(result);
         if(result.errCode==0){
             datas={}
             var url=$("#"+search).data("url");
