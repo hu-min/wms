@@ -280,3 +280,36 @@ function chUrlAction(nodelId){
         }
     })
 }
+var dialogMove=false
+$(document).on("click",".full-screen",function(e){
+    var modalDialog=$(this).parents(".modal-dialog")
+    if(modalDialog.hasClass("modal-full")){
+        modalDialog.removeClass("modal-full");
+        $(this).children("i").addClass("fa-arrows-alt")
+        $(this).children("i").removeClass("fa-compress")
+    }else{
+        modalDialog.addClass("modal-full");
+        $(this).children("i").removeClass("fa-arrows-alt")
+        $(this).children("i").addClass("fa-compress")
+    }
+    // $(this).parents(".modal-dialog").css("width","100%");
+    // console.log($(this).parents(".modal-dialog").css("width"));
+})
+//递归获取select option
+function getArtClsNode(element,level){
+    var option=""
+    var strs="";
+    for (let index = 0; index < level; index++) {
+        strs+="——";
+    }
+    if(typeof(element.nodes)=='object'){
+        level++
+        element.nodes.forEach(elementSub => {
+            option+=getArtClsNode(elementSub,level);
+        });
+    }
+    return '<option value="'+element.id+'">'+strs+element.text+'</option>'+option;
+}
+function clearTags(html){
+    return $('<p>'+html+'</p>').text()
+}

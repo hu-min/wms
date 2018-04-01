@@ -286,13 +286,13 @@ class UserController extends BaseController{
             $parameter=[
                 'where'=>['roleId'=>$roleId,"nodeId"=>$nodeId],
             ];
-            $rnodeResult=$this->rNodeCom->getRNodeOne($parameter);
+            $rnodeResult=$this->rNodeCom->getRoleNodeOne($parameter);
             if($rnodeResult){
                 $rnodeResult["list"]["authority"]=$authority;
                 // $this->log($rnodeResult["list"]);
-                $result=$this->rNodeCom->updateRNode(["where"=>["rnId"=>$rnodeResult["list"]["rnId"]],"data"=>$rnodeResult["list"]]);
+                $result=$this->rNodeCom->updateRoleNode(["where"=>["rnId"=>$rnodeResult["list"]["rnId"]],"data"=>$rnodeResult["list"]]);
             }else{
-                $result=$this->rNodeCom->inserRNode(["roleId"=>$roleId,"nodeId"=>$nodeId,"authority"=>$authority]);
+                $result=$this->rNodeCom->inserRoleNode(["roleId"=>$roleId,"nodeId"=>$nodeId,"authority"=>$authority]);
             }
         }
         $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
@@ -306,7 +306,7 @@ class UserController extends BaseController{
             'pageSize'=>9999,
             'orderStr'=>'rnId ASC',
         ];
-        $rNodeResult=$this->rNodeCom->getRNodeList($parameter);
+        $rNodeResult=$this->rNodeCom->getRoleNodeList($parameter);
         $authList=[];
         if($rNodeResult){
             $authList=$rNodeResult['list'];

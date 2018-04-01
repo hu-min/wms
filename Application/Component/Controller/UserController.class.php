@@ -1,12 +1,11 @@
 <?php
 namespace Component\Controller;
-use Common\Controller\BaseController;
+// use Common\Controller\BaseController;
 
 class UserController extends BaseController{
-    protected $userDB;
     public function _initialize(){
         parent::_initialize();
-        $this->userDB = D('Component/User');
+        $this->selfDB = D('Component/User');
         $this->nodeDB = D('Component/Node');
     }
     /** 
@@ -28,8 +27,8 @@ class UserController extends BaseController{
             'fields'=>'password',
             'noField'=>true,
         ];
-        $userResult=$this->userDB->getOne($parArray);
-        $this->log($this->userDB->_sql());
+        $userResult=$this->selfDB->getOne($parArray);
+        $this->log($this->selfDB->_sql());
         if($userResult){
             if($userResult['status']!=1){
                 $res->errCode=10002;
@@ -99,26 +98,26 @@ class UserController extends BaseController{
         $res->data=$menus;
         return $res;
     }
-    /** 
-     * @Author: vition 
-     * @Date: 2018-01-27 14:50:51 
-     * @Desc: 获取用户列表 
-     */    
-    function getUserList($parameter=[]){
-        $res=$this->initRes();
-        $where=$parameter['where']?$parameter['where']:true;
-        $fields=$parameter['fields']?$parameter['fields']:true;
-        $orderStr=$parameter['orderStr']?$parameter['orderStr']:null;
-        $page=$parameter['page']?$parameter['page']:0;
-        $pageNum=$parameter['pageSize']?$parameter['pageSize']:0;
-        $groupBy=$parameter['groupBy']?$parameter['groupBy']:null;
-        $userList=$this->userDB->getList($where , $fields, $orderStr, $page, $pageNum, $groupBy);
-        $count=$this->userDB->countList($where);
-        if($userList){
-            return ['list'=>$userList,'count'=>$count];
-        }
-        return false;
-    }
+    // /** 
+    //  * @Author: vition 
+    //  * @Date: 2018-01-27 14:50:51 
+    //  * @Desc: 获取用户列表 
+    //  */    
+    // function getUserList($parameter=[]){
+    //     $res=$this->initRes();
+    //     $where=$parameter['where']?$parameter['where']:true;
+    //     $fields=$parameter['fields']?$parameter['fields']:true;
+    //     $orderStr=$parameter['orderStr']?$parameter['orderStr']:null;
+    //     $page=$parameter['page']?$parameter['page']:0;
+    //     $pageNum=$parameter['pageSize']?$parameter['pageSize']:0;
+    //     $groupBy=$parameter['groupBy']?$parameter['groupBy']:null;
+    //     $userList=$this->selfDB->getList($where , $fields, $orderStr, $page, $pageNum, $groupBy);
+    //     $count=$this->selfDB->countList($where);
+    //     if($userList){
+    //         return ['list'=>$userList,'count'=>$count];
+    //     }
+    //     return false;
+    // }
     /** 
      * @Author: vition 
      * @Date: 2018-01-14 21:49:32 
@@ -135,7 +134,7 @@ class UserController extends BaseController{
         if($parameter['userId']){
             $where['userId']=$parameter['userId'];
         }
-        $userResult=$this->userDB->getOne(['where'=>$where,'fields'=>'password','noField'=>true]);
+        $userResult=$this->selfDB->getOne(['where'=>$where,'fields'=>'password','noField'=>true]);
         if($userResult){
             $res->errCode=0;
             $res->error=getError(0);
@@ -143,48 +142,48 @@ class UserController extends BaseController{
             return $res;
         }
     }
-    /** 
-     * @Author: vition 
-     * @Date: 2018-01-30 00:42:29 
-     * @Desc:  
-     */    
-    function insertUser($userInfo){
-        $res=$this->initRes();
-        $insertResult=$this->userDB->insert($userInfo);
-        if($insertResult){
-            $res->errCode=0;
-            $res->error=getError(0);
-            return $res;
-        }
-        $res->errCode=111;
-        $res->error=getError(111);
-        return $res;
-    }
-    /** 
-     * @Author: vition 
-     * @Date: 2018-02-03 00:42:15 
-     * @Desc:  
-     */    
-    function updateUser($userInfo){
-        $res=$this->initRes();
-        $insertResult=$this->userDB->save($userInfo);
-        $this->log($userInfo);
-        if($insertResult){
-            $res->errCode=0;
-            $res->error=getError(0);
-            return $res;
-        }
-        $res->errCode=111;
-        $res->error=getError(111);
-        return $res;
-    }
+    // /** 
+    //  * @Author: vition 
+    //  * @Date: 2018-01-30 00:42:29 
+    //  * @Desc:  
+    //  */    
+    // function insertUser($userInfo){
+    //     $res=$this->initRes();
+    //     $insertResult=$this->selfDB->insert($userInfo);
+    //     if($insertResult){
+    //         $res->errCode=0;
+    //         $res->error=getError(0);
+    //         return $res;
+    //     }
+    //     $res->errCode=111;
+    //     $res->error=getError(111);
+    //     return $res;
+    // }
+    // /** 
+    //  * @Author: vition 
+    //  * @Date: 2018-02-03 00:42:15 
+    //  * @Desc:  
+    //  */    
+    // function updateUser($userInfo){
+    //     $res=$this->initRes();
+    //     $insertResult=$this->selfDB->save($userInfo);
+    //     $this->log($userInfo);
+    //     if($insertResult){
+    //         $res->errCode=0;
+    //         $res->error=getError(0);
+    //         return $res;
+    //     }
+    //     $res->errCode=111;
+    //     $res->error=getError(111);
+    //     return $res;
+    // }
     /** 
      * @Author: vition 
      * @Date: 2018-02-04 00:15:49 
      * @Desc: 登录退出记录 
      */    
     function logIORec($userId){
-        $this->userDB->where(['userId'=>$userId])->setInc("loginNum");
-        $this->userDB->modify(['userId'=>$userId],['lastTime'=>time(),'lastIp'=>ipTolong(getIp())]);
+        $this->selfDB->where(['userId'=>$userId])->setInc("loginNum");
+        $this->selfDB->modify(['userId'=>$userId],['lastTime'=>time(),'lastIp'=>ipTolong(getIp())]);
     }
 }

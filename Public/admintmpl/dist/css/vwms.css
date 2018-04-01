@@ -1,32 +1,44 @@
 /*!
  */
 .tab-clo{
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  z-index: 1;
-  color: #FF6600;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	z-index: 1;
+	color: #FF6600;
 }
 .tab-clo:hover{
-  color: #FF0000;
-  cursor:pointer;
+  	color: #FF0000;
+  	cursor:pointer;
 }
 .none{
-  display:none;
+  	display:none;
 }
 .handle{
-  cursor:pointer;
+  	cursor:pointer;
 }
 .handle:hover{
-  color: #428BCA;
+	color: #428BCA;
 }
 .users-avatar-td{
-  text-align: center;
-  padding: 0!important;
+  	text-align: center;
+  	padding: 0!important;
 }
 #userTable tr td{
-  vertical-align:middle;
+  	vertical-align:middle;
 }
 .users-avatar-td img{
-  height:50px;
+  	height:50px;	
+}
+.modal-dialog .full-screen i{
+	margin-left: -42px;
+	font-size: 20px;
+	color:#CBCBCB;
+	cursor:pointer;
+}
+.modal-dialog .full-screen i:hover{
+	color:#333333;
+}
+.modal-full{
+	width:100%;
 }
