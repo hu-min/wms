@@ -42,3 +42,6 @@
 .modal-full{
 	width:100%;
 }
+.table thead th,.table tbody td{
+	text-align: center;
+}

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <!-- daterange picker -->
+    <link rel="stylesheet" href="__ADMINT__/bower_components/bootstrap-daterangepicker/daterangepicker.css">
+    <link rel="stylesheet" href="__ADMINT__/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-header">
+                        <i class="fa fa-plus-square"></i>
+                        <h4 class="box-title">项目列表</h4>
+                        <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加项目" data-target="#modal-projectInfo" data-con="project" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增项目</button>
+                    </div>
+                    <div class="box-body search-body" id="project-search-box">
+                        <div class="col-md-12">
+                            <div class="form-inline">
+                                <label class="control-label">项目名称：</label>
+                                <div class="form-group">
+                                    <input class="form-control search-info" name="name" placeholder="项目名称" type="text">
+                                </div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <label>时间范围:</label>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                          <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="text" name="time" class="form-control search-info pull-right project-time" >
+                                    </div>
+                                </div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <label class="control-label">直客公司：</label>
+                                <div class="form-group">
+                                    <input class="form-control search-info" name="toCompany" placeholder="直客公司" type="text">
+                                </div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <div class="form-group">
+                                    <label >状态：</label>
+                                    <select class="form-control search-info" title="状态" name="status">
+                                        <option value="">全部</option>
+                                        <option value="0">未中标</option>
+                                        <option value="1">已完成</option>
+                                        <option value="2">洽谈中</option>
+                                        <option value="3">进行中</option>
+                                    </select>
+                                </div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <button type="button" data-url="{$url}" id="project-search" data-reqtype="projectList" data-con="project" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                <button type="button" class="btn bg-teal search-refresh" data-con="project"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                            </div>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="count-div" id="projectCount" style="margin:10px;font-weight: 800;">
+                </div>
+                <table id="" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>项目日期</th>
+                            <th>项目名称</th>
+                            <th>直客公司</th>
+                            <th>客户跟进</th>
+                            <th>营业跟进</th>
+                            <th>项目主担</th>
+                            <th>承接模块</th>
+                            <th>场次</th>
+                            <th>营业总额</th>
+                            <th>已预支付</th>
+                            <th>剩余未付</th>
+                            <th>成本</th>
+                            <th>利润</th>
+                            <th>利润率</th>
+                            <th>进度</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="projectTable">
+                        {$tables}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="dataTables_wrapper">
+            <div id="projectPage" class="row page-div" data-url="{$url}" data-reqtype="projectList" data-con="project">
+                {$pages}
+            </div>
+        </div>
+    </section>
+    <div class="modal fade" id="modal-projectInfo">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+            <div class="modal-header">
+                <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Default Modal</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label for="info-title">立项代号：</label>
+                            <input  class="modal-info" title="projectId" name="projectId" type="hidden">
+                            <input class="form-control modal-info"  name="code" title="立项代号" placeholder="立项代号" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">项目名称：</label>
+                            <input class="form-control modal-info" name="name" title="项目名称" placeholder="项目名称" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">项目日期：</label>
+                            <input class="form-control modal-info datetime" name="time" title="项目日期" placeholder="项目日期" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">直客公司：</label>
+                            <input class="form-control modal-info" name="toCompany" title="直客公司" placeholder="直客公司" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">客户跟进：</label>
+                            <input class="form-control modal-info" name="followUp" title="客户跟进" placeholder="客户跟进" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">营业跟进：</label>
+                            <input class="form-control modal-info" name="business" title="营业跟进" placeholder="营业跟进" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">项目主担：</label>
+                            <input class="form-control modal-info" name="leader" title="项目主担" placeholder="项目主担" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">承接模块：</label>
+                            <input class="form-control modal-info" name="responsible" title="承接模块" placeholder="承接模块" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">场次：</label>
+                            <input class="form-control modal-info" name="num" title="场次" placeholder="场次" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">营业总额：</label>
+                            <input class="form-control modal-info" name="amount" title="营业总额" placeholder="营业总额" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">发票信息：</label>
+                            <input class="form-control modal-info" name="invoice" title="发票信息" placeholder="发票信息" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">支付标记：</label>
+                            <input class="form-control modal-info" name="paySign" title="支付标记" placeholder="支付标记" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">预付日：</label>
+                            <input class="form-control modal-info datetime" name="advanceDate" title="预付日" placeholder="预付日" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">预付：</label>
+                            <input class="form-control modal-info" name="advance" title="预付" placeholder="预付" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">剩余未付：</label>
+                            <input class="form-control modal-info" name="surplus" title="剩余未付" placeholder="剩余未付" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">成本：</label>
+                            <input class="form-control modal-info" name="cost" title="成本" placeholder="成本" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">利润：</label>
+                            <input class="form-control modal-info" name="profit" title="利润" placeholder="利润" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">利润率%：</label>
+                            <input class="form-control modal-info" name="profitRate" title="利润率" placeholder="利润率" type="text">
+                        </div>
+                        <div class="form-group">
+                            <div class="btn-group project-status status-group" data-toggle="btn-toggle">
+                                <button type="button" name="0" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-default"></i> 未中标 </button>
+                                <button type="button" name="1" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-green"> 已完成 </i>
+                                </button>
+                                <button type="button" name="2" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-info"></i> 洽谈中 </button>
+                                <button type="button" name="3" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-red"></i> 进行中 </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                        </div>
+                    </div>
+                </form>            
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary save-info" data-con="project" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    <!-- date-range-picker -->
+    <script src="__ADMINT__/bower_components/moment/min/moment.min.js"></script>
+    <script src="__ADMINT__/bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script src="__ADMINT__/bower_components/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+    <script>
+        // var E = window.wangEditor
+        // var editor = new E(tabId+' .art-editor')
+        //获取分类数据
+        function getArtClsTree() {
+            var tree=[]
+            datas["reqType"]="artclassList";
+            get("{$url}",datas,function(result){
+                tree=result.tree
+            },false)
+            intPClsSelect(tree);
+            return tree;
+        }
+        $(function(){
+            $(tabId+' .project-time').daterangepicker({
+                "startDate":moment().year()+"-01-01",
+                "endDate":moment().year()+"-"+(moment().month()+1)+"-"+moment().dates(),
+                "locale": {
+                    format: 'YYYY-MM-DD',
+                    separator: ' ~ ',
+                    applyLabel: "应用",
+                    cancelLabel: "取消",
+                    resetLabel: "重置",
+                    daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],
+                    monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月','七月', '八月', '九月', '十月', '十一月', '十二月' ],
+                },showDropdowns: true,
+            })
+            $(tabId+' .datetime').datepicker({
+                autoclose: true,
+                format: 'yyyy-mm-dd',
+                language:"cn",
+                clearBtn:true,
+            })
+            getArtClsTree();
+            //新增项目
+            $(tabId+" .box-header button").on("click",function(){
+                $(tabId+" .modal-info").val("");
+                // $(tabId+" #modal-artclass h4").text("新增项目");
+                // $(tabId+" #modal-artclass .save-info").data("reqtype","Add");
+                // $(tabId+" #modal-artclass .save-info").text("新增项目");
+                // $(tabId+" .modal-dialog .artclass").find("option[value='0']").prop("selected",true);
+                // $(tabId+" .modal-dialog .artclass").trigger('chosen:updated');
+                $(tabId+" .status-btn").removeClass("active");
+                $(tabId+" .status-btn[name='1']").addClass("active");
+            })
+            //计算利润
+            $(tabId+" input[name='cost']").on("input",function(){
+                var profit=$(tabId+" input[name='amount']").val()-$(tabId+" input[name='cost']").val()
+                $(tabId+" input[name='profit']").val(profit)
+            })
+            //计算利润率
+            $(tabId+" input[name='cost']").on("input",function(){
+                var profitRate=$(tabId+" input[name='profit']").val()/$(tabId+" input[name='amount']").val()
+                $(tabId+" input[name='profitRate']").val(Math.round(profitRate * 100))
+            })
+
+        })
+        function projectReFuns(){
+
+        }
+        function projectSearchFuns(){
+            datas['data']={}
+            $(tabId+" .search-info").each(function(){
+                var name=$(this).attr("name");
+                var val=$(this).val();
+                if(val!=""){
+                    datas['data'][name]=val
+                }
+            })
+        }
+        function projectInfoFuns(){
+            datas["data"]={}
+            $(tabId+" .modal-info").each(function(){
+                var name =$(this).attr("name");
+                var val =$(this).val();
+                if(name=="title" && val==""){
+                    alert("标题不能为空");
+                    throw "标题不能为空";
+                }else if(name=="class" && val<=0){
+                    alert("必须选择分类");
+                    throw "必须选择分类";
+                }else if(val!=""){
+                    datas["data"][name]=val;
+                }
+                
+            })
+            datas["data"].status=$(tabId+" .status-group .active").attr("name")
+        }
+        /*设置编辑用户信息*/
+        function projectShowFuns(info){
+
+            $(tabId+" .modal-info[name='projectId']").val(info['projectId']);
+            $(tabId+" .modal-info[name='title']").val(info['title']);
+            $(tabId+" .modal-info[name='tags']").val(info['tags']);
+            $(tabId+" .modal-info[name='cover']").val(info['cover']);
+            $(tabId+" .status-btn[name='"+info['status']+"']").addClass("active");
+            $(tabId+" .modal-info[name='class']").find("option[value='"+info['class']+"']").prop("selected",true);
+        }
+        //初始分类的select数据
+        function intPClsSelect(data){
+            var option='<option value="0">根Root</option>';
+            data.forEach(ele => {
+                option+=getArtClsNode(ele,0);
+            });
+            // $(tabId+" .artclass").html(option);
+        }
+    </script>
+</body>
+</html>

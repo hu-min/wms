@@ -1,4 +1,4 @@
 <?php
 return [
-    'admintitle'=>'VWMS后台管理',
+    'admintitle'=>'TWSH后台管理',
 ];

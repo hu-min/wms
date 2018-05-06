@@ -59,17 +59,19 @@ $(document).on("click",".search-list,.vpage",function(){
     }
     var table=con+"Table";
     var page=con+"Page";
+    var count=con+"Count";
     datas.reqType=reqtype;
     eval(con+"SearchFuns()");//对不同的id设置不同的发送数据
-    searchFun(url,datas,table,page);
+    searchFun(url,datas,table,page,count);
     
 })
 
-function searchFun(url,datas,table,page){
+function searchFun(url,datas,table,page,count){
     get(url,datas,function(result){
         if(result.errCode==0){
             $("#"+table).html(result.table);
             $("#"+page).html(result.page);
+            $("#"+count).html(result.count);
         }else{
             alert(result.error);
         }

@@ -1,0 +1,32 @@
+<volist name="projectList" id="item">
+        <tr>
+            <td>{$item['time']|date='Y-m-d',###}</td>
+            <td title="{$item['name']}">{:utf8_substr($item['name'],8)}</td>
+            <td>{$item['toCompany']}</td>
+            <td>{$item['followUp']}</td>
+            <td>{$item['business']}</td>
+            <td>{$item['leader']}</td>
+            <td>{$item['responsible']}</td>
+            <td>{$item['num']}</td>
+            <td>{$item['amount']|number_format}</td>
+            <td>{$item['advance']|number_format}</td>
+            <td>{$item['surplus']|number_format}</td>
+            <td>{$item['cost']|number_format}</td>
+            <td>{$item['profit']|number_format}</td>
+            <td>
+                <if condition="$item['profitRate'] gt 0">
+                    {$item['profitRate']}%
+                </if>
+            </td>
+            <if condition="$item['status'] eq 0">
+                <td><span class="label bg-black">{$processArr[$item["status"]]}</span></td>
+            <elseif condition="$item['status'] eq 1"/>
+                <td><span class="label label-success">{$processArr[$item["status"]]}</span></td>
+            <elseif condition="$item['status'] eq 2"/>
+                <td><span class="label label-warning">{$processArr[$item["status"]]}</span></td>
+            <else/>
+                <td><span class="label label-danger">{$processArr[$item["status"]]}</span></td>
+            </if>
+            <td><button type="button" data-show="One" data-reqtype="Edit"  data-id="{$item['projectId']}" data-url="{$url}" data-con="project" data-toggle="modal" data-target="#modal-projectInfo" data-title="编辑项目" class="btn btn-primary info-edit">编辑</button></td>
+        </tr>
+    </volist>
