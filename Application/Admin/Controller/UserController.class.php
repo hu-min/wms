@@ -123,9 +123,11 @@ class UserController extends BaseController{
     function userAdd(){
         $userInfo=$this->manageUserInfo();
         $insertResult=$this->userCom->insertUser($userInfo);
+        print_r($userInfo);
         if($insertResult->errCode==0){
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
         }
+        
         $this->ajaxReturn(['errCode'=>100,'error'=>getError(100),'reqType'=>$reqType]);
     }
     /** 

@@ -144,7 +144,7 @@ function setLevelTree($param=[]){
 }
 function utf8_substr($str,$length){
     $suf="";
-    if(mb_strlen($str)>$length){
+    if(strlen($str)>$length){
         $suf="……";
     }
     return mb_substr($str,0,$length,"utf8").$suf;
