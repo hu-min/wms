@@ -14,12 +14,11 @@ class IndexController extends BaseController{
      * 后台管理入口
      */
     function Index(){
-        echo "a";
-        // if($this->isLogin()){
-        //     $this->redirect('Index/Main');
-        // }else{
-        //     $this->redirect('Index/Login');
-        // }
+        if($this->isLogin()){
+            $this->redirect('Index/Main');
+        }else{
+            $this->redirect('Index/Login');
+        }
     }
     /** 
      * @Author: vition 
