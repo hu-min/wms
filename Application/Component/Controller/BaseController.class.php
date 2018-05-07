@@ -85,8 +85,14 @@ class BaseController extends \Common\Controller\BaseController{
      * @Desc: 更新数据 
      */    
     function update($parameter){
+
         $res=$this->initRes();
-        $insertResult=$this->selfDB->modify($parameter["where"],$parameter["data"]);
+        if($parameter && isset($parameter["where"]) && isset($parameter["data"])){
+            $insertResult=$this->selfDB->modify($parameter["where"],$parameter["data"]);
+        }else{
+            $insertResult=$this->selfDB->save($parameter);
+        }
+        
         if($insertResult){
             $res->errCode=0;
             $res->error=getError(0);
