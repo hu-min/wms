@@ -21,7 +21,6 @@ class BaseController extends \Common\Controller\BaseController{
         $thisClass=explode("\\",$thisClass);
         $className=str_replace("Controller","",$thisClass[count($thisClass)-1]);
         $method=str_replace($className,"",$fun);
-        
         if(method_exists(__CLASS__,$method)){
             return $this->$method($argu[0]);
         }
@@ -68,7 +67,7 @@ class BaseController extends \Common\Controller\BaseController{
      * @Date: 2018-04-01 12:50:26 
      * @Desc: 插入数据 
      */    
-    function inser($parameter){
+    function insert($parameter){
         $res=$this->initRes();
         $insertResult=$this->selfDB->insert($parameter);
         if($insertResult){
@@ -96,5 +95,13 @@ class BaseController extends \Common\Controller\BaseController{
         $res->errCode=114;
         $res->error=getError(114);
         return $res;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-07 23:02:26 
+     * @Desc: M方法 
+     */    
+    function M(){
+        return $this->selfDB;
     }
 }
