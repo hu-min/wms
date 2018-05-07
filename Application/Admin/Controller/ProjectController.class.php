@@ -11,7 +11,7 @@ class ProjectController extends BaseController{
     public function _initialize() {
         parent::_initialize();
         $this->projectCom=getComponent('Project');
-        $this->processArr=["0"=>"未中标","1"=>"已完成","2"=>"洽谈中","3"=>"进行中"];
+        $this->processArr=["0"=>"未中标","1"=>"已完成","2"=>"洽谈中","3"=>"进行中","4"=>"已删除"];
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
     }
@@ -149,11 +149,14 @@ class ProjectController extends BaseController{
     function projectAdd(){
         $projectInfo=$this->manageProjectInfo();
         if($projectInfo){
-            $insertResult=$this->projectCom->inserProject($projectInfo);
+            $insertResult=$this->projectCom->insertProject($projectInfo);
             if($insertResult && $insertResult->errCode==0){
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
         }
         $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    }
+    function projectConfig(){
+
     }
 }

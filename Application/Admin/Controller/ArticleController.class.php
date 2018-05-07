@@ -156,7 +156,7 @@ class ArticleController extends BaseController{
     function articleAdd(){
         $articleInfo=$this->manageArticleInfo();
         if($articleInfo){
-            $insertResult=$this->articleCom->inserArticle($articleInfo);
+            $insertResult=$this->articleCom->insertArticle($articleInfo);
             if($insertResult && $insertResult->errCode==0){
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
@@ -277,7 +277,7 @@ class ArticleController extends BaseController{
      */    
     function artclassAdd(){
         $classInfo=$this->manageClassInfo();
-        $insertResult=$this->classCom->inserArticleClass($classInfo);
+        $insertResult=$this->classCom->insertArticleClass($classInfo);
         if($insertResult->errCode==0){
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
         }

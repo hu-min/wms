@@ -258,7 +258,7 @@ class UserController extends BaseController{
      */    
     function roleAdd(){
         $roleInfo=$this->manageRoleInfo();
-        $insertResult=$this->roleCom->inserRole($roleInfo);
+        $insertResult=$this->roleCom->insertRole($roleInfo);
         if($insertResult->errCode==0){
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
         }
@@ -293,7 +293,7 @@ class UserController extends BaseController{
                 // $this->log($rnodeResult["list"]);
                 $result=$this->rNodeCom->updateRoleNode(["where"=>["rnId"=>$rnodeResult["list"]["rnId"]],"data"=>$rnodeResult["list"]]);
             }else{
-                $result=$this->rNodeCom->inserRoleNode(["roleId"=>$roleId,"nodeId"=>$nodeId,"authority"=>$authority]);
+                $result=$this->rNodeCom->insertRoleNode(["roleId"=>$roleId,"nodeId"=>$nodeId,"authority"=>$authority]);
             }
         }
         $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
@@ -439,7 +439,7 @@ class UserController extends BaseController{
      */    
     function nodeAdd(){
         $nodeInfo=$this->manageNodeInfo();
-        $insertResult=$this->nodeCom->inserNode($nodeInfo);
+        $insertResult=$this->nodeCom->insertNode($nodeInfo);
         if($insertResult->errCode==0){
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
         }

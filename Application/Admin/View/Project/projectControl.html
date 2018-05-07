@@ -50,10 +50,9 @@
                                     <label >状态：</label>
                                     <select class="form-control search-info" title="状态" name="status">
                                         <option value="">全部</option>
-                                        <option value="0">未中标</option>
-                                        <option value="1">已完成</option>
-                                        <option value="2">洽谈中</option>
-                                        <option value="3">进行中</option>
+                                        <volist name="processArr" id="item">
+                                                <option value="{$key}">{$item}</option>
+                                        </volist>
                                     </select>
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
