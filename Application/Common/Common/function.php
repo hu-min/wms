@@ -147,5 +147,5 @@ function utf8_substr($str,$length){
     if(mb_strlen($str)>$length){
         $suf="……";
     }
-    return $str;
+    return mb_substr($str,0,$length,"utf8").$suf;
 }
