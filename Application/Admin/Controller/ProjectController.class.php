@@ -11,6 +11,7 @@ class ProjectController extends BaseController{
     public function _initialize() {
         parent::_initialize();
         $this->projectCom=getComponent('Project');
+        $this->configCom=getComponent('Config');
         $this->processArr=["0"=>"未中标","1"=>"已完成","2"=>"洽谈中","3"=>"进行中","4"=>"清算期","5"=>"结案","6"=>"已删除"];
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
@@ -23,6 +24,8 @@ class ProjectController extends BaseController{
     function projectControl(){
         $reqType=I('reqType');
         $this->assign('processArr',$this->processArr);
+        $project=$this->configCom->get_val("project");
+        $this->assign("project",$project);
         if($reqType){
             $this->$reqType();
         }else{
@@ -44,6 +47,18 @@ class ProjectController extends BaseController{
         }
         if($data['toCompany']){
             $where['toCompany']=['LIKE','%'.$data['toCompany'].'%'];
+        }
+        if($data['followUp']){
+            $where['followUp']=['LIKE','%'.$data['followUp'].'%'];
+        }
+        if($data['business']){
+            $where['business']=['LIKE','%'.$data['business'].'%'];
+        }
+        if($data['leader']){
+            $where['leader']=['LIKE','%'.$data['leader'].'%'];
+        }
+        if($data['responsible']){
+            $where['responsible']=['LIKE','%'.$data['responsible'].'%'];
         }
         if($data['time']){
             $times=explode("~",$data['time']);
@@ -216,6 +231,29 @@ class ProjectController extends BaseController{
      * @Desc: 项目配置 
      */    
     function projectConfig(){
-
+        $reqType=I('reqType');
+        $this->assign('processArr',$this->processArr);
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $project=$this->configCom->get_val("project");
+            $this->assign("project",$project);
+            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            $this->returnHtml();
+        }
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-08 22:39:43 
+     * @Desc: 更新项目配置 
+     */    
+    function projectConfEdit(){
+        $datas=I("data");
+        $updateResult=[
+            "where"=>["name"=>"project"],
+            "data"=>["value"=>json_encode($datas)],
+        ];
+        $updateResult=$this->configCom->updateConfig($updateResult);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
 }

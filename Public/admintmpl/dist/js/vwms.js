@@ -314,3 +314,17 @@ function getArtClsNode(element,level){
 function clearTags(html){
     return $('<p>'+html+'</p>').text()
 }
+//格式化月份
+function formatMonth(month){
+    month++;
+    if(month<10){
+        return "0"+month;
+    }
+    return month;
+}
+//格式化日期
+function formatDate(date){
+    if(date<10){
+        return "0"+date;
+    }
+}
