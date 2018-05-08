@@ -11,7 +11,7 @@ class ProjectController extends BaseController{
     public function _initialize() {
         parent::_initialize();
         $this->projectCom=getComponent('Project');
-        $this->processArr=["0"=>"未中标","1"=>"已完成","2"=>"洽谈中","3"=>"进行中","4"=>"已删除"];
+        $this->processArr=["0"=>"未中标","1"=>"已完成","2"=>"洽谈中","3"=>"进行中","4"=>"清算期","5"=>"结案","6"=>"已删除"];
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
     }
@@ -61,7 +61,7 @@ class ProjectController extends BaseController{
         
         $projectResult=$this->projectCom->getProjectList($parameter);
         if($projectResult){
-            $projectRed="projectList_".session("userId");
+            $projectRed="projectList";
             $this->Redis->set($projectRed,json_encode($projectResult['list']),3600);
             $page = new \Think\VPage($projectResult['count'], $this->pageSize);
             $pageShow = $page->show();
@@ -74,6 +74,11 @@ class ProjectController extends BaseController{
         }
         $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-08 20:31:11 
+     * @Desc: 管理项目添加和修改的信息 
+     */    
     function manageProjectInfo(){
         $reqType=I("reqType");
         $datas=I("data");
@@ -119,7 +124,7 @@ class ProjectController extends BaseController{
                 $data['paySign']=$datas['paySign'];
             }
             if(isset($datas['advanceDate'])){
-                $data['advanceDate']=$datas['advanceDate'];
+                $data['advanceDate']=strtotime($datas['advanceDate']);
             }
             if(isset($datas['amount'])){
                 $data['amount']=$datas['amount'];
@@ -146,6 +151,11 @@ class ProjectController extends BaseController{
         }
         return "";
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-08 20:31:31 
+     * @Desc: 项目添加 
+     */    
     function projectAdd(){
         $projectInfo=$this->manageProjectInfo();
         if($projectInfo){
@@ -156,6 +166,55 @@ class ProjectController extends BaseController{
         }
         $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-08 20:58:39 
+     * @Desc: 修改项目 
+     */    
+    function projectEdit(){
+        $projectInfo=$this->manageProjectInfo();
+        $updateResult=$this->projectCom->updateProject($projectInfo);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-08 20:33:48 
+     * @Desc: 获取单一条项目 
+     */    
+    function projectOne(){
+        $id	=I("id");
+        $parameter=[
+            'projectId'=>$id,
+        ];
+        $pListRed="projectList";
+        $projectList=$this->Redis->get($pListRed);
+        $plist=[];
+        if($projectList){
+            foreach ($projectList as $project) {
+               if($project['projectId']==$id){
+                $plist=$project;
+                break;
+               }
+            }
+        }
+        if(empty($plist)){
+            $projectResult=$this->projectCom->getUser($parameter);
+            if($projectResult->errCode==0){
+                $plist=$projectResult->data;
+            }
+        }
+        if(!empty($plist)){
+            $plist["time"]=date("Y-m-d",$plist["time"]);
+            $plist["advanceDate"]=date("Y-m-d",$plist["advanceDate"]);
+            $this->ajaxReturn(['errCode'=>0,'info'=>$plist]);
+        }
+        $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-08 20:31:43 
+     * @Desc: 项目配置 
+     */    
     function projectConfig(){
 
     }

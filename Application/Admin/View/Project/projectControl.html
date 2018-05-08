@@ -190,11 +190,15 @@
                         </div>
                         <div class="form-group">
                             <div class="btn-group project-status status-group" data-toggle="btn-toggle">
-                                <button type="button" name="0" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-default"></i> 未中标 </button>
+                                <button type="button" name="0" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-light-blue"></i> 未中标 </button>
                                 <button type="button" name="1" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-green"> 已完成 </i>
                                 </button>
-                                <button type="button" name="2" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-info"></i> 洽谈中 </button>
-                                <button type="button" name="3" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-red"></i> 进行中 </button>
+                                <button type="button" name="2" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-yellow"></i> 洽谈中 </button>
+                                <button type="button" name="3" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-warning"></i> 进行中 </button>
+                                <button type="button" name="4" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-muted"> 清算期 </i>
+                                </button>
+                                <button type="button" name="5" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-info"></i> 结案 </button>
+                                <button type="button" name="6" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-red"></i> 已删除 </button>
                             </div>
                         </div>
                         <div class="form-group">
@@ -305,9 +309,27 @@
         function projectShowFuns(info){
 
             $(tabId+" .modal-info[name='projectId']").val(info['projectId']);
-            $(tabId+" .modal-info[name='title']").val(info['title']);
-            $(tabId+" .modal-info[name='tags']").val(info['tags']);
-            $(tabId+" .modal-info[name='cover']").val(info['cover']);
+            $(tabId+" .modal-info[name='code']").val(info['code']);
+            $(tabId+" .modal-info[name='name']").val(info['name']);
+            $(tabId+" .modal-info[name='toCompany']").val(info['toCompany']);
+            $(tabId+" .modal-info[name='time']").val(info['time']);
+            $(tabId+" .modal-info[name='followUp']").val(info['followUp']);
+            $(tabId+" .modal-info[name='business']").val(info['business']);
+            $(tabId+" .modal-info[name='leader']").val(info['leader']);
+            $(tabId+" .modal-info[name='responsible']").val(info['responsible']);
+            $(tabId+" .modal-info[name='num']").val(info['num']);
+            $(tabId+" .modal-info[name='invoice']").val(info['invoice']);
+            $(tabId+" .modal-info[name='paySign']").val(info['paySign']);
+            if(info['advanceDate']>0){
+                $(tabId+" .modal-info[name='advanceDate']").val(info['advanceDate']);
+            }
+            $(tabId+" .modal-info[name='amount']").val(info['amount']);
+            $(tabId+" .modal-info[name='advance']").val(info['advance']);
+            $(tabId+" .modal-info[name='surplus']").val(info['surplus']);
+            $(tabId+" .modal-info[name='cost']").val(info['cost']);
+            $(tabId+" .modal-info[name='profit']").val(info['profit']);
+            $(tabId+" .modal-info[name='profitRate']").val(info['profitRate']);
+            $(tabId+" .status-btn").removeClass("active");
             $(tabId+" .status-btn[name='"+info['status']+"']").addClass("active");
             $(tabId+" .modal-info[name='class']").find("option[value='"+info['class']+"']").prop("selected",true);
         }
