@@ -82,7 +82,6 @@ class ProjectController extends BaseController{
             $pageShow = $page->show();
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->assign('projectList',$projectResult['list']);
-            $this->assign('artClsList',$this->getArtClsList());
             $countResult=$this->projectCom->count($where);
             $count="营业总额：".number_format($countResult['totalAmount'])." | 总成本：".number_format($countResult['totalCost'])." | 总利润：".number_format($countResult['totalProfit']);
             $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Project/projectTable/projectList'),'page'=>$pageShow,"count"=>$count]);

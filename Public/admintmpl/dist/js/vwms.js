@@ -156,7 +156,9 @@ $(document).on("click",'.save-info',function(){
     var isModal=$(this).data("modal");
     var search=con+"-search";
     var parent=$(this).parents(".modal").attr("id")
-    
+    if($('body').hasClass('modal-open')==false){
+        $('body').addClass('modal-open')
+    }
     datas.reqType=con+reqtype;
     if(fun_is_exits(con+"InfoFuns")){
     	eval(con+"InfoFuns()");//对不同的id设置不同的发送数据
@@ -178,13 +180,12 @@ $(document).on("click",'.save-info',function(){
             var table=con2+"Table";
             var page=con2+"Page";
             datas.reqType=reqtype;
-	    if(fun_is_exits(con+"SearchFuns")){
+            if(fun_is_exits(con+"SearchFuns")){
                 eval(con2+"SearchFuns()");//对不同的id设置不同的发送数据
-	    }
+            }
             if(isModal){
                 // console.log(isModal);
                 searchFun(url,datas,table,page)
-                
             }
             if($('body').hasClass('modal-open')){
                 $(tabId+" #"+parent).modal('toggle')

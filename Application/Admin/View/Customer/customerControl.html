@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-header">
+                        <i class="fa fa-plus-square"></i>
+                        <h4 class="box-title">客户列表</h4>
+                        <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加客户" data-target="#modal-customerInfo" data-con="customer" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增客户</button>
+                    </div>
+                    <div class="box-body search-body" id="customer-search-box">
+                        <div class="col-md-12">
+                            <div class="form-inline">
+                                <label class="control-label">公司名称：</label>
+                                <div class="form-group">
+                                    <input class="form-control search-info input-sm" name="company" placeholder="公司名称" type="text">
+                                </div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <label class="control-label">联系人：</label>
+                                <div class="form-group">
+                                    <input class="form-control search-info input-sm" name="contact" placeholder="联系人" type="text">
+                                </div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <div class="form-group">
+                                    <label >类型：</label>
+                                    <select class="form-control search-info input-sm" title="类型" name="status">
+                                        <option value="">全部</option>
+                                        <volist name="customerType" id="item">
+                                            <option value="{$key}">{$item}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <button type="button" data-url="{$url}" id="customer-search" data-reqtype="customerList" data-con="customer" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                <button type="button" class="btn bg-teal search-refresh" data-con="customer"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                            </div>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" style="font-size:0.83em;overflow-x: auto;">
+                <div class="count-div" id="customerCount" style="margin:10px;font-weight: 800;">
+                </div>
+                <table id="" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>客户类型</th>
+                            <th>公司名称</th>
+                            <th>联系人</th>
+                            <th>联系电话</th>
+                            <th>邮箱</th>
+                            <th>地址</th>
+                            <th>备注</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customerTable">
+                        {$tables}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="dataTables_wrapper">
+            <div id="customerPage" class="row page-div" data-url="{$url}" data-reqtype="customerList" data-con="customer">
+                {$pages}
+            </div>
+        </div>
+    </section>
+    <div class="modal fade" id="modal-customerInfo">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+            <div class="modal-header">
+                <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Default Modal</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label>客户类型：</label>
+                            <select class="form-control modal-info" title="类型" required="required" name="type">
+                                <option value="">无</option>
+                                <volist name="customerType" id="item">
+                                    <option value="{$key}">{$item}</option>
+                                </volist>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">公司名称：</label>
+                            <input  class="modal-info" title="customerId" name="customerId" type="hidden">
+                            <input class="form-control modal-info"  name="company" title="公司名称"  placeholder="公司名称" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">联系人：</label>
+                            <input class="form-control modal-info" required="required" name="contact" title="联系人" placeholder="联系人" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">联系通讯：</label>
+                            <input class="form-control modal-info datetime" required="required" name="phone" title="联系通讯" placeholder="联系通讯" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">E-mail：</label>
+                            <input class="form-control modal-info" name="email" title="E-mail" placeholder="E-mail" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">联系地址：</label>
+                            <input class="form-control modal-info" name="address" title="联系地址" placeholder="联系地址" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">备注：</label>
+                            <input class="form-control modal-info" name="remarks" title="备注" placeholder="备注" type="text">
+                        </div>
+                    </div>
+                </form>            
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary save-info" data-con="customer" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // var E = window.wangEditor
+        // var editor = new E(tabId+' .art-editor')
+        //获取分类数据
+        var prefix ="{$customer['prefix']}";
+
+        $(function(){
+            //新增客户
+            $(tabId+" .box-header button").on("click",function(){
+                $(tabId+" .modal-info").val("");
+                $(tabId+" .status-btn").removeClass("active");
+                $(tabId+" .status-btn[name='1']").addClass("active");
+            })
+            //计算利润
+            $(tabId+" input[name='cost']").on("input",function(){
+                var profit=$(tabId+" input[name='amount']").val()-$(tabId+" input[name='cost']").val()
+                $(tabId+" input[name='profit']").val(profit)
+            })
+            //计算利润率
+            $(tabId+" input[name='cost']").on("input",function(){
+                var profitRate=$(tabId+" input[name='profit']").val()/$(tabId+" input[name='amount']").val()
+                $(tabId+" input[name='profitRate']").val(Math.round(profitRate * 100))
+            })
+
+        })
+        //function customerResetFuns(){}
+        function customerReFuns(){
+            var year=(new Date()).getFullYear()
+            var month=(new Date()).getMonth()
+            var day=(new Date()).getDate()
+            var hours=(new Date()).getHours()
+            var minutes=(new Date()).getMinutes()
+            $(tabId+" .modal-info[name='code']").val(prefix+year+formatMonth(month)+formatDate(day)+hours+minutes);
+        }
+        function customerSearchFuns(){
+            datas['data']={}
+            $(tabId+" .search-info").each(function(){
+                var name=$(this).attr("name");
+                var val=$(this).val();
+                if(val!=""){
+                    datas['data'][name]=val
+                }
+            })
+        }
+        function customerInfoFuns(){
+            datas["data"]={}
+            $(tabId+" .modal-info").each(function(){
+                var name =$(this).attr("name");
+                var val =$(this).val();
+                var required=$(this).attr("required");
+                var title=$(this).attr("title");
+                if(required=="required" && val==""){
+                    alert(title+"不能为空");
+                    throw title+"不能为空";
+                }else{
+                    datas["data"][name]=val;
+                }
+            })
+        }
+        /*设置编辑用户信息*/
+        function customerShowFuns(info){
+
+            $(tabId+" .modal-info[name='customerId']").val(info['customerId']);
+            $(tabId+" .modal-info[name='company']").val(info['company']);
+            $(tabId+" .modal-info[name='contact']").val(info['contact']);
+            $(tabId+" .modal-info[name='phone']").val(info['phone']);
+            $(tabId+" .modal-info[name='email']").val(info['email']);
+            $(tabId+" .modal-info[name='address']").val(info['address']);
+            $(tabId+" .modal-info[name='remarks']").val(info['remarks']);
+            $(tabId+" .modal-info[name='type']").find("option[value='"+info['type']+"']").prop("selected",true);
+        }
+        //初始分类的select数据
+        function intPClsSelect(data){
+            var option='<option value="0">根Root</option>';
+            data.forEach(ele => {
+                option+=getArtClsNode(ele,0);
+            });
+            // $(tabId+" .artclass").html(option);
+        }
+    </script>
+</body>
+</html>

@@ -243,16 +243,6 @@
         // var editor = new E(tabId+' .art-editor')
         //获取分类数据
         var prefix ="{$project['prefix']}";
-
-        function getArtClsTree() {
-            var tree=[]
-            datas["reqType"]="artclassList";
-            get("{$url}",datas,function(result){
-                tree=result.tree
-            },false)
-            intPClsSelect(tree);
-            return tree;
-        }
         $(function(){
             $(tabId+' .project-time').daterangepicker({
                 "startDate":moment().year()+"-01-01",
@@ -273,15 +263,9 @@
                 language:"cn",
                 clearBtn:true,
             })
-            getArtClsTree();
             //新增项目
             $(tabId+" .box-header button").on("click",function(){
                 $(tabId+" .modal-info").val("");
-                // $(tabId+" #modal-artclass h4").text("新增项目");
-                // $(tabId+" #modal-artclass .save-info").data("reqtype","Add");
-                // $(tabId+" #modal-artclass .save-info").text("新增项目");
-                // $(tabId+" .modal-dialog .artclass").find("option[value='0']").prop("selected",true);
-                // $(tabId+" .modal-dialog .artclass").trigger('chosen:updated');
                 $(tabId+" .status-btn").removeClass("active");
                 $(tabId+" .status-btn[name='1']").addClass("active");
             })
