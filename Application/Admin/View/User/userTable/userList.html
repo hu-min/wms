@@ -10,6 +10,7 @@
         <td>{$roleArr[$item['roleId']]}</td>
         <td>{$item['regTime']|date='Y-m-d H:i:s',###}</td>
         <td>{$item['lastIp']|long2Ip}</td>
+        <td>{$item['lastTime']|date='Y-m-d H:i:s',###}</td>
         <td>{$item['loginNum']}</td>
         <if condition="$item['status'] eq 0">
             <td><span class="label bg-black">{:C('userStatus.'.$item['status'])}</span></td>

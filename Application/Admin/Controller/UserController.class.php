@@ -92,7 +92,6 @@ class UserController extends BaseController{
                 'phone'=>$datas['phone'],
                 'gender'=>$datas['gender'],
                 'userType'=>$datas['userType'],
-                'lastIp'=>ipTolong(getIp()),
                 'status'=>$datas['status'],
                 'roleId'=>$datas['roleId'],
             ];
