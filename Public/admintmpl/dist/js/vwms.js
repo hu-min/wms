@@ -61,7 +61,9 @@ $(document).on("click",".search-list,.vpage",function(){
     var page=con+"Page";
     var count=con+"Count";
     datas.reqType=reqtype;
-    eval(con+"SearchFuns()");//对不同的id设置不同的发送数据
+    if(fun_is_exits("ResetFuns")){
+        eval(con+"SearchFuns()");//对不同的id设置不同的发送数据
+    }
     searchFun(url,datas,table,page,count);
     
 })
@@ -111,7 +113,9 @@ $(document).on("click",".info-edit",function(){
         })
     }else{//新建要重置数据
         $(target).find(".modal-info").val("");
-        eval(con+"ReFuns()");//对不同的模块的modal数据重置
+	if(fun_is_exits("ResetFuns")){i
+            eval(con+"ReFuns()");//对不同的模块的modal数据重置
+	}
     }
 })
 /** 
@@ -133,7 +137,9 @@ $(document).on("click",'.status-btn',function(){
 $(document).on("click",'.search-refresh',function(){
     $(this).parents(".search-body").find(".search-info").val("");
     var con=$(this).data("con")
-    eval(con+"ResetFuns()");//弥补不足
+    if(fun_is_exits("ResetFuns")){
+	eval(con+"ResetFuns()");//弥补不足
+    }
 })
 /** 
  * javascript comment 
@@ -151,8 +157,9 @@ $(document).on("click",'.save-info',function(){
     var parent=$(this).parents(".modal").attr("id")
     
     datas.reqType=con+reqtype;
-    eval(con+"InfoFuns()");//对不同的id设置不同的发送数据
-    
+    if(fun_is_exits("InfoFuns")){
+    	eval(con+"InfoFuns()");//对不同的id设置不同的发送数据
+    } 
     if(JSON.stringify(filesData)!="{}"){
         datas['filesData']=filesData
     }
@@ -170,7 +177,9 @@ $(document).on("click",'.save-info',function(){
             var table=con2+"Table";
             var page=con2+"Page";
             datas.reqType=reqtype;
-            eval(con2+"SearchFuns()");//对不同的id设置不同的发送数据
+	    if(fun_is_exits("ResetFuns")){
+                eval(con2+"SearchFuns()");//对不同的id设置不同的发送数据
+	    }
             if(isModal){
                 // console.log(isModal);
                 searchFun(url,datas,table,page)
@@ -327,4 +336,13 @@ function formatDate(date){
     if(date<10){
         return "0"+date;
     }
+}
+//判断函数是否存在
+function fun_is_exits(funcName){
+    try {
+        if (typeof(eval(funcName)) == "function") {
+ 	   return true;
+        }
+   } catch(e) {}
+   return false;
 }
