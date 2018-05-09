@@ -61,7 +61,7 @@ $(document).on("click",".search-list,.vpage",function(){
     var page=con+"Page";
     var count=con+"Count";
     datas.reqType=reqtype;
-    if(fun_is_exits("ResetFuns")){
+    if(fun_is_exits(con+"SearchFuns")){
         eval(con+"SearchFuns()");//对不同的id设置不同的发送数据
     }
     searchFun(url,datas,table,page,count);
@@ -105,15 +105,16 @@ $(document).on("click",".info-edit",function(){
         datas.id=id
         get(url,datas,function(result){
             if(result.errCode==0){
-                eval(con+"ShowFuns(result.info)");//对不同的模块设置不同的响应数据
-
+		if(fun_is_exits(con+"ShowFuns")){
+                    eval(con+"ShowFuns(result.info)");//对不同的模块设置不同的响应数据
+		}
             }else{
                 alert(result.error);
             }
         })
     }else{//新建要重置数据
         $(target).find(".modal-info").val("");
-	if(fun_is_exits("ResetFuns")){i
+	if(fun_is_exits(con+"ReFuns")){i
             eval(con+"ReFuns()");//对不同的模块的modal数据重置
 	}
     }
@@ -137,7 +138,7 @@ $(document).on("click",'.status-btn',function(){
 $(document).on("click",'.search-refresh',function(){
     $(this).parents(".search-body").find(".search-info").val("");
     var con=$(this).data("con")
-    if(fun_is_exits("ResetFuns")){
+    if(fun_is_exits(con+"ResetFuns")){
 	eval(con+"ResetFuns()");//弥补不足
     }
 })
@@ -157,7 +158,7 @@ $(document).on("click",'.save-info',function(){
     var parent=$(this).parents(".modal").attr("id")
     
     datas.reqType=con+reqtype;
-    if(fun_is_exits("InfoFuns")){
+    if(fun_is_exits(con+"InfoFuns")){
     	eval(con+"InfoFuns()");//对不同的id设置不同的发送数据
     } 
     if(JSON.stringify(filesData)!="{}"){
@@ -177,7 +178,7 @@ $(document).on("click",'.save-info',function(){
             var table=con2+"Table";
             var page=con2+"Page";
             datas.reqType=reqtype;
-	    if(fun_is_exits("ResetFuns")){
+	    if(fun_is_exits(con+"SearchFuns")){
                 eval(con2+"SearchFuns()");//对不同的id设置不同的发送数据
 	    }
             if(isModal){
