@@ -95,8 +95,8 @@ class UserController extends BaseController{
                 'status'=>$datas['status'],
                 'roleId'=>$datas['roleId'],
             ];
-            if($datas['password']){
-                $userInfo['password']=sha1($datas['password']);
+            if($datas['password']!=""){
+                $userInfo['password']=sha1(sha1($datas['password']));
             }
         }
         return $userInfo;
