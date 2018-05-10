@@ -12,6 +12,7 @@
     <!-- daterange picker -->
     <link rel="stylesheet" href="__ADMINT__/bower_components/bootstrap-daterangepicker/daterangepicker.css">
     <link rel="stylesheet" href="__ADMINT__/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="__ADMINT__/bower_components/chosen/css/chosen.min.css">
 </head>
 <body>
     <section class="content">
@@ -87,7 +88,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-12" style="font-size:0.83em;overflow-x: auto;">
+            <div class="col-sm-12" style="font-size:0.95em;overflow-x: auto;">
                 <div class="count-div" id="projectCount" style="margin:10px;font-weight: 800;">
                 </div>
                 <table id="" class="table table-bordered table-hover">
@@ -145,69 +146,119 @@
                             <label for="info-title">项目名称：</label>
                             <input class="form-control modal-info" name="name" title="项目名称" placeholder="项目名称" type="text">
                         </div>
-                        <div class="form-group">
-                            <label for="info-title">项目日期：</label>
-                            <input class="form-control modal-info datetime" name="time" title="项目日期" placeholder="项目日期" type="text">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="info-title">项目日期：</label>
+                                    <input class="form-control modal-info datetime" name="time" title="项目日期" placeholder="项目日期" type="text">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="info-title">直客公司：</label>
+                                    <select class="form-control modal-info" title="直客公司" name="toCompany">
+                                
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="info-title">直客公司：</label>
-                            <input class="form-control modal-info" name="toCompany" title="直客公司" placeholder="直客公司" type="text">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="info-title">客户跟进：</label>
+                                    <input class="form-control modal-info" name="followUp" title="客户跟进" placeholder="客户跟进" type="text">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="info-title">营业跟进：</label>
+                                    <input class="form-control modal-info" name="business" title="营业跟进" placeholder="营业跟进" type="text">
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="info-title">客户跟进：</label>
-                            <input class="form-control modal-info" name="followUp" title="客户跟进" placeholder="客户跟进" type="text">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="info-title">项目主担：</label>
+                                    <input class="form-control modal-info" name="leader" title="项目主担" placeholder="项目主担" type="text">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="info-title">承接模块：</label>
+                                    <input class="form-control modal-info" name="responsible" title="承接模块" placeholder="承接模块" type="text">
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="info-title">营业跟进：</label>
-                            <input class="form-control modal-info" name="business" title="营业跟进" placeholder="营业跟进" type="text">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="info-title">场次：</label>
+                                    <input class="form-control modal-info" name="num" title="场次" placeholder="场次" type="text">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="info-title">营业总额：</label>
+                                    <input class="form-control modal-info" name="amount" title="营业总额" placeholder="营业总额" type="text">
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="info-title">项目主担：</label>
-                            <input class="form-control modal-info" name="leader" title="项目主担" placeholder="项目主担" type="text">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="info-title">发票信息：</label>
+                                    <input class="form-control modal-info" name="invoice" title="发票信息" placeholder="发票信息" type="text">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="info-title">支付标记：</label>
+                                    <input class="form-control modal-info" name="paySign" title="支付标记" placeholder="支付标记" type="text">
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="info-title">承接模块：</label>
-                            <input class="form-control modal-info" name="responsible" title="承接模块" placeholder="承接模块" type="text">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="info-title">预付日：</label>
+                                    <input class="form-control modal-info datetime" name="advanceDate" title="预付日" placeholder="预付日" type="text">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="info-title">预付：</label>
+                                    <input class="form-control modal-info" name="advance" title="预付" placeholder="预付" type="text">
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="info-title">场次：</label>
-                            <input class="form-control modal-info" name="num" title="场次" placeholder="场次" type="text">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="info-title">剩余未付：</label>
+                                    <input class="form-control modal-info" name="surplus" title="剩余未付" placeholder="剩余未付" type="text">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="info-title">成本：</label>
+                                    <input class="form-control modal-info" name="cost" title="成本" placeholder="成本" type="text">
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="info-title">营业总额：</label>
-                            <input class="form-control modal-info" name="amount" title="营业总额" placeholder="营业总额" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">发票信息：</label>
-                            <input class="form-control modal-info" name="invoice" title="发票信息" placeholder="发票信息" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">支付标记：</label>
-                            <input class="form-control modal-info" name="paySign" title="支付标记" placeholder="支付标记" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">预付日：</label>
-                            <input class="form-control modal-info datetime" name="advanceDate" title="预付日" placeholder="预付日" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">预付：</label>
-                            <input class="form-control modal-info" name="advance" title="预付" placeholder="预付" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">剩余未付：</label>
-                            <input class="form-control modal-info" name="surplus" title="剩余未付" placeholder="剩余未付" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">成本：</label>
-                            <input class="form-control modal-info" name="cost" title="成本" placeholder="成本" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">利润：</label>
-                            <input class="form-control modal-info" name="profit" title="利润" placeholder="利润" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">利润率%：</label>
-                            <input class="form-control modal-info" name="profitRate" title="利润率" placeholder="利润率" type="text">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="info-title">利润：</label>
+                                    <input class="form-control modal-info" name="profit" title="利润" placeholder="利润" type="text">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="info-title">利润率%：</label>
+                                    <input class="form-control modal-info" name="profitRate" title="利润率" placeholder="利润率" type="text">
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <div class="btn-group project-status status-group" data-toggle="btn-toggle">
@@ -243,7 +294,9 @@
         // var editor = new E(tabId+' .art-editor')
         //获取分类数据
         var prefix ="{$project['prefix']}";
+        var tempCompany="";
         $(function(){
+            getCompanyData()
             $(tabId+' .project-time').daterangepicker({
                 "startDate":moment().year()+"-01-01",
                 "endDate":moment().year()+"-"+(moment().month()+1)+"-"+moment().dates(),
@@ -279,6 +332,15 @@
                 var profitRate=$(tabId+" input[name='profit']").val()/$(tabId+" input[name='amount']").val()
                 $(tabId+" input[name='profitRate']").val(Math.round(profitRate * 100))
             })
+            //客户列表
+            $(tabId+" .modal-info[name='toCompany']").chosen({search_contains:true,width: '100%'}).on("chosen:no_results",function(evt, params){
+                var key = $(this).nextAll().find(".chosen-search-input").val()
+                if(tempCompany!=key){
+                    getCompanyData(key)
+                    $(this).trigger('chosen:updated');
+                    $(this).nextAll().find(".chosen-search-input").val(key)
+                }
+            });
 
         })
         //function projectResetFuns(){}
@@ -323,7 +385,11 @@
             $(tabId+" .modal-info[name='projectId']").val(info['projectId']);
             $(tabId+" .modal-info[name='code']").val(info['code']);
             $(tabId+" .modal-info[name='name']").val(info['name']);
-            $(tabId+" .modal-info[name='toCompany']").val(info['toCompany']);
+            // $(tabId+" .modal-info[name='toCompany']").val(info['toCompany']);
+            $(tabId+" .modal-info[name='toCompany']").html("<option value='"+info['toCompany']+"'>"+info['toCompany']+"</option>");
+            $(tabId+" .modal-info[name='toCompany']").trigger('chosen:updated');
+            $(tabId+" .modal-info[name='toCompany']").find("option[value='"+info['toCompany']+"']").prop("selected",true);
+            // 
             $(tabId+" .modal-info[name='time']").val(info['time']);
             $(tabId+" .modal-info[name='followUp']").val(info['followUp']);
             $(tabId+" .modal-info[name='business']").val(info['business']);
@@ -343,15 +409,24 @@
             $(tabId+" .modal-info[name='profitRate']").val(info['profitRate']);
             $(tabId+" .status-btn").removeClass("active");
             $(tabId+" .status-btn[name='"+info['status']+"']").addClass("active");
-            $(tabId+" .modal-info[name='class']").find("option[value='"+info['class']+"']").prop("selected",true);
+            // $(tabId+" .modal-info[name='class']").find("option[value='"+info['class']+"']").prop("selected",true);
         }
-        //初始分类的select数据
-        function intPClsSelect(data){
-            var option='<option value="0">根Root</option>';
-            data.forEach(ele => {
-                option+=getArtClsNode(ele,0);
-            });
-            // $(tabId+" .artclass").html(option);
+        //获取客户信息并且select数据
+        function getCompanyData(toCompany) {
+            if(toCompany){
+                datas["data"]={company:toCompany}
+            }
+            var tree=[]
+            datas["reqType"]="customerList";
+            get("{$url}",datas,function(result){
+                if(result.list){
+                    var option='<option value="">请选择直客公司</option>';
+                    result.list.forEach(ele => {
+                        option+="<option value="+ele.company+">"+ele.company+"</option>'"
+                    });
+                    $(tabId+" .modal-info[name='toCompany']").html(option);
+                }
+            },false)
         }
     </script>
 </body>

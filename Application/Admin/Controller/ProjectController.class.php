@@ -12,6 +12,7 @@ class ProjectController extends BaseController{
         parent::_initialize();
         $this->projectCom=getComponent('Project');
         $this->configCom=getComponent('Config');
+        $this->customerCom=getComponent('Customer');
         $this->processArr=["0"=>"未中标","1"=>"已完成","2"=>"洽谈中","3"=>"进行中","4"=>"清算期","5"=>"结案","6"=>"已删除"];
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
@@ -223,6 +224,22 @@ class ProjectController extends BaseController{
             $this->ajaxReturn(['errCode'=>0,'info'=>$plist]);
         }
         $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
+    }
+
+    function customerList(){
+        $datas=I("data");
+        $where=[];
+        if(isset($datas['company'])){
+            $where['company']=["LIKE","%{$datas['company']}%"];
+        }
+        $parameter=[
+            'where'=>$where,
+            'fields'=>"customerId,company",
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>"customerId DESC"
+        ];
+        $listResult=$this->customerCom->getCustomerList($parameter);
+        $this->ajaxReturn($listResult);
     }
     /** 
      * @Author: vition 

@@ -338,6 +338,7 @@ function formatDate(date){
     if(date<10){
         return "0"+date;
     }
+    return date;
 }
 //判断函数是否存在
 function fun_is_exits(funcName){
