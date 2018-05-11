@@ -39,7 +39,9 @@ class BaseController extends \Common\Controller\BaseController{
         $page=$parameter['page']?$parameter['page']:0;
         $pageNum=$parameter['pageSize']?$parameter['pageSize']:0;
         $groupBy=$parameter['groupBy']?$parameter['groupBy']:null;
-        $classList=$this->selfDB->getList($where , $fields, $orderStr, $page, $pageNum, $groupBy);
+        $joins=$parameter['joins']?$parameter['joins']:"";
+
+        $classList=$this->selfDB->getList($where , $fields, $orderStr, $page, $pageNum, $groupBy,$joins);
         $count=$this->selfDB->countList($where);
         if($classList){
             return ['list'=>$classList,'count'=>$count];

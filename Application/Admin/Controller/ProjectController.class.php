@@ -70,9 +70,11 @@ class ProjectController extends BaseController{
         }
         $parameter=[
             'where'=>$where,
+            'fields'=>"projectId,code,name,time,status,toCompany,followUp,business,leader,responsible,num,invoice,paySign,advanceDate,amount,advance,surplus,cost,profit,profitRate,addTime,creator,updateTime,updateUser,authority,c.company toCompanyStr,c.contact toContactStr",
             'page'=>$p,
             'pageSize'=>$this->pageSize,
-            'orderStr'=>"time DESC"
+            'orderStr'=>"time DESC",
+            "joins"=>"LEFT JOIN (SELECT customerId,company,contact FROM v_customer) c ON c.customerId=toCompany",
         ];
         
         $projectResult=$this->projectCom->getProjectList($parameter);
@@ -101,12 +103,13 @@ class ProjectController extends BaseController{
         if($reqType=="projectAdd"){
             $datas['addTime']=time();
             $datas['time']=strtotime($datas['time']);
+            $datas['creator']=session('userId');
             unset($datas['projectId']);
             return $datas;
         }else if($reqType=="projectEdit"){
             $where=["projectId"=>$datas['projectId']];
             $data=[];
-
+            $data['updateUser']=session('userId');
             if(isset($datas['name'])){
                 $data['name']=$datas['name'];
             }

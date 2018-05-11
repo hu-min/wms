@@ -98,6 +98,7 @@
                             <th>项目日期</th>
                             <th>项目名称</th>
                             <th>直客公司</th>
+                            <th>直客联系人</th>
                             <th>客户跟进</th>
                             <th>营业跟进</th>
                             <th>项目主担</th>
@@ -335,8 +336,9 @@
                 $(tabId+" input[name='profitRate']").val(Math.round(profitRate * 100))
             })
             //客户列表
-            $(tabId+" .modal-info[name='toCompany']").chosen({search_contains:true,width: '100%'}).on("chosen:no_results",function(evt, params){
+            $(tabId+" .modal-info[name='toCompany']").chosen({search_contains:true,width: '100%',allow_single_deselect:true}).on("chosen:no_results",function(evt, params){
                 var key = $(this).nextAll().find(".chosen-search-input").val()
+                console.log(key)
                 if(tempCompany!=key){
                     getCompanyData(key)
                     $(this).trigger('chosen:updated');
@@ -388,7 +390,7 @@
             $(tabId+" .modal-info[name='code']").val(info['code']);
             $(tabId+" .modal-info[name='name']").val(info['name']);
             // $(tabId+" .modal-info[name='toCompany']").val(info['toCompany']);
-            $(tabId+" .modal-info[name='toCompany']").html("<option value='"+info['toCompany']+"'>"+info['toCompany']+"</option>");
+            $(tabId+" .modal-info[name='toCompany']").html("<option value='"+info['toCompany']+"'>"+info['toCompanyStr']+"-"+info['toContactStr']+"</option>");
             $(tabId+" .modal-info[name='toCompany']").trigger('chosen:updated');
             $(tabId+" .modal-info[name='toCompany']").find("option[value='"+info['toCompany']+"']").prop("selected",true);
             // 

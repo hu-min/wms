@@ -31,12 +31,19 @@ class BaseModel extends Model{
      * @Date: 2018-01-14 21:40:12 
      * @Desc: 获取多条数据 
      */    
-    public function getList($where_arra , $fields = true, $orderStr = null, $page = 0, $pageNum = 0, $groupBy = null){
+    public function getList($where_arra , $fields = true, $orderStr = null, $page = 0, $pageNum = 0, $groupBy = null,$joins=""){
         $page     = $page >= 1 ? $page : $this->page;
         $pageNum = $pageNum >= 1 ? $pageNum : $this->pageNum;
         $fields   = $fields ? $fields : true;
         $this->where($where_arra);
         $this->field ( $fields );
+        if(is_array($joins)){
+            foreach ($joins as $join) {
+                $this->join( $join);
+            }
+        }else{
+            $this->join($joins);
+        }
         if($orderStr){
             $this->order($orderStr);
         }
@@ -44,6 +51,7 @@ class BaseModel extends Model{
             $this->group($groupBy);
         }
         $listData = $this->limit(($page - 1) * $pageNum, $pageNum)->select();
+
         return $listData;
     }
     /** 
