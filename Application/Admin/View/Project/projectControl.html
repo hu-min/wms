@@ -321,6 +321,8 @@
                 $(tabId+" .modal-info").val("");
                 $(tabId+" .status-btn").removeClass("active");
                 $(tabId+" .status-btn[name='1']").addClass("active");
+	        getCompanyData()
+                $(tabId+" .modal-info[name='toCompany']").trigger('chosen:updated');
             })
             //计算利润
             $(tabId+" input[name='cost']").on("input",function(){
@@ -412,9 +414,9 @@
             // $(tabId+" .modal-info[name='class']").find("option[value='"+info['class']+"']").prop("selected",true);
         }
         //获取客户信息并且select数据
-        function getCompanyData(toCompany) {
-            if(toCompany){
-                datas["data"]={company:toCompany}
+        function getCompanyData(thisCompany) {
+            if(thisCompany){
+                datas["data"]={company:thisCompany}
             }
             var tree=[]
             datas["reqType"]="customerList";
