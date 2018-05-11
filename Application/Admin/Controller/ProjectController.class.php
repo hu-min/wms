@@ -234,7 +234,7 @@ class ProjectController extends BaseController{
         }
         $parameter=[
             'where'=>$where,
-            'fields'=>"customerId,company",
+            'fields'=>"customerId,company,contact",
             'pageSize'=>$this->pageSize,
             'orderStr'=>"customerId DESC"
         ];

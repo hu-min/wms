@@ -424,7 +424,7 @@
                 if(result.list){
                     var option='<option value="">请选择直客公司</option>';
                     result.list.forEach(ele => {
-                        option+="<option value="+ele.company+">"+ele.company+"</option>'"
+                        option+="<option value="+ele.customerId+">"+ele.company+"-"+ele.contact+"</option>'"
                     });
                     $(tabId+" .modal-info[name='toCompany']").html(option);
                 }
