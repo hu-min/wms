@@ -167,13 +167,18 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="info-title">客户跟进：</label>
-                                    <input class="form-control modal-info" name="followUp" title="客户跟进" placeholder="客户跟进" type="text">
+                                    <!-- <input class="form-control modal-info" name="followUp" title="客户跟进" placeholder="客户跟进" type="text"> -->
+                                    <select class="form-control modal-info" multiple="multiple" title="客户跟进" name="followUp">
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="info-title">营业跟进：</label>
-                                    <input class="form-control modal-info" name="business" title="营业跟进" placeholder="营业跟进" type="text">
+                                    <!-- <input class="form-control modal-info" name="business" title="营业跟进" placeholder="营业跟进" type="text">
+                                     -->
+                                     <select class="form-control modal-info" multiple="multiple" title="营业跟进" name="business">
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -181,7 +186,9 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="info-title">项目主担：</label>
-                                    <input class="form-control modal-info" name="leader" title="项目主担" placeholder="项目主担" type="text">
+                                    <!-- <input class="form-control modal-info" name="leader" title="项目主担" placeholder="项目主担" type="text"> -->
+                                    <select class="form-control modal-info" multiple="multiple" title="项目主担" name="leader">
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -296,8 +303,14 @@
         //获取分类数据
         var prefix ="{$project['prefix']}";
         var tempCompany="";
+        var followUpArr=[];
+        var businessArr=[];
+        var leaderArr=[];
         $(function(){
             getCompanyData()
+            getUserData("followUp")
+            getUserData("business")
+            getUserData("leader")
             $(tabId+' .project-time').daterangepicker({
                 "startDate":moment().year()+"-01-01",
                 "endDate":moment().year()+"-"+(moment().month()+1)+"-"+moment().dates(),
@@ -319,11 +332,15 @@
             })
             //新增项目
             $(tabId+" .box-header button").on("click",function(){
+                followUpArr=[]
                 $(tabId+" .modal-info").val("");
                 $(tabId+" .status-btn").removeClass("active");
                 $(tabId+" .status-btn[name='1']").addClass("active");
-	        getCompanyData()
-                $(tabId+" .modal-info[name='toCompany']").trigger('chosen:updated');
+                getCompanyData()
+                getUserData("followUp")
+                getUserData("business")
+                getUserData("leader")
+                
             })
             //计算利润
             $(tabId+" input[name='cost']").on("input",function(){
@@ -336,15 +353,44 @@
                 $(tabId+" input[name='profitRate']").val(Math.round(profitRate * 100))
             })
             //客户列表
-            $(tabId+" .modal-info[name='toCompany']").chosen({search_contains:true,width: '100%',allow_single_deselect:true}).on("chosen:no_results",function(evt, params){
+            $(tabId+" .modal-info[name='toCompany']").chosen({search_contains:true,width: '100%',allow_single_deselect:true}).on("chosen:results_single",function(evt, params){
                 var key = $(this).nextAll().find(".chosen-search-input").val()
-                console.log(key)
                 if(tempCompany!=key){
                     getCompanyData(key)
-                    $(this).trigger('chosen:updated');
                     $(this).nextAll().find(".chosen-search-input").val(key)
+                }else if(key==""){
+                    getCompanyData()
+                    $(this).nextAll().find(".chosen-search-input").val(tempCompany)
                 }
             });
+            //followUp
+            setMulSelect("followUp")
+            setMulSelect("business")
+            setMulSelect("leader")
+            // $(tabId+" .modal-info[name='followUp']").chosen({search_contains:true,width: '100%'}).on("chosen:results_single",function(evt, params){
+            //     var key = $(this).nextAll().find(".chosen-search-input").val()
+            //     if(tempCompany!=key){
+            //         getUserData("followUp",key)
+            //         $(this).nextAll().find(".chosen-search-input").val(key)
+            //     }else if(key==""){
+            //         getUserData("followUp")
+            //         $(this).nextAll().find(".chosen-search-input").val(tempCompany)
+            //     }
+            // }).on("chosen:no_results",function(evt, params){
+            //     var key = $(this).nextAll().find(".chosen-search-input").val()
+            //     if(tempCompany!=key){
+            //         getUserData("followUp",key)
+            //         // $(this).nextAll().find(".chosen-search-input").val(key)
+            //     }else if(key==""){
+            //         getUserData("followUp")
+            //         $(this).nextAll().find(".chosen-search-input").val(tempCompany)
+            //     }
+            // }).on("change",function(selected,deselected){
+            //     if(deselected.selected!=undefined){
+            //         followUpArr.push(deselected.selected)
+            //     }
+                
+            // });
 
         })
         //function projectResetFuns(){}
@@ -390,14 +436,38 @@
             $(tabId+" .modal-info[name='code']").val(info['code']);
             $(tabId+" .modal-info[name='name']").val(info['name']);
             // $(tabId+" .modal-info[name='toCompany']").val(info['toCompany']);
-            $(tabId+" .modal-info[name='toCompany']").html("<option value='"+info['toCompany']+"'>"+info['toCompanyStr']+"-"+info['toContactStr']+"</option>");
+            $(tabId+" .modal-info[name='toCompany']").html("<option value='"+info['toCompany']+"' selected>"+info['toCompanyStr']+"-"+info['toContactStr']+"</option>");
             $(tabId+" .modal-info[name='toCompany']").trigger('chosen:updated');
-            $(tabId+" .modal-info[name='toCompany']").find("option[value='"+info['toCompany']+"']").prop("selected",true);
-            // 
+            // $(tabId+" .modal-info[name='toCompany']").find("option[value='"+info['toCompany']+"']").prop("selected",true);
+            
+            followUpArr=info['followUp'].split(",")
+            var followUp=""
+            followUpArr.forEach(function(ele){
+                followUp+="<option value='"+ele+"' selected>"+ele+"</option>"
+            })
+            $(tabId+" .modal-info[name='followUp']").html(followUp);
+            $(tabId+" .modal-info[name='followUp']").trigger('chosen:updated');
+
             $(tabId+" .modal-info[name='time']").val(info['time']);
-            $(tabId+" .modal-info[name='followUp']").val(info['followUp']);
-            $(tabId+" .modal-info[name='business']").val(info['business']);
-            $(tabId+" .modal-info[name='leader']").val(info['leader']);
+
+            // $(tabId+" .modal-info[name='business']").val(info['business']);
+            businessArr=info['business'].split(",")
+            var business=""
+            businessArr.forEach(function(ele){
+                business+="<option value='"+ele+"' selected>"+ele+"</option>"
+            })
+            $(tabId+" .modal-info[name='business']").html(business);
+            $(tabId+" .modal-info[name='business']").trigger('chosen:updated');
+
+            // $(tabId+" .modal-info[name='leader']").val(info['leader']);
+            leaderArr=info['leader'].split(",")
+            var leader=""
+            leaderArr.forEach(function(ele){
+                leader+="<option value='"+ele+"' selected>"+ele+"</option>"
+            })
+            $(tabId+" .modal-info[name='leader']").html(leader);
+            $(tabId+" .modal-info[name='leader']").trigger('chosen:updated');
+
             $(tabId+" .modal-info[name='responsible']").val(info['responsible']);
             $(tabId+" .modal-info[name='num']").val(info['num']);
             $(tabId+" .modal-info[name='invoice']").val(info['invoice']);
@@ -429,8 +499,61 @@
                         option+="<option value="+ele.customerId+">"+ele.company+"-"+ele.contact+"</option>'"
                     });
                     $(tabId+" .modal-info[name='toCompany']").html(option);
+                    $(tabId+" .modal-info[name='toCompany']").trigger('chosen:updated');
                 }
             },false)
+        }
+        function getUserData(name,thisUser) {
+            if(thisUser){
+                datas["data"]={userName:thisUser}
+            }
+            var tree=[]
+            datas["reqType"]="userList";
+            get("{$url}",datas,function(result){
+                if(result.list){
+                    var option='<option value="">请选择用户</option>';
+                    var followUpAll=$.unique(eval(name+"Arr").concat(result.list))
+                    followUpAll.forEach(userName => {
+                        if($.inArray(userName,eval(name+"Arr"))>=0){
+                            // console.log(eval(name+"Arr"))
+                            // console.log(userName)
+                            option+="<option value="+userName+" selected>"+userName+"</option>'"
+                        }else{
+                            option+="<option value="+userName+">"+userName+"</option>'"
+                        }
+                        
+                    });
+                    $(tabId+" .modal-info[name='"+name+"']").html(option);
+                    $(tabId+" .modal-info[name='"+name+"']").trigger('chosen:updated');
+                }
+            },false)
+        }
+        function setMulSelect(name){
+
+            $(tabId+" .modal-info[name='"+name+"']").chosen({search_contains:true,width: '100%'}).on("chosen:results_single",function(evt, params){
+                var key = $(this).nextAll().find(".chosen-search-input").val()
+                if(tempCompany!=key){
+                    getUserData(name,key)
+                    $(this).nextAll().find(".chosen-search-input").val(key)
+                }else if(key==""){
+                    getUserData(name)
+                    $(this).nextAll().find(".chosen-search-input").val(tempCompany)
+                }
+            }).on("chosen:no_results",function(evt, params){
+                var key = $(this).nextAll().find(".chosen-search-input").val()
+                if(tempCompany!=key){
+                    getUserData(name,key)
+                    // $(this).nextAll().find(".chosen-search-input").val(key)
+                }else if(key==""){
+                    getUserData(name)
+                    $(this).nextAll().find(".chosen-search-input").val(tempCompany)
+                }
+            }).on("change",function(selected,deselected){
+                if(deselected.selected!=undefined){
+                    eval(name+"Arr").push(deselected.selected)
+                }
+                
+            });
         }
     </script>
 </body>

@@ -99,7 +99,15 @@ class ProjectController extends BaseController{
     function manageProjectInfo(){
         $reqType=I("reqType");
         $datas=I("data");
-
+        if(isset($datas['followUp'])){
+            $datas['followUp']=implode(",",$datas['followUp']);
+        }
+        if(isset($datas['business'])){
+            $datas['business']=implode(",",$datas['business']);
+        }
+        if(isset($datas['leader'])){
+            $datas['leader']=implode(",",$datas['leader']);
+        }
         if($reqType=="projectAdd"){
             $datas['addTime']=time();
             $datas['time']=strtotime($datas['time']);
@@ -243,6 +251,21 @@ class ProjectController extends BaseController{
         ];
         $listResult=$this->customerCom->getCustomerList($parameter);
         $this->ajaxReturn($listResult);
+    }
+    function userList(){
+        $datas=I("data");
+        $where=[];
+        if(isset($datas['userName'])){
+            $where['userName']=["LIKE","%{$datas['userName']}%"];
+        }
+        $parameter=[
+            'where'=>$where,
+            'fields'=>"userName",
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>"userId DESC"
+        ];
+        $listResult=$this->userCom->getUserList($parameter);
+        $this->ajaxReturn(["list"=>array_column($listResult["list"],"userName")]);
     }
     /** 
      * @Author: vition 
