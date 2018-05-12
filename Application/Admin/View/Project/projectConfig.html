@@ -45,7 +45,32 @@
                 </div>
             </div>
             <div class="col-md-6">
-                
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">承接模块管理</h3>
+                    </div>
+                    <form role="form">
+                        <div class="box-body">
+                            <div class="form-group">
+                                <select class="form-control modal-info"  title="承接模块" name="responsible">
+                                    <option value="">承接模块</option>
+                                    <volist name="responsible" id="item">
+                                        <option value="{$item}">{$item}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label >新增或修改当前承接模块</label>
+                                <input class="form-control input-info" placeholder="" name="responsible-input" type="text" value="">
+                            </div>
+                        </div>
+                        <div class="box-footer">
+                            <button type="button"  class="btn btn-success save-info" data-con="responsible" data-reqtype="Add" data-url="{$url}">新增</button>
+                            <button type="button"  class="btn btn-primary save-info" data-con="responsible" data-reqtype="Edit" data-url="{$url}">修改</button>
+                            <button type="button"  class="btn btn-danger save-info" data-con="responsible" data-reqtype="Del" data-url="{$url}">删除</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </section>
@@ -72,7 +97,30 @@
             }else{
                 datas["data"]["manual"]="false";
             }
-            console.log(datas);
+        }
+        function responsibleInfoFuns(){
+            datas["data"]={}
+            var responSelect=$(tabId+" .modal-info[name='responsible']").val();
+            var responInput=$(tabId+" input[name='responsible-input']").val();
+            if(responInput=="" && datas["reqType"]!="responsibleDel"){
+                alert("承接模块名称不能为空")
+                throw "承接模块名称不能为空";
+            }
+            if(datas["reqType"]=="responsibleEdit" && responSelect==""){
+                datas["reqType"]="responsibleAdd";
+            }else if(datas["reqType"]=="responsibleEdit" || datas["reqType"]=="responsibleDel"){
+                datas["data"]["fromResponsible"]=responSelect
+            }
+            datas["data"]["responsible"]=responInput
+        }
+        function responsibleSearchFuns(){
+            datas["reqType"]="responsList";
+            get("{$url}",datas,function(result){
+                if(result.html){
+                    $(tabId+" .modal-info[name='responsible']").html(result.html);
+                    $(tabId+" input[name='responsible-input']").val("");
+                }
+            },false)
         }
     </script>
 </body>

@@ -194,7 +194,11 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="info-title">承接模块：</label>
-                                    <input class="form-control modal-info" name="responsible" title="承接模块" placeholder="承接模块" type="text">
+                                    <select class="form-control modal-info" multiple="multiple" title="承接模块" style="height: 50px;" name="responsible">
+                                        <volist name="responList" id="item">
+                                            <option value="{$item}">{$item}</option>
+                                        </volist>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -333,13 +337,17 @@
             //新增项目
             $(tabId+" .box-header button").on("click",function(){
                 followUpArr=[]
+                businessArr=[]
+                leaderArr=[]
                 $(tabId+" .modal-info").val("");
                 $(tabId+" .status-btn").removeClass("active");
                 $(tabId+" .status-btn[name='1']").addClass("active");
+                $(tabId+" .modal-info[name='responsible']").prop("selected",false);
                 getCompanyData()
                 getUserData("followUp")
                 getUserData("business")
                 getUserData("leader")
+
                 
             })
             //计算利润
@@ -468,7 +476,15 @@
             $(tabId+" .modal-info[name='leader']").html(leader);
             $(tabId+" .modal-info[name='leader']").trigger('chosen:updated');
 
-            $(tabId+" .modal-info[name='responsible']").val(info['responsible']);
+            var responsibleArr=info['responsible'].split(",")
+            // var responsible=""
+            $(tabId+" .modal-info[name='responsible']").prop("selected",false);
+            responsibleArr.forEach(function(ele){
+                // responsible+="<option value='"+ele+"' selected>"+ele+"</option>"
+                $(tabId+" .modal-info[name='responsible']").find("option[value='"+ele+"']").prop("selected",true)
+            })
+            // $(tabId+" .modal-info[name='responsible']").html(responsible);
+            // $(tabId+" .modal-info[name='responsible']").val(info['responsible']);
             $(tabId+" .modal-info[name='num']").val(info['num']);
             $(tabId+" .modal-info[name='invoice']").val(info['invoice']);
             $(tabId+" .modal-info[name='paySign']").val(info['paySign']);
@@ -529,7 +545,6 @@
             },false)
         }
         function setMulSelect(name){
-
             $(tabId+" .modal-info[name='"+name+"']").chosen({search_contains:true,width: '100%'}).on("chosen:results_single",function(evt, params){
                 var key = $(this).nextAll().find(".chosen-search-input").val()
                 if(tempCompany!=key){

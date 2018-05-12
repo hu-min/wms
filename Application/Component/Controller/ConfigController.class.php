@@ -26,4 +26,23 @@ class ConfigController extends BaseController{
         }
         return false;
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-12 09:35:57 
+     * @Desc: 根据name设置配置项值 
+     */    
+    function set_val($name,$val){
+        $valJson="";
+        if(is_array($val)){
+            $valJson=json_encode($val,JSON_UNESCAPED_UNICODE);
+        }
+        $nameRes=$this->get_val($name);
+
+        if($nameRes){//存在则修改
+            $result=$this->update(["where"=>["name"=>$name],"data"=>["value"=>$valJson]]);
+        }else{//不存在则添加
+            $result=$this->selfDB->insert(["name"=>$name,"value"=>$valJson,"status"=>1]);
+        }
+        return $result;
+    }
 }

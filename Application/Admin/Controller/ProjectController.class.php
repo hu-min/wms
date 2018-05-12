@@ -31,6 +31,7 @@ class ProjectController extends BaseController{
             $this->$reqType();
         }else{
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            $this->assign('responList',$this->getResponsList());
             $this->returnHtml();
         }
     }
@@ -107,6 +108,9 @@ class ProjectController extends BaseController{
         }
         if(isset($datas['leader'])){
             $datas['leader']=implode(",",$datas['leader']);
+        }
+        if(isset($datas['responsible'])){
+            $datas['responsible']=implode(",",$datas['responsible']);
         }
         if($reqType=="projectAdd"){
             $datas['addTime']=time();
@@ -279,7 +283,9 @@ class ProjectController extends BaseController{
             $this->$reqType();
         }else{
             $project=$this->configCom->get_val("project");
+            $responsList=$this->getResponsList();
             $this->assign("project",$project);
+            $this->assign("responsible",$responsList);
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->returnHtml();
         }
@@ -297,5 +303,92 @@ class ProjectController extends BaseController{
         ];
         $updateResult=$this->configCom->updateConfig($updateResult);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-12 10:15:00 
+     * @Desc: 管理承接模块请求数据 
+     */    
+    function manageRespon(){
+        $responList=$this->getResponsList();
+        $datas=I("data");
+        $reqType=I("reqType");
+        if($reqType=="responsibleAdd"){
+            if(!in_array($datas["responsible"],$responList)){
+                array_push($responList,$datas["responsible"]);
+            }
+        }elseif($reqType=="responsibleEdit" || $reqType=="responsibleDel"){
+            foreach ($responList as $key => $value) {
+                if($value==$datas["fromResponsible"]){
+                    unset($responList[$key]);
+                }
+            }
+            if($reqType=="responsibleEdit"){
+                array_push($responList,$datas["responsible"]);
+            }
+        }
+        $this->Redis->set("responsible",$responList);
+        return $responList;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-12 10:03:37 
+     * @Desc: 新增承接模块 
+     */    
+    function responsibleAdd(){
+        $responList=$this->manageRespon();
+        $return=$this->configCom->set_val("responsible",$responList);
+        if($return){
+            $this->ajaxReturn(['errCode'=>0,'error'=>"添加成功"]);
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-12 10:03:46 
+     * @Desc: 修改承接模块 
+     */    
+    function responsibleEdit(){
+        $responList=$this->manageRespon();
+        $return=$this->configCom->set_val("responsible",$responList);
+        if($return){
+            $this->ajaxReturn(['errCode'=>0,'error'=>"修改成功"]);
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-12 16:07:49 
+     * @Desc: 删除 承接模块 
+     */    
+    function responsibleDel(){
+        $responList=$this->manageRespon();
+        $return=$this->configCom->set_val("responsible",$responList);
+        if($return){
+            $this->ajaxReturn(['errCode'=>0,'error'=>"删除"]);
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-12 16:13:49 
+     * @Desc:  
+     */
+    function responsList(){
+        $responList=$this->getResponsList();
+        $html='<option value="">承接模块</option>';
+        foreach ($responList as  $value) {
+            $html.='<option value="'.$value.'">'.$value.'</option>';
+        }
+        $this->ajaxReturn(['html'=>$html]);
+    }
+    function getResponsList(){
+        $responList=$this->Redis->get("responsible");
+        if(!$responList){
+            $responsible=$this->configCom->get_val("responsible");
+            $responList=$responsible?$responsible:[];
+            $this->Redis->set("responsible",$responList);
+        }
+        return $responList;
     }
 }
