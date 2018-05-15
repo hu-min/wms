@@ -13,7 +13,7 @@ class ProjectController extends BaseController{
         $this->projectCom=getComponent('Project');
         $this->configCom=getComponent('Config');
         $this->customerCom=getComponent('Customer');
-        $this->processArr=["0"=>"未中标","1"=>"已完成","2"=>"洽谈中","3"=>"进行中","4"=>"清算期","5"=>"结案","6"=>"已删除"];
+        $this->processArr=["0"=>"沟通","1"=>"完结","2"=>"裁决","3"=>"提案","4"=>"签约","5"=>"LOST","6"=>"筹备","7"=>"执行","8"=>"完成"];
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
     }
@@ -87,7 +87,7 @@ class ProjectController extends BaseController{
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->assign('projectList',$projectResult['list']);
             $countResult=$this->projectCom->count($where);
-            $count="营业总额：".number_format($countResult['totalAmount'])." | 总成本：".number_format($countResult['totalCost'])." | 总利润：".number_format($countResult['totalProfit']);
+            $count="合同额：".number_format($countResult['totalAmount'])." | 总成本：".number_format($countResult['totalCost'])." | 总纯利：".number_format($countResult['totalProfit'])." | 总纯利率：".round($countResult['totalProfit']/$countResult['totalAmount']*100,2)."%";
             $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Project/projectTable/projectList'),'page'=>$pageShow,"count"=>$count]);
         }
         $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);

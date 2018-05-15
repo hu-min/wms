@@ -32,19 +32,19 @@
                                     <input class="form-control search-info input-sm" name="name" placeholder="项目名称" type="text">
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <label class="control-label">客户跟进：</label>
+                                <label class="control-label">客户：</label>
                                 <div class="form-group">
-                                    <input class="form-control search-info input-sm" name="followUp" placeholder="客户跟进" type="text">
+                                    <input class="form-control search-info input-sm" name="followUp" placeholder="客户" type="text">
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <label class="control-label">营业跟进：</label>
+                                <label class="control-label">营业：</label>
                                 <div class="form-group">
-                                    <input class="form-control search-info input-sm" name="business" placeholder="营业跟进" type="text">
+                                    <input class="form-control search-info input-sm" name="business" placeholder="营业" type="text">
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <label class="control-label">项目主担：</label>
+                                <label class="control-label">项目：</label>
                                 <div class="form-group">
-                                    <input class="form-control search-info input-sm" name="leader" placeholder="项目主担" type="text">
+                                    <input class="form-control search-info input-sm" name="leader" placeholder="项目" type="text">
                                 </div>
                             </div>
                             <div class="form-inline">
@@ -63,9 +63,9 @@
                                     </div>
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <label class="control-label">直客公司：</label>
+                                <label class="control-label">签约公司：</label>
                                 <div class="form-group">
-                                    <input class="form-control search-info input-sm" name="toCompany" placeholder="直客公司" type="text">
+                                    <input class="form-control search-info input-sm" name="toCompany" placeholder="签约公司" type="text">
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                 <div class="form-group">
@@ -94,22 +94,22 @@
                 <table id="" class="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th>项目代码</th>
+                            <th>品牌</th>
+                            <th>项目编号</th>
                             <th>项目日期</th>
                             <th>项目名称</th>
-                            <th>直客公司</th>
-                            <th>直客联系人</th>
-                            <th>客户跟进</th>
-                            <th>营业跟进</th>
-                            <th>项目主担</th>
-                            <th>承接模块</th>
+                            <th>签约公司</th>
+                            <th>客户</th>
+                            <th>营业</th>
+                            <th>项目</th>
+                            <th>项目类型</th>
                             <th>场次</th>
-                            <th>营业总额</th>
-                            <th>已预支付</th>
-                            <th>剩余未付</th>
+                            <th>合同额</th>
+                            <th>预付</th>
+                            <th>未付</th>
                             <th>成本</th>
-                            <th>利润</th>
-                            <th>利润率</th>
+                            <th>纯利</th>
+                            <th>纯利率</th>
                             <th>进度</th>
                             <th>操作</th>
                         </tr>
@@ -156,8 +156,8 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="info-title">直客公司：</label>
-                                    <select class="form-control modal-info" title="直客公司" name="toCompany">
+                                    <label for="info-title">签约公司：</label>
+                                    <select class="form-control modal-info" title="签约公司" name="toCompany">
                                 
                                     </select>
                                 </div>
@@ -166,18 +166,18 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="info-title">客户跟进：</label>
-                                    <!-- <input class="form-control modal-info" name="followUp" title="客户跟进" placeholder="客户跟进" type="text"> -->
-                                    <select class="form-control modal-info" multiple="multiple" title="客户跟进" name="followUp">
+                                    <label for="info-title">客户：</label>
+                                    <!-- <input class="form-control modal-info" name="followUp" title="客户" placeholder="客户" type="text"> -->
+                                    <select class="form-control modal-info" multiple="multiple" title="客户" name="followUp">
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="info-title">营业跟进：</label>
-                                    <!-- <input class="form-control modal-info" name="business" title="营业跟进" placeholder="营业跟进" type="text">
+                                    <label for="info-title">营业：</label>
+                                    <!-- <input class="form-control modal-info" name="business" title="营业" placeholder="营业" type="text">
                                      -->
-                                     <select class="form-control modal-info" multiple="multiple" title="营业跟进" name="business">
+                                     <select class="form-control modal-info" multiple="multiple" title="营业" name="business">
                                     </select>
                                 </div>
                             </div>
@@ -185,16 +185,16 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="info-title">项目主担：</label>
-                                    <!-- <input class="form-control modal-info" name="leader" title="项目主担" placeholder="项目主担" type="text"> -->
-                                    <select class="form-control modal-info" multiple="multiple" title="项目主担" name="leader">
+                                    <label for="info-title">项目：</label>
+                                    <!-- <input class="form-control modal-info" name="leader" title="项目" placeholder="项目" type="text"> -->
+                                    <select class="form-control modal-info" multiple="multiple" title="项目" name="leader">
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="info-title">承接模块：</label>
-                                    <select class="form-control modal-info" multiple="multiple" title="承接模块" style="height: 50px;" name="responsible">
+                                    <label for="info-title">项目类型：</label>
+                                    <select class="form-control modal-info" multiple="multiple" title="项目类型" style="height: 50px;" name="responsible">
                                         <volist name="responList" id="item">
                                             <option value="{$item}">{$item}</option>
                                         </volist>
@@ -211,8 +211,8 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="info-title">营业总额：</label>
-                                    <input class="form-control modal-info" name="amount" title="营业总额" placeholder="营业总额" type="text">
+                                    <label for="info-title">合同额：</label>
+                                    <input class="form-control modal-info" name="amount" title="合同额" placeholder="合同额" type="text">
                                 </div>
                             </div>
                         </div>
@@ -247,8 +247,8 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="info-title">剩余未付：</label>
-                                    <input class="form-control modal-info" name="surplus" title="剩余未付" placeholder="剩余未付" type="text">
+                                    <label for="info-title">未付：</label>
+                                    <input class="form-control modal-info" name="surplus" title="未付" placeholder="未付" type="text">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -261,14 +261,14 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="info-title">利润：</label>
-                                    <input class="form-control modal-info" name="profit" title="利润" placeholder="利润" type="text">
+                                    <label for="info-title">纯利：</label>
+                                    <input class="form-control modal-info" name="profit" title="纯利" placeholder="纯利" type="text">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="info-title">利润率%：</label>
-                                    <input class="form-control modal-info" name="profitRate" title="利润率" placeholder="利润率" type="text">
+                                    <label for="info-title">纯利率%：</label>
+                                    <input class="form-control modal-info" name="profitRate" title="纯利率" placeholder="纯利率" type="text">
                                 </div>
                             </div>
                         </div>
@@ -350,12 +350,12 @@
 
                 
             })
-            //计算利润
+            //计算纯利
             $(tabId+" input[name='cost']").on("input",function(){
                 var profit=$(tabId+" input[name='amount']").val()-$(tabId+" input[name='cost']").val()
                 $(tabId+" input[name='profit']").val(profit)
             })
-            //计算利润率
+            //计算纯利率
             $(tabId+" input[name='cost']").on("input",function(){
                 var profitRate=$(tabId+" input[name='profit']").val()/$(tabId+" input[name='amount']").val()
                 $(tabId+" input[name='profitRate']").val(Math.round(profitRate * 100))
@@ -510,7 +510,7 @@
             datas["reqType"]="customerList";
             get("{$url}",datas,function(result){
                 if(result.list){
-                    var option='<option value="">请选择直客公司</option>';
+                    var option='<option value="">请选择签约公司</option>';
                     result.list.forEach(ele => {
                         option+="<option value="+ele.customerId+">"+ele.company+"-"+ele.contact+"</option>'"
                     });
