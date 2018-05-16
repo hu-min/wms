@@ -71,13 +71,13 @@ class ProjectController extends BaseController{
         }
         $parameter=[
             'where'=>$where,
-            'fields'=>"projectId,code,name,time,status,toCompany,followUp,business,leader,responsible,num,invoice,paySign,advanceDate,amount,advance,surplus,cost,profit,profitRate,addTime,creator,updateTime,updateUser,authority,c.company toCompanyStr,c.contact toContactStr",
+            'fields'=>"projectId,code,name,time,status,toCompany,followUp,business,leader,responsible,num,invoice,paySign,advanceDate,amount,advance,surplus,cost,profit,profitRate,addTime,creator,updateTime,updateUser,authority,toCompany toCompanyStr,c.contact toContactStr",
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"time DESC",
-            "joins"=>"LEFT JOIN (SELECT customerId,company,contact FROM v_customer) c ON c.customerId=toCompany",
+            "joins"=>"LEFT JOIN (SELECT customerId,company,contact FROM v_customer) c ON c.company=toCompany",
         ];
-        
+        // print_r($parameter);
         $projectResult=$this->projectCom->getProjectList($parameter);
         if($projectResult){
             $projectRed="projectList";

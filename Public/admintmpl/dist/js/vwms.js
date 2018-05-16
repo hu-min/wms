@@ -92,7 +92,21 @@ $(document).on("click",".info-edit",function(){
     var reqtype=$(this).data("reqtype");
     var show=$(this).data("show");
     var con=$(this).data("con");
-    
+    var url=$(this).data("url");
+
+    if(url){
+        $(target).find(".box-body").html("");
+        datas={}
+        datas.reqType="formOne";
+        var name=$(this).attr("name");
+        datas.form=name;
+        get(url,datas,function(result){
+            if(result.errCode==0){
+                $(target).find(".box-body").html(result.html);
+            }
+            
+        })
+    }
     $(target).find('.modal-title').text(title)
     $(target).find('.save-info').text(title)
     $(target).find('.save-info').data("reqtype",reqtype)
@@ -105,18 +119,18 @@ $(document).on("click",".info-edit",function(){
         datas.id=id
         get(url,datas,function(result){
             if(result.errCode==0){
-		if(fun_is_exits(con+"ShowFuns")){
+                if(fun_is_exits(con+"ShowFuns")){
                     eval(con+"ShowFuns(result.info)");//对不同的模块设置不同的响应数据
-		}
+                }
             }else{
                 alert(result.error);
             }
         })
     }else{//新建要重置数据
         $(target).find(".modal-info").val("");
-	if(fun_is_exits(con+"ReFuns")){i
+        if(fun_is_exits(con+"ReFuns")){i
             eval(con+"ReFuns()");//对不同的模块的modal数据重置
-	}
+        }
     }
 })
 /** 
@@ -139,7 +153,7 @@ $(document).on("click",'.search-refresh',function(){
     $(this).parents(".search-body").find(".search-info").val("");
     var con=$(this).data("con")
     if(fun_is_exits(con+"ResetFuns")){
-	eval(con+"ResetFuns()");//弥补不足
+	    eval(con+"ResetFuns()");//弥补不足
     }
 })
 /** 
