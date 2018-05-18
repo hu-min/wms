@@ -93,12 +93,12 @@ $(document).on("click",".info-edit",function(){
     var show=$(this).data("show");
     var con=$(this).data("con");
     var url=$(this).data("url");
-
-    if(url){
+    var name=$(this).attr("name");
+    if(name){
         $(target).find(".box-body").html("");
         datas={}
         datas.reqType="formOne";
-        var name=$(this).attr("name");
+        
         datas.form=name;
         get(url,datas,function(result){
             if(result.errCode==0){
@@ -113,8 +113,6 @@ $(document).on("click",".info-edit",function(){
     if(show=='One'){//编辑要获取数据
         datas={}
         var id=$(this).data("id");
-        var url=$(this).data("url");
-        
         datas.reqType=con+show;
         datas.id=id
         get(url,datas,function(result){

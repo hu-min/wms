@@ -14,6 +14,7 @@ class ProjectController extends BaseController{
         $this->configCom=getComponent('Config');
         $this->customerCom=getComponent('Customer');
         $this->processArr=["0"=>"沟通","1"=>"完结","2"=>"裁决","3"=>"提案","4"=>"签约","5"=>"LOST","6"=>"筹备","7"=>"执行","8"=>"完成"];
+        $this->dateArr=["0"=>"立项日期","1"=>"提案日期","2"=>"项目日期","3"=>"结束日期"];
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
     }
