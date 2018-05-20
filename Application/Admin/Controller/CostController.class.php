@@ -40,4 +40,12 @@ class CostController extends BaseController{
         $form=I('form');
         $this->ajaxReturn(['html'=>$this->fetch("Cost/form/".$form),'errCode'=>0,'error'=>getError(0)]);
     }
+    function testList(){
+        header('content-type:text/event-stream');
+        header('cache-control:no-cache');
+        $time = date("Y-m-d H:i:s");
+        
+        echo "data: The server time is: {$time}\n\n";
+        flush();
+    }
 }

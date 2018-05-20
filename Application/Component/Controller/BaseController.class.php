@@ -55,10 +55,15 @@ class BaseController extends \Common\Controller\BaseController{
      */    
     function getOne($parameter=[]){
         $res=$this->initRes();
-        $where=$parameter['where']?$parameter['where']:true;
-        $fields=$parameter['fields']?$parameter['fields']:true;
-        $orderStr=$parameter['orderStr']?$parameter['orderStr']:null;
-        $classList=$this->selfDB->getOne(['where'=>$where]);
+        if($parameter && isset($parameter["where"])){
+            $where=$parameter['where']?$parameter['where']:true;
+            $fields=$parameter['fields']?$parameter['fields']:true;
+            $orderStr=$parameter['orderStr']?$parameter['orderStr']:null;
+            $classList=$this->selfDB->getOne(['where'=>$where]);
+        }else{
+            $classList=$this->selfDB->getOne($parameter);
+        }
+        
         if($classList){
             return ['list'=>$classList];
         }

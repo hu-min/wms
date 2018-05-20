@@ -15,6 +15,7 @@ class BaseController extends \Common\Controller\BaseController{
     protected $authority;
     protected $nodeAuth;
     protected $exemption;
+    protected $pageSize=15;
     /**
      * 对admin的每一个控制器和方法做权限检查
      */

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-body search-body" id="field-search-box">
+                        <div class="col-md-12">
+                            <div class="form-inline">
+                                <label class="control-label">场地名称：</label>
+                                <div class="form-group">
+                                    <input class="form-control search-info" name="name" placeholder="场地名称" type="text">
+                                </div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <label class="control-label">场地别名：</label>
+                                <div class="form-group">
+                                    <input class="form-control search-info" name="alias" placeholder="场地别名" type="text">
+                                </div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <button type="button" data-url="{$url}" id="field-search" data-reqtype="fieldList" data-con="field" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                <button type="button" class="btn bg-teal search-refresh" data-con="field"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加场地" data-target="#modal-fieldInfo" data-con="field" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus"></i> 添加场地</button>
+                            </div>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <table id="" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>场地名称</th>
+                            <th>场地别名</th>
+                            <th>场地备注</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fieldTable">
+                        {$tables}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="dataTables_wrapper">
+            <div id="fieldPage" class="row page-div" data-url="{$url}" data-reqtype="fieldList" data-con="field">
+                {$pages}
+            </div>
+        </div>
+    </section>
+    <div class="modal fade" id="modal-fieldInfo">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Default Modal</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label >场地名称：</label>
+                            <input  class="modal-info" title="basicId" name="basicId" type="hidden">
+                            <input class="form-control modal-info"  name="name" title="场地名称" placeholder="场地名称" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label >场地别名：</label>
+                            <input class="form-control modal-info" name="alias" title="场地别名" placeholder="场地别名" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label >场地备注：</label>
+                            <input class="form-control modal-info" name="remark" title="场地备注" placeholder="场地备注" type="text">
+                        </div>
+                    </div>
+                </form>            
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary save-info" data-con="field" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        /*查询列表函数*/
+        function fieldSearchFuns(){
+            datas['data']={}
+            $(tabId+" .search-info").each(function(){
+                var name=$(this).attr("name");
+                var val=$(this).val();
+                if(val!=""){
+                    datas['data'][name]=val
+                }
+            })
+        }
+        /*设置编辑信息*/
+        function fieldShowFuns(info){
+            $(tabId+" .modal-info[name='basicId']").val(info['basicId']);
+            $(tabId+" .modal-info[name='name']").val(info['name']);
+            $(tabId+" .modal-info[name='alias']").val(info['alias']);
+            $(tabId+" .modal-info[name='remark']").val(info['remark']);
+        }
+        /*用户信息*/
+        function fieldInfoFuns(){
+            datas.data={}
+            $(tabId+" .modal-info").each(function(){
+                var name=$(this).attr("name");
+                var val=$(this).val();
+                if(name=="name" && val==""){
+                    alert($(this).attr("title")+"不能为空")
+                    throw "字段不能为空"
+                }
+                datas.data[name]=val
+            })
+        }
+    </script>
+</body>
+</html>

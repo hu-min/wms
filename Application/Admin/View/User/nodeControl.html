@@ -139,6 +139,7 @@
                 datas["reqType"]='nodeOne';
                 get("{$url}",datas,function(result){
                     if(result.errCode==0){
+                        console.log(result.info);
                         $(tabId+" .modal-info[name='nodeNames']").val(result.info['nodeNames']);
                         $(tabId+" .modal-info[name='nodeTitle']").val(result.info['nodeTitle']);
                         $(tabId+" .modal-info[name='nodeId']").val(result.info['nodeId']);
