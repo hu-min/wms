@@ -41,11 +41,48 @@ class CostController extends BaseController{
         $this->ajaxReturn(['html'=>$this->fetch("Cost/form/".$form),'errCode'=>0,'error'=>getError(0)]);
     }
     function testList(){
-        header('content-type:text/event-stream');
-        header('cache-control:no-cache');
-        $time = date("Y-m-d H:i:s");
         
-        echo "data: The server time is: {$time}\n\n";
-        flush();
+        // header('content-type:text/atext/event-streamContent-Type');
+        // header('Content-Type: text/event-stream; charset=utf-8');
+        // // // header('content-type:text/event-stream');
+        // header('cache-control:no-cache');
+        
+        // while (true) {
+        //     $rand=rand(1,10);
+        //     if($rand<5){
+        //         $time = date("Y-m-d H:i:s");
+        //         echo "data: The server time is: {$time}\n\n";
+        //     }
+        //     ob_flush();
+        //     flush();
+        //     sleep(1);
+        // }
+        // $time = date("Y-m-d H:i:s");
+        // // ob_start();
+        // echo "data: The server time is: {$time}\n\n";
+        // echo PHP_EOL;
+        // ob_flush();
+        // flush();
+        // ob_end_flush();
+        // flush();
+        header("Content-Type:text/event-stream\n\n"); 
+        $counter = rand(1, 10);
+        while (1) {  
+        // Every second, sent a "ping"event.     
+        echo "event: ping\n";  
+        $curDate = date(DATE_ISO8601);  
+        echo 'data: {"time": "' .$curDate . '"}';  
+        echo "\n\n";     
+        // Send a simple message at randomintervals.     
+        $counter--;     
+        if (!$counter) {    
+            echo'data: This is a message at time ' .
+            $curDate. "\n\n";    
+            $counter = rand(1, 10);  
+        }     
+        ob_flush();  
+        flush();  
+        sleep(1);
+        }
     }
 }

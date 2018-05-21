@@ -474,7 +474,9 @@ class UserController extends BaseController{
         }else if($reqType=="nodeEdit"){
             $where=["nodeId"=>$datas['nodeId']];
             $data=[];
-
+            if(isset($datas['nodeNames'])){
+                $data['nodeNames']=$datas['nodeNames'];
+            }
             if(isset($datas['controller'])){
                 $data['controller']=$datas['controller'];
             }
