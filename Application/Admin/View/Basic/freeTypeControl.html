@@ -15,33 +15,33 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="box box-info">
-                    <div class="box-body search-body" id="execute-search-box">
+                    <div class="box-body search-body" id="freeType-search-box">
                         <div class="col-md-12">
                             <div class="form-inline">
-                                <label class="control-label">线上线下：</label>
+                                <label class="control-label">费用主类别：</label>
                                 <div class="form-group">
-                                    <select class="form-control search-info" title="线上线下" name="pId">
+                                    <select class="form-control search-info" title="费用主类别" name="pId">
                                         <option value="">全部</option>
-                                        <volist name="exe_root" id="item" >
+                                        <volist name="free_main" id="item" >
                                             <option value="{$item.basicId}">{$item.name}</option>
                                         </volist>
                                     </select>
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <label class="control-label">执行类型名称：</label>
+                                <label class="control-label">费用类别关键字：</label>
                                 <div class="form-group">
-                                    <input class="form-control search-info" name="name" placeholder="执行类型名称" type="text">
+                                    <input class="form-control search-info" name="name" placeholder="费用类别关键字" type="text">
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <label class="control-label">执行类型别名：</label>
+                                <label class="control-label">费用类别别名：</label>
                                 <div class="form-group">
-                                    <input class="form-control search-info" name="alias" placeholder="执行类型别名" type="text">
+                                    <input class="form-control search-info" name="alias" placeholder="费用类别别名" type="text">
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <button type="button" data-url="{$url}" id="execute-search" data-reqtype="executeList" data-con="execute" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
-                                <button type="button" class="btn bg-teal search-refresh" data-con="execute"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                <button type="button" data-url="{$url}" id="freeType-search" data-reqtype="freeTypeList" data-con="freeType" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                <button type="button" class="btn bg-teal search-refresh" data-con="freeType"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加执行类型" data-target="#modal-executeInfo" data-con="execute" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus"></i> 添加执行类型</button>
+                                <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加费用类别" data-target="#modal-freeTypeInfo" data-con="freeType" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus"></i> 添加费用类别</button>
                             </div>
                             <br>
                         </div>
@@ -54,26 +54,27 @@
                 <table id="" class="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th>线上线下</th>
-                            <th>执行类型名称</th>
-                            <th>执行类型别名</th>
-                            <th>执行类型备注</th>
+                            <th>费用主类别</th>
+                            <th>费用父类名称</th>
+                            <th>费用子类名称</th>
+                            <th>费用子类别名</th>
+                            <th>费用子类备注</th>
                             <th>操作</th>
                         </tr>
                     </thead>
-                    <tbody id="executeTable">
+                    <tbody id="freeTypeTable">
                         {$tables}
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="dataTables_wrapper">
-            <div id="executePage" class="row page-div" data-url="{$url}" data-reqtype="executeList" data-con="execute">
+            <div id="freeTypePage" class="row page-div" data-url="{$url}" data-reqtype="freeTypeList" data-con="freeType">
                 {$pages}
             </div>
         </div>
     </section>
-    <div class="modal fade" id="modal-executeInfo">
+    <div class="modal fade" id="modal-freeTypeInfo">
         <div class="modal-dialog">
             <div class="modal-content">
             <div class="modal-header">
@@ -85,39 +86,39 @@
                 <form role="form">
                     <div class="box-body">
                         <div class=form-group>
-                            <select class="form-control modal-info" title="线上线下" name="pId">
-                                <option value="">全部</option>
-                                <volist name="exe_root" id="item" >
+                            <select class="form-control modal-info" title="费用主类别" name="pId">
+                                <option value="free_main">主分类</option>
+                                <volist name="free_main" id="item" >
                                     <option value="{$item.basicId}">{$item.name}</option>
                                 </volist>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label >执行类型名称：</label>
+                            <label >费用类别名称：</label>
                             <input  class="modal-info" title="basicId" name="basicId" type="hidden">
-                            <input class="form-control modal-info"  name="name" title="执行类型名称" placeholder="执行类型名称" type="text">
+                            <input class="form-control modal-info"  name="name" title="费用类别名称" placeholder="费用类别名称" type="text">
                         </div>
                         <div class="form-group">
-                            <label >执行类型别名：</label>
-                            <input class="form-control modal-info" name="alias" title="执行类型别名" placeholder="执行类型别名" type="text">
+                            <label >费用类别别名：</label>
+                            <input class="form-control modal-info" name="alias" title="费用类别别名" placeholder="费用类别别名" type="text">
                         </div>
                         <div class="form-group">
-                            <label >执行类型备注：</label>
-                            <input class="form-control modal-info" name="remark" title="执行类型备注" placeholder="执行类型备注" type="text">
+                            <label >费用类别备注：</label>
+                            <input class="form-control modal-info" name="remark" title="费用类别备注" placeholder="费用类别备注" type="text">
                         </div>
                     </div>
                 </form>            
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary save-info" data-con="execute" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
+                <button type="button" class="btn btn-primary save-info" data-con="freeType" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
             </div>
             </div>
         </div>
     </div>
     <script>
         /*查询列表函数*/
-        function executeSearchFuns(){
+        function freeTypeSearchFuns(){
             datas['data']={}
             $(tabId+" .search-info").each(function(){
                 var name=$(this).attr("name");
@@ -128,7 +129,7 @@
             })
         }
         /*设置编辑信息*/
-        function executeShowFuns(info){
+        function freeTypeShowFuns(info){
             $(tabId+" .modal-info[name='basicId']").val(info['basicId']);
             $(tabId+" .modal-info[name='pId']").find("option[value='"+info['pId']+"']").prop("selected",true);
             $(tabId+" .modal-info[name='name']").val(info['name']);
@@ -136,12 +137,12 @@
             $(tabId+" .modal-info[name='remark']").val(info['remark']);
         }
         /*信息*/
-        function executeInfoFuns(){
+        function freeTypeInfoFuns(){
             datas.data={}
             $(tabId+" .modal-info").each(function(){
                 var name=$(this).attr("name");
                 var val=$(this).val();
-                if((name=="name" ||  name=="pId" ) && val==""){
+                if(name=="name" && val==""){
                     alert($(this).attr("title")+"不能为空")
                     throw "字段不能为空"
                 }

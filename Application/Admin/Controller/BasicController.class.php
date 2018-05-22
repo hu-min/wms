@@ -463,8 +463,10 @@ class BasicController extends BaseController{
     //执行类型管理execute开始
     function executeControl(){
         $reqType=I('reqType');
-	$exe_root=$this->basicCom->get_exe_root();
-	$this->assign("exe_root",$exe_root);
+        $exe_root=$this->basicCom->get_exe_root();
+        $root_arr=array_combine(array_column($exe_root,"basicId"),array_column($exe_root,"name"));
+        $this->assign("root_arr",$root_arr);
+        $this->assign("exe_root",$exe_root);
         if($reqType){
             $this->$reqType();
         }else{
@@ -481,7 +483,9 @@ class BasicController extends BaseController{
         $data=I("data");
         $p=I("p")?I("p"):1;
         $where=["class"=>"execute"];
-
+        if($data['pId']){
+            $where['pId']=['EQ',$data['pId']];
+        }
         if($data['name']){
             $where['name']=['LIKE','%'.$data['name'].'%'];
         }
@@ -573,4 +577,124 @@ class BasicController extends BaseController{
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
     //执行类型管理execute结束
+    //费用类别管理开始
+    function freeTypeControl(){
+        $reqType=I('reqType');
+        $free_t_main=$this->basicCom->get_class_data("FTMClass");//费用类型主类
+        $main_array=array_combine(array_column($free_t_main,"basicId"),array_column($free_t_main,"name"));
+        $this->assign("free_main",$free_t_main);
+        $this->assign("main_array",$main_array);
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            $this->returnHtml();
+        }
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-20 22:45:25 
+     * @Desc: 品牌列表 
+     */    
+    function freeTypeList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $where=["class"=>["IN",["FTMClass","FTPClass","freeType"]]];
+        if($data['pId']){
+            $where['pId']=['EQ',$data['pId']];
+        }
+        if($data['name']){
+            $where['name']=['LIKE','%'.$data['name'].'%'];
+        }
+        if($data['alias']){
+            $where['alias']=['LIKE','%'.$data['alias'].'%'];
+        }
+        $parameter=[
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>"basicId DESC",
+        ];
+        $basicResult=$this->basicCom->getBasicList($parameter);
+        if($basicResult){
+            $basicRed="freeTypeList";
+            $this->Redis->set($basicRed,json_encode($basicResult['list']),3600);
+            $page = new \Think\VPage($basicResult['count'], $this->pageSize);
+            $pageShow = $page->show();
+            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            $this->assign('freeTypeList',$basicResult['list']);
+            $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Basic/basicTable/freeTypeList'),'page'=>$pageShow,"count"=>$count]);
+        }
+        $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
+    }
+
+    function freeTypeOne(){
+        $id	=I("id");
+        $parameter=[
+            'basicId'=>$id,
+        ];
+        $blistRed="freeTypeList";
+        $freeTypeList=$this->Redis->get($blistRed);
+        $blist=[];
+        if($freeTypeList){
+            foreach ($freeTypeList as $freeType) {
+               if($freeType['basicId']==$id){
+                $blist=$freeType;
+                break;
+               }
+            }
+        }
+        if(empty($blist)){
+            $basicResult=$this->basicCom->getOne($parameter);
+            if($basicResult->errCode==0){
+                $blist=$basicResult->data;
+            }
+        }
+        if(!empty($blist)){
+            $this->ajaxReturn(['errCode'=>0,'info'=>$blist]);
+        }
+        $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
+    }
+    function manageFreeTypeInfo(){
+        $reqType=I("reqType");
+        $datas=I("data");
+        if($reqType=="freeTypeAdd"){
+            if($datas["pId"]=="free_main"){
+                $datas['class']="FTMClass";
+                unset($datas["pId"]);
+            }
+            unset($datas['basicId']);
+            return $datas;
+        }else if($reqType=="freeTypeEdit"){
+            $where=["basicId"=>$datas['basicId']];
+            $data=[];
+            if(isset($datas['name'])){
+                $data['name']=$datas['name'];
+            }
+            if(isset($datas['alias'])){
+                $data['alias']=$datas['alias'];
+            }
+            if(isset($datas['remark'])){
+                $data['remark']=$datas['remark'];
+            }
+            return ["where"=>$where,"data"=>$data];
+        }
+        return "";
+    }
+    function freeTypeAdd(){
+        $freeTypeInfo=$this->manageFreeTypeInfo();
+        if($freeTypeInfo){
+            $insertResult=$this->basicCom->insertBasic($freeTypeInfo);
+            if($insertResult && $insertResult->errCode==0){
+                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+            }
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    } 
+    function freeTypeEdit(){
+        $freeTypeInfo=$this->manageFreeTypeInfo();
+        $updateResult=$this->basicCom->updateBasic($freeTypeInfo);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+    //费用类别管理结束
 }

@@ -12,6 +12,9 @@ class BasicController extends BaseController{
         $this->selfDB = D('Component/Basic');
     }
     function get_exe_root(){
-	return $this->selfDB->where(["class"=>"exeRoot"])->select();
+	    return $this->selfDB->where(["class"=>"exeRoot"])->select();
+    }
+    function get_class_data($className){
+        return $this->selfDB->where(["class"=>$className])->select();
     }
 }
