@@ -463,6 +463,8 @@ class BasicController extends BaseController{
     //执行类型管理execute开始
     function executeControl(){
         $reqType=I('reqType');
+	$exe_root=$this->basicCom->get_exe_root();
+	$this->assign("exe_root",$exe_root);
         if($reqType){
             $this->$reqType();
         }else{

@@ -11,4 +11,7 @@ class BasicController extends BaseController{
         parent::_initialize();
         $this->selfDB = D('Component/Basic');
     }
+    function get_exe_root(){
+	return $this->selfDB->where(["class"=>"exeRoot"])->select();
+    }
 }
