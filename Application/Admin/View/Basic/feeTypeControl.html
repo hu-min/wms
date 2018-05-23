@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="__ADMINT__/bower_components/chosen/css/chosen.min.css">
+    <style>
+        #modal-icon .modal-dialog {position: absolute;top: 0;bottom: 0;left: 0;right: 0;} 
+        #modal-icon .modal-content {position: absolute;top: 0;bottom: 0;width: 100%;} 
+        #modal-icon .modal-body {overflow-y: scroll;position: absolute;top: 55px;bottom: 65px;width: 100%;} 
+    </style>
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="box box-success">
+                <div class="box-header">
+                    <i class="fa fa-plus-square"></i>
+                    <h4 class="box-title">费用类别列表</h4>
+                    <button type="button" class="btn btn-info margin pull-right" data-toggle="modal" data-title="新建费用类别" data-target="#modal-feeTypeInfo">新建费用类别</button>
+                </div>
+                <div class='box-body'>
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <input class="form-control input-expand-feeType" placeholder="搜索费用类别" value="" type="input">
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <span class="tree-plus handle" data-id="#feeTypetree"><i class="fa fa-fw fa-plus-square"></i>收起</span>
+                            <span class="tree-minus handle" data-id="#feeTypetree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div id="feeTypetree"></div>
+                    </div>
+                    <div class="box-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="modal fade" id="modal-feeTypeInfo">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Default Modal</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label >费用类别名称：</label>
+                            <input class="modal-info" title="费用类别Id" name="basicId" type="hidden">
+                            <input class="form-control modal-info"  name="name" title="费用类别名称" placeholder="费用类别名称" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label >费用类别别名：</label>
+                            <input class="form-control modal-info" name="feeTypeTitle" title="费用类别别名" placeholder="费用类别别名" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label >费用类别备注：</label>
+                            <input class="form-control modal-info" name="controller" title="费用类别备注" placeholder="费用类别备注" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label >上级费用类别：</label>
+                            <select class="form-control modal-info" id="feeTypePid" title="上级费用类别" name="feeTypePid">
+                                
+                            </select>
+                        </div>
+                    </div>
+                </form>            
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary save-info" data-con="feeType" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-icon">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        //获取费用类别数据
+        function getfeeTypeTree() {
+            var tree=[]
+            datas["reqType"]="feeTypeList";
+            get("{$url}",datas,function(result){
+                // console.log(result);
+                tree=result.tree
+            },false)
+            intPfeeTypeSelect(tree);
+            return tree;
+        }
+         //生成费用类别树和费用类别树选中的事件
+         function createfeeTypeTree(){
+            $(tabId+' #feeTypetree').treeview({showButton: true,highlightSelected:false,data: getfeeTypeTree(),levels:1,color: "#428bca",});
+            //费用类别编辑
+            $(tabId+' #feeTypetree').on("click",'li button',function(){
+                $(tabId+" #modal-feeTypeInfo h4").text("费用类别编辑");
+                $(tabId+" #modal-feeTypeInfo .save-info").data("reqtype","Edit");
+                $(tabId+" #modal-feeTypeInfo .save-info").text("费用类别编辑");
+                var feeTypeData= $(tabId+' #feeTypetree').treeview('getNode', $(this).parent(".node-nodetree").data("basicId"));
+                console.log($(this).parent(".node-nodetree"))
+                console.log(feeTypeData.id)
+                datas["basicId"]=feeTypeData.id;
+                datas["reqType"]='feeTypeOne';
+                get("{$url}",datas,function(result){
+                    if(result.errCode==0){
+                        console.log(result.info);
+                        $(tabId+" .modal-info[name='name']").val(result.info['name']);
+                        $(tabId+" .modal-info[name='feeTypeTitle']").val(result.info['feeTypeTitle']);
+                        $(tabId+" .modal-info[name='basicId']").val(result.info['basicId']);
+                        $(tabId+" .modal-info[name='controller']").val(result.info['controller']);
+                        $(tabId+" .modal-info[name='feeTypeIcon']").val(result.info['feeTypeIcon']);
+                        $(tabId+" .modal-info[name='sort']").val(result.info['sort']);
+                        $(tabId+" .modal-info[name='feeTypePid']").val(result.info['feeTypePid']);
+                        $(tabId+" .status-btn").removeClass("active");
+                        $(tabId+" .status-btn[name='"+result.info['status']+"']").addClass("active");
+                        $(tabId+" #feeTypePid").find("option[value='"+result.info['feeTypePid']+"']").prop("selected",true);
+                        $(tabId+" #feeTypePid").trigger('chosen:updated');
+                    }
+                })
+                $(tabId+" #modal-feeTypeInfo").modal('show')
+                
+            })
+        }
+        $(function(){
+            createfeeTypeTree()
+            //搜索费用类别
+            $(tabId+' .input-expand-feeType').on("input",function(){
+                $(tabId+' #feeTypetree').treeview('collapseAll', { silent: true });
+                var prvefeeType=$('#feeTypetree').treeview('search', [$(tabId+' .input-expand-feeType').val(), {
+                    ignoreCase: false,     // case insensitive
+                    exactMatch: false,    // like or equals
+                    revealResults: true,  // reveal matching feeTypes
+                }]);
+            })
+            //上级费用类别chosen
+            $(tabId+" #feeTypePid").chosen({search_contains:true,width: '100%'});
+            //新增费用类别
+            $(tabId+" .box-header button").on("click",function(){
+                $(tabId+" .modal-info").val("");
+                $(tabId+" #modal-feeTypeInfo h4").text("新增费用类别");
+                $(tabId+" #modal-feeTypeInfo .save-info").data("reqtype","Add");
+                $(tabId+" #modal-feeTypeInfo .save-info").text("新增费用类别");
+                $(tabId+" #feeTypePid").find("option[value='0']").prop("selected",true);
+                $(tabId+" #feeTypePid").trigger('chosen:updated');
+                $(tabId+" .status-btn").removeClass("active");
+                $(tabId+" .status-btn[name='1']").addClass("active");
+            })
+        })
+        //初始化父费用类别的select数据
+        function intPfeeTypeSelect(data){
+            var option='<option value="0">根Root</option>';
+            data.forEach(ele => {
+                option+=getfeeType(ele,0);
+            });
+            $(tabId+" #feeTypePid").html(option);
+        }
+        //递归获取费用类别
+        function getfeeType(element,level){
+            var option=""
+            var strs="";
+            for (let index = 0; index < level; index++) {
+                strs+="——";
+            }
+            if(typeof(element.nodes)=='object'){
+                level++
+                element.nodes.forEach(elementSub => {
+                    option+=getfeeType(elementSub,level);
+                });
+            }
+            return '<option value="'+element.id+'">'+strs+element.text+'</option>'+option;
+        }
+        //费用类别信息
+        function feeTypeInfoFuns(){
+            datas["data"]={}
+            $(tabId+" .modal-info").each(function(){
+                var name =$(this).attr("name");
+                var val =$(this).val();
+                if(name=="feeTypeTitle" && val==""){
+                    alert("费用类别标题不能为空");
+                    throw "费用类别标题不能为空";
+                }else if(val!=""){
+                    datas["data"][name]=val;
+                }
+                
+            })
+            datas["data"].status=$(tabId+" .status-group .active").attr("name")
+        }
+        /** 
+         * @Author: vition 
+         * @Date: 2018-02-23 10:08:52 
+         * @Desc: 刷新费用类别 
+         */        
+        function feeTypeSearchFuns(){
+            createfeeTypeTree()
+        }
+    </script>
+</body>
+</html>

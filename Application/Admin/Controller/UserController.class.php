@@ -382,7 +382,6 @@ class UserController extends BaseController{
         $nodeResult=$this->nodeCom->getNodeList($parameter);
         $nodeTree=[];
         $level=[];
-        $newAllNodes=[];
         
         $nodeArray=$nodeResult["list"];
         foreach ($nodeArray AS $key => $nodeInfo) {

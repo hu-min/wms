@@ -10,6 +10,8 @@ class BasicController extends BaseController{
     public function _initialize() {
         parent::_initialize();
         $this->basicCom=getComponent('Basic');
+        Vendor("levelTree.levelTree");
+        $this->levelTree=new \levelTree();
     }
     //品牌管理开始
     /** 
@@ -578,11 +580,11 @@ class BasicController extends BaseController{
     }
     //执行类型管理execute结束
     //费用类别管理开始
-    function freeTypeControl(){
+    function feeTypeControl(){
         $reqType=I('reqType');
-        $free_t_main=$this->basicCom->get_class_data("FTMClass");//费用类型主类
-        $main_array=array_combine(array_column($free_t_main,"basicId"),array_column($free_t_main,"name"));
-        $this->assign("free_main",$free_t_main);
+        $fee_t_main=$this->basicCom->get_class_data("FTMClass");//费用类型主类
+        $main_array=array_combine(array_column($fee_t_main,"basicId"),array_column($fee_t_main,"name"));
+        $this->assign("fee_main",$fee_t_main);
         $this->assign("main_array",$main_array);
         if($reqType){
             $this->$reqType();
@@ -591,81 +593,76 @@ class BasicController extends BaseController{
             $this->returnHtml();
         }
     }
-    /** 
-     * @Author: vition 
-     * @Date: 2018-05-20 22:45:25 
-     * @Desc: 品牌列表 
-     */    
-    function freeTypeList(){
-        $data=I("data");
-        $p=I("p")?I("p"):1;
-        $where=["class"=>["IN",["FTMClass","FTPClass","freeType"]]];
-        if($data['pId']){
-            $where['pId']=['EQ',$data['pId']];
-        }
-        if($data['name']){
-            $where['name']=['LIKE','%'.$data['name'].'%'];
-        }
-        if($data['alias']){
-            $where['alias']=['LIKE','%'.$data['alias'].'%'];
-        }
-        $parameter=[
-            'where'=>$where,
-            'page'=>$p,
-            'pageSize'=>$this->pageSize,
-            'orderStr'=>"basicId DESC",
-        ];
-        $basicResult=$this->basicCom->getBasicList($parameter);
-        if($basicResult){
-            $basicRed="freeTypeList";
-            $this->Redis->set($basicRed,json_encode($basicResult['list']),3600);
-            $page = new \Think\VPage($basicResult['count'], $this->pageSize);
-            $pageShow = $page->show();
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
-            $this->assign('freeTypeList',$basicResult['list']);
-            $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Basic/basicTable/freeTypeList'),'page'=>$pageShow,"count"=>$count]);
-        }
-        $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
-    }
 
-    function freeTypeOne(){
-        $id	=I("id");
-        $parameter=[
-            'basicId'=>$id,
-        ];
-        $blistRed="freeTypeList";
-        $freeTypeList=$this->Redis->get($blistRed);
-        $blist=[];
-        if($freeTypeList){
-            foreach ($freeTypeList as $freeType) {
-               if($freeType['basicId']==$id){
-                $blist=$freeType;
-                break;
-               }
-            }
-        }
-        if(empty($blist)){
-            $basicResult=$this->basicCom->getOne($parameter);
-            if($basicResult->errCode==0){
-                $blist=$basicResult->data;
-            }
-        }
-        if(!empty($blist)){
-            $this->ajaxReturn(['errCode'=>0,'info'=>$blist]);
+    function feeTypeOne(){
+        $basicId = I("basicId");
+
+        $feeTypeInfo=$this->getfeeTypeOne($basicId);
+        if(!empty($feeTypeInfo)){
+            $this->ajaxReturn(['errCode'=>0,'info'=>$feeTypeInfo]);
         }
         $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
+
+    //     $parameter=[
+    //         'basicId'=>$id,
+    //     ];
+    //     $blistRed="feeTypeList";
+    //     $feeTypeList=$this->Redis->get($blistRed);
+    //     $blist=[];
+    //     if($feeTypeList){
+    //         foreach ($feeTypeList as $feeType) {
+    //            if($feeType['basicId']==$id){
+    //             $blist=$feeType;
+    //             break;
+    //            }
+    //         }
+    //     }
+    //     if(empty($blist)){
+    //         $basicResult=$this->basicCom->getOne($parameter);
+    //         if($basicResult->errCode==0){
+    //             $blist=$basicResult->data;
+    //         }
+    //     }
+    //     if(!empty($blist)){
+    //         $this->ajaxReturn(['errCode'=>0,'info'=>$blist]);
+    //     }
+    //     $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
     }
-    function manageFreeTypeInfo(){
+    function getfeeTypeOne($basicId){
+        $parameter=[
+            'basicId'=>$basicId,
+        ];
+        $fListRed="feeTypeArray";
+        $feeTypeList=$this->Redis->get($fListRed);
+        if($feeTypeList){
+            foreach ($feeTypeList as $feeType) {
+                if($feeType['basicId']==$basicId){
+                    return $feeType;
+                }
+            }
+        }
+        $feeTypeResult=$this->basicCom->getfeeTypeOne($parameter);
+        if($feeTypeResult->errCode==0){
+            return $feeTypeResult->data['list'];
+        }
+        return [];
+    }
+    function manageFeeTypeInfo(){
         $reqType=I("reqType");
         $datas=I("data");
-        if($reqType=="freeTypeAdd"){
-            if($datas["pId"]=="free_main"){
+        if($reqType=="feeTypeAdd"){
+            if($datas["gId"]=="fee_main" || $datas["gId"]==""){
                 $datas['class']="FTMClass";
+                unset($datas["gId"]);
                 unset($datas["pId"]);
+            }elseif($datas["pId"]=="fee_parent"){
+                $datas["pId"]=$datas["gId"];
+                $datas['class']="FTPClass";
+                unset($datas["gId"]);
             }
             unset($datas['basicId']);
             return $datas;
-        }else if($reqType=="freeTypeEdit"){
+        }else if($reqType=="feeTypeEdit"){
             $where=["basicId"=>$datas['basicId']];
             $data=[];
             if(isset($datas['name'])){
@@ -681,20 +678,58 @@ class BasicController extends BaseController{
         }
         return "";
     }
-    function freeTypeAdd(){
-        $freeTypeInfo=$this->manageFreeTypeInfo();
-        if($freeTypeInfo){
-            $insertResult=$this->basicCom->insertBasic($freeTypeInfo);
+    function feeTypeAdd(){
+        $feeTypeInfo=$this->manageFeeTypeInfo();
+        if($feeTypeInfo){
+            $insertResult=$this->basicCom->insertBasic($feeTypeInfo);
             if($insertResult && $insertResult->errCode==0){
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
         }
         $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
     } 
-    function freeTypeEdit(){
-        $freeTypeInfo=$this->manageFreeTypeInfo();
-        $updateResult=$this->basicCom->updateBasic($freeTypeInfo);
+    function feeTypeEdit(){
+        $feeTypeInfo=$this->manageFeeTypeInfo();
+        $updateResult=$this->basicCom->updateBasic($feeTypeInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-24 06:42:53 
+     * @Desc: 返回费用类型的节点 
+     */    
+    function feeTypeList(){
+        $this->ajaxReturn(["tree"=>$this->getFeeTypeTree()]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-24 06:43:12 
+     * @Desc: 获取费用类型节点 
+     */    
+    function getFeeTypeTree(){
+        $parameter=[
+            'where'=>["class"=>"feeType"],
+            'page'=>0,
+            'pageSize'=>9999,
+            'orderStr'=>'level DESC',
+        ];
+        $feeTypeResult=$this->basicCom->getBasicList($parameter);
+        $feeTypeTree=[];
+        $level=[];
+        
+        $feeTypeArray=$feeTypeResult["list"];
+        foreach ($feeTypeArray AS $key => $feeTypeInfo) {
+            $level[$feeTypeInfo["level"]][$feeTypeInfo["Pid"]][]= $feeTypeInfo;
+            unset($feeTypeArray[$key]);
+        }
+        $this->Redis->set("feeTypeArray",json_encode($feeTypeResult["list"]),3600);
+        asort($level);
+        
+        $this->levelTree->setKeys(["idName"=>"basicId","pidName"=>"pId"]);
+        $this->levelTree->setReplace(["name"=>"text","basicId"=>"id"]);
+        $this->levelTree->switchOption(["beNode"=>false,"idAsKey"=>false]);
+        $feeTypeTree=$this->levelTree->createTree($feeTypeResult["list"]);
+        return $feeTypeTree;
     }
     //费用类别管理结束
 }
