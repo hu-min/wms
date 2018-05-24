@@ -650,16 +650,10 @@ class BasicController extends BaseController{
     function manageFeeTypeInfo(){
         $reqType=I("reqType");
         $datas=I("data");
+        $feeTypePInfo=$this->getfeeTypeOne($datas['pId']);
+        $datas['level']=$feeTypePInfo['level']?($feeTypePInfo['level']+1):1;
         if($reqType=="feeTypeAdd"){
-            if($datas["gId"]=="fee_main" || $datas["gId"]==""){
-                $datas['class']="FTMClass";
-                unset($datas["gId"]);
-                unset($datas["pId"]);
-            }elseif($datas["pId"]=="fee_parent"){
-                $datas["pId"]=$datas["gId"];
-                $datas['class']="FTPClass";
-                unset($datas["gId"]);
-            }
+            $datas['class']="feeType";
             unset($datas['basicId']);
             return $datas;
         }else if($reqType=="feeTypeEdit"){
@@ -673,6 +667,12 @@ class BasicController extends BaseController{
             }
             if(isset($datas['remark'])){
                 $data['remark']=$datas['remark'];
+            }
+            if(isset($datas['pId'])){
+                $data['pId']=$datas['pId'];
+            }
+            if(isset($datas['level'])){
+                $data['level']=$datas['level'];
             }
             return ["where"=>$where,"data"=>$data];
         }

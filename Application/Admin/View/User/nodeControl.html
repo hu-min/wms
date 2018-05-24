@@ -135,6 +135,7 @@
                 $(tabId+" #modal-nodeInfo .save-info").data("reqtype","Edit");
                 $(tabId+" #modal-nodeInfo .save-info").text("节点编辑");
                 var nodeData= $(tabId+' #nodetree').treeview('getNode', $(this).parent(".node-nodetree").data("nodeid"));
+
                 datas["nodeId"]=nodeData.id;
                 datas["reqType"]='nodeOne';
                 get("{$url}",datas,function(result){
