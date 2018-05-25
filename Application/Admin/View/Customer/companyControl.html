@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-header">
+                        <i class="fa fa-plus-square"></i>
+                        <h4 class="box-title">公司列表</h4>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加公司" data-target="#modal-companyInfo" data-con="company" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增公司</button>
+                    </div>
+                    <div class="box-body search-body" id="company-search-box">
+                        <div class="col-md-12">
+                            <div class="form-inline">
+                                <label class="control-label">公司名称：</label>
+                                <div class="form-group">
+                                    <input class="form-control search-info input-sm" name="company" placeholder="公司名称" type="text">
+                                </div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <label class="control-label">公司别名：</label>
+                                <div class="form-group">
+                                    <input class="form-control search-info input-sm" name="alias" placeholder="公司别名" type="text">
+                                </div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <div class="form-group">
+                                    <label >省份：</label>
+                                    <select class="form-control search-info input-sm" data-city="search-info" title="省份" name="provinceId">
+                                        <option value="">省份</option>
+                                        <volist name="province" id="item">
+                                            <option value="{$item.pid}">{$item.province}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <div class="form-group">
+                                    <label >城市：</label>
+                                    <select class="form-control search-info input-sm" title="省份" name="cityId">
+                                    </select>
+                                </div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <div class="form-group">
+                                    <label >状态：</label>
+                                    <select class="form-control search-info input-sm" title="状态" name="status">
+                                        <option value="">全部</option>
+                                        <volist name="statusType" id="item">
+                                            <option value="{$key}">{$item}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <button type="button" data-url="{$url}" id="company-search" data-reqtype="companyList" data-con="company" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                <button type="button" class="btn bg-teal search-refresh" data-con="company"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                            </div>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" style="font-size:0.95em;overflow-x: auto;">
+                <div class="count-div" id="companyCount" style="margin:10px;font-weight: 800;">
+                </div>
+                <table id="" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>公司名称</th>
+                            <th>公司别名</th>
+                            <th>省份</th>
+                            <th>城市</th>
+                            <th>地址</th>
+                            <th>备注</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="companyTable">
+                        {$tables}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="dataTables_wrapper">
+            <div id="companyPage" class="row page-div" data-url="{$url}" data-reqtype="companyList" data-con="company">
+                {$pages}
+            </div>
+        </div>
+    </section>
+    <div class="modal fade" id="modal-companyInfo">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+            <div class="modal-header">
+                <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Default Modal</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label for="info-title">公司名称：</label>
+                            <input  class="modal-info" title="companyId" name="companyId" type="hidden">
+                            <input class="form-control modal-info"  name="company" title="公司名称"  placeholder="公司名称" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">公司别名：</label>
+                            <input class="form-control modal-info" required="required" name="alias" title="公司别名" placeholder="公司别名" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label >省份：</label>
+                            <select class="form-control modal-info input-sm" data-city="modal-info" title="省份" name="provinceId">
+                                <option value="">省份</option>
+                                <volist name="province" id="item">
+                                    <option value="{$item.pid}">{$item.province}</option>
+                                </volist>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label >城市：</label>
+                            <select class="form-control modal-info input-sm" title="省份" name="cityId">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">联系地址：</label>
+                            <input class="form-control modal-info" name="address" title="联系地址" placeholder="联系地址" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="info-title">备注：</label>
+                            <input class="form-control modal-info" name="remarks" title="备注" placeholder="备注" type="text">
+                        </div>
+                        <div class="form-group">
+                            <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
+                                <input class="modal-info" id="info-status" value="1" name="status" type="hidden">
+                                <button type="button" name="0" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
+                                <button type="button" name="1" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-green"> 启用 </i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>            
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary save-info" data-con="company" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // var E = window.wangEditor
+        // var editor = new E(tabId+' .art-editor')
+        //获取分类数据
+        var prefix ="{$company['prefix']}";
+
+        $(function(){
+            //新增公司
+            $(tabId+" .box-header button").on("click",function(){
+                $(tabId+" .modal-info").val("");
+                $(tabId+" .status-btn").removeClass("active");
+                $(tabId+" .status-btn[name='1']").addClass("active");
+            })
+            $(tabId+" select[name='provinceId']").on("change",function(){
+                var provinceId=$(this).val()
+                var whereCity=$(this).data("city")
+                if(provinceId>0){
+                    // console.log(pid)
+                    setCityOption(provinceId,whereCity)
+                }else{
+                    $(tabId+" ."+whereCity+"[name='cityId']").html("")
+                }
+            })
+            //计算利润
+            // $(tabId+" input[name='cost']").on("input",function(){
+            //     var profit=$(tabId+" input[name='amount']").val()-$(tabId+" input[name='cost']").val()
+            //     $(tabId+" input[name='profit']").val(profit)
+            // })
+            // //计算利润率
+            // $(tabId+" input[name='cost']").on("input",function(){
+            //     var profitRate=$(tabId+" input[name='profit']").val()/$(tabId+" input[name='amount']").val()
+            //     $(tabId+" input[name='profitRate']").val(Math.round(profitRate * 100))
+            // })
+
+        })
+        function setCityOption(pid,whereCity){
+                datas["reqType"]="getCityList";
+                datas["pid"]=pid
+                $(tabId+" ."+whereCity+"[name='cityId']").html("")
+                get("{$url}",datas,function(result){
+                    if(result.errCode==0){
+                        var cityOption='<option value="">全部</option>';
+                        
+                        result.citys.forEach(ele => {
+                            cityOption+='<option value="'+ele.cid+'">'+ele.city+'</option>'
+                        })
+                        $(tabId+" ."+whereCity+"[name='cityId']").html(cityOption)
+                    }
+                },false)
+        }
+        //function companyResetFuns(){}
+        function companyReFuns(){
+            var year=(new Date()).getFullYear()
+            var month=(new Date()).getMonth()
+            var day=(new Date()).getDate()
+            var hours=(new Date()).getHours()
+            var minutes=(new Date()).getMinutes()
+            $(tabId+" .modal-info[name='code']").val(prefix+year+formatMonth(month)+formatDate(day)+hours+minutes);
+        }
+        function companySearchFuns(){
+            datas['data']={}
+            $(tabId+" .search-info").each(function(){
+                var name=$(this).attr("name");
+                var val=$(this).val();
+                if(val!=""){
+                    datas['data'][name]=val
+                }
+            })
+        }
+        function companyInfoFuns(){
+            datas["data"]={}
+            $(tabId+" .modal-info").each(function(){
+                var name =$(this).attr("name");
+                var val =$(this).val();
+                var required=$(this).attr("required");
+                var title=$(this).attr("title");
+                if(required=="required" && val==""){
+                    alert(title+"不能为空");
+                    throw title+"不能为空";
+                }else{
+                    datas["data"][name]=val;
+                }
+            })
+        }
+        /*设置编辑用户信息*/
+        function companyShowFuns(info){
+
+            $(tabId+" .modal-info[name='companyId']").val(info['companyId']);
+            $(tabId+" .modal-info[name='company']").val(info['company']);
+            $(tabId+" .modal-info[name='alias']").val(info['alias']);
+            $(tabId+" .modal-info[name='address']").val(info['address']);
+            $(tabId+" .modal-info[name='remarks']").val(info['remarks']);
+            $(tabId+" .modal-status .status-btn").removeClass("active");
+            $(tabId+" .modal-status .status-btn[name='"+info['status']+"']").addClass("active");
+
+            $(tabId+" .modal-info[name='provinceId']").find("option[value='"+info['provinceId']+"']").prop("selected",true);
+            setCityOption(info['provinceId'],"modal-info")
+            $(tabId+" .modal-info[name='cityId']").find("option[value='"+info['cityId']+"']").prop("selected",true);
+        }
+        //初始分类的select数据
+        function intPClsSelect(data){
+            var option='<option value="0">根Root</option>';
+            data.forEach(ele => {
+                option+=getArtClsNode(ele,0);
+            });
+            // $(tabId+" .artclass").html(option);
+        }
+    </script>
+</body>
+</html>

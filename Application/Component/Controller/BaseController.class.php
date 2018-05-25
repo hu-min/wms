@@ -42,6 +42,7 @@ class BaseController extends \Common\Controller\BaseController{
         $joins=$parameter['joins']?$parameter['joins']:"";
 
         $classList=$this->selfDB->getList($where , $fields, $orderStr, $page, $pageNum, $groupBy,$joins);
+        $this->log($this->selfDB->_sql());
         $count=$this->selfDB->countList($where);
         if($classList){
             return ['list'=>$classList,'count'=>$count];
