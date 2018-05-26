@@ -33,8 +33,7 @@ class BasicController extends BaseController{
                     return  $province;
                 }
             }
-        }
-        
+        }   
     }
     function get_citys($pid,$cid=0){
         $citysRed="province_".$pid."_city";

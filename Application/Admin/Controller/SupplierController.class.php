@@ -4,17 +4,129 @@ namespace Admin\Controller;
 /** 
  * @Author: vition 
  * @Date: 2018-05-09 22:46:55 
- * @Desc: 客户管理 
+ * @Desc: 供应商管理 
  */
-class CustomerController extends BaseController{
+class SupplierController extends BaseController{
     protected $pageSize=10;
     public function _initialize() {
         parent::_initialize();
         $this->basicCom=getComponent('Basic');
-        $this->customerCom=getComponent('Customer');
+        $this->supplierCom=getComponent('Supplier');
         $this->statusType=["0"=>"未启用","1"=>"启用"];
     }
-    //客户公司管理开始
+    //供应商配置开始    
+    function supType(){
+        $reqType=I('reqType');
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            $this->returnHtml();
+        }
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-20 22:45:25 
+     * @Desc: 供应商类型列表 
+     */    
+    function supTypeList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $where=["class"=>"supType"];
+
+        if($data['name']){
+            $where['name']=['LIKE','%'.$data['name'].'%'];
+        }
+        if($data['alias']){
+            $where['alias']=['LIKE','%'.$data['alias'].'%'];
+        }
+        $parameter=[
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>"basicId DESC",
+        ];
+        $basicResult=$this->basicCom->getBasicList($parameter);
+        if($basicResult){
+            $basicRed="supTypeList";
+            $this->Redis->set($basicRed,json_encode($basicResult['list']),3600);
+            $page = new \Think\VPage($basicResult['count'], $this->pageSize);
+            $pageShow = $page->show();
+            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            $this->assign('list',$basicResult['list']);
+            $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Supplier/supplierTable/supTypeList'),'page'=>$pageShow,"count"=>$count]);
+        }
+        $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
+    }
+
+    function supTypeOne(){
+        $id	=I("id");
+        $parameter=[
+            'basicId'=>$id,
+        ];
+        $blistRed="supTypeList";
+        $supTypeList=$this->Redis->get($blistRed);
+        $blist=[];
+        if($supTypeList){
+            foreach ($supTypeList as $supType) {
+               if($supType['basicId']==$id){
+                $blist=$supType;
+                break;
+               }
+            }
+        }
+        if(empty($blist)){
+            $basicResult=$this->basicCom->getOne($parameter);
+            if($basicResult->errCode==0){
+                $blist=$basicResult->data;
+            }
+        }
+        if(!empty($blist)){
+            $this->ajaxReturn(['errCode'=>0,'info'=>$blist]);
+        }
+        $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
+    }
+    function manageSupTypeInfo(){
+        $reqType=I("reqType");
+        $datas=I("data");
+        if($reqType=="supTypeAdd"){
+            $datas['class']="supType";
+            unset($datas['basicId']);
+            return $datas;
+        }else if($reqType=="supTypeEdit"){
+            $where=["basicId"=>$datas['basicId']];
+            $data=[];
+            if(isset($datas['name'])){
+                $data['name']=$datas['name'];
+            }
+            if(isset($datas['alias'])){
+                $data['alias']=$datas['alias'];
+            }
+            if(isset($datas['remark'])){
+                $data['remark']=$datas['remark'];
+            }
+            return ["where"=>$where,"data"=>$data];
+        }
+        return "";
+    }
+    function supTypeAdd(){
+        $supTypeInfo=$this->manageSupTypeInfo();
+        if($supTypeInfo){
+            $insertResult=$this->basicCom->insertBasic($supTypeInfo);
+            if($insertResult && $insertResult->errCode==0){
+                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+            }
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    } 
+    function supTypeEdit(){
+        $supTypeInfo=$this->manageSupTypeInfo();
+        $updateResult=$this->basicCom->updateBasic($supTypeInfo);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+    //供应商配置结束
+
+    //供应商公司管理开始
     function companyControl(){
         $reqType=I('reqType');
         $this->assign('statusType',$this->statusType);
@@ -35,7 +147,7 @@ class CustomerController extends BaseController{
     /** 
      * @Author: vition 
      * @Date: 2018-05-09 23:51:01 
-     * @Desc: 客户列表 
+     * @Desc: 供应商列表 
      */    
     function companyList(){
         $data=I("data");
@@ -58,14 +170,14 @@ class CustomerController extends BaseController{
         }
         $parameter=[
             'where'=>$where,
-            'fields'=>"`companyId`,`company`,`alias`,`provinceId`,`cityId`,`province`,`city`,`address`,`remarks`,`addTime`,`updateTime`,`status`",
+            'fields'=>"`companyId`,`type`,`company`,`alias`,`provinceId`,`cityId`,`province`,`city`,`address`,`remarks`,`addTime`,`updateTime`,`status`",
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"companyId DESC",
             "joins"=>["LEFT JOIN v_province p ON p.pid=provinceId","LEFT JOIN v_city c ON c.pid=p.pid AND c.cid=cityId"],
         ];
         
-        $listResult=$this->customerCom->getCompanyList($parameter);
+        $listResult=$this->supplierCom->getCompanyList($parameter);
         if($listResult){
             $companyRed="companyList";
             $this->Redis->set($companyRed,json_encode($listResult['list']),3600);
@@ -74,7 +186,7 @@ class CustomerController extends BaseController{
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->assign('list',$listResult['list']);
 
-            $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Customer/customerTable/companyList'),'page'=>$pageShow]);
+            $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Supplier/supplierTable/companyList'),'page'=>$pageShow]);
         }
         $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
     }
@@ -121,12 +233,12 @@ class CustomerController extends BaseController{
     /** 
      * @Author: vition 
      * @Date: 2018-05-09 23:46:44 
-     * @Desc: 添加客户信息 
+     * @Desc: 添加供应商信息 
      */    
     function companyAdd(){
         $dataInfo=$this->manageCompanyInfo();
         if($dataInfo){
-            $insertResult=$this->customerCom->insertCompany($dataInfo);
+            $insertResult=$this->supplierCom->insertCompany($dataInfo);
             if($insertResult && $insertResult->errCode==0){
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
@@ -136,7 +248,7 @@ class CustomerController extends BaseController{
     /** 
      * @Author: vition 
      * @Date: 2018-05-09 23:59:28 
-     * @Desc: 获取单一条客户信息 
+     * @Desc: 获取单一条供应商信息 
      */    
     function companyOne(){
         $id	=I("id");
@@ -155,7 +267,7 @@ class CustomerController extends BaseController{
             }
         }
         if(empty($plist)){
-            $companyResult=$this->customerCom->getCompanyList($parameter,true);
+            $companyResult=$this->supplierCom->getCompanyList($parameter,true);
             if($companyResult->errCode==0){
                 $plist=$companyResult->data;
             }
@@ -168,20 +280,20 @@ class CustomerController extends BaseController{
     /** 
      * @Author: vition 
      * @Date: 2018-05-10 00:02:10 
-     * @Desc: 修改客户信息 
+     * @Desc: 修改供应商信息 
      */    
     function companyEdit(){
         $companyInfo=$this->manageCompanyInfo();
-        $updateResult=$this->customerCom->updateCompany($companyInfo);
+        $updateResult=$this->supplierCom->updateCompany($companyInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
-    //客户公司管理结束
+    //供应商公司管理结束
 
-    //客户联系人管理开始
+    //供应商联系人管理开始
     /** 
      * @Author: vition 
      * @Date: 2018-05-09 23:42:41 
-     * @Desc: 客户信息控制 
+     * @Desc: 供应商信息控制 
      */    
     function contactControl(){
         $reqType=I('reqType');
@@ -191,7 +303,7 @@ class CustomerController extends BaseController{
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->assign('statusType',$this->statusType);
             $companyHtml="";
-            $companyList=$this->customerCom->find_company();
+            $companyList=$this->supplierCom->find_company();
             foreach ($companyList["list"] as $company) {
                 $companyHtml.="<option value='{$company['companyId']}'>{$company['company']}</option>";
             }
@@ -201,7 +313,7 @@ class CustomerController extends BaseController{
     }
     function findCompanyList(){
         $key=I("companykey");
-        $companyRes=$this->customerCom->find_company(urldecode($key));
+        $companyRes=$this->supplierCom->find_company(urldecode($key));
         if($companyRes){
             $this->ajaxReturn(['errCode'=>0,'data'=>$companyRes["list"]]);
         }
@@ -210,7 +322,7 @@ class CustomerController extends BaseController{
     /** 
      * @Author: vition 
      * @Date: 2018-05-09 23:51:01 
-     * @Desc: 客户列表 
+     * @Desc: 供应商列表 
      */    
     function contactList(){
         $data=I("data");
@@ -228,10 +340,10 @@ class CustomerController extends BaseController{
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"contactId DESC",
-            "joins"=>"LEFT JOIN (SELECT companyId cid,company FROM v_customer_company WHERE status=1) c ON c.cid=companyId",
+            "joins"=>"LEFT JOIN (SELECT companyId cid,company FROM v_supplier_company WHERE status=1) c ON c.cid=companyId",
         ];
         
-        $listResult=$this->customerCom->getCustomerList($parameter);
+        $listResult=$this->supplierCom->getSupplierList($parameter);
         if($listResult){
             $contactRed="contactList";
             $this->Redis->set($contactRed,json_encode($listResult['list']),3600);
@@ -240,7 +352,7 @@ class CustomerController extends BaseController{
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->assign('list',$listResult['list']);
 
-            $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Customer/customerTable/contactList'),'page'=>$pageShow]);
+            $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Supplier/supplierTable/contactList'),'page'=>$pageShow]);
         }
         $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
     }
@@ -285,12 +397,12 @@ class CustomerController extends BaseController{
     /** 
      * @Author: vition 
      * @Date: 2018-05-09 23:46:44 
-     * @Desc: 添加客户信息 
+     * @Desc: 添加供应商信息 
      */    
     function contactAdd(){
         $dataInfo=$this->manageContactInfo();
         if($dataInfo){
-            $insertResult=$this->customerCom->insertContact($dataInfo);
+            $insertResult=$this->supplierCom->insertContact($dataInfo);
             if($insertResult && $insertResult->errCode==0){
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
@@ -300,7 +412,7 @@ class CustomerController extends BaseController{
     /** 
      * @Author: vition 
      * @Date: 2018-05-09 23:59:28 
-     * @Desc: 获取单一条客户信息 
+     * @Desc: 获取单一条供应商信息 
      */    
     function contactOne(){
         $id	=I("id");
@@ -319,7 +431,7 @@ class CustomerController extends BaseController{
             }
         }
         if(empty($plist)){
-            $contactResult=$this->customerCom->getUser($parameter);
+            $contactResult=$this->supplierCom->getUser($parameter);
             if($contactResult->errCode==0){
                 $plist=$contactResult->data;
             }
@@ -332,11 +444,11 @@ class CustomerController extends BaseController{
     /** 
      * @Author: vition 
      * @Date: 2018-05-10 00:02:10 
-     * @Desc: 修改客户信息 
+     * @Desc: 修改供应商信息 
      */    
     function contactEdit(){
         $contactInfo=$this->manageContactInfo();
-        $updateResult=$this->customerCom->updateContact($contactInfo);
+        $updateResult=$this->supplierCom->updateContact($contactInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
 }

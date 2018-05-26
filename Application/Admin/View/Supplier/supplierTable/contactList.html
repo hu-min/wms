@@ -1,0 +1,16 @@
+<volist name="list" id="item">
+    <tr>
+        <td>{$item['company']}</td>
+        <td>{$item['contact']}</td>
+        <td>{$item['phone']}</td>
+        <td>{$item['email']}</td>
+        <td>{$item['address']}</td>
+        <td>{$item['remarks']}</td>
+        <if condition="$item['status'] eq 0">
+            <td><span class="label bg-black">{$statusType[$item['status']]}</span></td>
+        <elseif condition="$item['status'] eq 1"/>
+            <td><span class="label label-success">{$statusType[$item['status']]}</span></td>
+        </if>
+        <td><button type="button" data-show="One" data-reqtype="Edit"  data-id="{$item['contactId']}" data-url="{$url}" data-con="contact" data-toggle="modal" data-target="#modal-contactInfo" data-title="编辑联系人" class="btn btn-sm btn-primary info-edit">编辑</button></td>
+    </tr>
+</volist>

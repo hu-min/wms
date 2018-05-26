@@ -140,6 +140,8 @@ $(document).on("click",".info-edit",function(){
 $(document).on("click",'.status-btn',function(){
     $(this).parents(".status-group").children(".status-btn").removeClass("active");
     $(this).addClass("active");
+    var val= $(this).attr("name");
+    $(this).parent(".status-group").children("input[name='status']").val(val);
 })
 /** 
  * javascript comment 

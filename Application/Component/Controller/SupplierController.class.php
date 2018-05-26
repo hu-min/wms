@@ -2,11 +2,11 @@
 namespace Component\Controller;
 // use Common\Controller\BaseController;
 
-class CustomerController extends BaseController{
+class SupplierController extends BaseController{
     public function _initialize(){
         parent::_initialize();
-        $this->companyDB = D('Component/CustomerCompany');
-        $this->contactDB = D('Component/CustomerContact');
+        $this->companyDB = D('Component/SupplierCompany');
+        $this->contactDB = D('Component/SupplierContact');
     }
 
     function getCompanyList($parameter=[],$one=false){
@@ -27,7 +27,7 @@ class CustomerController extends BaseController{
     /** 
      * @Author: vition 
      * @Date: 2018-05-26 06:56:01 
-     * @Desc: 根据关键字查找指定公司列表了 
+     * @Desc: 根据关键字查找指定供应商公司列表了 
      */    
     function find_company($key=""){
         $this->selfDB=$this->companyDB;
@@ -44,7 +44,7 @@ class CustomerController extends BaseController{
         ];
         return $this->getList($parameter); 
     }
-    function getCustomerList($parameter=[],$one=false){
+    function getSupplierList($parameter=[],$one=false){
         $this->selfDB=$this->contactDB;
         if($one){
             return $this->getOne($parameter);
