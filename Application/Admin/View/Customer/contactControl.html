@@ -18,8 +18,6 @@
                     <div class="box-header">
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">联系人列表</h4>
-                        &nbsp;&nbsp;&nbsp;&nbsp;
-                        <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加联系人" data-target="#modal-contactInfo" data-con="contact" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增联系人</button>
                     </div>
                     <div class="box-body search-body" id="contact-search-box">
                         <div class="col-md-12">
@@ -33,14 +31,18 @@
                                         </volist>
                                     </select>
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <label class="control-label">联系人：</label>
+                                
                                 <div class="form-group">
+                                    <label class="control-label">联系人：</label>
                                     <input class="form-control search-info input-sm" name="contact" placeholder="联系人" type="text">
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <button type="button" data-url="{$url}" id="contact-search" data-reqtype="contactList" data-con="contact" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
-                                <button type="button" class="btn bg-teal search-refresh" data-con="contact"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                <div class="form-group">
+                                    <button type="button" data-url="{$url}" id="contact-search" data-reqtype="contactList" data-con="contact" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="contact"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加联系人" data-target="#modal-contactInfo" data-con="contact" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增联系人</button>
+                                </div>
                             </div>
                             <br>
                         </div>

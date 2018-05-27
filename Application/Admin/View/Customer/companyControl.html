@@ -25,16 +25,16 @@
                     <div class="box-body search-body" id="company-search-box">
                         <div class="col-md-12">
                             <div class="form-inline">
-                                <label class="control-label">公司名称：</label>
+                                
                                 <div class="form-group">
+                                    <label class="control-label">公司名称：</label>
                                     <input class="form-control search-info input-sm" name="company" placeholder="公司名称" type="text">
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <label class="control-label">公司别名：</label>
+                                
                                 <div class="form-group">
+                                    <label class="control-label">公司别名：</label>
                                     <input class="form-control search-info input-sm" name="alias" placeholder="公司别名" type="text">
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
                                 <div class="form-group">
                                     <label >省份：</label>
                                     <select class="form-control search-info input-sm" data-city="search-info" title="省份" name="provinceId">
@@ -44,13 +44,11 @@
                                         </volist>
                                     </select>
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
                                 <div class="form-group">
                                     <label >城市：</label>
                                     <select class="form-control search-info input-sm" title="省份" name="cityId">
                                     </select>
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
                                 <div class="form-group">
                                     <label >状态：</label>
                                     <select class="form-control search-info input-sm" title="状态" name="status">
@@ -60,9 +58,11 @@
                                         </volist>
                                     </select>
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <button type="button" data-url="{$url}" id="company-search" data-reqtype="companyList" data-con="company" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
-                                <button type="button" class="btn bg-teal search-refresh" data-con="company"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                <div class="form-group">
+                                    <button type="button" data-url="{$url}" id="company-search" data-reqtype="companyList" data-con="company" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="company"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                </div>
+                                
                             </div>
                             <br>
                         </div>

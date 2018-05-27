@@ -38,12 +38,10 @@
                                         </volist>
                                     </select>
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
                                 <div class="form-group">
                                     <label class="control-label">供应商别名：</label>
                                     <input class="form-control search-info input-sm" name="alias" placeholder="供应商别名" type="text">
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
                                 <div class="form-group">
                                     <label >省份：</label>
                                     <select class="form-control search-info input-sm" data-city="search-info" title="省份" name="provinceId">
@@ -53,13 +51,11 @@
                                         </volist>
                                     </select>
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
                                 <div class="form-group">
                                     <label >城市：</label>
                                     <select class="form-control search-info input-sm" title="省份" name="cityId">
                                     </select>
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
                                 <div class="form-group">
                                     <label >状态：</label>
                                     <select class="form-control search-info input-sm" title="状态" name="status">
@@ -69,9 +65,10 @@
                                         </volist>
                                     </select>
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <button type="button" data-url="{$url}" id="supcompany-search" data-reqtype="companyList" data-con="supcompany" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
-                                <button type="button" class="btn bg-teal search-refresh" data-con="supcompany"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                <div class="form-group">
+                                    <button type="button" data-url="{$url}" id="supcompany-search" data-reqtype="companyList" data-con="supcompany" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="supcompany"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                </div>
                             </form>
                             <br>
                         </div>

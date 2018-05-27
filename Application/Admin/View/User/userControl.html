@@ -22,12 +22,10 @@
                                 <div class="form-group">
                                     <input class="form-control search-info" id="loginName" name="loginName" placeholder="登录名" type="text">
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
                                 <label for="userName" class="control-label">用户名：</label>
                                 <div class="form-group">
                                     <input class="form-control search-info" id="userName" name="userName" placeholder="用户名" type="text">
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
                                 <div class="form-group">
                                     <label for="gender" class="control-label">性别：</label>
                                     <select class="form-control search-info" name="gender" id="gender">
@@ -36,8 +34,10 @@
                                         <option value="2">女性</option>
                                     </select>
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加用户" data-target="#modal-userInfo" data-con="user" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus"></i> 添加用户</button>
+                                <div class="form-group">
+                                    <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加用户" data-target="#modal-userInfo" data-con="user" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus"></i> 添加用户</button>
+                                </div>
+                                
                             </div>
                             <br>
                             <div class="form-inline">
@@ -50,7 +50,6 @@
                                         </volist>
                                     </select>
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
                                 <div class="form-group">
                                     <label for="status" class="control-label">状态：</label>
                                     <select class="form-control search-info" name="status" id="status">
@@ -60,7 +59,6 @@
                                         </volist>
                                     </select>
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
                                 <div class="form-group">
                                     <label for="regFrom" class="control-label">注册来源：</label>
                                     <select class="form-control search-info" name="regFrom" id="regFrom">
@@ -70,7 +68,6 @@
                                         </volist>
                                     </select>
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
                                 <div class="form-group">
                                     <label for="info-roleId">角色：</label>
                                     <select class="form-control search-info" title="角色" name="roleId" id="roleId">
@@ -80,9 +77,11 @@
                                         </volist>
                                     </select>
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <button type="button" data-url="{$url}" id="user-search" data-reqtype="userList" data-con="user" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
-                                <button type="button" class="btn bg-teal search-refresh" data-con="user"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                <div class="form-group">
+                                    <button type="button" data-url="{$url}" id="user-search" data-reqtype="userList" data-con="user" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="user"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                </div>
+                                
                             </div>
                         </div>
                     </div>
