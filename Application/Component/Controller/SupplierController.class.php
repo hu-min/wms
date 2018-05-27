@@ -24,26 +24,6 @@ class SupplierController extends BaseController{
         $this->selfDB=$this->companyDB;
         return $this->update($parameter);
     }
-    /** 
-     * @Author: vition 
-     * @Date: 2018-05-26 06:56:01 
-     * @Desc: 根据关键字查找指定供应商公司列表了 
-     */    
-    function find_company($key=""){
-        $this->selfDB=$this->companyDB;
-        $where=["status"=>1];
-        if($key!=""){
-            $where["company"]=["LIKE","%{$key}%"];
-        }
-        $parameter=[
-            'where'=>$where,
-            'fields'=>"`companyId`,`company`",
-            'page'=>1,
-            'pageSize'=>20,
-            'orderStr'=>"companyId DESC",
-        ];
-        return $this->getList($parameter); 
-    }
     function getSupplierList($parameter=[],$one=false){
         $this->selfDB=$this->contactDB;
         if($one){

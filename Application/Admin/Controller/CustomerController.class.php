@@ -14,6 +14,30 @@ class CustomerController extends BaseController{
         $this->customerCom=getComponent('Customer');
         $this->statusType=["0"=>"未启用","1"=>"启用"];
     }
+
+    //内部公用方法
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-27 15:13:52 
+     * @Desc: 内部获取供应商类型列表
+     */    
+    protected function getCusCompany($key=""){
+        $where=["status"=>"1"];
+        if ($key!=""){
+            $where["company"]=["LIKE","%{$key}%"];
+        }
+        $parameter=[
+            'where'=>$where,
+            'fields'=>'companyId,company',
+            'page'=>1,
+            'pageSize'=>20,
+            'orderStr'=>"companyId DESC",
+        ];
+        $cusCompanyResult = $this->customerCom->getCompanyList($parameter);
+        return $cusCompanyResult['list'] ? $cusCompanyResult['list'] : [];
+    }
+    //内部公用方法结束
+
     //客户公司管理开始
     function companyControl(){
         $reqType=I('reqType');
@@ -67,7 +91,7 @@ class CustomerController extends BaseController{
         
         $listResult=$this->customerCom->getCompanyList($parameter);
         if($listResult){
-            $companyRed="companyList";
+            $companyRed="cuscompanyList";
             $this->Redis->set($companyRed,json_encode($listResult['list']),3600);
             $page = new \Think\VPage($listResult['count'], $this->pageSize);
             $pageShow = $page->show();
@@ -143,7 +167,7 @@ class CustomerController extends BaseController{
         $parameter=[
             'companyId'=>$id,
         ];
-        $pListRed="companyList";
+        $pListRed="cuscompanyList";
         $companyList=$this->Redis->get($pListRed);
         $plist=[];
         if($companyList){
@@ -190,22 +214,18 @@ class CustomerController extends BaseController{
         }else{
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->assign('statusType',$this->statusType);
-            $companyHtml="";
-            $companyList=$this->customerCom->find_company();
-            foreach ($companyList["list"] as $company) {
-                $companyHtml.="<option value='{$company['companyId']}'>{$company['company']}</option>";
-            }
-            $this->assign('companyList',$companyHtml);
+            $this->assign("cusCompanyList",$this->getCusCompany());
             $this->returnHtml();
         }
     }
-    function findCompanyList(){
-        $key=I("companykey");
-        $companyRes=$this->customerCom->find_company(urldecode($key));
-        if($companyRes){
-            $this->ajaxReturn(['errCode'=>0,'data'=>$companyRes["list"]]);
-        }
-        $this->ajaxReturn(['errCode'=>110,'error'=>""]);
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-27 15:16:49 
+     * @Desc: 接口获取客户公司列表 
+     */    
+    function getCusCompanyList(){
+        $key=I("key");
+        $this->ajaxReturn(["data"=>$this->getCusCompany($key)]);
     }
     /** 
      * @Author: vition 
@@ -232,8 +252,9 @@ class CustomerController extends BaseController{
         ];
         
         $listResult=$this->customerCom->getCustomerList($parameter);
+        // print_r($listResult);
         if($listResult){
-            $contactRed="contactList";
+            $contactRed="cuscontactList";
             $this->Redis->set($contactRed,json_encode($listResult['list']),3600);
             $page = new \Think\VPage($listResult['count'], $this->pageSize);
             $pageShow = $page->show();
@@ -278,6 +299,9 @@ class CustomerController extends BaseController{
             if(isset($datas['remarks'])){
                 $data['remarks']=$datas['remarks'];
             }
+            if(isset($datas['status'])){
+                $data['status']=$datas['status'];
+            }
             return ["where"=>$where,"data"=>$data];
         }
         return "";
@@ -307,7 +331,7 @@ class CustomerController extends BaseController{
         $parameter=[
             'contactId'=>$id,
         ];
-        $pListRed="contactList";
+        $pListRed="cuscontactList";
         $contactList=$this->Redis->get($pListRed);
         $plist=[];
         if($contactList){

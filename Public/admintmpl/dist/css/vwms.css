@@ -45,3 +45,15 @@
 .table thead th,.table tbody td{
 	text-align: center;
 }
+.chosen-select{
+	padding: 0;
+	height: 30px;
+	line-height: 30px;
+	border: none;
+}
+.chosen-select .chosen-single{
+	height: 30px;
+	line-height: 30px;
+	border: 1px solid #D2D6DE;
+	border-radius: 0px;
+}

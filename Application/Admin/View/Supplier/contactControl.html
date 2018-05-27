@@ -19,26 +19,28 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">联系人列表</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加联系人" data-target="#modal-contactInfo" data-con="contact" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增联系人</button>
+                        <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加联系人" data-target="#modal-contactInfo" data-con="supcontact" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增联系人</button>
                     </div>
-                    <div class="box-body search-body" id="contact-search-box">
+                    <div class="box-body search-body" id="supcontact-search-box">
                         <div class="col-md-12">
                             <div class="form-inline">
-                                <label class="control-label">公司名称：</label>
-                                <div class="form-group">
-                                    <select class="form-control search-info input-sm companySelect with142" title="公司名称" name="companyId">
+                                <div class="form-group"> 
+                                    <label class="control-label">供应商名称：</label>
+                                    <select class="form-control search-info chosen-supplier chosen-select" title="供应商名称" name="companyId">
                                         <option value="">全部</option>
-                                        {$companyList|default=''}
+                                        <volist name="supplierList" id="item">
+                                            <option value="{$item.companyId}">{$item.company}</option>
+                                        </volist>
                                     </select>
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <label class="control-label">联系人：</label>
                                 <div class="form-group">
+                                        <label class="control-label">联系人：</label>
                                     <input class="form-control search-info input-sm" name="contact" placeholder="联系人" type="text">
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <button type="button" data-url="{$url}" id="contact-search" data-reqtype="contactList" data-con="contact" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
-                                <button type="button" class="btn bg-teal search-refresh" data-con="contact"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                <button type="button" data-url="{$url}" id="supcontact-search" data-reqtype="contactList" data-con="supcontact" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                <button type="button" class="btn bg-teal search-refresh" data-con="supcontact"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                             </div>
                             <br>
                         </div>
@@ -48,12 +50,12 @@
         </div>
         <div class="row">
             <div class="col-sm-12" style="font-size:1em;overflow-x: auto;">
-                <div class="count-div" id="contactCount" style="margin:10px;font-weight: 800;">
+                <div class="count-div" id="supcontactCount" style="margin:10px;font-weight: 800;">
                 </div>
                 <table id="" class="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th>公司名称</th>
+                            <th>供应商名称</th>
                             <th>联系人</th>
                             <th>联系电话</th>
                             <th>邮箱</th>
@@ -63,19 +65,19 @@
                             <th>操作</th>
                         </tr>
                     </thead>
-                    <tbody id="contactTable">
+                    <tbody id="supcontactTable">
                         {$tables}
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="dataTables_wrapper">
-            <div id="contactPage" class="row page-div" data-url="{$url}" data-reqtype="contactList" data-con="contact">
+            <div id="supcontactPage" class="row page-div" data-url="{$url}" data-reqtype="contactList" data-con="supcontact">
                 {$pages}
             </div>
         </div>
     </section>
-    <div class="modal fade" id="modal-contactInfo">
+    <div class="modal fade" id="modal-supcontactInfo">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
             <div class="modal-header">
@@ -88,11 +90,13 @@
                 <form role="form">
                     <div class="box-body">
                         <input class="modal-info" id="info-status" value="1" name="contactId" type="hidden">
-                        <div class="form-group">
-                            <label>公司名称：</label>
-                            <select class="form-control modal-info input-sm companySelect" title="公司名称" name="companyId">
-                                <option value="">个人</option>
-                                {$companyList|default=''}
+                        <div class="form-group"> 
+                            <label class="control-label">供应商名称：</label>
+                            <select class="form-control modal-info chosen-supplier chosen-select" title="供应商名称" name="companyId">
+                                <option value="">全部</option>
+                                <volist name="supplierList" id="item">
+                                    <option value="{$item.companyId}">{$item.company}</option>
+                                </volist>
                             </select>
                         </div>
                         <div class="form-group">
@@ -117,7 +121,7 @@
                         </div>
                         <div class="form-group">
                             <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
-                                <input class="modal-info" id="info-status" value="0" name="status" type="hidden">
+                                <input class="modal-info" value="0" name="status" type="hidden">
                                 <button type="button" name="0" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
                                 <button type="button" name="1" class="btn btn-default btn-sm  status-btn"><i class="fa fa-square text-green"> 启用 </i>
                                 </button>
@@ -128,7 +132,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary save-info" data-con="contact" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
+                <button type="button" class="btn btn-primary save-info" data-con="supcontact" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
             </div>
             </div>
         </div>
@@ -140,39 +144,20 @@
         // var prefix ="{$contact['prefix']}";
 
         $(function(){
-            $(tabId+' .companySelect').selectator({
-                valueField: 'companyId', 
-                textField: 'company', 
-                delay: 10, 
-                labels: {
-                    search: '搜索客户公司名称'            // Placeholder text in search box in single select box
-                },
-                load: function (search, callback) {
-                    if (search.length < this.minSearchLength) return callback();
-                    datas={reqType:"findCompanyList",companykey:encodeURIComponent(search)};
-                    get("{$url}",datas,function(result){
-                        if(result.errCode==0){
-                            result.data
-                            callback(result.data);
-                        }
-                    })
-                },
-            });
             //新增联系人
             $(tabId+" .box-header button").on("click",function(){
                 $(tabId+" .modal-info").val("");
                 $(tabId+" .status-btn").removeClass("active");
                 $(tabId+" .status-btn[name='0']").addClass("active");
-                var companyList ="{$companyList}";
-                $(tabId+" .modal-info[name='companyId']").html(companyList);
-                $(tabId+" .modal-info[name='companyId']").selectator('refresh');
             })
+            //供应商列表
+            $(tabId+" .chosen-supplier").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true,ajax_load:{url:"{$url}",data:{reqType:"getSupplierList"},value:"companyId",text:"company"}})
         })
         // //function contactResetFuns(){}
-        function contactReFuns(){
+        function supcontactReFuns(){
 
         }
-        function contactSearchFuns(){
+        function supcontactSearchFuns(){
             datas['data']={}
             $(tabId+" .search-info").each(function(){
                 var name=$(this).attr("name");
@@ -182,7 +167,7 @@
                 }
             })
         }
-        function contactInfoFuns(){
+        function supcontactInfoFuns(){
             datas["data"]={}
             $(tabId+" .modal-info").each(function(){
                 var name =$(this).attr("name");
@@ -198,12 +183,16 @@
             })
         }
         // /*设置编辑用户信息*/
-        function contactShowFuns(info){
+        function supcontactShowFuns(info){
 
             $(tabId+" .modal-info[name='contactId']").val(info['contactId']);
 
             $(tabId+" .modal-info[name='companyId']").html('<option value="'+info['companyId']+'">'+info['company']+'</option>');
-            $(tabId+" .modal-info[name='companyId']").selectator('refresh');
+            $(tabId+" .modal-info[name='companyId']").trigger("chosen:updated");
+
+            $(tabId+" .modal-status .status-btn").removeClass("active");
+            $(tabId+" .modal-status .status-btn[name='"+info['status']+"']").addClass("active");
+            $(tabId+" .modal-info[name='status']").val(info['status']);
 
             $(tabId+" .modal-info[name='contact']").val(info['contact']);
             $(tabId+" .modal-info[name='phone']").val(info['phone']);

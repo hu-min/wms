@@ -9,7 +9,6 @@
         <include file="Index/Heads" /> 
     </eq>
     <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
-    <link rel="stylesheet" href="__ADMINT__/bower_components/selectator/fm.selectator.jquery.css"/>
 </head>
 <body>
     <section class="content">
@@ -25,11 +24,13 @@
                     <div class="box-body search-body" id="contact-search-box">
                         <div class="col-md-12">
                             <div class="form-inline">
-                                <label class="control-label">公司名称：</label>
-                                <div class="form-group">
-                                    <select class="form-control search-info input-sm companySelect with142" title="公司名称" name="companyId">
+                                <div class="form-group"> 
+                                    <label class="control-label">供应商名称：</label>
+                                    <select class="form-control search-info chosen-cusCompany chosen-select" title="公司名称" name="companyId">
                                         <option value="">全部</option>
-                                        {$companyList|default=''}
+                                        <volist name="cusCompanyList" id="item">
+                                            <option value="{$item.companyId}">{$item.company}</option>
+                                        </volist>
                                     </select>
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
@@ -89,11 +90,13 @@
                 <form role="form">
                     <div class="box-body">
                         <input class="modal-info" id="info-status" value="1" name="contactId" type="hidden">
-                        <div class="form-group">
-                            <label>公司名称：</label>
-                            <select class="form-control modal-info input-sm companySelect" title="公司名称" name="companyId">
+                        <div class="form-group"> 
+                            <label class="control-label">供应商名称：</label>
+                            <select class="form-control modal-info chosen-cusCompany chosen-select" title="公司名称" name="companyId">
                                 <option value="">个人</option>
-                                {$companyList|default=''}
+                                <volist name="cusCompanyList" id="item">
+                                    <option value="{$item.companyId}">{$item.company}</option>
+                                </volist>
                             </select>
                         </div>
                         <div class="form-group">
@@ -118,7 +121,7 @@
                         </div>
                         <div class="form-group">
                             <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
-                                <input class="modal-info" id="info-status" value="0" name="status" type="hidden">
+                                <input class="modal-info" value="0" name="status" type="hidden">
                                 <button type="button" name="0" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
                                 <button type="button" name="1" class="btn btn-default btn-sm  status-btn"><i class="fa fa-square text-green"> 启用 </i>
                                 </button>
@@ -134,7 +137,6 @@
             </div>
         </div>
     </div>
-    <script src="__ADMINT__/bower_components/selectator/fm.selectator.jquery.js"></script>
     <script>
         // var E = window.wangEditor
         // var editor = new E(tabId+' .art-editor')
@@ -142,33 +144,14 @@
         // var prefix ="{$contact['prefix']}";
 
         $(function(){
-            $(tabId+' .companySelect').selectator({
-                valueField: 'companyId', 
-                textField: 'company', 
-                delay: 10, 
-                labels: {
-                    search: '搜索客户公司名称'            // Placeholder text in search box in single select box
-                },
-                load: function (search, callback) {
-                    if (search.length < this.minSearchLength) return callback();
-                    datas={reqType:"findCompanyList",companykey:encodeURIComponent(search)};
-                    get("{$url}",datas,function(result){
-                        if(result.errCode==0){
-                            result.data
-                            callback(result.data);
-                        }
-                    })
-                },
-            });
             //新增联系人
             $(tabId+" .box-header button").on("click",function(){
                 $(tabId+" .modal-info").val("");
                 $(tabId+" .status-btn").removeClass("active");
                 $(tabId+" .status-btn[name='0']").addClass("active");
-                var companyList ="{$companyList}";
-                $(tabId+" .modal-info[name='companyId']").html(companyList);
-                $(tabId+" .modal-info[name='companyId']").selectator('refresh');
             })
+            //供应商列表
+            $(tabId+" .chosen-cusCompany").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true,ajax_load:{url:"{$url}",data:{reqType:"getCusCompanyList"},value:"companyId",text:"company"}})
         })
         // //function contactResetFuns(){}
         function contactReFuns(){
@@ -205,7 +188,11 @@
             $(tabId+" .modal-info[name='contactId']").val(info['contactId']);
 
             $(tabId+" .modal-info[name='companyId']").html('<option value="'+info['companyId']+'">'+info['company']+'</option>');
-            $(tabId+" .modal-info[name='companyId']").selectator('refresh');
+            $(tabId+" .modal-info[name='companyId']").trigger("chosen:updated");
+
+            $(tabId+" .modal-status .status-btn").removeClass("active");
+            $(tabId+" .modal-status .status-btn[name='"+info['status']+"']").addClass("active");
+            $(tabId+" .modal-info[name='status']").val(info['status']);
 
             $(tabId+" .modal-info[name='contact']").val(info['contact']);
             $(tabId+" .modal-info[name='phone']").val(info['phone']);

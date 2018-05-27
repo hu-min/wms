@@ -244,6 +244,7 @@
             $(tabId+" .modal-info[name='remarks']").val(info['remarks']);
             $(tabId+" .modal-status .status-btn").removeClass("active");
             $(tabId+" .modal-status .status-btn[name='"+info['status']+"']").addClass("active");
+            $(tabId+" .modal-info[name='status']").val(info['status']);
 
             $(tabId+" .modal-info[name='provinceId']").find("option[value='"+info['provinceId']+"']").prop("selected",true);
             setCityOption(info['provinceId'],"modal-info")
