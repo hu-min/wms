@@ -52,8 +52,8 @@
 	border: none;
 }
 .chosen-select .chosen-single{
-	height: 30px;
-	line-height: 30px;
-	border: 1px solid #D2D6DE;
-	border-radius: 0px;
+	height: 30px!important;
+	line-height: 30px!important;
+	border: 1px solid #D2D6DE!important;
+	border-radius: 0px!important;
 }

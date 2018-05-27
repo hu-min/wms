@@ -123,11 +123,11 @@ class CustomerController extends BaseController{
             if(isset($datas['alias'])){
                 $data['alias']=$datas['alias'];
             }
-            if(isset($datas['province'])){
-                $data['province']=$datas['province'];
+            if(isset($datas['provinceId'])){
+                $data['provinceId']=$datas['provinceId'];
             }
-            if(isset($datas['city'])){
-                $data['city']=$datas['city'];
+            if(isset($datas['cityId'])){
+                $data['cityId']=$datas['cityId'];
             }
             if(isset($datas['address'])){
                 $data['address']=$datas['address'];

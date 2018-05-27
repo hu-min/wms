@@ -182,4 +182,14 @@ class BaseController extends \Common\Controller\BaseController{
         $this->Redis->set($this->refreNode,1,3600);
     }
 
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-28 00:05:43 
+     * @Desc: 生成id 
+     */    
+    function createId(){
+        $header=strtolower(str_replace("Controller","",CONTROLLER_NAME));
+        $middle=strtolower(substr(ACTION_NAME,0,(strlen(ACTION_NAME)>5?5:strlen(ACTION_NAME))));
+        
+    }
 }

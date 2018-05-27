@@ -506,4 +506,14 @@ class UserController extends BaseController{
     function iconList(){
         $this->ajaxReturn(['errCode'=>0,'info'=>$this->fetch("Index/Icons")]);
     }
+
+    function ProcessControl(){
+        $reqType=I('reqType');
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            $this->returnHtml();
+        }
+    }
 }
