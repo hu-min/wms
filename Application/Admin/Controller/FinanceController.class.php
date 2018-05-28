@@ -46,10 +46,16 @@ class FinanceController extends BaseController{
         foreach ($datas as $basicId => $value) {
             $res=false;
             if(isset($stockList[$basicId])){
-                if($stockList[$basicId]["alias"] != $value['val'] && $stockList[$basicId]["company"]!=$value['company']){
-                    $Info=["basicId"=>$value['company'],"alias"=>$value['val']];
+                if($stockList[$basicId]["alias"] != $value['val'] || $stockList[$basicId]["name"]!=$value['company']){
+                    $Info=["basicId"=>$basicId,"name"=>$value['company'],"alias"=>$value['val']];
+                    // print_r($Info);
                     $res= $this->basicCom->updateBasic($Info);
-                    $logInfo["describe"]="将{$value['company']}的原始值".$stockList[$basicId]["alias"]."修改为：".$value['val'];
+                    if($stockList[$basicId]["name"] != $value['company']){
+                        $logInfo["describe"]="将子公司名 原名【".$stockList[$basicId]["name"]."】修改为：【".$value['company']."】";
+                    }else{
+                        $logInfo["describe"]="将【{$value['company']}】的原值【".$stockList[$basicId]["alias"]."】修改为：【".$value['val']."】";
+                    }
+                    
                 }
             }else{
                 $Info=[

@@ -32,7 +32,7 @@
                                     </thead>
                                     <tbody class="bankstock-tab">
                                         <volist name="bankstockList" id="item">
-                                            <tr><td><input class='form-control input-info bank-info' disabled="disabled" name="{$item.basicId}" placeholder='子公司名称' value="{$item.name}" type='text' /></td><td><input class='form-control input-info' placeholder='库存金额' value="{$item.alias}" type='text' /></td></tr>
+                                            <tr><td><input class='form-control input-info bank-info' name="{$item.basicId}" placeholder='子公司名称' value="{$item.name}" type='text' /></td><td><input class='form-control input-info' placeholder='库存金额' value="{$item.alias}" type='text' /></td></tr>
                                         </volist>
                                         <tr class="bank-info-count"><td>总金额：</td><td>{$bankstockCount}</td></tr>
                                     </tbody>
@@ -82,7 +82,7 @@
                                     </thead>
                                     <tbody class="cashstock-tab">
                                         <volist name="cashstockList" id="item">
-                                            <tr><td><input class='form-control input-info cash-info' disabled="disabled" placeholder='子公司名称' value="{$item.name}" type='text' /></td><td><input class='form-control input-info' placeholder='库存金额' value="{$item.alias}" type='text' /></td></tr>
+                                            <tr><td><input class='form-control input-info cash-info' name="{$item.basicId}" placeholder='子公司名称' value="{$item.name}" type='text' /></td><td><input class='form-control input-info' placeholder='库存金额' value="{$item.alias}" type='text' /></td></tr>
                                         </volist>
                                         <tr class="cash-info-count"><td>总金额：</td><td>{$cashstockCount}</td></tr>
                                     </tbody>
@@ -157,11 +157,11 @@
             stockSearch(".cash-info");
         }
         function stockSearch(stockName){
-            $(tabId+" "+stockName).each(function(){
-                if($(this).prop("disabled")==false){
-                    $(this).prop("disabled",true);
-                }
-            })
+            // $(tabId+" "+stockName).each(function(){
+            //     if($(this).prop("disabled")==false){
+            //         $(this).prop("disabled",true);
+            //     }
+            // })
         }
         
         // function projectConfInfoFuns(){
