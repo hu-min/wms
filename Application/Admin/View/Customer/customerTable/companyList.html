@@ -11,6 +11,6 @@
             <elseif condition="$item['status'] eq 1"/>
                 <td><span class="label label-success">{$statusType[$item['status']]}</span></td>
             </if>
-            <td><button type="button" data-show="One" data-reqtype="Edit"  data-id="{$item['companyId']}" data-url="{$url}" data-con="company" data-toggle="modal" data-target="#modal-companyInfo" data-title="编辑客户公司" class="btn btn-sm btn-primary info-edit">编辑</button></td>
+            <td><button type="button" data-show="One" data-reqtype="Edit"  data-id="{$item['companyId']}" data-url="{$url}" data-con="company" data-toggle="modal" data-target=".modal-companyInfo" data-title="编辑客户公司" class="btn btn-sm btn-primary info-edit">编辑</button></td>
         </tr>
     </volist>

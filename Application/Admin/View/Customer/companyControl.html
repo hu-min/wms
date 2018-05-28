@@ -20,9 +20,9 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">公司列表</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加公司" data-target="#modal-companyInfo" data-con="company" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增公司</button>
+                        <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加公司" data-target=".modal-companyInfo" data-con="company" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增公司</button>
                     </div>
-                    <div class="box-body search-body" id="company-search-box">
+                    <div class="box-body search-body company-search-box">
                         <div class="col-md-12">
                             <div class="form-inline">
                                 
@@ -72,9 +72,9 @@
         </div>
         <div class="row">
             <div class="col-sm-12" style="font-size:0.95em;overflow-x: auto;">
-                <div class="count-div" id="companyCount" style="margin:10px;font-weight: 800;">
+                <div class="count-div companyCount" style="margin:10px;font-weight: 800;">
                 </div>
-                <table id="" class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>公司名称</th>
@@ -87,19 +87,19 @@
                             <th>操作</th>
                         </tr>
                     </thead>
-                    <tbody id="companyTable">
+                    <tbody class="companyTable">
                         {$tables}
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="dataTables_wrapper">
-            <div id="companyPage" class="row page-div" data-url="{$url}" data-reqtype="companyList" data-con="company">
+            <div  class="row page-div companyPage" data-url="{$url}" data-reqtype="companyList" data-con="company">
                 {$pages}
             </div>
         </div>
     </section>
-    <div class="modal fade" id="modal-companyInfo">
+    <div class="modal fade modal-companyInfo">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
             <div class="modal-header">

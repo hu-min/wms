@@ -71,6 +71,10 @@ $(document).on("click",".search-list,.vpage",function(){
 function searchFun(url,datas,table,page,count){
     get(url,datas,function(result){
         if(result.errCode==0){
+            // $(tabId+" ."+table).html(result.table);
+            // $(tabId+" ."+page).html(result.page);
+            // $(tabId+" ."+count).html(result.count);
+
             $("#"+table).html(result.table);
             $("#"+page).html(result.page);
             $("#"+count).html(result.count);
@@ -179,6 +183,10 @@ $(document).on("click",'.save-info',function(){
     } 
     if(JSON.stringify(filesData)!="{}"){
         datas['filesData']=filesData
+    }
+    if(JSON.stringify(datas["data"])=="{}"){
+        alert("没有更新数据");
+        throw "没有更新数据";
     }
     // console.log(datas);
     post(url,datas,function(result){

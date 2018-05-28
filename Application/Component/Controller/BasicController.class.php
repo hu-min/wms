@@ -15,9 +15,19 @@ class BasicController extends BaseController{
 	    return $this->selfDB->where(["class"=>"exeRoot"])->select();
     }
     function get_class_data($className){
-        return $this->selfDB->where(["class"=>$className])->select();
+        // $classNameRed="basic_".$className;
+        // $classList=$this->Redis->get($classNameRed);
+        $classList=false;
+        if(!$classList){
+            $classList=$this->selfDB->where(["class"=>$className])->select();
+            $this->Redis->set($classNameRed,$classList,3600);
+        }
+        return $classList;
     }
-    
+    function clear_cache($className){
+        $classNameRed="basic_".$className;
+        $this->Redis->set($classNameRed,$classList,1);
+    }
     function get_provinces($pid=0){
         $provinceRed="province";
         $provinceList=$this->Redis->get($provinceRed);

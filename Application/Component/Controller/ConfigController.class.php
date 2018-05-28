@@ -18,7 +18,10 @@ class ConfigController extends BaseController{
             "fields"=>"value",
         ];
         $configRes=$this->selfDB->getOne($parameter);
-        if($configRes){
+        if(!is_null($configRes)){
+            if($configRes){
+                return $configRes;
+            }
             if($json_decode){
                 return json_decode($configRes["value"],true);
             }
@@ -32,16 +35,15 @@ class ConfigController extends BaseController{
      * @Desc: 根据name设置配置项值 
      */    
     function set_val($name,$val){
-        $valJson="";
+        $valJson=$val;
         if(is_array($val)){
             $valJson=json_encode($val,JSON_UNESCAPED_UNICODE);
         }
         $nameRes=$this->get_val($name);
-
-        if($nameRes){//存在则修改
-            $result=$this->update(["where"=>["name"=>$name],"data"=>["value"=>$valJson]]);
-        }else{//不存在则添加
+        if(!$nameRes){
             $result=$this->selfDB->insert(["name"=>$name,"value"=>$valJson,"status"=>1]);
+        }else if(!is_null($nameRes)){//存在则修改
+            $result=$this->update(["where"=>["name"=>$name],"data"=>["value"=>$valJson]]);
         }
         return $result;
     }

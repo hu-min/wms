@@ -22,6 +22,7 @@ class BaseController extends \Common\Controller\BaseController{
     public function _initialize() {
         parent::_initialize();
         $this->userCom=getComponent('User');
+        $this->LogCom=getComponent('Log');
         $this->authority=C('authority');
         $this->nodeAuth=session('nodeAuth');
         $this->exemption=[//排除的控制器
@@ -48,6 +49,8 @@ class BaseController extends \Common\Controller\BaseController{
                 $this->prompt(1,'警告!','您不具备访问此页面的权限，如果您认为值得拥有，请联系管理员！');
                 exit;
             }
+            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            $this->assign("pageId",$this->createId());
         }
         // exit;
     }
@@ -190,6 +193,7 @@ class BaseController extends \Common\Controller\BaseController{
     function createId(){
         $header=strtolower(str_replace("Controller","",CONTROLLER_NAME));
         $middle=strtolower(substr(ACTION_NAME,0,(strlen(ACTION_NAME)>5?5:strlen(ACTION_NAME))));
-        
+        $index=substr((string)time(),7,4);
+        return "{$header}{$middle}{$index}";
     }
 }

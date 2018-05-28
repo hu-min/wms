@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <!-- iCheck for checkboxes and radio inputs -->
+  <link rel="stylesheet" href="__ADMINT__/plugins/iCheck/all.css">
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">公司银行账户余额（银行库存）<i class="fa fa-fw fa-plus-square text-aqua add-subcompany" title="新增子公司" data-target=".bankstock-tab" style="cursor: pointer;"></i></h3>
+                    </div>
+                    <form role="form">
+                        <div class="box-body">
+                            <div class="form-group">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>子公司名称</th>
+                                            <th>余额</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bankstock-tab">
+                                        <volist name="bankstockList" id="item">
+                                            <tr><td><input class='form-control input-info bank-info' disabled="disabled" placeholder='子公司名称' value="{$item.name}" type='text' /></td><td><input class='form-control input-info' placeholder='库存金额' value="{$item.alias}" type='text' /></td></tr>
+                                        </volist>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="form-group">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>更新时间</th>
+                                            <th>操作人</th>
+                                            <th>操作描述</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bankstock-log">
+                                        <volist name="banksLogList" id="item">
+                                            <tr>
+                                                <td>{$item.addTime|date='Y-m-d H:i:s',###}</td>
+                                                <td>{$item.userName}</td>
+                                                <td>{$item.describe}</td>
+                                            </tr>
+                                        </volist>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="box-footer">
+                            <button type="button"  class="btn btn-primary save-info" data-con="bankstock" data-reqtype="Edit" data-url="{$url}">更新金额</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">现金余额（现金库存）<i class="fa fa-fw fa-plus-square text-aqua add-subcompany" title="新增子公司" data-target=".cashstock-tab" style="cursor: pointer;"></i></h3>
+                    </div>
+                    <form role="form">
+                        <div class="box-body">
+                            <div class="form-group">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>子公司名称</th>
+                                            <th>余额</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="cashstock-tab">
+                                        <volist name="cashstockList" id="item">
+                                            <tr><td><input class='form-control input-info cash-info' disabled="disabled" placeholder='子公司名称' value="{$item.name}" type='text' /></td><td><input class='form-control input-info' placeholder='库存金额' value="{$item.alias}" type='text' /></td></tr>
+                                        </volist>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="form-group">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>更新时间</th>
+                                            <th>操作人</th>
+                                            <th>操作描述</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="cashstock-log">
+                                        <volist name="cashsLogList" id="item">
+                                            <tr>
+                                                <td>{$item.addTime|date='Y-m-d',###}</td>
+                                                <td>{$item.userName}</td>
+                                                <td>{$item.describe}</td>
+                                            </tr>
+                                        </volist>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="box-footer">
+                            <button type="button"  class="btn btn-primary save-info" data-con="cashstock" data-reqtype="Edit" data-url="{$url}">更新金额</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- iCheck 1.0.1 -->
+    <script src="__ADMINT__/plugins/iCheck/icheck.min.js"></script>
+    <script>
+        $(function(){
+            $(tabId+" .add-subcompany").on("click",function(){
+                var target = $(this).data("target");
+                if(target==".bankstock-tab"){
+                    var dataClass="bank-info";
+                }else{
+                    var dataClass="cash-info";
+                }
+                var tr="<tr><td><input class='form-control input-info "+dataClass+"' placeholder='子公司名称' type='text' /></td><td><input class='form-control input-info' placeholder='库存金额' type='text' /></td></tr>";
+                $(tabId+" "+target).append(tr);
+            })
+        })
+        function bankstockInfoFuns(){
+            stockInfo(".bank-info")
+        }
+        function cashstockInfoFuns(){
+            stockInfo(".cash-info")
+        }
+        function stockInfo(stockName){
+            datas["data"]={}
+            $(tabId+" "+stockName).each(function(){
+                var company = $(this).val();
+                var val = $(this).parent().next().children("input").val();
+                if(company!="" && val != ""){
+                    datas["data"][company]=val;
+                }
+            })
+        }
+
+        function bankstockSearchFuns(){
+            stockSearch(".bank-info");
+        }
+        function cashstockSearchFuns(){
+            stockSearch(".cash-info");
+        }
+        function stockSearch(stockName){
+            $(tabId+" "+stockName).each(function(){
+                if($(this).prop("disabled")==false){
+                    $(this).prop("disabled",true);
+                }
+            })
+        }
+        
+        // function projectConfInfoFuns(){
+        //     datas["data"]={}
+        //     $(tabId+" .input-info").each(function(){
+        //         var name =$(this).attr("name");
+        //         var val =$(this).val();
+        //         datas["data"][name]=val;
+        //     })
+        //     var checked=$(tabId+" input[name='manual']").is(":checked");
+        //     if(checked==true){
+        //         datas["data"]["manual"]="true";
+        //     }else{
+        //         datas["data"]["manual"]="false";
+        //     }
+        // }
+        // function responsibleInfoFuns(){
+        //     datas["data"]={}
+        //     var responSelect=$(tabId+" .modal-info[name='responsible']").val();
+        //     var responInput=$(tabId+" input[name='responsible-input']").val();
+        //     if(responInput=="" && datas["reqType"]!="responsibleDel"){
+        //         alert("承接模块名称不能为空")
+        //         throw "承接模块名称不能为空";
+        //     }
+        //     if(datas["reqType"]=="responsibleEdit" && responSelect==""){
+        //         datas["reqType"]="responsibleAdd";
+        //     }else if(datas["reqType"]=="responsibleEdit" || datas["reqType"]=="responsibleDel"){
+        //         datas["data"]["fromResponsible"]=responSelect
+        //     }
+        //     datas["data"]["responsible"]=responInput
+        // }
+        // function responsibleSearchFuns(){
+        //     datas["reqType"]="responsList";
+        //     get("{$url}",datas,function(result){
+        //         if(result.html){
+        //             $(tabId+" .modal-info[name='responsible']").html(result.html);
+        //             $(tabId+" input[name='responsible-input']").val("");
+        //         }
+        //     },false)
+        // }
+    </script>
+</body>
+</html>
