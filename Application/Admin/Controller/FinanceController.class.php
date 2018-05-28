@@ -17,8 +17,12 @@ class FinanceController extends BaseController{
         if($reqType){
             $this->$reqType();
         }else{
-            $this->assign("bankstockList",$this->basicCom->get_class_data("bankstock"));
-            $this->assign("cashstockList",$this->basicCom->get_class_data("cashstock"));
+            $bankstock=$this->basicCom->get_class_data("bankstock");
+            $cashstock=$this->basicCom->get_class_data("cashstock");
+            $this->assign("bankstockList",$bankstock);
+            $this->assign("cashstockList",$cashstock);
+            $this->assign("bankstockCount",array_sum(array_column($bankstock,"alias")));
+            $this->assign("cashstockCount",array_sum(array_column($cashstock,"alias")));
             $this->assign("banksLogList",$this->LogCom->getLogList(['where'=>["class"=>"bankstock"],'pageSize'=>5,'orderStr'=>"addTime DESC",])["list"]);
             $this->assign("cashsLogList",$this->LogCom->getLogList(['where'=>["class"=>"cashstock"],'pageSize'=>5,'orderStr'=>"addTime DESC",])["list"]);
             $this->returnHtml();
@@ -36,25 +40,25 @@ class FinanceController extends BaseController{
         $stockRes=$this->basicCom->get_class_data($stockName);
         $stockList=[];
         foreach ($stockRes as $stock) {
-            $stockList[$stock["name"]]=["basicId"=>$stock["basicId"],"alias"=>$stock["alias"],"addTime"=>time()];
+            $stockList[$stock["basicId"]]=["name"=>$stock["name"],"alias"=>$stock["alias"],"addTime"=>time()];
         }
         $logInfo=["userId"=>session("userId"),"userName"=>session("userName"),"class"=>$stockName,"addTime"=>time()];
-        foreach ($datas as $company => $value) {
+        foreach ($datas as $basicId => $value) {
             $res=false;
-            if(isset($stockList[$company]["basicId"])){
-                if($stockList[$company]["alias"] != $value){
-                    $Info=["basicId"=>$stockList[$company]["basicId"],"alias"=>$value];
+            if(isset($stockList[$basicId])){
+                if($stockList[$basicId]["alias"] != $value['val'] && $stockList[$basicId]["company"]!=$value['company']){
+                    $Info=["basicId"=>$value['company'],"alias"=>$value['val']];
                     $res= $this->basicCom->updateBasic($Info);
-                    $logInfo["describe"]="将{$company}的原始值".$stockList[$company]["alias"]."修改为：".$value;
+                    $logInfo["describe"]="将{$value['company']}的原始值".$stockList[$basicId]["alias"]."修改为：".$value['val'];
                 }
             }else{
                 $Info=[
                     "class"=>$stockName,
-                    "name"=>$company,
-                    "alias"=>$value,
+                    "name"=>$value['company'],
+                    "alias"=>$value['val'],
                 ];
                 $res= $this->basicCom->insertBasic($Info);
-                $logInfo["describe"]="新增{$company}，值为:{$value}";
+                $logInfo["describe"]="新增{$value['company']}，值为:{$value['val']}";
             }
             if ($res){
                 $this->LogCom->insert($logInfo);
