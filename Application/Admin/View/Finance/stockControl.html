@@ -100,7 +100,7 @@
                                     <tbody class="cashstock-log">
                                         <volist name="cashsLogList" id="item">
                                             <tr>
-                                                <td>{$item.addTime|date='Y-m-d',###}</td>
+                                                <td>{$item.addTime|date='Y-m-d H:i:s',###}</td>
                                                 <td>{$item.userName}</td>
                                                 <td>{$item.describe}</td>
                                             </tr>
@@ -150,13 +150,14 @@
             })
         }
 
-        function bankstockSearchFuns(){
-            stockSearch(".bank-info");
+        function bankstockSearchFuns(result){
+            stockSearch(result,".bank-info");
         }
         function cashstockSearchFuns(){
-            stockSearch(".cash-info");
+            stockSearch(result,".cash-info");
         }
-        function stockSearch(stockName){
+        function stockSearch(result,stockName){
+            $(tabId+" ."+result.stock+"-log").html(result.html);
             // $(tabId+" "+stockName).each(function(){
             //     if($(this).prop("disabled")==false){
             //         $(this).prop("disabled",true);

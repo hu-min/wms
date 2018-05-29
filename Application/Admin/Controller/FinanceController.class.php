@@ -73,7 +73,12 @@ class FinanceController extends BaseController{
         }
         if($result){
             $this->basicCom->clear_cache($stockName);
-            $this->ajaxReturn(['errCode'=>0,'error'=>"更新成功"]);
+            $logHtml="";
+            foreach ($this->LogCom->getLogList(['where'=>["class"=>$stockName],'pageSize'=>5,'orderStr'=>"addTime DESC",])["list"] as $log) {
+                $logHtml.="<tr><td>".date("Y-m-m H:i:s",$log["addTime"])."</td><td>{$log['userName']}</td><td>{$log['describe']}</td></tr>";
+            }
+
+            $this->ajaxReturn(['errCode'=>0,'error'=>"更新成功","stock"=>$stockName,"html"=>$logHtml]);
         }
         $this->ajaxReturn(['errCode'=>100,'error'=>"更新失败"]);
     }

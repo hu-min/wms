@@ -57,3 +57,15 @@
 	border: 1px solid #D2D6DE!important;
 	border-radius: 0px!important;
 }
+#v-notice-window{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 400px;
+	margin-left: -200px;
+	height: 90px;
+	margin-top: -90px;
+}
+#v-notice-window .box-title{
+	font-size: 15px;
+}

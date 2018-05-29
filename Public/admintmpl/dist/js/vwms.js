@@ -70,16 +70,17 @@ $(document).on("click",".search-list,.vpage",function(){
 
 function searchFun(url,datas,table,page,count){
     get(url,datas,function(result){
+        notice(result.errCode,result.error);
         if(result.errCode==0){
             // $(tabId+" ."+table).html(result.table);
             // $(tabId+" ."+page).html(result.page);
             // $(tabId+" ."+count).html(result.count);
-
+            
             $("#"+table).html(result.table);
             $("#"+page).html(result.page);
             $("#"+count).html(result.count);
         }else{
-            alert(result.error);
+            // alert(result.error);
         }
     })
 }
@@ -105,6 +106,7 @@ $(document).on("click",".info-edit",function(){
         
         datas.form=name;
         get(url,datas,function(result){
+            notice(result.errCode,result.error);
             if(result.errCode==0){
                 $(target).find(".box-body").html(result.html);
             }
@@ -120,12 +122,13 @@ $(document).on("click",".info-edit",function(){
         datas.reqType=con+show;
         datas.id=id
         get(url,datas,function(result){
+            notice(result.errCode,result.error);
             if(result.errCode==0){
                 if(fun_is_exits(con+"ShowFuns")){
                     eval(con+"ShowFuns(result.info)");//对不同的模块设置不同的响应数据
                 }
             }else{
-                alert(result.error);
+                // alert(result.error);
             }
         })
     }else{//新建要重置数据
@@ -190,6 +193,7 @@ $(document).on("click",'.save-info',function(){
     }
     // console.log(datas);
     post(url,datas,function(result){
+        notice(result.errCode,result.error);
         if(result.errCode==0){
             datas={}
             var url=$("#"+search).data("url");
@@ -203,7 +207,7 @@ $(document).on("click",'.save-info',function(){
             var page=con2+"Page";
             datas.reqType=reqtype;
             if(fun_is_exits(con+"SearchFuns")){
-                eval(con2+"SearchFuns()");//对不同的id设置不同的发送数据
+                eval(con2+"SearchFuns(result)")//对不同的id设置不同的发送数据
             }
             if(isModal){
                 // console.log(isModal);
@@ -213,7 +217,7 @@ $(document).on("click",'.save-info',function(){
                 $(tabId+" #"+parent).modal('toggle')
             }
         }else{
-            alert(result.error)
+            // alert(result.error)
         }
         
     });
@@ -370,4 +374,30 @@ function fun_is_exits(funcName){
         }
    } catch(e) {}
    return false;
+}
+/** 
+ * javascript comment 
+ * @Author: vition 
+ * @Date: 2018-05-29 22:20:49 
+ * @Desc: 弹出提示框 
+ */
+function notice(status){
+    var color="box-warning"
+    var content = arguments[1] ? arguments[1] : "成功返回了"
+    var title = arguments[2] ? arguments[2] : "警告提示！"
+    var seconds = arguments[3] ? arguments[3] : 3
+    if(status==100){
+        color = "box-danger"
+        title = "错误提示！"
+    }else if(status==0){
+        color = "box-success"
+        title = "成功提示！"
+    }else{
+        content = "出现异常了，联系下管理员吧！"
+    }
+    $("#v-notice-window .box-solid").addClass(color);
+    $("#v-notice-window .box-solid .box-header .box-title").text(title);
+    $("#v-notice-window .box-solid .box-body").text(content);
+    $("#v-notice-window").removeClass("none");
+    setTimeout(function(){$("#v-notice-window").addClass("none");$("#v-notice-window .box-solid").removeClass(color);},Number(seconds)*1000)
 }

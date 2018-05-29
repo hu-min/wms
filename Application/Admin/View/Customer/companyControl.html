@@ -87,14 +87,14 @@
                             <th>操作</th>
                         </tr>
                     </thead>
-                    <tbody class="companyTable">
+                    <tbody id="companyTable">
                         {$tables}
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="dataTables_wrapper">
-            <div  class="row page-div companyPage" data-url="{$url}" data-reqtype="companyList" data-con="company">
+            <div id="companyPage"  class="row page-div" data-url="{$url}" data-reqtype="companyList" data-con="company">
                 {$pages}
             </div>
         </div>
