@@ -390,7 +390,7 @@ function notice(status){
         color = "box-danger"
         title = "错误提示！"
     }else if(status==0){
-        color = "box-success"
+        color = "box-primary"
         title = "成功提示！"
     }else{
         content = "出现异常了，联系下管理员吧！"

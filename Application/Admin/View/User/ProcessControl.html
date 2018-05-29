@@ -20,9 +20,9 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">审核流程列表</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加审核流程" data-target="#modal-{$pageId}Info" data-con="process" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增审核流程</button>
+                        <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加审核流程" data-target="#modal-processInfo" data-con="process" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增审核流程</button>
                     </div>
-                    <div class="box-body search-body" id="{$pageId}-search-box">
+                    <div class="box-body search-body" id="process-search-box">
                         <div class="col-md-12">
                             <form class="form-inline">
                                 <div class="form-group"> 
@@ -34,7 +34,7 @@
                                     <input class="form-control search-info input-sm" name="company" placeholder="审核流程名称" type="text">
                                 </div>
                                 <div class="form-group">
-                                    <button type="button" data-url="{$url}" id="{$pageId}-search" data-reqtype="companyList" data-con="process" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" data-url="{$url}" id="process-search" data-reqtype="companyList" data-con="process" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
                                     <button type="button" class="btn bg-teal search-refresh" data-con="process"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 </div>
                             </form>
@@ -46,7 +46,7 @@
         </div>
         <div class="row">
             <div class="col-sm-12" style="font-size:0.95em;overflow-x: auto;">
-                <div class="count-div" id="{$pageId}Count" style="margin:10px;font-weight: 800;">
+                <div class="count-div" id="processCount" style="margin:10px;font-weight: 800;">
                 </div>
                 <table id="" class="table table-bordered table-hover">
                     <thead>
@@ -59,19 +59,19 @@
                             <th>操作</th>
                         </tr>
                     </thead>
-                    <tbody id="{$pageId}Table">
+                    <tbody id="processTable">
                         {$tables}
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="dataTables_wrapper">
-            <div id="{$pageId}Page" class="row page-div" data-url="{$url}" data-reqtype="companyList" data-con="process">
+            <div id="processPage" class="row page-div" data-url="{$url}" data-reqtype="companyList" data-con="process">
                 {$pages}
             </div>
         </div>
     </section>
-    <div class="modal fade" id="modal-{$pageId}Info">
+    <div class="modal fade" id="modal-processInfo">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
             <div class="modal-header">
@@ -85,43 +85,17 @@
                     <div class="box-body">
                         <div class="form-group">
                             <label for="info-title">审核流程名称：</label>
-                            <input  class="modal-info" title="companyId" name="companyId" type="hidden">
+                            <input  class="modal-info" title="processNname" name="processNname" type="hidden">
                             <input class="form-control modal-info"  name="company" title="审核流程名称"  placeholder="审核流程名称" type="text">
                         </div>
-                        <div class="form-group"> 
-                            <label class="control-label">审核流程类型：</label>
-                            <select class="form-control modal-info chosen-suptype chosen-select" title="审核流程类型" name="type">
-                                <option value="">全部</option>
-                                <volist name="supTypeList" id="item">
-                                    <option value="{$item.basicId}">{$item.name}</option>
-                                </volist>
-                            </select>
-                        </div>
                         <div class="form-group">
-                            <label for="info-title">审核流程别名：</label>
-                            <input class="form-control modal-info" required="required" name="alias" title="审核流程别名" placeholder="审核流程别名" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label >省份：</label>
-                            <select class="form-control modal-info input-sm" data-city="modal-info" title="省份" name="provinceId">
-                                <option value="">省份</option>
-                                <volist name="province" id="item">
-                                    <option value="{$item.pid}">{$item.province}</option>
-                                </volist>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label >城市：</label>
-                            <select class="form-control modal-info input-sm" title="省份" name="cityId">
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">联系地址：</label>
-                            <input class="form-control modal-info" name="address" title="联系地址" placeholder="联系地址" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">备注：</label>
-                            <input class="form-control modal-info" name="remarks" title="备注" placeholder="备注" type="text">
+                            <label for="info-title">审核流程配置：<i class="fa fa-fw fa-plus-square text-aqua add-processnode" title="新增流程节点" data-target=".bankstock-tab" style="cursor: pointer;"></i></label>
+
+                            <table class="table table-bordered">
+                                <tbody class="process-tab">
+                                            
+                                </tbody>
+                            </table>
                         </div>
                         <div class="form-group">
                             <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
@@ -143,104 +117,119 @@
     </div>
    
     <script>
-        // var E = window.wangEditor
-        // var editor = new E(tabId+' .art-editor')
         //获取分类数据
-        var prefix ="{$company['prefix']}";
-
         $(function(){
             //新增审核流程
             $(tabId+" .box-header button").on("click",function(){
                 $(tabId+" .modal-info").val("");
+                $(tabId+" .process-tab").children("tr").remove()
                 $(tabId+" .status-btn").removeClass("active");
                 $(tabId+" .status-btn[name='0']").addClass("active");
             })
-            $(tabId+" select[name='provinceId']").on("change",function(){
-                var provinceId=$(this).val()
-                var whereCity=$(this).data("city")
-                if(provinceId>0){
-                    // console.log(pid)
-                    setCityOption(provinceId,whereCity)
-                }else{
-                    $(tabId+" ."+whereCity+"[name='cityId']").html("")
-                }
+            $(tabId+" .add-processnode").on("click",function(){
+                var tr=$('<tr><td style="width:30%;"><select class="form-control input-sm role-type" title="角色类型" name="roleType"><option value="">选择角色类型</option><option value="1">分组</option><option value="2">角色</option></select></td><td style="width:70%;"><select class="form-control input-sm chosen-roles chosen-select" title="角色" name="roles"><option value=""></option></select></td></tr>');
+                
+                $(tabId+" .process-tab").append(tr)
+
             })
+            $(tabId).on("change",".role-type",function(){
+                var chosen_roles=$(this).parent("td").next("td").find(".chosen-roles");
+                var roleType = $(this).val()
+                if(chosen_roles.prop("multiple")==false){
+                    datas["reqType"]="getRolesList";
+                    datas["data"]={roleType:roleType};
+                    chosen_roles.prop("multiple",true)
+                    chosen_roles.chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true,ajax_load:{url:"{$url}",value:"roleId",text:"roleName",isPush:false}})
+                }
+                datas["reqType"]="getRolesList";
+                datas["data"]={roleType:roleType};
+            })
+            // $(tabId+" select[name='provinceId']").on("change",function(){
+            //     var provinceId=$(this).val()
+            //     var whereCity=$(this).data("city")
+            //     if(provinceId>0){
+            //         // console.log(pid)
+            //         setCityOption(provinceId,whereCity)
+            //     }else{
+            //         $(tabId+" ."+whereCity+"[name='cityId']").html("")
+            //     }
+            // })
             //审核流程类型
-            $(tabId+" .chosen-suptype").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true,ajax_load:{url:"{$url}",data:{reqType:"getSupTypeList"},value:"basicId",text:"name"}})
+            // $(tabId+" .chosen-roles").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true,ajax_load:{url:"{$url}",data:{reqType:"getSupTypeList"},value:"basicId",text:"name"}})
         })
 
-        function setCityOption(pid,whereCity){
-                datas["reqType"]="getCityList";
-                datas["pid"]=pid
-                $(tabId+" ."+whereCity+"[name='cityId']").html("")
-                get("{$url}",datas,function(result){
-                    if(result.errCode==0){
-                        var cityOption='<option value="">全部</option>';
+        // function setCityOption(pid,whereCity){
+        //         datas["reqType"]="getCityList";
+        //         datas["pid"]=pid
+        //         $(tabId+" ."+whereCity+"[name='cityId']").html("")
+        //         get("{$url}",datas,function(result){
+        //             if(result.errCode==0){
+        //                 var cityOption='<option value="">全部</option>';
                         
-                        result.citys.forEach(ele => {
-                            cityOption+='<option value="'+ele.cid+' selected">'+ele.city+'</option>'
-                        })
-                        $(tabId+" ."+whereCity+"[name='cityId']").html(cityOption)
-                    }
-                },false)
-        }
-        //function companyResetFuns(){}
-        function processReFuns(){
+        //                 result.citys.forEach(ele => {
+        //                     cityOption+='<option value="'+ele.cid+' selected">'+ele.city+'</option>'
+        //                 })
+        //                 $(tabId+" ."+whereCity+"[name='cityId']").html(cityOption)
+        //             }
+        //         },false)
+        // }
+        // //function companyResetFuns(){}
+        // function processReFuns(){
 
-        }
-        function processSearchFuns(){
-            datas['data']={}
-            $(tabId+" .search-info").each(function(){
-                var name=$(this).attr("name");
-                var val=$(this).val();
-                if(val!=""){
-                    datas['data'][name]=val
-                }
-            })
-        }
-        function processInfoFuns(){
-            datas["data"]={}
-            $(tabId+" .modal-info").each(function(){
-                var name =$(this).attr("name");
-                var val =$(this).val();
-                var required=$(this).attr("required");
-                var title=$(this).attr("title");
-                if(required=="required" && val==""){
-                    alert(title+"不能为空");
-                    throw title+"不能为空";
-                }else if (name!==undefined){
-                    datas["data"][name]=val;
-                }
-            })
-        }
-        /*设置编辑用户信息*/
-        function processShowFuns(info){
+        // }
+        // function processSearchFuns(){
+        //     datas['data']={}
+        //     $(tabId+" .search-info").each(function(){
+        //         var name=$(this).attr("name");
+        //         var val=$(this).val();
+        //         if(val!=""){
+        //             datas['data'][name]=val
+        //         }
+        //     })
+        // }
+        // function processInfoFuns(){
+        //     datas["data"]={}
+        //     $(tabId+" .modal-info").each(function(){
+        //         var name =$(this).attr("name");
+        //         var val =$(this).val();
+        //         var required=$(this).attr("required");
+        //         var title=$(this).attr("title");
+        //         if(required=="required" && val==""){
+        //             alert(title+"不能为空");
+        //             throw title+"不能为空";
+        //         }else if (name!==undefined){
+        //             datas["data"][name]=val;
+        //         }
+        //     })
+        // }
+        // /*设置编辑用户信息*/
+        // function processShowFuns(info){
 
-            $(tabId+" .modal-info[name='companyId']").val(info['companyId']);
-            $(tabId+" .modal-info[name='company']").val(info['company']);
-            $(tabId+" .modal-info[name='alias']").val(info['alias']);
-            $(tabId+" .modal-info[name='address']").val(info['address']);
-            $(tabId+" .modal-info[name='remarks']").val(info['remarks']);
+        //     $(tabId+" .modal-info[name='companyId']").val(info['companyId']);
+        //     $(tabId+" .modal-info[name='company']").val(info['company']);
+        //     $(tabId+" .modal-info[name='alias']").val(info['alias']);
+        //     $(tabId+" .modal-info[name='address']").val(info['address']);
+        //     $(tabId+" .modal-info[name='remarks']").val(info['remarks']);
 
-            $(tabId+" .modal-info[name='type']").html('<option value="'+info['basicId']+'">'+info['typeName']+'</option>');
-            $(tabId+" .modal-info[name='type']").trigger("chosen:updated");
+        //     $(tabId+" .modal-info[name='type']").html('<option value="'+info['basicId']+'">'+info['typeName']+'</option>');
+        //     $(tabId+" .modal-info[name='type']").trigger("chosen:updated");
 
-            $(tabId+" .modal-status .status-btn").removeClass("active");
-            $(tabId+" .modal-status .status-btn[name='"+info['status']+"']").addClass("active");
-            $(tabId+" .modal-info[name='status']").val(info['status']);
+        //     $(tabId+" .modal-status .status-btn").removeClass("active");
+        //     $(tabId+" .modal-status .status-btn[name='"+info['status']+"']").addClass("active");
+        //     $(tabId+" .modal-info[name='status']").val(info['status']);
 
-            $(tabId+" .modal-info[name='provinceId']").find("option[value='"+info['provinceId']+"']").prop("selected",true);
-            setCityOption(info['provinceId'],"modal-info")
-            $(tabId+" .modal-info[name='cityId']").find("option[value='"+info['cityId']+"']").prop("selected",true);
-        }
-        //初始分类的select数据
-        function intPClsSelect(data){
-            var option='<option value="0">根Root</option>';
-            data.forEach(ele => {
-                option+=getArtClsNode(ele,0);
-            });
-            // $(tabId+" .artclass").html(option);
-        }
+        //     $(tabId+" .modal-info[name='provinceId']").find("option[value='"+info['provinceId']+"']").prop("selected",true);
+        //     setCityOption(info['provinceId'],"modal-info")
+        //     $(tabId+" .modal-info[name='cityId']").find("option[value='"+info['cityId']+"']").prop("selected",true);
+        // }
+        // //初始分类的select数据
+        // function intPClsSelect(data){
+        //     var option='<option value="0">根Root</option>';
+        //     data.forEach(ele => {
+        //         option+=getArtClsNode(ele,0);
+        //     });
+        //     // $(tabId+" .artclass").html(option);
+        // }
     </script>
 </body>
 </html>

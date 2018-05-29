@@ -516,4 +516,34 @@ class UserController extends BaseController{
             $this->returnHtml();
         }
     }
+    function getRolesList(){
+        $key=I("key");
+        $this->ajaxReturn(["data"=>$this->getRoles($key)]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-09 23:51:01 
+     * @Desc: 客户列表 
+     */    
+    function getRoles($key=""){
+        $data=I("data");
+        $where=["status"=>"1"];
+        if($data["roleType"]==1){
+            $where["rolePid"]=0;
+        }else{
+            $where["rolePid"]=["gt",0];
+        }
+        if($key!=""){
+            $where["roleName"]=["LIKE","%{$key}%"];
+        }
+        $parameter=[
+            'fields'=>"roleId,roleName",
+            'where'=>$where,
+            'page'=>1,
+            'pageSize'=>20,
+            'orderStr'=>"roleId DESC",
+        ];
+        $roleResult=$this->roleCom->getRoleList($parameter);
+        return $roleResult['list'] ? $roleResult['list'] : [];
+    }
 }
