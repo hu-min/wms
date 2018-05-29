@@ -177,7 +177,7 @@ $(document).on("click",'.save-info',function(){
     var isModal=$(this).data("modal");
     var search=con+"-search";
     var parent=$(this).parents(".modal").attr("id")
-    if($('body').hasClass('modal-open')==false){
+    if($('body').hasClass('modal-open')==false && isModal){
         $('body').addClass('modal-open')
     }
     datas.reqType=con+reqtype;
