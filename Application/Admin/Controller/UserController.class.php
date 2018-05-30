@@ -10,6 +10,7 @@ class UserController extends BaseController{
         $this->roleCom=getComponent('Role');
         $this->nodeCom=getComponent('Node');
         $this->rNodeCom=getComponent('RoleNode');
+        $this->processCom=getComponent('Process');
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
     }
@@ -507,14 +508,48 @@ class UserController extends BaseController{
         $this->ajaxReturn(['errCode'=>0,'info'=>$this->fetch("Index/Icons")]);
     }
 
-    function ProcessControl(){
+    function processControl(){
         $reqType=I('reqType');
         if($reqType){
             $this->$reqType();
         }else{
+	    $this->assign("groupData",$this->getRoles(1));
+	    $this->assign("roleData",$this->getRoles(2));
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->returnHtml();
         }
+    }
+    function processList(){
+	$data=I("data");
+        $p=I("p")?I("p"):1;
+        $where=[];
+        if($data['processName']){
+            $where['processName']=['LIKE','%'.$data['processName'].'%'];
+        }
+        if($data['processDepict']){
+            $where['processDepict']=['LIKE','%'.$data['processDepict'].'%'];
+        }
+        if(isset($data['status'])){
+            $where['status']=$data['status'];
+        }
+        $parameter=[
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$this->pageSize,
+        ];
+        
+        $processResult=$this->processCom->getProcessList($parameter);
+        if($processResult){
+            $pListRed="processList_".session("userId");
+            $this->Redis->set($pListRed,json_encode($processResult['list']),3600);
+            $page = new \Think\VPage($processResult['count'], $this->pageSize);
+            $pageShow = $page->show();
+            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            $this->assign('list',$processResult['list']);
+            $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('User/userTable/processList'),'page'=>$pageShow]);
+        }
+        $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
+
     }
     function getRolesList(){
         $key=I("key");
@@ -525,25 +560,73 @@ class UserController extends BaseController{
      * @Date: 2018-05-09 23:51:01 
      * @Desc: 客户列表 
      */    
-    function getRoles($key=""){
-        $data=I("data");
+    function getRoles($roleType=1,$key="",$option=true){
         $where=["status"=>"1"];
-        if($data["roleType"]==1){
+	$join="";
+	$pName="";
+        if($roleType==1){
             $where["rolePid"]=0;
         }else{
             $where["rolePid"]=["gt",0];
+	    $join="LEFT JOIN (SELECT roleId pid,roleName pname FROM v_role) pr ON pr.pid=rolePid";
+	    $pName=",pname";
         }
         if($key!=""){
             $where["roleName"]=["LIKE","%{$key}%"];
         }
         $parameter=[
-            'fields'=>"roleId,roleName",
+            'fields'=>"roleId,roleName".$pName,
             'where'=>$where,
             'page'=>1,
-            'pageSize'=>20,
+            'pageSize'=>9999,
             'orderStr'=>"roleId DESC",
+	    'joins'=>$join,
         ];
         $roleResult=$this->roleCom->getRoleList($parameter);
+	if($option){
+	    $optionStr='<option value=""></option>';
+		foreach($roleResult['list'] as $opt){
+		    $optionStr.='<option value="'.$opt["roleId"].'">'.(isset($opt["pname"])?$opt["pname"]."/":"").$opt["roleName"].'</option>';
+		}
+	    return $optionStr;
+	}
         return $roleResult['list'] ? $roleResult['list'] : [];
+    }
+
+    function manageProcessInfo(){
+        $reqType=I("reqType");
+        $datas=I("data");
+	$datas["processDepict"]=json_encode($datas["Depict"],JSON_UNESCAPED_UNICODE);
+	unset($datas["Depict"]);
+
+	$datas["processOption"]=json_encode($datas["Option"],JSON_UNESCAPED_UNICODE);
+	unset($datas["Option"]);
+
+        if($reqType=="processAdd"){
+	    $datas["addTime"]=time();
+            unset($datas['processId']);
+            return $datas;
+        }else if($reqType=="processEdit"){
+            $data=[];
+            if(isset($datas['processName'])){
+                $data['processName']=$datas['processName'];
+            }
+            if(isset($datas['status'])){
+                $data['status']=$datas['status'];
+            }
+	    $data['updateTime']=time();
+            return ["where"=>$where,"data"=>$data];
+        }
+    }
+
+    function processAdd(){
+	$Info=$this->manageProcessInfo();
+        $insertResult=$this->processCom->insertProcess($Info);
+        if($insertResult->errCode==0){
+            $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+        }
+        
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100),'reqType'=>$reqType]);
+
     }
 }

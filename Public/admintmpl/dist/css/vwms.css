@@ -65,6 +65,7 @@
 	margin-left: -200px;
 	height: 90px;
 	margin-top: -90px;
+	z-index:999999999;
 }
 #v-notice-window .box-title{
 	font-size: 15px;

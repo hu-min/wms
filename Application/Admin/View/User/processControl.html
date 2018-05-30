@@ -27,14 +27,14 @@
                             <form class="form-inline">
                                 <div class="form-group"> 
                                     <label class="control-label">审核流程名称：</label>
-                                    <input class="form-control search-info input-sm" name="company" placeholder="审核流程名称" type="text">
+                                    <input class="form-control search-info input-sm" name="processName" placeholder="审核流程名称" type="text">
                                 </div>
                                 <div class="form-group"> 
                                     <label class="control-label">审核流程描述：</label>
-                                    <input class="form-control search-info input-sm" name="company" placeholder="审核流程名称" type="text">
+                                    <input class="form-control search-info input-sm" name="processDepict" placeholder="审核流程描述" type="text">
                                 </div>
                                 <div class="form-group">
-                                    <button type="button" data-url="{$url}" id="process-search" data-reqtype="companyList" data-con="process" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" data-url="{$url}" id="process-search" data-reqtype="processList" data-con="process" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
                                     <button type="button" class="btn bg-teal search-refresh" data-con="process"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 </div>
                             </form>
@@ -66,7 +66,7 @@
             </div>
         </div>
         <div class="dataTables_wrapper">
-            <div id="processPage" class="row page-div" data-url="{$url}" data-reqtype="companyList" data-con="process">
+            <div id="processPage" class="row page-div" data-url="{$url}" data-reqtype="processList" data-con="process">
                 {$pages}
             </div>
         </div>
@@ -85,8 +85,8 @@
                     <div class="box-body">
                         <div class="form-group">
                             <label for="info-title">审核流程名称：</label>
-                            <input  class="modal-info" title="processNname" name="processNname" type="hidden">
-                            <input class="form-control modal-info"  name="company" title="审核流程名称"  placeholder="审核流程名称" type="text">
+                            <input  class="modal-info"  name="processId" type="hidden">
+                            <input class="form-control modal-info"  name="processName" title="审核流程名称"  placeholder="审核流程名称" type="text">
                         </div>
                         <div class="form-group">
                             <label for="info-title">审核流程配置：<i class="fa fa-fw fa-plus-square text-aqua add-processnode" title="新增流程节点" data-target=".bankstock-tab" style="cursor: pointer;"></i></label>
@@ -117,17 +117,21 @@
     </div>
    
     <script>
+	var groupOption='{$groupData}';
+        var roleOption='{$roleData}';
+
         //获取分类数据
         $(function(){
             //新增审核流程
             $(tabId+" .box-header button").on("click",function(){
                 $(tabId+" .modal-info").val("");
                 $(tabId+" .process-tab").children("tr").remove()
+		$(tabId+" .modal-info[name='status']").val(0);
                 $(tabId+" .status-btn").removeClass("active");
                 $(tabId+" .status-btn[name='0']").addClass("active");
             })
             $(tabId+" .add-processnode").on("click",function(){
-                var tr=$('<tr><td style="width:30%;"><select class="form-control input-sm role-type" title="角色类型" name="roleType"><option value="">选择角色类型</option><option value="1">分组</option><option value="2">角色</option></select></td><td style="width:70%;"><select class="form-control input-sm chosen-roles chosen-select" title="角色" name="roles"><option value=""></option></select></td></tr>');
+                var tr=$('<tr><td style="width:30%;padding: 3px;vertical-align: middle;"><select class="form-control input-sm role-type" title="角色类型" name="roleType"><option value="">选择角色类型</option><option value="1">分组</option><option value="2">角色</option></select></td><td style="width:65%;padding: 3px;vertical-align: middle;"><select class="form-control input-sm chosen-roles chosen-select" title="角色" name="roles"><option value=""></option></select></td><td sytle="width:5%;padding: 3px;vertical-align: middle;"><i class="fa fa-minus minus-processnode" style="padding: 10px;cursor:pointer;"></i></td></tr>');
                 
                 $(tabId+" .process-tab").append(tr)
 
@@ -135,15 +139,27 @@
             $(tabId).on("change",".role-type",function(){
                 var chosen_roles=$(this).parent("td").next("td").find(".chosen-roles");
                 var roleType = $(this).val()
-                if(chosen_roles.prop("multiple")==false){
-                    datas["reqType"]="getRolesList";
-                    datas["data"]={roleType:roleType};
-                    chosen_roles.prop("multiple",true)
-                    chosen_roles.chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true,ajax_load:{url:"{$url}",value:"roleId",text:"roleName",isPush:false}})
-                }
-                datas["reqType"]="getRolesList";
-                datas["data"]={roleType:roleType};
+		chosen_roles.find("option").remove()
+		if(roleType==1){
+		    chosen_roles.eq(0).append(groupOption)
+		    if(chosen_roles.prop("multiple")==false){
+			chosen_roles.prop("multiple",true)
+		    }
+		}else{
+		    chosen_roles.eq(0).append(roleOption);
+		    if(chosen_roles.prop("multiple")==true){
+                        chosen_roles.prop("multiple",false)
+                    }
+		}
+		if(chosen_roles.length>1){
+		    chosen_roles.chosen("destroy");
+		}
+                chosen_roles.chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
+		
             })
+	    $(tabId).on("click",".minus-processnode",function(){
+		$(this).parents("tr").remove()	
+	    })
             // $(tabId+" select[name='provinceId']").on("change",function(){
             //     var provinceId=$(this).val()
             //     var whereCity=$(this).data("city")
@@ -187,21 +203,40 @@
         //         }
         //     })
         // }
-        // function processInfoFuns(){
-        //     datas["data"]={}
-        //     $(tabId+" .modal-info").each(function(){
-        //         var name =$(this).attr("name");
-        //         var val =$(this).val();
-        //         var required=$(this).attr("required");
-        //         var title=$(this).attr("title");
-        //         if(required=="required" && val==""){
-        //             alert(title+"不能为空");
-        //             throw title+"不能为空";
-        //         }else if (name!==undefined){
-        //             datas["data"][name]=val;
-        //         }
-        //     })
-        // }
+         function processInfoFuns(){
+             datas["data"]={}
+	     $(tabId+" .modal-info").each(function(){
+		var name = $(this).attr("name")
+	   	var val = $(this).val()
+		if(name=="processName" && val==""){
+		    notice(100,"流程名不能为空");
+		    throw "流程名不能为空";
+		}	
+		datas["data"][name]=val
+	     })
+	   	datas["data"]["Option"]=[]
+	   	datas["data"]["Depict"]=[]
+             $(tabId+" .role-type").each(function(){
+		var typeData = $(this).val()
+		var roleData = $(this).parent("td").next("td").find(".chosen-roles").val();
+	        datas["data"]["Option"].push({type:typeData,role:roleData})
+		var typeStr = $(this).find("option[value='"+typeData+"']").text()
+		var roleStr = []
+		if(typeData==1){
+		   //var option = groupOption
+		   $(roleData).each(function(index,val){
+                        roleStr.push($("<select>"+groupOption+"</select>").find("option[value='"+val+"']").text())
+                   })
+		}else{
+		  // var option = roleOption
+		    console.log(roleData);
+			console.log($("<select>"+roleOption+"</select>").find("option[value='"+roleData+"']").text());
+			console.log(roleStr);
+                   roleStr.push($("<select>"+roleOption+"</select>").find("option[value='"+roleData+"']").text())
+		}
+		datas["data"]["Depict"].push({type:typeStr,role:roleStr});
+             })
+         }
         // /*设置编辑用户信息*/
         // function processShowFuns(info){
 
