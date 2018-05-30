@@ -562,14 +562,14 @@ class UserController extends BaseController{
      */    
     function getRoles($roleType=1,$key="",$option=true){
         $where=["status"=>"1"];
-	$join="";
-	$pName="";
+        $join="";
+        $pName="";
         if($roleType==1){
             $where["rolePid"]=0;
         }else{
             $where["rolePid"]=["gt",0];
-	    $join="LEFT JOIN (SELECT roleId pid,roleName pname FROM v_role) pr ON pr.pid=rolePid";
-	    $pName=",pname";
+            $join="LEFT JOIN (SELECT roleId pid,roleName pname FROM v_role) pr ON pr.pid=rolePid";
+            $pName=",pname";
         }
         if($key!=""){
             $where["roleName"]=["LIKE","%{$key}%"];
@@ -580,33 +580,33 @@ class UserController extends BaseController{
             'page'=>1,
             'pageSize'=>9999,
             'orderStr'=>"roleId DESC",
-	    'joins'=>$join,
+	        'joins'=>$join,
         ];
         $roleResult=$this->roleCom->getRoleList($parameter);
-	if($option){
-	    $optionStr='<option value=""></option>';
-		foreach($roleResult['list'] as $opt){
-		    $optionStr.='<option value="'.$opt["roleId"].'">'.(isset($opt["pname"])?$opt["pname"]."/":"").$opt["roleName"].'</option>';
-		}
-	    return $optionStr;
-	}
+        if($option){
+            $optionStr='<option value=""></option>';
+            foreach($roleResult['list'] as $opt){
+                $optionStr.='<option value="'.$opt["roleId"].'">'.(isset($opt["pname"])?$opt["pname"]."——":"").$opt["roleName"].'</option>';
+            }
+            return $optionStr;
+        }
         return $roleResult['list'] ? $roleResult['list'] : [];
     }
 
     function manageProcessInfo(){
         $reqType=I("reqType");
         $datas=I("data");
-	$datas["processDepict"]=json_encode($datas["Depict"],JSON_UNESCAPED_UNICODE);
-	unset($datas["Depict"]);
+        $datas["processDepict"]=json_encode($datas["Depict"],JSON_UNESCAPED_UNICODE);
+        unset($datas["Depict"]);
 
-	$datas["processOption"]=json_encode($datas["Option"],JSON_UNESCAPED_UNICODE);
-	unset($datas["Option"]);
-
+        $datas["processOption"]=json_encode($datas["Option"],JSON_UNESCAPED_UNICODE);
+        unset($datas["Option"]);
         if($reqType=="processAdd"){
 	    $datas["addTime"]=time();
             unset($datas['processId']);
             return $datas;
         }else if($reqType=="processEdit"){
+            $where=["processId"=>$datas['processId']];
             $data=[];
             if(isset($datas['processName'])){
                 $data['processName']=$datas['processName'];
@@ -614,19 +614,42 @@ class UserController extends BaseController{
             if(isset($datas['status'])){
                 $data['status']=$datas['status'];
             }
-	    $data['updateTime']=time();
+	        $data['updateTime']=time();
             return ["where"=>$where,"data"=>$data];
         }
     }
 
     function processAdd(){
-	$Info=$this->manageProcessInfo();
+	    $Info=$this->manageProcessInfo();
         $insertResult=$this->processCom->insertProcess($Info);
         if($insertResult->errCode==0){
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
         }
-        
         $this->ajaxReturn(['errCode'=>100,'error'=>getError(100),'reqType'=>$reqType]);
-
+    }
+    function processEdit(){
+        $Info=$this->manageProcessInfo();
+        $updateResult=$this->processCom->updateProcess($Info);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+    function processOne(){
+        $id	=I("id");
+        $parameter=[
+            'processId'=>$id,
+        ];
+        $ListRed="processList_".session("userId");
+        $List=$this->Redis->get($ListRed);
+        if($List){
+            foreach ($List as $process) {
+               if($process['processId']==$id){
+                $this->ajaxReturn(['errCode'=>0,'info'=>$process]);
+               }
+            }
+        }
+        $Result=$this->processCom->getProcess($parameter);
+        if($Result->errCode==0){
+            $this->ajaxReturn(['errCode'=>0,'info'=>$Result->data]);
+        }
+        $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
     }
 }

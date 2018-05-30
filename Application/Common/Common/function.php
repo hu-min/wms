@@ -142,10 +142,14 @@ function setLevelTree($param=[]){
     }
     return [$nodes=>_setTree($nodeLevel,1,$id,$pid,$nodes)];
 }
-function utf8_substr($str,$length){
+function utf8_substr($str,$length,$middle=false){
     $suf="";
     if(mb_strlen($str)>$length){
         $suf="……";
+    }
+    if($middle){
+        $start=(int)$length/2;
+        return mb_substr($str,0,$start,"utf8").$suf.mb_substr($str,$start,($length-$start),"utf8");
     }
     return mb_substr($str,0,$length,"utf8").$suf;
 }

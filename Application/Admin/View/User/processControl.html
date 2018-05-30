@@ -30,7 +30,7 @@
                                     <input class="form-control search-info input-sm" name="processName" placeholder="审核流程名称" type="text">
                                 </div>
                                 <div class="form-group"> 
-                                    <label class="control-label">审核流程描述：</label>
+                                    <label class="control-label">审核流程配置数据：</label>
                                     <input class="form-control search-info input-sm" name="processDepict" placeholder="审核流程描述" type="text">
                                 </div>
                                 <div class="form-group">
@@ -45,14 +45,14 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-12" style="font-size:0.95em;overflow-x: auto;">
+            <div class="col-sm-12" style="font-size:1em;overflow-x: auto;">
                 <div class="count-div" id="processCount" style="margin:10px;font-weight: 800;">
                 </div>
                 <table id="" class="table table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>审核流程名称</th>
-                            <th>描述</th>
+                            <th>配置数据</th>
                             <th>添加时间</th>
                             <th>修改时间</th>
                             <th>状态</th>
@@ -89,7 +89,7 @@
                             <input class="form-control modal-info"  name="processName" title="审核流程名称"  placeholder="审核流程名称" type="text">
                         </div>
                         <div class="form-group">
-                            <label for="info-title">审核流程配置：<i class="fa fa-fw fa-plus-square text-aqua add-processnode" title="新增流程节点" data-target=".bankstock-tab" style="cursor: pointer;"></i></label>
+                            <label for="info-title">审核流程配置[审核顺序从上往下]：<i class="fa fa-fw fa-plus-square text-aqua add-processnode" title="新增流程节点" data-target=".bankstock-tab" style="cursor: pointer;"></i></label>
 
                             <table class="table table-bordered">
                                 <tbody class="process-tab">
@@ -117,7 +117,7 @@
     </div>
    
     <script>
-	var groupOption='{$groupData}';
+	    var groupOption='{$groupData}';
         var roleOption='{$roleData}';
 
         //获取分类数据
@@ -126,145 +126,125 @@
             $(tabId+" .box-header button").on("click",function(){
                 $(tabId+" .modal-info").val("");
                 $(tabId+" .process-tab").children("tr").remove()
-		$(tabId+" .modal-info[name='status']").val(0);
+		        $(tabId+" .modal-info[name='status']").val(0);
                 $(tabId+" .status-btn").removeClass("active");
                 $(tabId+" .status-btn[name='0']").addClass("active");
             })
+            //新增审核流程输入框
             $(tabId+" .add-processnode").on("click",function(){
-                var tr=$('<tr><td style="width:30%;padding: 3px;vertical-align: middle;"><select class="form-control input-sm role-type" title="角色类型" name="roleType"><option value="">选择角色类型</option><option value="1">分组</option><option value="2">角色</option></select></td><td style="width:65%;padding: 3px;vertical-align: middle;"><select class="form-control input-sm chosen-roles chosen-select" title="角色" name="roles"><option value=""></option></select></td><td sytle="width:5%;padding: 3px;vertical-align: middle;"><i class="fa fa-minus minus-processnode" style="padding: 10px;cursor:pointer;"></i></td></tr>');
-                
-                $(tabId+" .process-tab").append(tr)
-
+                createProcess()
             })
+            //切换角色类型            
             $(tabId).on("change",".role-type",function(){
                 var chosen_roles=$(this).parent("td").next("td").find(".chosen-roles");
                 var roleType = $(this).val()
-		chosen_roles.find("option").remove()
-		if(roleType==1){
-		    chosen_roles.eq(0).append(groupOption)
-		    if(chosen_roles.prop("multiple")==false){
-			chosen_roles.prop("multiple",true)
-		    }
-		}else{
-		    chosen_roles.eq(0).append(roleOption);
-		    if(chosen_roles.prop("multiple")==true){
-                        chosen_roles.prop("multiple",false)
+                chosen_roles.eq(0).find("option").remove()
+                if(roleType==1){
+                    chosen_roles.eq(0).append(groupOption)
+                    if(chosen_roles.eq(0).prop("multiple")==false){
+                        chosen_roles.eq(0).prop("multiple",true)
                     }
-		}
-		if(chosen_roles.length>1){
-		    chosen_roles.chosen("destroy");
-		}
-                chosen_roles.chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
-		
+                }else{
+                    chosen_roles.eq(0).append(roleOption);
+                    if(chosen_roles.eq(0).prop("multiple")==true){
+                        chosen_roles.eq(0).prop("multiple",false)
+                    }
+                }
+                if(chosen_roles.length>1){
+                    chosen_roles.eq(0).chosen("destroy");
+                }
+                chosen_roles.eq(0).chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
+                
             })
-	    $(tabId).on("click",".minus-processnode",function(){
-		$(this).parents("tr").remove()	
-	    })
-            // $(tabId+" select[name='provinceId']").on("change",function(){
-            //     var provinceId=$(this).val()
-            //     var whereCity=$(this).data("city")
-            //     if(provinceId>0){
-            //         // console.log(pid)
-            //         setCityOption(provinceId,whereCity)
-            //     }else{
-            //         $(tabId+" ."+whereCity+"[name='cityId']").html("")
-            //     }
-            // })
-            //审核流程类型
-            // $(tabId+" .chosen-roles").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true,ajax_load:{url:"{$url}",data:{reqType:"getSupTypeList"},value:"basicId",text:"name"}})
+            //删除审批流程
+            $(tabId).on("click",".minus-processnode",function(){
+                $(this).parents("tr").remove()	
+            })
         })
-
-        // function setCityOption(pid,whereCity){
-        //         datas["reqType"]="getCityList";
-        //         datas["pid"]=pid
-        //         $(tabId+" ."+whereCity+"[name='cityId']").html("")
-        //         get("{$url}",datas,function(result){
-        //             if(result.errCode==0){
-        //                 var cityOption='<option value="">全部</option>';
-                        
-        //                 result.citys.forEach(ele => {
-        //                     cityOption+='<option value="'+ele.cid+' selected">'+ele.city+'</option>'
-        //                 })
-        //                 $(tabId+" ."+whereCity+"[name='cityId']").html(cityOption)
-        //             }
-        //         },false)
-        // }
-        // //function companyResetFuns(){}
-        // function processReFuns(){
-
-        // }
-        // function processSearchFuns(){
-        //     datas['data']={}
-        //     $(tabId+" .search-info").each(function(){
-        //         var name=$(this).attr("name");
-        //         var val=$(this).val();
-        //         if(val!=""){
-        //             datas['data'][name]=val
-        //         }
-        //     })
-        // }
-         function processInfoFuns(){
-             datas["data"]={}
-	     $(tabId+" .modal-info").each(function(){
-		var name = $(this).attr("name")
-	   	var val = $(this).val()
-		if(name=="processName" && val==""){
-		    notice(100,"流程名不能为空");
-		    throw "流程名不能为空";
-		}	
-		datas["data"][name]=val
-	     })
-	   	datas["data"]["Option"]=[]
-	   	datas["data"]["Depict"]=[]
-             $(tabId+" .role-type").each(function(){
-		var typeData = $(this).val()
-		var roleData = $(this).parent("td").next("td").find(".chosen-roles").val();
-	        datas["data"]["Option"].push({type:typeData,role:roleData})
-		var typeStr = $(this).find("option[value='"+typeData+"']").text()
-		var roleStr = []
-		if(typeData==1){
-		   //var option = groupOption
-		   $(roleData).each(function(index,val){
+        //搜索字段新增
+        function processSearchFuns(){
+            datas['data']={}
+            $(tabId+" .search-info").each(function(){
+                var name=$(this).attr("name");
+                var val=$(this).val();
+                if(val!=""){
+                    datas['data'][name]=val
+                }
+            })
+        }
+        //新增保存表单数据
+        function processInfoFuns(){
+            datas["data"]={}
+            $(tabId+" .modal-info").each(function(){
+                var name = $(this).attr("name")
+                var val = $(this).val()
+                if(name=="processName" && val==""){
+                    notice(100,"流程名不能为空");
+                    throw "流程名不能为空";
+                }	
+                datas["data"][name]=val
+	        })
+            datas["data"]["Option"]=[]
+            datas["data"]["Depict"]=[]
+            $(tabId+" .role-type").each(function(){
+                var typeData = $(this).val()
+                var roleData = $(this).parent("td").next("td").find(".chosen-roles").val();
+                datas["data"]["Option"].push({type:typeData,role:roleData})
+                var typeStr = $(this).find("option[value='"+typeData+"']").text()
+                var roleStr = []
+                if(typeData==1){
+                    $(roleData).each(function(index,val){
                         roleStr.push($("<select>"+groupOption+"</select>").find("option[value='"+val+"']").text())
-                   })
-		}else{
-		  // var option = roleOption
-		    console.log(roleData);
-			console.log($("<select>"+roleOption+"</select>").find("option[value='"+roleData+"']").text());
-			console.log(roleStr);
-                   roleStr.push($("<select>"+roleOption+"</select>").find("option[value='"+roleData+"']").text())
-		}
-		datas["data"]["Depict"].push({type:typeStr,role:roleStr});
-             })
+                    })
+                }else{
+                    roleStr.push($("<select>"+roleOption+"</select>").find("option[value='"+roleData+"']").text())
+                }
+                datas["data"]["Depict"].push({type:typeStr,role:roleStr});
+            })
          }
-        // /*设置编辑用户信息*/
-        // function processShowFuns(info){
+        // /*设置编辑审核流程信息*/
+        function processShowFuns(info){
+            $(tabId+" .process-tab").children("tr").remove()
+            $(tabId+" .modal-info[name='processId']").val(info['processId']);
+            $(tabId+" .modal-info[name='processName']").val(info['processName']);
+            
+            JSON.parse(info['processOption']).forEach(function(process,index){
+                console.log(index)
+                console.log(process)
+                createProcess()
+                $(tabId+" .role-type").eq(index).find("option[value='"+process["type"]+"']").prop("selected",true);
+                var tempChosen = $(tabId+" .role-type").eq(index).parent("td").next("td").find(".chosen-roles")
+                if(process["type"]==1){
+                    tempChosen.prop("multiple",true)
+                    tempChosen.html(groupOption);
+                    process["role"].forEach(function(roleId){
+                        tempChosen.find("option[value='"+roleId+"']").prop("selected",true);
+                    })
+                }else{
+                    tempChosen.html(roleOption);
+                    tempChosen.find("option[value='"+process["role"]+"']").prop("selected",true);
+                }
+                
+                
+                tempChosen.chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true});
 
-        //     $(tabId+" .modal-info[name='companyId']").val(info['companyId']);
-        //     $(tabId+" .modal-info[name='company']").val(info['company']);
-        //     $(tabId+" .modal-info[name='alias']").val(info['alias']);
-        //     $(tabId+" .modal-info[name='address']").val(info['address']);
-        //     $(tabId+" .modal-info[name='remarks']").val(info['remarks']);
+            })
+            
+            // $(tabId+" .modal-info[name='type']").html('<option value="'+info['basicId']+'">'+info['typeName']+'</option>');
+            // $(tabId+" .modal-info[name='type']").trigger("chosen:updated");
 
-        //     $(tabId+" .modal-info[name='type']").html('<option value="'+info['basicId']+'">'+info['typeName']+'</option>');
-        //     $(tabId+" .modal-info[name='type']").trigger("chosen:updated");
+            // $(tabId+" .modal-status .status-btn").removeClass("active");
+            // $(tabId+" .modal-status .status-btn[name='"+info['status']+"']").addClass("active");
+            // $(tabId+" .modal-info[name='status']").val(info['status']);
 
-        //     $(tabId+" .modal-status .status-btn").removeClass("active");
-        //     $(tabId+" .modal-status .status-btn[name='"+info['status']+"']").addClass("active");
-        //     $(tabId+" .modal-info[name='status']").val(info['status']);
-
-        //     $(tabId+" .modal-info[name='provinceId']").find("option[value='"+info['provinceId']+"']").prop("selected",true);
-        //     setCityOption(info['provinceId'],"modal-info")
-        //     $(tabId+" .modal-info[name='cityId']").find("option[value='"+info['cityId']+"']").prop("selected",true);
-        // }
-        // //初始分类的select数据
-        // function intPClsSelect(data){
-        //     var option='<option value="0">根Root</option>';
-        //     data.forEach(ele => {
-        //         option+=getArtClsNode(ele,0);
-        //     });
-        //     // $(tabId+" .artclass").html(option);
-        // }
+            // $(tabId+" .modal-info[name='provinceId']").find("option[value='"+info['provinceId']+"']").prop("selected",true);
+            // // setCityOption(info['provinceId'],"modal-info")
+            // $(tabId+" .modal-info[name='cityId']").find("option[value='"+info['cityId']+"']").prop("selected",true);
+        }
+        function createProcess(){
+            var tr=$('<tr><td style="width:30%;padding: 3px;vertical-align: middle;"><select class="form-control input-sm role-type" title="角色类型" name="roleType"><option value="">选择角色类型</option><option value="1">分组</option><option value="2">角色</option></select></td><td style="width:65%;padding: 3px;vertical-align: middle;"><select class="form-control input-sm chosen-roles chosen-select" title="角色" name="roles"><option value=""></option></select></td><td sytle="width:5%;padding: 3px;vertical-align: middle;"><i class="fa fa-minus minus-processnode" style="padding: 10px;cursor:pointer;"></i></td></tr>');
+            $(tabId+" .process-tab").append(tr)
+        }
     </script>
 </body>
 </html>

@@ -217,6 +217,7 @@ $(document).on("click",'.save-info',function(){
                 $(tabId+" #"+parent).modal('toggle')
             }
         }else{
+            notice(100,result.error);
             // alert(result.error)
         }
         
@@ -383,9 +384,9 @@ function fun_is_exits(funcName){
  */
 function notice(status){
     var color="box-warning"
-    var content = arguments[1] ? arguments[1] : "成功返回了"
+    var content = arguments[1] ? arguments[1] : "操作成功"
     var title = arguments[2] ? arguments[2] : "警告提示！"
-    var seconds = arguments[3] ? arguments[3] : 3
+    var seconds = arguments[3] ? arguments[3] : 2
     if(status==100){
         color = "box-danger"
         title = "错误提示！"

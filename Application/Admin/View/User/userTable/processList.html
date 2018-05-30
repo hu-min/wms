@@ -1,9 +1,9 @@
 <volist name="list" id="item">
     <tr>
         <td>{$item['processName']}</td>
-        <td>{$item['processDepict']}</td>
+        <td>{:utf8_substr($item['processDepict'],100,true)}</td>
         <td>{$item['addTime']|date='Y-m-d H:i:s',###}</td>
-        <td><gt name="$item['updateTime']" value="0" >{$item['updateTime']|date='Y-m-d H:i:s',###}</gt></td>
+        <td><gt name="item['updateTime']" value="0" >{$item['updateTime']|date='Y-m-d H:i:s',###}</gt></td>
         <if condition="$item['status'] eq 0">
             <td><span class="label bg-black">{:C('userStatus.'.$item['status'])}</span></td>
         <elseif condition="$item['status'] eq 1"/>
@@ -13,6 +13,6 @@
         <else/>
             <td><span class="label label-danger">{:C('userStatus.'.$item['status'])}</span></td>
         </if>
-        <td><button type="button" data-show="One" data-reqtype="Edit"  data-id="{$item['processId']}" data-url="{$url}" data-con="process" data-toggle="modal" data-target="#modal-processInfo" data-title="编辑审核流程" class="btn btn-primary info-edit">编辑</button></td>
+        <td><button type="button" data-show="One" data-reqtype="Edit"  data-id="{$item['processId']}" data-url="{$url}" data-con="process" data-toggle="modal" data-target="#modal-processInfo" data-title="编辑审核流程" class="btn btn-primary btn-sm info-edit">编辑</button></td>
     </tr>
 </volist>
