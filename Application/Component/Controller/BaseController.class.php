@@ -60,7 +60,7 @@ class BaseController extends \Common\Controller\BaseController{
             $where=$parameter['where']?$parameter['where']:true;
             $fields=$parameter['fields']?$parameter['fields']:true;
             $orderStr=$parameter['orderStr']?$parameter['orderStr']:null;
-            $classList=$this->selfDB->getOne(['where'=>$where]);
+            $classList=$this->selfDB->getOne(['where'=>$where,'fields'=>$fields]);
         }else{
             $classList=$this->selfDB->getOne($parameter);
         }

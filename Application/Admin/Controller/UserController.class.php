@@ -652,4 +652,62 @@ class UserController extends BaseController{
         }
         $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
     }
-}
+
+    function processAuth(){
+        $reqType=I('reqType');
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            $this->returnHtml();
+        }
+    }
+    function nodeAuthOne(){
+        $id	=I("nodeId");
+        $where=[
+            'status'=>1,
+            '_string'=>"FIND_IN_SET({$id},processNode)",
+        ];
+        $parameter=[
+            'fields'=>"processId,processNode",
+            'where'=>$where,
+        ];
+        $Result=$this->processCom->getProcessOne($parameter);
+        if($Result->errCode==0){
+            $this->ajaxReturn(['errCode'=>0,'info'=>$Result["list"]]);
+        }
+        $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
+    }
+    function getProcess($roleType=1,$key="",$option=true){
+        $where=["status"=>"1"];
+        $join="";
+        $pName="";
+        if($roleType==1){
+            $where["rolePid"]=0;
+        }else{
+            $where["rolePid"]=["gt",0];
+            $join="LEFT JOIN (SELECT roleId pid,roleName pname FROM v_role) pr ON pr.pid=rolePid";
+            $pName=",pname";
+        }
+        if($key!=""){
+            $where["roleName"]=["LIKE","%{$key}%"];
+        }
+        $parameter=[
+            'fields'=>"roleId,roleName".$pName,
+            'where'=>$where,
+            'page'=>1,
+            'pageSize'=>9999,
+            'orderStr'=>"roleId DESC",
+	        'joins'=>$join,
+        ];
+        $roleResult=$this->roleCom->getRoleList($parameter);
+        if($option){
+            $optionStr='<option value=""></option>';
+            foreach($roleResult['list'] as $opt){
+                $optionStr.='<option value="'.$opt["roleId"].'">'.(isset($opt["pname"])?$opt["pname"]."——":"").$opt["roleName"].'</option>';
+            }
+            return $optionStr;
+        }
+        return $roleResult['list'] ? $roleResult['list'] : [];
+    }
+}   
