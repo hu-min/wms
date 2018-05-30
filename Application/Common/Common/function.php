@@ -148,8 +148,8 @@ function utf8_substr($str,$length,$middle=false){
         $suf="……";
     }
     if($middle){
-        $start=(int)$length/2;
-        return mb_substr($str,0,$start,"utf8").$suf.mb_substr($str,$start,($length-$start),"utf8");
+        $len=(int)$length/2;
+        return mb_substr($str,0,$len,"utf8").$suf.mb_substr($str,-$len,$len,"utf8");
     }
     return mb_substr($str,0,$length,"utf8").$suf;
 }
