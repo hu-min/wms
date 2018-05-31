@@ -75,7 +75,7 @@ class BaseController extends \Common\Controller\BaseController{
             }
         }
 	$logType=$this->LogCom->getType(strtolower($reqType));	
-	if($logType>=0){
+	if($logType>2){
 		$this->vlog($logType);
 	}
 	if($this->nodeAuth[$conAct]>=7){

@@ -53,13 +53,15 @@
                     </div>
                     <div class='box-body'>
                         <div class="row">
-                            <div class="col-sm-2">
+                            <div class="col-sm-12">
                                 <div class="form-group">
-                                    
+				    <input type="hidden" class="modal-info" name="nodeId" value="0" />
+				    <select class="form-control input-sm chosen-process chosen-select modal-info" multiple="multiple" title="审核流程" name="processIds"><option value=""></option></select>                                    
                                 </div>
                             </div>
                         </div>
                         <div class="box-footer">
+				<button type="button" class="btn btn-primary save-info" data-con="processAuth" data-reqtype="Edit" data-url="{$url}">更新节点审核流程</button>
                         </div>
                     </div>
                 </div>
@@ -67,6 +69,7 @@
         </div>
     </section>
     <script>
+	var processOption = '{$processData}'
         //获取节点数据
         function getNodeTree() {
             var tree=[]
@@ -85,24 +88,23 @@
                
                 var nodeData= $(tabId+' .nodetree').treeview('getNode', $(this).parent(".list-group-item").data("nodeid"));
                 datas["nodeId"]=nodeData.id;
-                datas["reqType"]='nodeAuthOne';
+                datas["reqType"]='nodeOne';
+		$(tabId+" .modal-info[name='nodeId']").val(nodeData.id)
+		$(tabId+" .save-info").text($(this).parent(".list-group-item").text());
                 get("{$url}",datas,function(result){
                     if(result.errCode==0){
-                        console.log(result.info);
-                        // $(tabId+" .modal-info[name='nodeNames']").val(result.info['nodeNames']);
-                        // $(tabId+" .modal-info[name='nodeTitle']").val(result.info['nodeTitle']);
-                        // $(tabId+" .modal-info[name='nodeId']").val(result.info['nodeId']);
-                        // $(tabId+" .modal-info[name='controller']").val(result.info['controller']);
-                        // $(tabId+" .modal-info[name='nodeIcon']").val(result.info['nodeIcon']);
-                        // $(tabId+" .modal-info[name='sort']").val(result.info['sort']);
-                        // $(tabId+" .modal-info[name='nodePid']").val(result.info['nodePid']);
-                        // $(tabId+" .status-btn").removeClass("active");
-                        // $(tabId+" .status-btn[name='"+result.info['status']+"']").addClass("active");
+			$(tabId+" .chosen-process").find("option").prop("selected",false);
+			result.info.processIds.split(",").forEach(function(val){
+				$(tabId+" .chosen-process").find("option[value='"+val+"']").prop("selected",true);
+			})
+			$(tabId+" .chosen-process").trigger("chosen:updated");
                     }
                 })
             })
         }
         $(function(){
+	    $(tabId+" .chosen-process").html(processOption).chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
+
             createNodeTree()
             //搜索节点
             $(tabId+' .input-expand-node').on("input",function(){
@@ -130,20 +132,19 @@
             return '<option value="'+element.id+'">'+strs+element.text+'</option>'+option;
         }
         //节点信息
-        function nodeInfoFuns(){
+        function processAuthInfoFuns(){
             datas["data"]={}
             $(tabId+" .modal-info").each(function(){
                 var name =$(this).attr("name");
                 var val =$(this).val();
-                if(name=="nodeTitle" && val==""){
-                    alert("节点标题不能为空");
-                    throw "节点标题不能为空";
-                }else if(val!=""){
+                if(val<=0 && name != undefined){
+		    notice(100,"没有要修改的数据")
+                    throw "没有要修改的数据";
+                }else if(name != undefined){
                     datas["data"][name]=val;
                 }
                 
             })
-            datas["data"].status=$(tabId+" .status-group .active").attr("name")
         }
         /** 
          * @Author: vition 

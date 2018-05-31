@@ -664,6 +664,7 @@ class UserController extends BaseController{
         if($reqType){
             $this->$reqType();
         }else{
+	    $this->assign("processData",$this->getProcess());
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->returnHtml();
         }
@@ -675,45 +676,46 @@ class UserController extends BaseController{
             '_string'=>"FIND_IN_SET({$id},processNode)",
         ];
         $parameter=[
-            'fields'=>"processId,processNode",
+            'fields'=>"processId",
             'where'=>$where,
         ];
-        $Result=$this->processCom->getProcessOne($parameter);
+        $Result=$this->processCom->getProcessList($parameter);
         if($Result->errCode==0){
-            $this->ajaxReturn(['errCode'=>0,'info'=>$Result["list"]]);
+	    $processArr= $Result["list"] ? array_column($Result["list"],"processId") : [];
+            $this->ajaxReturn(['errCode'=>0,'info'=>$processArr]);
         }
         $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
     }
-    function getProcess($roleType=1,$key="",$option=true){
+    function getProcess($key="",$option=true){
         $where=["status"=>"1"];
-        $join="";
-        $pName="";
-        if($roleType==1){
-            $where["rolePid"]=0;
-        }else{
-            $where["rolePid"]=["gt",0];
-            $join="LEFT JOIN (SELECT roleId pid,roleName pname FROM v_role) pr ON pr.pid=rolePid";
-            $pName=",pname";
-        }
         if($key!=""){
-            $where["roleName"]=["LIKE","%{$key}%"];
+            $where["processName"]=["LIKE","%{$key}%"];
         }
         $parameter=[
-            'fields'=>"roleId,roleName".$pName,
+            'fields'=>"processId,processName".$pName,
             'where'=>$where,
             'page'=>1,
             'pageSize'=>9999,
-            'orderStr'=>"roleId DESC",
-	        'joins'=>$join,
+            'orderStr'=>"processId DESC",
         ];
-        $roleResult=$this->roleCom->getRoleList($parameter);
+        $result=$this->processCom->getProcessList($parameter);
         if($option){
             $optionStr='<option value=""></option>';
-            foreach($roleResult['list'] as $opt){
-                $optionStr.='<option value="'.$opt["roleId"].'">'.(isset($opt["pname"])?$opt["pname"]."——":"").$opt["roleName"].'</option>';
+            foreach($result['list'] as $opt){
+                $optionStr.='<option value="'.$opt["processId"].'">'.$opt["processName"].'</option>';
             }
             return $optionStr;
         }
-        return $roleResult['list'] ? $roleResult['list'] : [];
+        return $result['list'] ? $result['list'] : [];
+    }
+    function processAuthEdit(){
+	$datas =I("data");
+	$nodeInfo=[
+		"nodeId"=>$datas["nodeId"],
+		"processIds"=>implode(",",$datas["processIds"]),
+	];
+	$updateResult=$this->nodeCom->updateNode($nodeInfo);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+	
     }
 }   

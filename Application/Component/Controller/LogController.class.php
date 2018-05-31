@@ -26,7 +26,7 @@ class LogController extends BaseController{
     protected function formatDesc($type){
 	$userName=session("userName");
 	$time=date("Y-m-d H:i:s");
-	$moduleCon=MODULE_NAME.'/'.CONTROLLER_NAME;
+	$moduleCon=MODULE_NAME.'/'.CONTROLLER_NAME.'/'.ACTION_NAME;
 	if(in_array($type,[0,1,4,8])){
 		$request="";
 	}else{
