@@ -61,10 +61,10 @@ class BaseController extends \Common\Controller\BaseController{
      */    
     private function authVerify($conAct){
         $reqType=I("reqType");
-	if(!$reqType){
-	    $reqType="List";
-            I("reqType",$reqType);
-	}
+        if(!$reqType){
+            $reqType="List";
+                I("reqType",$reqType);
+        }
         if(!in_array($reqType,C("authority.6"))){
             preg_match("/\S([A-Z]+[^[A-Z]*\S]*)$/",$reqType,$match);
             if(count($match)<1){
@@ -74,11 +74,11 @@ class BaseController extends \Common\Controller\BaseController{
                 $reqType=$match[1];
             }
         }
-	$logType=$this->LogCom->getType(strtolower($reqType));	
-	if($logType>2){
-		$this->vlog($logType);
-	}
-	if($this->nodeAuth[$conAct]>=7){
+        $logType=$this->LogCom->getType(strtolower($reqType));	
+        if($logType>2){
+            $this->vlog($logType);
+        }
+        if($this->nodeAuth[$conAct]>=7){
             return true;
         }else if(in_array($reqType,$this->authority[$this->nodeAuth[$conAct]])){
             return true;
@@ -205,7 +205,15 @@ class BaseController extends \Common\Controller\BaseController{
         $index=substr((string)time(),7,4);
         return "{$header}{$middle}{$index}";
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-31 21:51:08 
+     * @Desc: 写指定日志到数据库 
+     */    
     function vlog($type){
-	$this->LogCom->log($type);
+	    $this->LogCom->log($type);
+    }
+    function processAuth(){
+        dump(session("nodeId"));
     }
 }

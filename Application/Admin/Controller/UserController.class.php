@@ -709,12 +709,12 @@ class UserController extends BaseController{
         return $result['list'] ? $result['list'] : [];
     }
     function processAuthEdit(){
-	$datas =I("data");
-	$nodeInfo=[
-		"nodeId"=>$datas["nodeId"],
-		"processIds"=>implode(",",$datas["processIds"]),
-	];
-	$updateResult=$this->nodeCom->updateNode($nodeInfo);
+        $datas =I("data");
+        $nodeInfo=[
+            "nodeId"=>$datas["nodeId"],
+            "processIds"=>implode(",",$datas["processIds"]),
+        ];
+        $updateResult=$this->nodeCom->updateNode($nodeInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
 	
     }

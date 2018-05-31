@@ -14,35 +14,35 @@ class LogController extends BaseController{
         $this->selfDB = D('Component/Log');
     }
     function log($type,$describe=""){
-	$logInfo=[
-		"userId"=>session("userId"),
-		"userName"=>session("userName"),
-		"class"=>$this->logType[$type],
-		"describe"=>$describe?$describe:$this->formatDesc($type),
-		"addTime"=>time(),
-	];
-	$this->selfDB->insert($logInfo);
+		$logInfo=[
+			"userId"=>session("userId"),
+			"userName"=>session("userName"),
+			"class"=>$this->logType[$type],
+			"describe"=>$describe?$describe:$this->formatDesc($type),
+			"addTime"=>time(),
+		];
+		$this->selfDB->insert($logInfo);
     }
     protected function formatDesc($type){
-	$userName=session("userName");
-	$time=date("Y-m-d H:i:s");
-	$moduleCon=MODULE_NAME.'/'.CONTROLLER_NAME.'/'.ACTION_NAME;
-	if(in_array($type,[0,1,4,8])){
-		$request="";
-	}else{
-		$request=json_encode($_REQUEST,JSON_UNESCAPED_UNICODE);
-	}
-	return sprintf($this->desc[$type],$userName,$time,$moduleCon,$request);
+		$userName=session("userName");
+		$time=date("Y-m-d H:i:s");
+		$moduleCon=MODULE_NAME.'/'.CONTROLLER_NAME.'/'.ACTION_NAME;
+		if(in_array($type,[0,1,4,8])){
+			$request="";
+		}else{
+			$request=json_encode($_REQUEST,JSON_UNESCAPED_UNICODE);
+		}
+		return sprintf($this->desc[$type],$userName,$time,$moduleCon,$request);
     }
     function getType($class){
-	if($class=="list" || $class=="one"){
-		$class="read";
-	}
-	foreach($this->logType as $type => $tclass){
-		if($class==$tclass){
-			return $type;
+		if($class=="list" || $class=="one"){
+			$class="read";
 		}
-	}
-	return false;
+		foreach($this->logType as $type => $tclass){
+			if($class==$tclass){
+				return $type;
+			}
+		}
+		return false;
     }
 }

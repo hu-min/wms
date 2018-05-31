@@ -40,6 +40,7 @@ class CustomerController extends BaseController{
 
     //客户公司管理开始
     function companyControl(){
+        $this->processAuth();
         $reqType=I('reqType');
         $this->assign('statusType',$this->statusType);
         if($reqType){

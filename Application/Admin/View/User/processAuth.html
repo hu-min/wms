@@ -89,21 +89,21 @@
                 var nodeData= $(tabId+' .nodetree').treeview('getNode', $(this).parent(".list-group-item").data("nodeid"));
                 datas["nodeId"]=nodeData.id;
                 datas["reqType"]='nodeOne';
-		$(tabId+" .modal-info[name='nodeId']").val(nodeData.id)
-		$(tabId+" .save-info").text($(this).parent(".list-group-item").text());
+                $(tabId+" .modal-info[name='nodeId']").val(nodeData.id)
+                $(tabId+" .save-info").text($(this).parent(".list-group-item").text());
                 get("{$url}",datas,function(result){
                     if(result.errCode==0){
-			$(tabId+" .chosen-process").find("option").prop("selected",false);
-			result.info.processIds.split(",").forEach(function(val){
-				$(tabId+" .chosen-process").find("option[value='"+val+"']").prop("selected",true);
-			})
-			$(tabId+" .chosen-process").trigger("chosen:updated");
+                        $(tabId+" .chosen-process").find("option").prop("selected",false);
+                        result.info.processIds.split(",").forEach(function(val){
+                            $(tabId+" .chosen-process").find("option[value='"+val+"']").prop("selected",true);
+                        })
+                        $(tabId+" .chosen-process").trigger("chosen:updated");
                     }
                 })
             })
         }
         $(function(){
-	    $(tabId+" .chosen-process").html(processOption).chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
+	        $(tabId+" .chosen-process").html(processOption).chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
 
             createNodeTree()
             //搜索节点
