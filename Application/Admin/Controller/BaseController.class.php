@@ -61,9 +61,10 @@ class BaseController extends \Common\Controller\BaseController{
      */    
     private function authVerify($conAct){
         $reqType=I("reqType");
-        if($this->nodeAuth[$conAct]>=7){
-            return true;
-        }
+	if(!$reqType){
+	    $reqType="List";
+            I("reqType",$reqType);
+	}
         if(!in_array($reqType,C("authority.6"))){
             preg_match("/\S([A-Z]+[^[A-Z]*\S]*)$/",$reqType,$match);
             if(count($match)<1){
@@ -73,7 +74,13 @@ class BaseController extends \Common\Controller\BaseController{
                 $reqType=$match[1];
             }
         }
-        if(in_array($reqType,$this->authority[$this->nodeAuth[$conAct]])){
+	$logType=$this->LogCom->getType(strtolower($reqType));	
+	if($logType>=0){
+		$this->vlog($logType);
+	}
+	if($this->nodeAuth[$conAct]>=7){
+            return true;
+        }else if(in_array($reqType,$this->authority[$this->nodeAuth[$conAct]])){
             return true;
         }
         return false;
@@ -100,6 +107,7 @@ class BaseController extends \Common\Controller\BaseController{
     protected function setLogin($userInfo=[]){
         $this->log($userInfo);
         if(empty($userInfo)){
+	    $this->vlog(0);
             //退出设置
             session('userId',NULL);
             session('userName',NULL);
@@ -119,6 +127,7 @@ class BaseController extends \Common\Controller\BaseController{
             session('userName',$userInfo['userName']);
             session('roleId',$userInfo['roleId']);
             session('rolePid',$userInfo['rolePid']);
+	    $this->vlog(1);
             if($userInfo['avatar']==""){
                 $userInfo['avatar']=U(__ROOT__.'/Public'.'/admintmpl'."/dist/img/avatar/avatar".rand(1,5).".png",'','');
             }else{
@@ -195,5 +204,8 @@ class BaseController extends \Common\Controller\BaseController{
         $middle=strtolower(substr(ACTION_NAME,0,(strlen(ACTION_NAME)>5?5:strlen(ACTION_NAME))));
         $index=substr((string)time(),7,4);
         return "{$header}{$middle}{$index}";
+    }
+    function vlog($type){
+	$this->LogCom->log($type);
     }
 }

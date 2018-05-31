@@ -611,6 +611,12 @@ class UserController extends BaseController{
             if(isset($datas['processName'])){
                 $data['processName']=$datas['processName'];
             }
+	    if(isset($datas['processDepict'])){
+                $data['processDepict']=$datas['processDepict'];
+            }
+	    if(isset($datas['processOption'])){
+                $data['processOption']=$datas['processOption'];
+            }
             if(isset($datas['status'])){
                 $data['status']=$datas['status'];
             }
