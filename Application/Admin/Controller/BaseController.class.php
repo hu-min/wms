@@ -23,6 +23,7 @@ class BaseController extends \Common\Controller\BaseController{
         parent::_initialize();
         $this->userCom=getComponent('User');
         $this->LogCom=getComponent('Log');
+        $this->nodeCom=getComponent('Node');
         $this->authority=C('authority');
         $this->nodeAuth=session('nodeAuth');
         $this->exemption=[//排除的控制器
@@ -33,6 +34,7 @@ class BaseController extends \Common\Controller\BaseController{
             'Admin/Index/Index',
         ];
         $this->refreNode();
+        
         // print_r($this->nodeAuth);
         // $this->setLogin();
         $nowConAct=MODULE_NAME."/".CONTROLLER_NAME.'/'.ACTION_NAME;
@@ -49,9 +51,9 @@ class BaseController extends \Common\Controller\BaseController{
                 $this->prompt(1,'警告!','您不具备访问此页面的权限，如果您认为值得拥有，请联系管理员！');
                 exit;
             }
-	    if(I("nodeId")){
-		session("nodeId",I("nodeId"));
-	    }
+            $this->processAuth=$this->iniProcessAuth();
+            // print_r($this->processAuth);
+            $this->assign('processAuth',$this->processAuth);
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->assign("pageId",$this->createId());
         }
@@ -216,7 +218,60 @@ class BaseController extends \Common\Controller\BaseController{
     function vlog($type){
 	    $this->LogCom->log($type);
     }
-    function processAuth(){
-        dump(session("nodeId"));
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-31 22:54:23 
+     * @Desc: 初始化每个节点的权限了 
+     */    
+    protected function iniProcessAuth(){
+        $actionRedis = ACTION_NAME.session("userId");
+        
+        $authNodeId=I("authNodeId");
+        $roleId=session('roleId');
+        $rolePid=session('rolePid');
+        $isLevel=0;
+        $allLevel=0;
+        if(!$authNodeId){
+            $processAuth = $this->Redis->get($actionRedis);
+            if($processAuth){
+                return $processAuth;
+            }
+        }
+        $parameter=[
+            "where"=>["nodeId"=>$authNodeId],
+            "fields"=>"nodeId,processIds"
+        ];
+        $nodeInfo=$this->nodeCom->getNodeOne($parameter);
+        if(!empty($nodeInfo["list"])){
+            $processArray=explode(",",$nodeInfo["list"]["processIds"]);
+            $processCom=getComponent('Process');
+            $processPar=[
+                "where"=>["processId"=>["IN",$processArray]],
+                "fields"=>"processOption",
+            ];
+            $processRes=$processCom->getProcessList($processPar);
+            if(!empty($processRes["list"])){
+                
+                foreach ($processRes["list"] as $process) {
+                    $processOption = json_decode($process["processOption"],true);
+                    foreach ($processOption as $level => $subProcess) {
+                        if($subProcess["type"]==1){
+                            if(in_array($rolePid,$subProcess["role"])){
+                                $isLevel=$level + 1;
+                                $allLevel = count($processOption);
+                            }
+                        }else{
+                            if($roleId==$subProcess["role"]){
+                                $isLevel=$level + 1;
+                                $allLevel = count($processOption);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        $processAuth = ["level"=>$isLevel,"allLevel"=> $allLevel];
+        $this->Redis->set($actionRedis,$processAuth,86400);
+        return $processAuth;
     }
 }

@@ -138,9 +138,9 @@
                 var name =$(this).attr("name");
                 var val =$(this).val();
                 if(val<=0 && name != undefined){
-		    notice(100,"没有要修改的数据")
+		            notice(100,"没有要修改的数据")
                     throw "没有要修改的数据";
-                }else if(name != undefined){
+                }else if(name != undefined && val!=""){
                     datas["data"][name]=val;
                 }
                 

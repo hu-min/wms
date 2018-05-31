@@ -8,7 +8,6 @@ class UserController extends BaseController{
     public function _initialize() {
         parent::_initialize();
         $this->roleCom=getComponent('Role');
-        $this->nodeCom=getComponent('Node');
         $this->rNodeCom=getComponent('RoleNode');
         $this->processCom=getComponent('Process');
         Vendor("levelTree.levelTree");
@@ -520,7 +519,7 @@ class UserController extends BaseController{
         }
     }
     function processList(){
-	$data=I("data");
+	    $data=I("data");
         $p=I("p")?I("p"):1;
         $where=[];
         if($data['processName']){
@@ -692,7 +691,7 @@ class UserController extends BaseController{
             $where["processName"]=["LIKE","%{$key}%"];
         }
         $parameter=[
-            'fields'=>"processId,processName".$pName,
+            'fields'=>"processId,processName",
             'where'=>$where,
             'page'=>1,
             'pageSize'=>9999,
@@ -712,7 +711,7 @@ class UserController extends BaseController{
         $datas =I("data");
         $nodeInfo=[
             "nodeId"=>$datas["nodeId"],
-            "processIds"=>implode(",",$datas["processIds"]),
+            "processIds"=>trim(implode(",",$datas["processIds"]),","),
         ];
         $updateResult=$this->nodeCom->updateNode($nodeInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);

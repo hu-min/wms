@@ -40,7 +40,6 @@ class CustomerController extends BaseController{
 
     //客户公司管理开始
     function companyControl(){
-        $this->processAuth();
         $reqType=I('reqType');
         $this->assign('statusType',$this->statusType);
         if($reqType){
@@ -65,7 +64,7 @@ class CustomerController extends BaseController{
     function companyList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
-        $where=[];
+        $where=["processLevel"=>[($this->processAuth["level"]-1),0,"OR"],'status'=>1];
         if($data['company']){
             $where['company']=['LIKE','%'.$data['company'].'%'];
         }
@@ -236,7 +235,7 @@ class CustomerController extends BaseController{
     function contactList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
-        $where=[];
+        $where=["processLevel"=>[($this->processAuth["level"]-1),0,"OR"]];
         if($data['companyId']){
             $where['companyId']=$data['companyId'];
         }
@@ -253,6 +252,7 @@ class CustomerController extends BaseController{
         ];
         
         $listResult=$this->customerCom->getCustomerList($parameter);
+        // echo $this->customerCom->M()->_sql();
         // print_r($listResult);
         if($listResult){
             $contactRed="cuscontactList";
@@ -276,6 +276,7 @@ class CustomerController extends BaseController{
         $datas=I("data");
         if($reqType=="contactAdd"){
             $datas['addTime']=time();
+            $datas['processLevel']=$this->processAuth["level"];
             unset($datas['contactId']);
             return $datas;
         }else if($reqType=="contactEdit"){
@@ -301,7 +302,13 @@ class CustomerController extends BaseController{
                 $data['remarks']=$datas['remarks'];
             }
             if(isset($datas['status'])){
-                $data['status']=$datas['status'];
+                if($datas['status']==1 && $this->processAuth["level"] == $this->processAuth["allLevel"]){
+                    $data['status']=$datas['status'];
+                    $data['processLevel'] = 0;
+                }else if($datas['status']==1){
+                    $data['status']=2;
+                    $data['processLevel'] = $this->processAuth["level"];
+                }
             }
             return ["where"=>$where,"data"=>$data];
         }
@@ -317,10 +324,10 @@ class CustomerController extends BaseController{
         if($dataInfo){
             $insertResult=$this->customerCom->insertContact($dataInfo);
             if($insertResult && $insertResult->errCode==0){
-                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0),"sql"=>$this->customerCom->M()->_sql()]);
             }
         }
-        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100),"sql"=>$this->customerCom->M()->_sql()]);
     }
     /** 
      * @Author: vition 
@@ -344,7 +351,8 @@ class CustomerController extends BaseController{
             }
         }
         if(empty($plist)){
-            $contactResult=$this->customerCom->getUser($parameter);
+            $contactResult=$this->customerCom->getCustomerList($parameter,true);
+            // echo $this->customerCom->M()->_sql();
             if($contactResult->errCode==0){
                 $plist=$contactResult->data;
             }

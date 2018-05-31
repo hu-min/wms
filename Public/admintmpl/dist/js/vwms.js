@@ -65,7 +65,7 @@ $(document).on("click",".search-list,.vpage",function(){
         eval(con+"SearchFuns()");//对不同的id设置不同的发送数据
     }
     searchFun(url,datas,table,page,count);
-    
+    datas={};
 })
 
 function searchFun(url,datas,table,page,count){
@@ -137,6 +137,7 @@ $(document).on("click",".info-edit",function(){
             eval(con+"ReFuns()");//对不同的模块的modal数据重置
         }
     }
+    datas={};
 })
 /** 
  * javascript comment 
@@ -222,6 +223,7 @@ $(document).on("click",'.save-info',function(){
         }
         
     });
+    datas={};
 })
 /** 
  * javascript comment 

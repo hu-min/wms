@@ -19,7 +19,10 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">联系人列表</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加联系人" data-target="#modal-contactInfo" data-con="supcontact" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增联系人</button>
+                        <if condition="$processAuth['level'] gt 0">
+                            <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加联系人" data-target="#modal-contactInfo" data-con="supcontact" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增联系人</button>
+                        </if>
+                        
                     </div>
                     <div class="box-body search-body" id="supcontact-search-box">
                         <div class="col-md-12">
@@ -123,7 +126,10 @@
                             <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
                                 <input class="modal-info" value="0" name="status" type="hidden">
                                 <button type="button" name="0" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
-                                <button type="button" name="1" class="btn btn-default btn-sm  status-btn"><i class="fa fa-square text-green"> 启用 </i>
+                                <if condition="$processAuth['level'] gt 1">
+                                    <button type="button" name="1" class="btn btn-default btn-sm  status-btn"><i class="fa fa-square text-green"> 启用 </i>
+                                </if>
+                                
                                 </button>
                             </div>
                         </div>
@@ -132,7 +138,10 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary save-info" data-con="supcontact" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
+                <if condition="$processAuth['level'] gt 0">
+                    <button type="button" class="btn btn-primary save-info" data-con="supcontact" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
+                </if>
+                
             </div>
             </div>
         </div>
