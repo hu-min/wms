@@ -49,6 +49,9 @@ class BaseController extends \Common\Controller\BaseController{
                 $this->prompt(1,'警告!','您不具备访问此页面的权限，如果您认为值得拥有，请联系管理员！');
                 exit;
             }
+	    if(I("nodeId")){
+		session("nodeId",I("nodeId"));
+	    }
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->assign("pageId",$this->createId());
         }

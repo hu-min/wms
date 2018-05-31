@@ -583,7 +583,7 @@
                     if(cMatch!=null && cMatch[1]!=urlParam){
                         setUrlAction(cMatch[1],cMatch[1]);
                     }
-                    get(controller,{},function(result){
+                    get(controller,{nodeId:nodeid},function(result){
                         createTab(title,"vtabs"+nodeid,result.html);
                     });
                     
