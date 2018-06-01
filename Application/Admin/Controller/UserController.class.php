@@ -714,6 +714,18 @@ class UserController extends BaseController{
             "processIds"=>trim(implode(",",$datas["processIds"]),","),
         ];
         $updateResult=$this->nodeCom->updateNode($nodeInfo);
+	$nListRed="nodeArray";
+        $nodeList=$this->Redis->get($nListRed);
+        if($nodeList){
+            foreach ($nodeList as $index => $node) {
+                if($node['nodeId']==$nodeInfo["nodeId"]){
+                    $nodeList[$index]['processIds']=$nodeInfo["processIds"];
+		    $this->Redis->set($nListRed,$nodeList);
+		    break;
+                }
+            }
+        }
+
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
 	
     }
