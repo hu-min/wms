@@ -21,7 +21,7 @@
                         <h4 class="box-title">公司列表</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
                         <if condition="$processAuth['level'] gt 0">
-                            <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加公司" data-target=".modal-companyInfo" data-con="company" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增公司</button>
+                            <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加公司" data-target=".modal-companyInfo" data-con="company" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增公司 </button>
                         </if>
                         
                     </div>
@@ -102,7 +102,7 @@
             </div>
         </div>
     </section>
-    <div class="modal fade modal-companyInfo">
+    <div class="modal fade modal-companyInfo" id="modal-companyInfo">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
             <div class="modal-header">
@@ -148,9 +148,14 @@
                         <div class="form-group">
                             <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
                                 <input class="modal-info" id="info-status" value="0" name="status" type="hidden">
-                                <button type="button" name="0" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
+                                <if condition="$nodeAuth eq 7">
+                                    <button  type="button" name="0" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
+                                </if>
+                                
                                 <if condition="$processAuth['level'] gt 1">
-                                    <button type="button" name="1" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-green"> 同意启用 </i>
+                                    <button type="button" name="1" class="btn btn-success btn-sm status-btn"><i class="fa fa-square text-default"> 批准 </i>
+                                    <button type="button" name="3" class="btn btn-warning btn-sm status-btn"><i class="fa fa-square text-default"> 拒绝 </i>
+                                    <button type="button" name="4" class="btn btn-danger btn-sm status-btn"><i class="fa fa-square text-default"> 删除 </i>
                                 </if>
                                 
                                 </button>
@@ -181,6 +186,7 @@
                 $(tabId+" .modal-info").val("");
                 $(tabId+" .status-btn").removeClass("active");
                 $(tabId+" .status-btn[name='0']").addClass("active");
+                $(tabId+" .modal-info").prop("disabled",false)
             })
             $(tabId+" select[name='provinceId']").on("change",function(){
                 var provinceId=$(this).val()
@@ -257,7 +263,10 @@
             $(tabId+" .modal-status .status-btn").removeClass("active");
             $(tabId+" .modal-status .status-btn[name='"+info['status']+"']").addClass("active");
             $(tabId+" .modal-info[name='status']").val(info['status']);
+            if((info['processLevel'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7){
+                $(tabId+" .modal-info").prop("disabled",true)
 
+            }
             $(tabId+" .modal-info[name='provinceId']").find("option[value='"+info['provinceId']+"']").prop("selected",true);
             setCityOption(info['provinceId'],"modal-info",info['cityId'])
         }

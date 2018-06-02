@@ -48,6 +48,34 @@ class UserController extends BaseController{
     }
     /** 
      * @Author: vition 
+     * @Date: 2018-06-02 09:59:18 
+     * @Desc: 验证高级密码 
+     */    
+    function checkSeniorPwd($userId,$seniorPwd){
+        $where['seniorPassword']=sha1(sha1($seniorPwd));
+        $where['userId']=$userId;
+        $parArray=[
+            'where'=>$where,
+            'fields'=>'loginName,status',
+        ];
+        $userResult=$this->selfDB->getOne($parArray);
+        if($userResult){
+            if($userResult['status']!=1){
+                $res->errCode=10002;
+                $res->error=getError(10002);
+                return $res;
+            }
+            $res->errCode=0;
+            $res->error=getError(0);
+            $res->data=$userResult;
+            return $res;
+        }
+        $res->errCode=10000;
+        $res->error=getError(10000);
+        return $res;
+    }
+    /** 
+     * @Author: vition 
      * @Date: 2018-01-18 00:17:50 
      * @Desc: 通过用户userId获取节点信息 4层
      */    

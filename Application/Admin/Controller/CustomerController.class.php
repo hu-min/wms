@@ -12,7 +12,6 @@ class CustomerController extends BaseController{
         parent::_initialize();
         $this->basicCom=getComponent('Basic');
         $this->customerCom=getComponent('Customer');
-        $this->statusType=["0"=>"未启用","1"=>"启用"];
     }
 
     //内部公用方法
@@ -41,11 +40,11 @@ class CustomerController extends BaseController{
     //客户公司管理开始
     function companyControl(){
         $reqType=I('reqType');
-        $this->assign('statusType',$this->statusType);
+        
         if($reqType){
             $this->$reqType();
         }else{
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            $this->assign("controlName","company");
             $this->assign("province",$this->basicCom->get_provinces());
             $this->returnHtml();
         }
@@ -64,7 +63,8 @@ class CustomerController extends BaseController{
     function companyList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
-        $where=["processLevel"=>[($this->processAuth["level"]-1),0,"OR"]];
+        // $where=["processLevel"=>[($this->processAuth["level"]-1),0,"OR"]];
+        $where['_string']=" (processLevel = ".($this->processAuth["level"]-1)." OR processLevel = 0 OR author = ".session("userId")." OR FIND_IN_SET(".session("userId").",examine))";
         if($data['company']){
             $where['company']=['LIKE','%'.$data['company'].'%'];
         }
@@ -79,23 +79,20 @@ class CustomerController extends BaseController{
         }
         if(isset($data['status'])){
             $where['status']=$data['status'];
+        }else{
+            $where['_string'].=" AND status < 3";
         }
         $parameter=[
             'where'=>$where,
-            'fields'=>"`companyId`,`company`,`alias`,`provinceId`,`cityId`,`province`,`city`,`address`,`remarks`,`addTime`,`updateTime`,`status`",
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"companyId DESC",
-            "joins"=>["LEFT JOIN v_province p ON p.pid=provinceId","LEFT JOIN v_city c ON c.pid=p.pid AND c.cid=cityId"],
         ];
         
         $listResult=$this->customerCom->getCompanyList($parameter);
         if($listResult){
-            $companyRed="cuscompanyList";
-            $this->Redis->set($companyRed,json_encode($listResult['list']),3600);
             $page = new \Think\VPage($listResult['count'], $this->pageSize);
             $pageShow = $page->show();
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->assign('list',$listResult['list']);
 
             $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Customer/customerTable/companyList'),'page'=>$pageShow]);
@@ -113,6 +110,7 @@ class CustomerController extends BaseController{
         if($reqType=="companyAdd"){
             $datas['addTime']=time();
             $datas['processLevel']=$this->processAuth["level"];
+            $datas['author']=session("userId");
             unset($datas['companyId']);
             return $datas;
         }else if($reqType=="companyEdit"){
@@ -134,7 +132,16 @@ class CustomerController extends BaseController{
                 $data['address']=$datas['address'];
             }
             if(isset($datas['status'])){
-		if($datas['status']==1 && $this->processAuth["level"] == $this->processAuth["allLevel"]){
+                $parameter=[
+                    'where'=>["companyId"=>$id],
+                ];
+                $result=$this->customerCom->getCompanyList($parameter,true);
+                if($result["examine"]==""){
+                    $data['examine']=session("userId");
+                }else{
+                    $data['examine'].=",".session("userId");
+                }
+		        if($datas['status']==1 && $this->processAuth["level"] == $this->processAuth["allLevel"]){
                     $data['status']=$datas['status'];
                     $data['processLevel'] = 0;
                 }else if($datas['status']==1){
@@ -142,6 +149,7 @@ class CustomerController extends BaseController{
                     $data['processLevel'] = $this->processAuth["level"];
                 }
             }
+            $data['upateTime']=time();
             if(isset($datas['remarks'])){
                 $data['remarks']=$datas['remarks'];
             }
@@ -171,28 +179,13 @@ class CustomerController extends BaseController{
      */    
     function companyOne(){
         $id	=I("id");
+        // $result=$this->id_get_company($id);
         $parameter=[
-            'companyId'=>$id,
+            'where'=>["companyId"=>$id],
         ];
-        $pListRed="cuscompanyList";
-        $companyList=$this->Redis->get($pListRed);
-        $plist=[];
-        if($companyList){
-            foreach ($companyList as $company) {
-               if($company['companyId']==$id){
-                $plist=$company;
-                break;
-               }
-            }
-        }
-        if(empty($plist)){
-            $companyResult=$this->customerCom->getCompanyList($parameter,true);
-            if($companyResult->errCode==0){
-                $plist=$companyResult->data;
-            }
-        }
-        if(!empty($plist)){
-            $this->ajaxReturn(['errCode'=>0,'info'=>$plist]);
+        $result=$this->customerCom->getCompanyList($parameter,true);
+        if(!empty($result)){
+            $this->ajaxReturn(['errCode'=>0,'info'=>$result]);
         }
         $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
     }
@@ -219,8 +212,6 @@ class CustomerController extends BaseController{
         if($reqType){
             $this->$reqType();
         }else{
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
-            $this->assign('statusType',$this->statusType);
             $this->assign("cusCompanyList",$this->getCusCompany());
             $this->returnHtml();
         }
@@ -242,31 +233,32 @@ class CustomerController extends BaseController{
     function contactList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
-        $where=["processLevel"=>[($this->processAuth["level"]-1),0,"OR"]];
+
+        $where['_string']=" (processLevel = ".($this->processAuth["level"]-1)." OR processLevel = 0 OR author = ".session("userId")." OR FIND_IN_SET(".session("userId").",examine))";
         if($data['companyId']){
             $where['companyId']=$data['companyId'];
         }
         if($data['contact']){
             $where['contact']=['LIKE','%'.$data['contact'].'%'];
         }
+        if(isset($data['status'])){
+            $where['status']=$data['status'];
+        }else{
+            $where['_string'].=" AND status < 3";
+        }
         $parameter=[
-            'fields'=>"`contactId`,`companyId`,`contact`,`phone`,`email`,`address`,`remarks`,`addTime`,`updateTime`,`status`,company",
             'where'=>$where,
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"contactId DESC",
-            "joins"=>"LEFT JOIN (SELECT companyId cid,company FROM v_customer_company WHERE status=1) c ON c.cid=companyId",
         ];
         
         $listResult=$this->customerCom->getCustomerList($parameter);
         // echo $this->customerCom->M()->_sql();
         // print_r($listResult);
         if($listResult){
-            $contactRed="cuscontactList";
-            $this->Redis->set($contactRed,json_encode($listResult['list']),3600);
             $page = new \Think\VPage($listResult['count'], $this->pageSize);
             $pageShow = $page->show();
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->assign('list',$listResult['list']);
 
             $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Customer/customerTable/contactList'),'page'=>$pageShow]);
@@ -284,6 +276,7 @@ class CustomerController extends BaseController{
         if($reqType=="contactAdd"){
             $datas['addTime']=time();
             $datas['processLevel']=$this->processAuth["level"];
+            $datas['author']=session("userId");
             unset($datas['contactId']);
             return $datas;
         }else if($reqType=="contactEdit"){
@@ -309,6 +302,15 @@ class CustomerController extends BaseController{
                 $data['remarks']=$datas['remarks'];
             }
             if(isset($datas['status'])){
+                $parameter=[
+                    'where'=>["contactId"=>$id],
+                ];
+                $result=$this->customerCom->getCustomerList($parameter,true);
+                if($result["examine"]==""){
+                    $data['examine']=session("userId");
+                }else{
+                    $data['examine'].=",".session("userId");
+                }
                 if($datas['status']==1 && $this->processAuth["level"] == $this->processAuth["allLevel"]){
                     $data['status']=$datas['status'];
                     $data['processLevel'] = 0;
@@ -317,6 +319,7 @@ class CustomerController extends BaseController{
                     $data['processLevel'] = $this->processAuth["level"];
                 }
             }
+            $data['upateTime']=time();
             return ["where"=>$where,"data"=>$data];
         }
         return "";
@@ -331,10 +334,10 @@ class CustomerController extends BaseController{
         if($dataInfo){
             $insertResult=$this->customerCom->insertContact($dataInfo);
             if($insertResult && $insertResult->errCode==0){
-                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0),"sql"=>$this->customerCom->M()->_sql()]);
+                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
         }
-        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100),"sql"=>$this->customerCom->M()->_sql()]);
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
     }
     /** 
      * @Author: vition 
@@ -344,28 +347,11 @@ class CustomerController extends BaseController{
     function contactOne(){
         $id	=I("id");
         $parameter=[
-            'contactId'=>$id,
+            'where'=>["contactId"=>$id],
         ];
-        $pListRed="cuscontactList";
-        $contactList=$this->Redis->get($pListRed);
-        $plist=[];
-        if($contactList){
-            foreach ($contactList as $contact) {
-               if($contact['contactId']==$id){
-                $plist=$contact;
-                break;
-               }
-            }
-        }
-        if(empty($plist)){
-            $contactResult=$this->customerCom->getCustomerList($parameter,true);
-            // echo $this->customerCom->M()->_sql();
-            if($contactResult->errCode==0){
-                $plist=$contactResult->data;
-            }
-        }
-        if(!empty($plist)){
-            $this->ajaxReturn(['errCode'=>0,'info'=>$plist]);
+        $result=$this->customerCom->getCustomerList($parameter,true);
+        if(!empty($result)){
+            $this->ajaxReturn(['errCode'=>0,'info'=>$result]);
         }
         $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
     }

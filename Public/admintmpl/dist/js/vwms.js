@@ -70,7 +70,7 @@ $(document).on("click",".search-list,.vpage",function(){
 
 function searchFun(url,datas,table,page,count){
     get(url,datas,function(result){
-        notice(result.errCode,result.error);
+        
         if(result.errCode==0){
             // $(tabId+" ."+table).html(result.table);
             // $(tabId+" ."+page).html(result.page);
@@ -81,6 +81,7 @@ function searchFun(url,datas,table,page,count){
             $("#"+count).html(result.count);
         }else{
             // alert(result.error);
+            notice(result.errCode,result.error);
         }
     })
 }
@@ -97,7 +98,9 @@ $(document).on("click",".info-edit",function(){
     var reqtype=$(this).data("reqtype");
     var show=$(this).data("show");
     var con=$(this).data("con");
+    con = con ? con : $(this).parent(".status-con").data("con");
     var url=$(this).data("url");
+    url = url ? url : $(this).parent(".status-con").data("url");
     var name=$(this).attr("name");
     if(name){
         $(target).find(".box-body").html("");
@@ -119,6 +122,7 @@ $(document).on("click",".info-edit",function(){
     if(show=='One'){//编辑要获取数据
         datas={}
         var id=$(this).data("id");
+        id = id ? id : $(this).parent(".status-con").data("id");
         datas.reqType=con+show;
         datas.id=id
         get(url,datas,function(result){
@@ -138,6 +142,19 @@ $(document).on("click",".info-edit",function(){
         }
     }
     datas={};
+})
+/** 
+ * javascript comment 
+ * @Author: vition 
+ * @Date: 2018-06-02 17:08:13 
+ * @Desc: 弹出 global-modal 操作
+ */
+$(document).on("click",".v-showmodal",function(){
+    var url = $(this).data("url")
+    
+    get(url,datas,function(result){
+
+    })
 })
 /** 
  * javascript comment 
@@ -214,9 +231,10 @@ $(document).on("click",'.save-info',function(){
                 // console.log(isModal);
                 searchFun(url,datas,table,page)
             }
-            if($('body').hasClass('modal-open')){
+            // if($('body').hasClass('modal-open')){
+                console.log(" #"+parent)
                 $(tabId+" #"+parent).modal('toggle')
-            }
+            // }
         }else{
             notice(100,result.error);
             // alert(result.error)
@@ -249,6 +267,52 @@ $(document).on("click",'.tree-plus',function(){
 $(document).on("click",'.tree-minus',function(){
     var treeId=$(this).data("id")
     $(treeId).treeview('expandAll', { silent: true });
+})
+$(document).on("click",".status-info",function(){
+    var url = $(this).parent(".status-con").data("url");
+    var id = $(this).parent(".status-con").data("id");
+    var db = $(this).parent(".status-con").data("db");
+    var con = $(this).parent(".status-con").data("con");
+    var status = $(this).data("status");
+    var html = '<div class="v-status-box" style="text-align: center;" data-status="'+status+'"  data-db="'+db+'" data-con="'+con+'" data-url="'+url+'" data-id="'+id+'"><div class="col-sm-3"><button type="button" name="del"  class="btn btn-sm bg-orange submit-status">删除</button></div><div class="col-sm-5"><input type="password" placeholder="输入二级密码" class="form-control input-sm senior-password" /></div><div class="col-sm-3"><button type="button" name="deepDel" class="btn bg-navy btn-sm submit-status">彻底删除</button></div></div>'
+    notice(100,html,"删除提示",0)
+})
+$(document).on("click",".submit-status",function(){
+    var statusType = $(this).attr("name")
+    var senior_pwd = $(this).parents(".v-status-box").find(".senior-password").val();
+    var url = $(this).parents(".v-status-box").data("url")
+    url = url ? url : $(this).parent(".status-con").data("url");
+    var id = $(this).parents(".v-status-box").data("id")
+    id = id ? id : $(this).parent(".status-con").data("id");
+    var db = $(this).parents(".v-status-box").data("db")
+    db = db ? db : $(this).parent(".status-con").data("db");
+    var con = $(this).parents(".v-status-box").data("con")
+    con = con ? con : $(this).parent(".status-con").data("con");
+    var status = $(this).parents(".v-status-box").data("status");
+    status = status ? status : $(this).data("status");
+    if(statusType=="deepDel" && senior_pwd == ""){
+        alert("彻底删除必须输入二级密码")
+        throw "彻底删除必须输入二级密码";
+    }
+    var data={reqType:"globalStatusEdit",statusType:statusType,id:id,status:status,db:db,seniorPwd:senior_pwd}
+    // console.log(data);
+    // return;
+    post(url,data,function(result){
+        notice(result.errCode,result.error);
+        if(result.errCode==0){
+            if(fun_is_exits(con+"SearchFuns")){
+                eval(con+"SearchFuns()");//对不同的id设置不同的发送数据
+                var table=con+"Table";
+                var page=con+"Page";
+                var count=con+"Count";
+                datas.reqType=con+"List";
+                searchFun(url,datas,table,page,count);
+            }
+        }
+        
+        
+        datas={};
+    })
 })
 $(function(){
     /** 
@@ -385,22 +449,43 @@ function fun_is_exits(funcName){
  * @Desc: 弹出提示框 
  */
 function notice(status){
+    // ["box-warning","box-danger","box-primary"].forEach(function(col){
+    //     $("#v-notice-window .box-solid").removeClass(col);
+    // })
     var color="box-warning"
-    var content = arguments[1] ? arguments[1] : "操作成功"
-    var title = arguments[2] ? arguments[2] : "警告提示！"
-    var seconds = arguments[3] ? arguments[3] : 2
+    var title = "";
+    var content = "";
+    var seconds = arguments[3] >= 0 ? arguments[3] : 2
     if(status==100){
         color = "box-danger"
-        title = "错误提示！"
+        title = arguments[2] ? arguments[2] : "错误提示！"
+        content = arguments[1] ? arguments[1] : "操作失败，请仔细检查数据"
     }else if(status==0){
         color = "box-primary"
-        title = "成功提示！"
+        title = arguments[2] ? arguments[2] : "成功提示！"
+        content = arguments[1] ? arguments[1] : "操作成功"
     }else{
-        content = "出现异常了，联系下管理员吧！"
+        content = arguments[1] ? arguments[1] : "出现异常了，联系下管理员吧！"
+        title = arguments[2] ? arguments[2] : "异常提示！"
     }
     $("#v-notice-window .box-solid").addClass(color);
     $("#v-notice-window .box-solid .box-header .box-title").text(title);
-    $("#v-notice-window .box-solid .box-body").text(content);
+    $("#v-notice-window .box-solid .box-body").html(content);
     $("#v-notice-window").removeClass("none");
-    setTimeout(function(){$("#v-notice-window").addClass("none");$("#v-notice-window .box-solid").removeClass(color);},Number(seconds)*1000)
+    if(seconds>0){
+        setTimeout(function(){$("#v-notice-window").addClass("none");$("#v-notice-window .box-solid").removeClass(color);},Number(seconds)*1000)
+    }else{
+        
+    }
 }
+/** 
+ * javascript comment 
+ * @Author: vition 
+ * @Date: 2018-06-02 07:51:33 
+ * @Desc: 关闭提示框 
+ */
+$("#v-notice-window .v-close").on("click",function(){
+    if(!$("#v-notice-window").hasClass("none")){
+        $("#v-notice-window").addClass("none");
+    } 
+})

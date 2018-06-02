@@ -11,9 +11,34 @@ class CustomerController extends BaseController{
 
     function getCompanyList($parameter=[],$one=false){
         $this->selfDB=$this->companyDB;
-        if($one){
-            return $this->getOne($parameter);
+        $redisName="cuscompanyList";
+        $parameter["fields"]="`companyId`,`company`,`alias`,`provinceId`,`cityId`,`province`,`city`,`address`,`remarks`,`addTime`,`updateTime`,`status`,`author`,`examine`,processLevel";
+        $joins=["LEFT JOIN v_province p ON p.pid=provinceId","LEFT JOIN v_city c ON c.pid=p.pid AND c.cid=cityId"];
+        if(isset($parameter["joins"])){
+            if(is_array($parameter["joins"])){
+                $parameter["joins"]=array_merge($parameter["joins"],$joins);
+            }else{
+                array_push($joins,$parameter["joins"]);
+                $parameter["joins"]=$joins;
+            }
+        }else{
+            $parameter["joins"]=$joins;
         }
+        if($one){
+            $itemData=$this->redis_one($redisName,"companyId",$id);
+            if(empty($itemData)){
+                $result=$this->getOne($parameter);
+                if(isset($result["list"])){
+                    $itemData=$result["list"]; 
+                }
+            }
+            return $itemData;
+        }
+        $listResult=$this->getList($parameter);
+        if($listResult){
+            $this->Redis->set($redisName,json_encode($listResult['list']),$this->expire);
+        }
+        
         return $this->getList($parameter);
     }
     function insertCompany($parameter){
@@ -26,10 +51,34 @@ class CustomerController extends BaseController{
     }
     function getCustomerList($parameter=[],$one=false){
         $this->selfDB=$this->contactDB;
-        if($one){
-            return $this->getOne($parameter);
+        $parameter["fields"]="`contactId`,`companyId`,`contact`,`phone`,`email`,`address`,`remarks`,`addTime`,`updateTime`,`status`,company,`author`,`examine`,processLevel";
+        $redisName="cuscontactList";
+        $joins=["LEFT JOIN (SELECT companyId cid,company FROM v_customer_company WHERE status=1) c ON c.cid=companyId"];
+        if(isset($parameter["joins"])){
+            if(is_array($parameter["joins"])){
+                $parameter["joins"]=array_merge($parameter["joins"],$joins);
+            }else{
+                array_push($joins,$parameter["joins"]);
+                $parameter["joins"]=$joins;
+            }
+        }else{
+            $parameter["joins"]=$joins;
         }
-        return $this->getList($parameter);
+        if($one){
+            $itemData=$this->redis_one($redisName,"contactId",$id);
+            if(empty($itemData)){
+                $result=$this->getOne($parameter);
+                if(isset($result["list"])){
+                    $itemData=$result["list"]; 
+                }
+            }
+            return $itemData;
+        }
+        $listResult=$this->getList($parameter);
+        if($listResult){
+            $this->Redis->set($redisName,json_encode($listResult['list']),$this->expire);
+        }
+        return $listResult;
     }
     function insertContact($parameter){
         $this->selfDB=$this->contactDB;

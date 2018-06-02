@@ -34,7 +34,7 @@ class BaseController extends \Common\Controller\BaseController{
     function getList($parameter=[]){
         $res=$this->initRes();
         $where=$parameter['where']?$parameter['where']:true;
-        $fields=$parameter['fields']?$parameter['fields']:true;
+        $fields=$parameter['fields']?$parameter['fields']:"*";
         $orderStr=$parameter['orderStr']?$parameter['orderStr']:null;
         $page=$parameter['page']?$parameter['page']:0;
         $pageNum=$parameter['pageSize']?$parameter['pageSize']:0;
@@ -58,9 +58,10 @@ class BaseController extends \Common\Controller\BaseController{
         $res=$this->initRes();
         if($parameter && isset($parameter["where"])){
             $where=$parameter['where']?$parameter['where']:true;
-            $fields=$parameter['fields']?$parameter['fields']:true;
+            $fields=$parameter['fields']?$parameter['fields']:"*";
             $orderStr=$parameter['orderStr']?$parameter['orderStr']:null;
-            $classList=$this->selfDB->getOne(['where'=>$where,'fields'=>$fields]);
+            $joins=$parameter['joins']?$parameter['joins']:null;
+            $classList=$this->selfDB->getOne(['where'=>$where,'fields'=>$fields,"joins"=>$joins]);
         }else{
             $classList=$this->selfDB->getOne($parameter);
         }
@@ -117,5 +118,24 @@ class BaseController extends \Common\Controller\BaseController{
      */    
     function M(){
         return $this->selfDB;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-06-02 00:34:18 
+     * @Desc: 从redis中获取单一数据 
+     */    
+    function redis_one($redisName,$key,$id){
+        $listRedisName=$redisName;
+        $listRedis=$this->Redis->get($listRedisName);
+        $itemData=[];
+        if($listRedis){
+            foreach ($listRedis as $item) {
+                if($item[$key]==$id){
+                    $itemData=$item;
+                    break;
+                }
+            }
+        }
+        return $itemData;
     }
 }

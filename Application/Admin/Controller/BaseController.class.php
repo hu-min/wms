@@ -16,10 +16,13 @@ class BaseController extends \Common\Controller\BaseController{
     protected $nodeAuth;
     protected $exemption;
     protected $pageSize=15;
+    protected $statusType=[0=>"未启用",1=>"启用",2=>"审核中",3=>"无效",4=>"删除"];
+    protected $statusLabel=[0=>"blue",1=>"green",2=>"yellow",3=>"black",4=>"red"];
     /**
      * 对admin的每一个控制器和方法做权限检查
      */
     public function _initialize() {
+        
         parent::_initialize();
         $this->userCom=getComponent('User');
         $this->LogCom=getComponent('Log');
@@ -52,8 +55,11 @@ class BaseController extends \Common\Controller\BaseController{
                 exit;
             }
             $this->processAuth=$this->iniProcessAuth();
-            // print_r($this->processAuth);
+            $this->assign('nodeAuth',$this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]);
+            $this->assign('userId',session("userId"));
             $this->assign('processAuth',$this->processAuth);
+            $this->assign('statusType',$this->statusType);
+            $this->assign('statusLabel',$this->statusLabel);
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->assign("pageId",$this->createId());
         }
@@ -81,6 +87,9 @@ class BaseController extends \Common\Controller\BaseController{
         }
         $logType=$this->LogCom->getType(strtolower($reqType));	
         if($logType>2){
+            if(I("delType")=="deepDel"){
+                $logType=6;
+            }
             $this->vlog($logType);
         }
         if($this->nodeAuth[$conAct]>=7){
@@ -274,4 +283,60 @@ class BaseController extends \Common\Controller\BaseController{
         $this->Redis->set($actionRedis,$processAuth,86400);
         return $processAuth;
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-06-02 10:54:10 
+     * @Desc: 全局修改指定信息状态 
+     */    
+    function globalStatusEdit(){
+        extract($_REQUEST);
+        $dbObject=D($db);
+        $msg="删除成功！";
+        if($statusType=="del"){
+            $conResult=$dbObject->save([$dbObject->getPk()=>$id,"status"=>$status]);
+        }else if($statusType=="deepDel"){
+            $seniorResult=$this->userCom->checkSeniorPwd(session("userId"),$seniorPwd);
+            if($seniorResult->errCode!==0){
+                $this->ajaxReturn(['errCode'=>$seniorResult->errCode,'error'=>$seniorResult->error]);
+            }
+            $conResult=$dbObject->where([$dbObject->getPk()=>$id])->delete();
+        }else{
+            $updateData=[
+                $dbObject->getPk()=>$id,
+            ];
+            $findResult=$dbObject->where($updateData)->find();
+            $updateData['processLevel'] = $this->processAuth["level"];
+            if($findResult["examine"]==""){
+                $updateData['examine']=session("userId");
+            }else{
+                $updateData['examine']=$findResult['examine'].",".session("userId");
+            }
+            if($status==1 && $this->processAuth["level"] == $this->processAuth["allLevel"]){
+                $updateData['status']=$status;
+                $updateData['processLevel'] = 0;
+            }else if($status==1){
+                $updateData['status']=2;
+            }else if($status==3){
+                $updateData['status']=$status;
+            }
+            
+            $updateData["updateTime"]=time();
+            $conResult = $conResult=$dbObject->save($updateData);
+            $msg = "操作成功！";
+        }
+        if($conResult){
+            $this->ajaxReturn(['errCode'=>0,'error'=>$msg]);
+        }
+        $msg = "操作异常！";
+        $this->ajaxReturn(['errCode'=>110,'error'=>$msg]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-06-02 17:24:05 
+     * @Desc: 全局 global-modal 
+     * 
+     */
+    function modalOne(){
+        print_r($_REQUEST);
+    }    
 }

@@ -37,6 +37,15 @@
                                     <input class="form-control search-info input-sm" name="contact" placeholder="联系人" type="text">
                                 </div>
                                 <div class="form-group">
+                                    <label >状态：</label>
+                                    <select class="form-control search-info input-sm" title="状态" name="status">
+                                        <option value="">全部</option>
+                                        <volist name="statusType" id="item">
+                                            <option value="{$key}">{$item}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                <div class="form-group">
                                     <button type="button" data-url="{$url}" id="contact-search" data-reqtype="contactList" data-con="contact" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
                                     <button type="button" class="btn bg-teal search-refresh" data-con="contact"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 </div>
@@ -127,9 +136,14 @@
                         <div class="form-group">
                             <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
                                 <input class="modal-info" value="0" name="status" type="hidden">
-                                <button type="button" name="0" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
+                                <if condition="$nodeAuth eq 7">
+                                    <button type="button" name="0" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
+                                </if>
+                                
                                 <if condition="$processAuth['level'] gt 1">
-                                    <button type="button" name="1" class="btn btn-default btn-sm  status-btn"><i class="fa fa-square text-green"> 同意启用 </i>
+                                    <button type="button" name="1" class="btn btn-success btn-sm status-btn"><i class="fa fa-square text-default"> 批准 </i>
+                                    <button type="button" name="3" class="btn btn-warning btn-sm status-btn"><i class="fa fa-square text-default"> 拒绝 </i>
+                                    <button type="button" name="4" class="btn btn-danger btn-sm status-btn"><i class="fa fa-square text-default"> 删除 </i>
                                 </if>
                                 
                                 </button>
@@ -160,6 +174,7 @@
                 $(tabId+" .modal-info").val("");
                 $(tabId+" .status-btn").removeClass("active");
                 $(tabId+" .status-btn[name='0']").addClass("active");
+                $(tabId+" .modal-info").prop("disabled",false)
             })
             //供应商列表
             $(tabId+" .chosen-cusCompany").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true,ajax_load:{url:"{$url}",data:{reqType:"getCusCompanyList"},value:"companyId",text:"company"}})
@@ -204,7 +219,9 @@
             $(tabId+" .modal-status .status-btn").removeClass("active");
             $(tabId+" .modal-status .status-btn[name='"+info['status']+"']").addClass("active");
             $(tabId+" .modal-info[name='status']").val(info['status']);
-
+            if((info['processLevel'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7){
+                $(tabId+" .modal-info").prop("disabled",true)
+            }
             $(tabId+" .modal-info[name='contact']").val(info['contact']);
             $(tabId+" .modal-info[name='phone']").val(info['phone']);
             $(tabId+" .modal-info[name='email']").val(info['email']);
@@ -212,14 +229,6 @@
             $(tabId+" .modal-info[name='remarks']").val(info['remarks']);
             
         }
-        // //初始分类的select数据
-        // function intPClsSelect(data){
-        //     var option='<option value="0">根Root</option>';
-        //     data.forEach(ele => {
-        //         option+=getArtClsNode(ele,0);
-        //     });
-        //     // $(tabId+" .artclass").html(option);
-        // }
     </script>
 </body>
 </html>

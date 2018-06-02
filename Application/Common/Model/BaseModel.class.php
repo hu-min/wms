@@ -18,8 +18,16 @@ class BaseModel extends Model{
         $fields=$parameter['fields']?$parameter['fields']:'*';
         $noField=$parameter['noField']?$parameter['noField']:false;
         $order=$parameter['order']?$parameter['order']:null;
+        $joins=$parameter['joins']?$parameter['joins']:"";
 
         $this->where ( $where_arra );
+        if(is_array($joins)){
+            foreach ($joins as $join) {
+                $this->join( $join);
+            }
+        }else{
+            $this->join($joins);
+        }
         if (!is_null ( $fields )) 
             $this->field ( $fields ,$noField);
         if (!empty( $order )) 

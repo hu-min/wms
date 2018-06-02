@@ -15,6 +15,7 @@ class BaseController extends Controller{
     protected $Redis;
     protected $refreNode='refreNode';
     protected $baseLogPath = MODULE_NAME."/".CONTROLLER_NAME."/";//seasLog 日志目录
+    protected $expire=3600;
 
     public function _initialize() {
         $this->Redis= new Redis();
