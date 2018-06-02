@@ -16,7 +16,7 @@ class BaseController extends \Common\Controller\BaseController{
     protected $nodeAuth;
     protected $exemption;
     protected $pageSize=15;
-    protected $statusType=[0=>"未启用",1=>"启用",2=>"审核中",3=>"无效",4=>"删除"];
+    protected $statusType=[0=>"待审核",1=>"启用",2=>"审核中",3=>"无效",4=>"删除"];
     protected $statusLabel=[0=>"blue",1=>"green",2=>"yellow",3=>"black",4=>"red"];
     /**
      * 对admin的每一个控制器和方法做权限检查
@@ -336,7 +336,27 @@ class BaseController extends \Common\Controller\BaseController{
      * @Desc: 全局 global-modal 
      * 
      */
-    function modalOne(){
-        print_r($_REQUEST);
+    protected function modalOne($parameter=[]){
+        // print_r($_REQUEST);
+        $assign=[];
+        $assign["control"] = $parameter["con"] ? $parameter["con"] : I("con");
+        $assign["gettype"] = $parameter["gettype"] ? $parameter["gettype"] : I("gettype");
+        $assign["title"] = $parameter["title"] ? $parameter["title"] : ($gettype=="Add" ? "新增":"编辑");
+        $assign["btnTitle"] = $parameter["btnTitle"] ? $parameter["btnTitle"] : ($gettype=="Add" ? "新增":"编辑");
+
+        $data = $parameter["data"] ? $parameter["data"] : [];
+
+        $tpFolder = $parameter["tpFolder"] ? $parameter["tpFolder"] : CONTROLLER_NAME;
+        $folder = $parameter["folder"] ? $parameter["folder"] : strtolower(CONTROLLER_NAME).'Table';
+        $templet = $parameter["templet"] ? $parameter["templet"] : strtolower($control).'Modal';
+        $templets = $parameter["templets"] ? $parameter["templets"] : $tpFolder.'/'.$folder.'/'.$templet;
+        $errCode = 0;
+        $error = "数据获取成功";
+        foreach ($assign as $key => $value) {
+            $this->assign($key,$value);
+        }
+        $html=$this->fetch($templets);
+
+        $this->ajaxReturn(['html'=>$html,"data"=>$data,"errCode"=>$errCode,"error"=>$error]);
     }    
 }

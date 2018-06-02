@@ -46,12 +46,12 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <button type="button" data-url="{$url}" id="contact-search" data-reqtype="contactList" data-con="contact" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
-                                    <button type="button" class="btn bg-teal search-refresh" data-con="contact"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 </div>
                                 <if condition="$processAuth['level'] gt 0">
                                     <div class="form-group">
-                                        <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加联系人" data-target="#modal-contactInfo" data-con="contact" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增联系人</button>
+                                        <button type="button" data-gettype="Add" data-toggle="modal"  data-url="{$url}" data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info info-edit v-showmodal"><i class="fa fa-fw fa-user-plus "></i> 新增联系人 </button>
                                     </div>
                                 </if>
                                 
@@ -64,7 +64,7 @@
         </div>
         <div class="row">
             <div class="col-sm-12" style="font-size:1em;overflow-x: auto;">
-                <div class="count-div" id="contactCount" style="margin:10px;font-weight: 800;">
+                <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;">
                 </div>
                 <table id="" class="table table-bordered table-hover">
                     <thead>
@@ -79,87 +79,21 @@
                             <th>操作</th>
                         </tr>
                     </thead>
-                    <tbody id="contactTable">
+                    <tbody class="{$controlName}-table">
                         {$tables}
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="dataTables_wrapper">
-            <div id="contactPage" class="row page-div" data-url="{$url}" data-reqtype="contactList" data-con="contact">
+            <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
                 {$pages}
             </div>
         </div>
     </section>
-    <div class="modal fade" id="modal-contactInfo">
+    <div class="modal fade global-modal">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-            <div class="modal-header">
-                <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Default Modal</h4>
-            </div>
-            <div class="modal-body">
-                <form role="form">
-                    <div class="box-body">
-                        <input class="modal-info" id="info-status" value="1" name="contactId" type="hidden">
-                        <div class="form-group"> 
-                            <label class="control-label">供应商名称：</label>
-                            <select class="form-control modal-info chosen-cusCompany chosen-select" title="公司名称" name="companyId">
-                                <option value="">个人</option>
-                                <volist name="cusCompanyList" id="item">
-                                    <option value="{$item.companyId}">{$item.company}</option>
-                                </volist>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">联系人：</label>
-                            <input class="form-control modal-info" required="required" name="contact" title="联系人" placeholder="联系人" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">联系通讯：</label>
-                            <input class="form-control modal-info datetime" required="required" name="phone" title="联系通讯" placeholder="联系通讯" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">E-mail：</label>
-                            <input class="form-control modal-info" name="email" title="E-mail" placeholder="E-mail" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">联系地址：</label>
-                            <input class="form-control modal-info" name="address" title="联系地址" placeholder="联系地址" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">备注：</label>
-                            <input class="form-control modal-info" name="remarks" title="备注" placeholder="备注" type="text">
-                        </div>
-                        <div class="form-group">
-                            <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
-                                <input class="modal-info" value="0" name="status" type="hidden">
-                                <if condition="$nodeAuth eq 7">
-                                    <button type="button" name="0" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
-                                </if>
-                                
-                                <if condition="$processAuth['level'] gt 1">
-                                    <button type="button" name="1" class="btn btn-success btn-sm status-btn"><i class="fa fa-square text-default"> 批准 </i>
-                                    <button type="button" name="3" class="btn btn-warning btn-sm status-btn"><i class="fa fa-square text-default"> 拒绝 </i>
-                                    <button type="button" name="4" class="btn btn-danger btn-sm status-btn"><i class="fa fa-square text-default"> 删除 </i>
-                                </if>
-                                
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>            
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-                <if condition="$processAuth['level'] gt 0">
-                    <button type="button" class="btn btn-primary save-info" data-con="contact" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
-                </if>
-                
-            </div>
-            </div>
+            <div class="modal-content"></div>
         </div>
     </div>
     <script>
@@ -179,37 +113,33 @@
             //供应商列表
             $(tabId+" .chosen-cusCompany").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true,ajax_load:{url:"{$url}",data:{reqType:"getCusCompanyList"},value:"companyId",text:"company"}})
         })
-        // //function contactResetFuns(){}
-        function contactReFuns(){
-
-        }
-        function contactSearchFuns(){
-            datas['data']={}
-            $(tabId+" .search-info").each(function(){
-                var name=$(this).attr("name");
-                var val=$(this).val();
-                if(val!=""){
-                    datas['data'][name]=val
-                }
-            })
-        }
-        function contactInfoFuns(){
-            datas["data"]={}
-            $(tabId+" .modal-info").each(function(){
-                var name =$(this).attr("name");
-                var val =$(this).val();
-                var required=$(this).attr("required");
-                var title=$(this).attr("title");
-                if(required=="required" && val==""){
-                    alert(title+"不能为空");
-                    throw title+"不能为空";
-                }else{
-                    datas["data"][name]=val;
-                }
-            })
-        }
-        // /*设置编辑用户信息*/
-        function contactShowFuns(info){
+        // function contactSearchFuns(){
+        //     datas['data']={}
+        //     $(tabId+" .search-info").each(function(){
+        //         var name=$(this).attr("name");
+        //         var val=$(this).val();
+        //         if(val!=""){
+        //             datas['data'][name]=val
+        //         }
+        //     })
+        // }
+        // function contactInfoFuns(){
+        //     datas["data"]={}
+        //     $(tabId+" .modal-info").each(function(){
+        //         var name =$(this).attr("name");
+        //         var val =$(this).val();
+        //         var required=$(this).attr("required");
+        //         var title=$(this).attr("title");
+        //         if(required=="required" && val==""){
+        //             alert(title+"不能为空");
+        //             throw title+"不能为空";
+        //         }else{
+        //             datas["data"][name]=val;
+        //         }
+        //     })
+        // }
+        /*设置需要编辑的信息*/
+        function cust_contact_setInfo(info){
 
             $(tabId+" .modal-info[name='contactId']").val(info['contactId']);
 

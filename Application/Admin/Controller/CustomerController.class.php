@@ -40,16 +40,47 @@ class CustomerController extends BaseController{
     //客户公司管理开始
     function companyControl(){
         $reqType=I('reqType');
-        
+        $this->assign("province",$this->basicCom->get_provinces());
+        $this->assign("controlName","cust_company");//名字对应cust_company_modalOne，和cust_companyModal.html
         if($reqType){
             $this->$reqType();
         }else{
-            $this->assign("controlName","company");
-            $this->assign("province",$this->basicCom->get_provinces());
             $this->returnHtml();
         }
     }
-
+    /** 
+     * @Author: vition 
+     * @Date: 2018-06-02 23:47:09 
+     * @Desc: 添加和修改获取modal html页面 
+     */    
+    function cust_company_modalOne(){
+        $title = "新建客户公司";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑客户公司";
+            $btnTitle = "保存数据";
+            $parameter=[
+                'where'=>["companyId"=>$id],
+            ];
+            $resultData=$this->customerCom->getCompanyList($parameter,true);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"companyModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-06-02 23:47:44 
+     * @Desc: 取城市列表 
+     */    
     function getCityList(){
         $pid=I("pid");
         $cityList=$this->basicCom->get_citys($pid);
@@ -60,7 +91,7 @@ class CustomerController extends BaseController{
      * @Date: 2018-05-09 23:51:01 
      * @Desc: 客户列表 
      */    
-    function companyList(){
+    function cust_companyList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
         // $where=["processLevel"=>[($this->processAuth["level"]-1),0,"OR"]];
@@ -94,7 +125,7 @@ class CustomerController extends BaseController{
             $page = new \Think\VPage($listResult['count'], $this->pageSize);
             $pageShow = $page->show();
             $this->assign('list',$listResult['list']);
-
+            $this->assign('dbName',"CustomerCompany");
             $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Customer/customerTable/companyList'),'page'=>$pageShow]);
         }
         $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
@@ -107,13 +138,13 @@ class CustomerController extends BaseController{
     function manageCompanyInfo(){
         $reqType=I("reqType");
         $datas=I("data");
-        if($reqType=="companyAdd"){
+        if($reqType=="cust_companyAdd"){
             $datas['addTime']=time();
             $datas['processLevel']=$this->processAuth["level"];
             $datas['author']=session("userId");
             unset($datas['companyId']);
             return $datas;
-        }else if($reqType=="companyEdit"){
+        }else if($reqType=="cust_companyEdit"){
             $where=["companyId"=>$datas['companyId']];
             $data=[];
             if(isset($datas['company'])){
@@ -162,7 +193,7 @@ class CustomerController extends BaseController{
      * @Date: 2018-05-09 23:46:44 
      * @Desc: 添加客户信息 
      */    
-    function companyAdd(){
+    function cust_companyAdd(){
         $dataInfo=$this->manageCompanyInfo();
         if($dataInfo){
             $insertResult=$this->customerCom->insertCompany($dataInfo);
@@ -177,24 +208,24 @@ class CustomerController extends BaseController{
      * @Date: 2018-05-09 23:59:28 
      * @Desc: 获取单一条客户信息 
      */    
-    function companyOne(){
-        $id	=I("id");
-        // $result=$this->id_get_company($id);
-        $parameter=[
-            'where'=>["companyId"=>$id],
-        ];
-        $result=$this->customerCom->getCompanyList($parameter,true);
-        if(!empty($result)){
-            $this->ajaxReturn(['errCode'=>0,'info'=>$result]);
-        }
-        $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
-    }
+    // function companyOne(){
+    //     $id	=I("id");
+    //     // $result=$this->id_get_company($id);
+    //     $parameter=[
+    //         'where'=>["companyId"=>$id],
+    //     ];
+    //     $result=$this->customerCom->getCompanyList($parameter,true);
+    //     if(!empty($result)){
+    //         $this->ajaxReturn(['errCode'=>0,'info'=>$result]);
+    //     }
+    //     $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
+    // }
     /** 
      * @Author: vition 
      * @Date: 2018-05-10 00:02:10 
      * @Desc: 修改客户信息 
      */    
-    function companyEdit(){
+    function cust_companyEdit(){
         $companyInfo=$this->manageCompanyInfo();
         $updateResult=$this->customerCom->updateCompany($companyInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
@@ -209,12 +240,37 @@ class CustomerController extends BaseController{
      */    
     function contactControl(){
         $reqType=I('reqType');
+        $this->assign("cusCompanyList",$this->getCusCompany());
+        $this->assign("controlName","cust_contact");//名字对应cust_company_modalOne，和cust_companyModal.html
         if($reqType){
             $this->$reqType();
         }else{
-            $this->assign("cusCompanyList",$this->getCusCompany());
+            
             $this->returnHtml();
         }
+    }
+    function cust_contact_modalOne(){
+        $title = "新建客户联系人";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑客户联系人";
+            $btnTitle = "保存数据";
+            $parameter=[
+                'where'=>["contactId"=>$id],
+            ];
+            $resultData=$this->customerCom->getCustomerList($parameter,true);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"contactModal",
+        ];
+        $this->modalOne($modalPara);
     }
     /** 
      * @Author: vition 
@@ -230,7 +286,7 @@ class CustomerController extends BaseController{
      * @Date: 2018-05-09 23:51:01 
      * @Desc: 客户列表 
      */    
-    function contactList(){
+    function cust_contactList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
 
@@ -260,7 +316,7 @@ class CustomerController extends BaseController{
             $page = new \Think\VPage($listResult['count'], $this->pageSize);
             $pageShow = $page->show();
             $this->assign('list',$listResult['list']);
-
+            $this->assign('dbName',"CustomerContact");
             $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Customer/customerTable/contactList'),'page'=>$pageShow]);
         }
         $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
@@ -329,7 +385,7 @@ class CustomerController extends BaseController{
      * @Date: 2018-05-09 23:46:44 
      * @Desc: 添加客户信息 
      */    
-    function contactAdd(){
+    function cust_contactAdd(){
         $dataInfo=$this->manageContactInfo();
         if($dataInfo){
             $insertResult=$this->customerCom->insertContact($dataInfo);
@@ -344,23 +400,23 @@ class CustomerController extends BaseController{
      * @Date: 2018-05-09 23:59:28 
      * @Desc: 获取单一条客户信息 
      */    
-    function contactOne(){
-        $id	=I("id");
-        $parameter=[
-            'where'=>["contactId"=>$id],
-        ];
-        $result=$this->customerCom->getCustomerList($parameter,true);
-        if(!empty($result)){
-            $this->ajaxReturn(['errCode'=>0,'info'=>$result]);
-        }
-        $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
-    }
+    // function contactOne(){
+    //     $id	=I("id");
+    //     $parameter=[
+    //         'where'=>["contactId"=>$id],
+    //     ];
+    //     $result=$this->customerCom->getCustomerList($parameter,true);
+    //     if(!empty($result)){
+    //         $this->ajaxReturn(['errCode'=>0,'info'=>$result]);
+    //     }
+    //     $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
+    // }
     /** 
      * @Author: vition 
      * @Date: 2018-05-10 00:02:10 
      * @Desc: 修改客户信息 
      */    
-    function contactEdit(){
+    function cust_contactEdit(){
         $contactInfo=$this->manageContactInfo();
         $updateResult=$this->customerCom->updateContact($contactInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);

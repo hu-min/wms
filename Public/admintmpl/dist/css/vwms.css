@@ -1,5 +1,23 @@
 /*!
  */
+#loadwaiting{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	z-index: 9999999;
+	background: rgba(255,255,255,0.7);
+}
+#loadwaiting .overlay{
+	position: relative;
+	height: 100%;
+}
+#loadwaiting .overlay .fa-refresh{
+	font-size: 3em;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+}
 .tab-clo{
 	position: absolute;
 	right: 0px;

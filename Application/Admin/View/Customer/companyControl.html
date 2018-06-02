@@ -21,7 +21,7 @@
                         <h4 class="box-title">公司列表</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
                         <if condition="$processAuth['level'] gt 0">
-                            <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加公司" data-target=".modal-companyInfo" data-con="company" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增公司 </button>
+                            <button type="button" data-gettype="Add" data-toggle="modal"  data-url="{$url}" data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info info-edit v-showmodal"><i class="fa fa-fw fa-user-plus "></i> 新增公司 </button>
                         </if>
                         
                     </div>
@@ -62,8 +62,8 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <button type="button" data-url="{$url}" id="company-search" data-reqtype="companyList" data-con="company" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
-                                    <button type="button" class="btn bg-teal search-refresh" data-con="company"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 </div>
                                 
                             </div>
@@ -75,7 +75,7 @@
         </div>
         <div class="row">
             <div class="col-sm-12" style="font-size:0.95em;overflow-x: auto;">
-                <div class="count-div companyCount" style="margin:10px;font-weight: 800;">
+                <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;">
                 </div>
                 <table class="table table-bordered table-hover">
                     <thead>
@@ -90,87 +90,21 @@
                             <th>操作</th>
                         </tr>
                     </thead>
-                    <tbody id="companyTable">
+                    <tbody class="{$controlName}-table">
                         {$tables}
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="dataTables_wrapper">
-            <div id="companyPage"  class="row page-div" data-url="{$url}" data-reqtype="companyList" data-con="company">
+            <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
                 {$pages}
             </div>
         </div>
     </section>
-    <div class="modal fade modal-companyInfo" id="modal-companyInfo">
+    <div class="modal fade global-modal">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-            <div class="modal-header">
-                <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Default Modal</h4>
-            </div>
-            <div class="modal-body">
-                <form role="form">
-                    <div class="box-body">
-                        <div class="form-group">
-                            <label for="info-title">公司名称：</label>
-                            <input  class="modal-info" title="companyId" name="companyId" type="hidden">
-                            <input class="form-control modal-info"  name="company" title="公司名称"  placeholder="公司名称" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">公司别名：</label>
-                            <input class="form-control modal-info" required="required" name="alias" title="公司别名" placeholder="公司别名" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label >省份：</label>
-                            <select class="form-control modal-info input-sm" data-city="modal-info" title="省份" name="provinceId">
-                                <option value="">省份</option>
-                                <volist name="province" id="item">
-                                    <option value="{$item.pid}">{$item.province}</option>
-                                </volist>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label >城市：</label>
-                            <select class="form-control modal-info input-sm" title="省份" name="cityId">
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">联系地址：</label>
-                            <input class="form-control modal-info" name="address" title="联系地址" placeholder="联系地址" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">备注：</label>
-                            <input class="form-control modal-info" name="remarks" title="备注" placeholder="备注" type="text">
-                        </div>
-                        <div class="form-group">
-                            <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
-                                <input class="modal-info" id="info-status" value="0" name="status" type="hidden">
-                                <if condition="$nodeAuth eq 7">
-                                    <button  type="button" name="0" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
-                                </if>
-                                
-                                <if condition="$processAuth['level'] gt 1">
-                                    <button type="button" name="1" class="btn btn-success btn-sm status-btn"><i class="fa fa-square text-default"> 批准 </i>
-                                    <button type="button" name="3" class="btn btn-warning btn-sm status-btn"><i class="fa fa-square text-default"> 拒绝 </i>
-                                    <button type="button" name="4" class="btn btn-danger btn-sm status-btn"><i class="fa fa-square text-default"> 删除 </i>
-                                </if>
-                                
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>            
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-                <if condition="$processAuth['level'] gt 0">
-                    <button type="button" class="btn btn-primary save-info" data-con="company" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
-                </if>
-            </div>
-            </div>
+            <div class="modal-content"></div>
         </div>
     </div>
    
@@ -182,17 +116,16 @@
 
         $(function(){
             //新增公司
-            $(tabId+" .box-header button").on("click",function(){
-                $(tabId+" .modal-info").val("");
-                $(tabId+" .status-btn").removeClass("active");
-                $(tabId+" .status-btn[name='0']").addClass("active");
-                $(tabId+" .modal-info").prop("disabled",false)
-            })
-            $(tabId+" select[name='provinceId']").on("change",function(){
+            // $(tabId+" .box-header button").on("click",function(){
+            //     $(tabId+" .modal-info").val("");
+            //     $(tabId+" .status-btn").removeClass("active");
+            //     $(tabId+" .status-btn[name='0']").addClass("active");
+            //     $(tabId+" .modal-info").prop("disabled",false)
+            // })
+            $(tabId).on("change","select[name='provinceId']",function(){
                 var provinceId=$(this).val()
                 var whereCity=$(this).data("city")
                 if(provinceId>0){
-                    // console.log(pid)
                     setCityOption(provinceId,whereCity)
                 }else{
                     $(tabId+" ."+whereCity+"[name='cityId']").html("")
@@ -227,34 +160,33 @@
             var minutes=(new Date()).getMinutes()
             $(tabId+" .modal-info[name='code']").val(prefix+year+formatMonth(month)+formatDate(day)+hours+minutes);
         }
-        function companySearchFuns(){
-            datas['data']={}
-            $(tabId+" .search-info").each(function(){
-                var name=$(this).attr("name");
-                var val=$(this).val();
-                if(val!=""){
-                    datas['data'][name]=val
-                }
-            })
-        }
-        function companyInfoFuns(){
-            datas["data"]={}
-            $(tabId+" .modal-info").each(function(){
-                var name =$(this).attr("name");
-                var val =$(this).val();
-                var required=$(this).attr("required");
-                var title=$(this).attr("title");
-                if(required=="required" && val==""){
-                    alert(title+"不能为空");
-                    throw title+"不能为空";
-                }else{
-                    datas["data"][name]=val;
-                }
-            })
-        }
-        /*设置编辑用户信息*/
-        function companyShowFuns(info){
-
+        // function companySearchFuns(){
+        //     datas['data']={}
+        //     $(tabId+" .search-info").each(function(){
+        //         var name=$(this).attr("name");
+        //         var val=$(this).val();
+        //         if(val!=""){
+        //             datas['data'][name]=val
+        //         }
+        //     })
+        // }
+        // function cust_company_getInfo(){
+        //     datas["data"]={}
+        //     $(tabId+" .modal-info").each(function(){
+        //         var name =$(this).attr("name");
+        //         var val =$(this).val();
+        //         var required=$(this).attr("required");
+        //         var title=$(this).attr("title");
+        //         if(required=="required" && val==""){
+        //             alert(title+"不能为空");
+        //             throw title+"不能为空";
+        //         }else{
+        //             datas["data"][name]=val;
+        //         }
+        //     })
+        // }
+        /*设置需要编辑的信息*/
+        function cust_company_setInfo(info){
             $(tabId+" .modal-info[name='companyId']").val(info['companyId']);
             $(tabId+" .modal-info[name='company']").val(info['company']);
             $(tabId+" .modal-info[name='alias']").val(info['alias']);
@@ -265,7 +197,6 @@
             $(tabId+" .modal-info[name='status']").val(info['status']);
             if((info['processLevel'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7){
                 $(tabId+" .modal-info").prop("disabled",true)
-
             }
             $(tabId+" .modal-info[name='provinceId']").find("option[value='"+info['provinceId']+"']").prop("selected",true);
             setCityOption(info['provinceId'],"modal-info",info['cityId'])

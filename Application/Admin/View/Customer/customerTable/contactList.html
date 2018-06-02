@@ -7,8 +7,8 @@
         <td>{$item['address']}</td>
         <td>{$item['remarks']}</td>
         <td><span class="label bg-{$statusLabel[$item['status']]}">{$statusType[$item['status']]}</span></td>
-        <td class="status-con" data-db="CustomerContact" data-con="contact" data-id="{$item['contactId']}" data-url="{$url}" >
-            <button type="button" data-show="One" data-reqtype="Edit" data-toggle="modal" data-target=".modal-contactInfo" data-title="编辑客户公司" class="btn btn-sm btn-primary info-edit">编辑</button>
+        <td class="status-con" data-db="{$dbName}" data-con="{$controlName}" data-id="{$item['contactId']}" data-url="{$url}" >
+            <button type="button" data-gettype="Edit" data-toggle="modal" data-vtarget=".global-modal" class="btn btn-sm btn-primary v-showmodal">编辑</button>
             <if condition="in_array($userId,explode(',',$item['examine'])) eq true and $item['status'] eq 2" >
 
             <else/>

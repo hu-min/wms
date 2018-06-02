@@ -1,9 +1,12 @@
+var datas={};
+var filesData={};
 /** 
  * @Author: vition 
  * @Date: 2018-01-23 00:41:37 
  * @Desc: get方式获取数据 
  */    
 function get(url,datas,callBack){
+    setLoad()
     asyncs=arguments[3]!=undefined?arguments[3]:true;
     $.ajax({
         url:url,
@@ -11,24 +14,28 @@ function get(url,datas,callBack){
         dataType:'json',
         data:datas,
         async:asyncs,
-        success:callBack,
-    })
+    }).done(function(result) {callBack(result);})
+      .always(function() { setLoad();datas={};})
+    
+    
+}
 /** 
  * javascript comment 
  * @Author: vition 
  * @Date: 2018-01-27 22:43:43 
  * @Desc: post发送 
- */}
+ */
 function post(url,datas,callBack){
     asyncs=arguments[3]!=undefined?arguments[3]:true;
+    setLoad()
     $.ajax({
         url:url,
         type:'post',
         dataType:'json',
         data:datas,
         async:asyncs,
-        success:callBack,
-    })
+    }).done(function(result) {callBack(result);})
+    .always(function() { setLoad();datas={};})
 }
 //enter-input class的输入框键盘回车事件
 $(document).on("keypress",".enter-input",function(e){
@@ -36,13 +43,12 @@ $(document).on("keypress",".enter-input",function(e){
         $($(this).data("btn")).click();
     }
 })
-var datas={};
-var filesData={};
+
 /** 
  * javascript comment 
  * @Author: vition 
- * @Date: 2018-01-27 18:19:11 
- * @Desc: 所有搜索按钮触发事件 
+ * @Date: 2018-06-02 23:27:42 
+ * @Desc:  所有搜索按钮触发事件
  */
 $(document).on("click",".search-list,.vpage",function(){
     datas={}
@@ -57,30 +63,37 @@ $(document).on("click",".search-list,.vpage",function(){
         var con=$(this).data("con");
         var reqtype=$(this).data("reqtype");
     }
-    var table=con+"Table";
-    var page=con+"Page";
-    var count=con+"Count";
+    var table=con+"-table";
+    var page=con+"-page";
+    var count=con+"-count";
     datas.reqType=reqtype;
-    if(fun_is_exits(con+"SearchFuns")){
-        eval(con+"SearchFuns()");//对不同的id设置不同的发送数据
+    if(fun_is_exits(con+"_searchInfo")){
+        eval(con+"_searchInfo(result)")//对不同的id设置不同的发送数据
+    }else{
+        datas['data']={}
+        $(tabId+" .search-info").each(function(){
+            var name=$(this).attr("name");
+            var val=$(this).val();
+            if(val!=""){
+                datas['data'][name]=val
+            }
+        })
     }
     searchFun(url,datas,table,page,count);
-    datas={};
 })
-
+/** 
+ * javascript comment 
+ * @Author: vition 
+ * @Date: 2018-06-02 23:08:58 
+ * @Desc: 执行查询数据并插入到对应的表格中 
+ */
 function searchFun(url,datas,table,page,count){
     get(url,datas,function(result){
-        
-        if(result.errCode==0){
-            // $(tabId+" ."+table).html(result.table);
-            // $(tabId+" ."+page).html(result.page);
-            // $(tabId+" ."+count).html(result.count);
-            
-            $("#"+table).html(result.table);
-            $("#"+page).html(result.page);
-            $("#"+count).html(result.count);
+        if(result.errCode==0){          
+            $(tabId+" ."+table).html(result.table);
+            $(tabId+" ."+page).html(result.page);
+            $(tabId+" ."+count).html(result.count);
         }else{
-            // alert(result.error);
             notice(result.errCode,result.error);
         }
     })
@@ -91,69 +104,95 @@ function searchFun(url,datas,table,page,count){
  * @Date: 2018-01-27 18:19:36 
  * @Desc: 所有编辑，添加，触发弹出modal事件 
  */
-$(document).on("click",".info-edit",function(){
+// $(document).on("click",".info-edit",function(){
 
-    var target=$(this).data("target");
-    var title=$(this).data("title");
-    var reqtype=$(this).data("reqtype");
-    var show=$(this).data("show");
-    var con=$(this).data("con");
-    con = con ? con : $(this).parent(".status-con").data("con");
-    var url=$(this).data("url");
-    url = url ? url : $(this).parent(".status-con").data("url");
-    var name=$(this).attr("name");
-    if(name){
-        $(target).find(".box-body").html("");
-        datas={}
-        datas.reqType="formOne";
+//     var target=$(this).data("target");
+//     var title=$(this).data("title");
+//     var reqtype=$(this).data("reqtype");
+//     var show=$(this).data("show");
+//     var con=$(this).data("con");
+//     con = con ? con : $(this).parent(".status-con").data("con");
+//     var url=$(this).data("url");
+//     url = url ? url : $(this).parent(".status-con").data("url");
+//     var name=$(this).attr("name");
+//     if(name){
+//         $(target).find(".box-body").html("");
+//         datas={}
+//         datas.reqType="formOne";
         
-        datas.form=name;
-        get(url,datas,function(result){
-            notice(result.errCode,result.error);
-            if(result.errCode==0){
-                $(target).find(".box-body").html(result.html);
-            }
+//         datas.form=name;
+//         get(url,datas,function(result){
+//             notice(result.errCode,result.error);
+//             if(result.errCode==0){
+//                 $(target).find(".box-body").html(result.html);
+//             }
             
-        })
-    }
-    $(target).find('.modal-title').text(title)
-    $(target).find('.save-info').text(title)
-    $(target).find('.save-info').data("reqtype",reqtype)
-    if(show=='One'){//编辑要获取数据
-        datas={}
-        var id=$(this).data("id");
-        id = id ? id : $(this).parent(".status-con").data("id");
-        datas.reqType=con+show;
-        datas.id=id
-        get(url,datas,function(result){
-            notice(result.errCode,result.error);
-            if(result.errCode==0){
-                if(fun_is_exits(con+"ShowFuns")){
-                    eval(con+"ShowFuns(result.info)");//对不同的模块设置不同的响应数据
-                }
-            }else{
-                // alert(result.error);
-            }
-        })
-    }else{//新建要重置数据
-        $(target).find(".modal-info").val("");
-        if(fun_is_exits(con+"ReFuns")){i
-            eval(con+"ReFuns()");//对不同的模块的modal数据重置
-        }
-    }
-    datas={};
-})
+//         })
+//     }
+//     $(target).find('.modal-title').text(title)
+//     $(target).find('.save-info').text(title)
+//     $(target).find('.save-info').data("reqtype",reqtype)
+//     if(show=='One'){//编辑要获取数据
+//         datas={}
+//         var id=$(this).data("id");
+//         id = id ? id : $(this).parent(".status-con").data("id");
+//         datas.reqType=con+show;
+//         datas.id=id
+//         get(url,datas,function(result){
+            
+//             if(result.errCode==0){
+//                 if(fun_is_exits(con+"ShowFuns")){
+//                     eval(con+"ShowFuns(result.info)");//对不同的模块设置不同的响应数据
+//                 }
+//             }else{
+//                 // alert(result.error);
+//                 notice(result.errCode,result.error);
+//             }
+//         })
+//     }else{//新建要重置数据
+//         $(target).find(".modal-info").val("");
+//         if(fun_is_exits(con+"ReFuns")){i
+//             eval(con+"ReFuns()");//对不同的模块的modal数据重置
+//         }
+//     }
+//     datas={};
+// })
 /** 
  * javascript comment 
  * @Author: vition 
  * @Date: 2018-06-02 17:08:13 
- * @Desc: 弹出 global-modal 操作
+ * @Desc: 弹出 global-modal 操作 new
  */
 $(document).on("click",".v-showmodal",function(){
     var url = $(this).data("url")
-    
+    url = url ? url : $(this).parent(".status-con").data("url");
+    var con = $(this).data("con")
+    con = con ? con : $(this).parent(".status-con").data("con");
+    var gettype = $(this).data("gettype")
+    gettype = gettype ? gettype : $(this).parent(".status-con").data("gettype");
+    var title = $(this).data("title")
+    title = title ? title : $(this).parent(".status-con").data("title");
+    var vtarget = $(this).data("vtarget")
+    vtarget = vtarget ? vtarget : $(this).parent(".status-con").data("vtarget");
+    var id = $(this).data("id")
+    id = id ? id : $(this).parent(".status-con").data("id");
+    datas.id = id
+    datas.gettype = gettype
+    datas.title = title
+    datas.con = con
+    datas.gettype = gettype
+    datas.reqType = con+"_modalOne"
     get(url,datas,function(result){
-
+        // console.log(result)
+        if(result.errCode==0){
+            $(tabId+" .global-modal .modal-content").html(result.html);
+            $(tabId+" "+vtarget).modal('toggle')
+            if(gettype=="Edit"){
+                if(fun_is_exits(con+"_setInfo")){
+                    eval(con+"_setInfo(result.data)");//对不同的模块设置不同的响应数据
+                }
+            }
+        }
     })
 })
 /** 
@@ -177,71 +216,90 @@ $(document).on("click",'.status-btn',function(){
 $(document).on("click",'.search-refresh',function(){
     $(this).parents(".search-body").find(".search-info").val("");
     var con=$(this).data("con")
-    if(fun_is_exits(con+"ResetFuns")){
-	    eval(con+"ResetFuns()");//弥补不足
+    if(fun_is_exits(con+"_resetInfo")){
+	    eval(con+"_resetInfo()");//弥补不足
     }
 })
 /** 
  * javascript comment 
  * @Author: vition 
  * @Date: 2018-01-27 22:38:31 
- * @Desc: 保存数据、新增或修改 
+ * @Desc: 保存数据、新增或修改 new
  */
 $(document).on("click",'.save-info',function(){
     datas={}
     var url=$(this).data("url");
-    var reqtype=$(this).data("reqtype");
+    var gettype=$(this).data("gettype");
     var con=$(this).data("con");
     var isModal=$(this).data("modal");
-    var search=con+"-search";
-    var parent=$(this).parents(".modal").attr("id")
+    var search=con+"_search";
+    // var parent=$(this).parents(".modal").attr("id")
     if($('body').hasClass('modal-open')==false && isModal){
         $('body').addClass('modal-open')
     }
-    datas.reqType=con+reqtype;
-    if(fun_is_exits(con+"InfoFuns")){
-    	eval(con+"InfoFuns()");//对不同的id设置不同的发送数据
-    } 
+    datas.reqType=con+gettype;
+    if(fun_is_exits(con+"_getInfo")){
+    	eval(con+"_getInfo()");//对不同的id设置不同的发送数据
+    }else{
+        datas["data"]={}
+        $(tabId+" .modal-info").each(function(){
+            var name =$(this).attr("name");
+            var val =$(this).val();
+            var required=$(this).attr("required");
+            var title=$(this).attr("title");
+            if(required=="required" && val==""){
+                notice(110,title,"输入异常");
+            }else{
+                datas["data"][name]=val;
+            }
+        })
+    }
     if(JSON.stringify(filesData)!="{}"){
-        datas['filesData']=filesData
+        datas['filesData']=filesData //存在文件上传
     }
     if(JSON.stringify(datas["data"])=="{}"){
-        alert("没有更新数据");
-        throw "没有更新数据";
+        notice(110,"没有更新数据")
     }
     // console.log(datas);
     post(url,datas,function(result){
-        notice(result.errCode,result.error);
+        // notice(result.errCode,result.error);
         if(result.errCode==0){
-            datas={}
-            var url=$("#"+search).data("url");
-            var con2=$("#"+search).data("con");
-            if(con2==undefined){
-                con2=con;
-            }
-            // console.log(search);
-            var reqtype=$("#"+search).data("reqtype");
-            var table=con2+"Table";
-            var page=con2+"Page";
+            // var url=$("#"+search).data("url");
+            // var con2=$("#"+search).data("con");
+            // if(con2==undefined){
+            //     con2=con;
+            // }
+            // // console.log(search);
+            url=$(tabId+" .search-list").data("url");
+            reqtype=$(tabId+" .search-list").data("reqtype");
+            var table=con+"-table";
+            var page=con+"-page";
+            var count=con+"-count";
             datas.reqType=reqtype;
-            if(fun_is_exits(con+"SearchFuns")){
-                eval(con2+"SearchFuns(result)")//对不同的id设置不同的发送数据
+            if(fun_is_exits(con+"_searchInfo")){
+                eval(con+"_searchInfo(result)")//对不同的id设置不同的发送数据
+            }else{
+                datas['data']={}
+                $(tabId+" .search-info").each(function(){
+                    var name=$(this).attr("name");
+                    var val=$(this).val();
+                    if(val!=""){
+                        datas['data'][name]=val
+                    }
+                })
             }
             if(isModal){
                 // console.log(isModal);
-                searchFun(url,datas,table,page)
+                searchFun(url,datas,table,page,count)
             }
-            // if($('body').hasClass('modal-open')){
-                console.log(" #"+parent)
-                $(tabId+" #"+parent).modal('toggle')
-            // }
+            if($('body').hasClass('modal-open')){
+                $(tabId+" .global-modal").modal('toggle')
+            }
         }else{
             notice(100,result.error);
-            // alert(result.error)
         }
         
     });
-    datas={};
 })
 /** 
  * javascript comment 
@@ -309,9 +367,6 @@ $(document).on("click",".submit-status",function(){
                 searchFun(url,datas,table,page,count);
             }
         }
-        
-        
-        datas={};
     })
 })
 $(function(){
@@ -445,8 +500,27 @@ function fun_is_exits(funcName){
 /** 
  * javascript comment 
  * @Author: vition 
+ * @Date: 2018-06-02 19:14:20 
+ * @Desc: 设置加载图标 
+ */
+function setLoad(){
+    if($("#loadwaiting").hasClass("none")){
+        $("#loadwaiting").removeClass("none")
+    }else{
+        $("#loadwaiting").addClass("none")
+    }
+    if($("#loadwaiting .overlay i").hasClass("fa-spin")){
+        $("#loadwaiting .overlay i").removeClass("fa-spin")
+    }else{
+        $("#loadwaiting .overlay i").addClass("fa-spin")
+    }
+}
+/** 
+ * javascript comment 
+ * @Author: vition 
  * @Date: 2018-05-29 22:20:49 
  * @Desc: 弹出提示框 
+ * notice(status,content,title,seconds)
  */
 function notice(status){
     // ["box-warning","box-danger","box-primary"].forEach(function(col){
@@ -473,7 +547,7 @@ function notice(status){
     $("#v-notice-window .box-solid .box-body").html(content);
     $("#v-notice-window").removeClass("none");
     if(seconds>0){
-        setTimeout(function(){$("#v-notice-window").addClass("none");$("#v-notice-window .box-solid").removeClass(color);},Number(seconds)*1000)
+        setTimeout(function(){$("#v-notice-window").addClass("none");$("#v-notice-window .box-solid").removeClass(color);if(status>0){throw content;};},Number(seconds)*1000)
     }else{
         
     }
