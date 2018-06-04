@@ -49,7 +49,7 @@
                                     <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
                                     <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 </div>
-                                <if condition="$processAuth['level'] gt 0">
+                                <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 7">
                                     <div class="form-group">
                                         <button type="button" data-gettype="Add" data-toggle="modal"  data-url="{$url}" data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info info-edit v-showmodal"><i class="fa fa-fw fa-user-plus "></i> 新增联系人 </button>
                                     </div>
@@ -66,7 +66,7 @@
             <div class="col-sm-12" style="font-size:1em;overflow-x: auto;">
                 <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;">
                 </div>
-                <table id="" class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>公司名称</th>
@@ -109,6 +109,7 @@
                 $(tabId+" .status-btn").removeClass("active");
                 $(tabId+" .status-btn[name='0']").addClass("active");
                 $(tabId+" .modal-info").prop("disabled",false)
+                set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
             })
             //供应商列表
             $(tabId+" .chosen-cusCompany").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true,ajax_load:{url:"{$url}",data:{reqType:"getCusCompanyList"},value:"companyId",text:"company"}})
@@ -146,11 +147,15 @@
             $(tabId+" .modal-info[name='companyId']").html('<option value="'+info['companyId']+'">'+info['company']+'</option>');
             $(tabId+" .modal-info[name='companyId']").trigger("chosen:updated");
 
-            $(tabId+" .modal-status .status-btn").removeClass("active");
-            $(tabId+" .modal-status .status-btn[name='"+info['status']+"']").addClass("active");
-            $(tabId+" .modal-info[name='status']").val(info['status']);
+            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
+            
             if((info['processLevel'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7){
                 $(tabId+" .modal-info").prop("disabled",true)
+            }
+            if(info['author'] == "{$Think.session.userId}"){
+                $(tabId+" .status-btn[name='3']").addClass("none")
+            }else{
+                $(tabId+" .status-btn[name='3']").removeClass("none")
             }
             $(tabId+" .modal-info[name='contact']").val(info['contact']);
             $(tabId+" .modal-info[name='phone']").val(info['phone']);

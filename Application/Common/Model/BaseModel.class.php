@@ -19,8 +19,12 @@ class BaseModel extends Model{
         $noField=$parameter['noField']?$parameter['noField']:false;
         $order=$parameter['order']?$parameter['order']:null;
         $joins=$parameter['joins']?$parameter['joins']:"";
-
-        $this->where ( $where_arra );
+        if(isset($parameter["where"])){
+            $this->where ( $where_arra );
+        }else{
+            $this->where ( $parameter );
+        }
+        
         if(is_array($joins)){
             foreach ($joins as $join) {
                 $this->join( $join);

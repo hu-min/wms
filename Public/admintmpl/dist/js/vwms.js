@@ -68,7 +68,7 @@ $(document).on("click",".search-list,.vpage",function(){
     var count=con+"-count";
     datas.reqType=reqtype;
     if(fun_is_exits(con+"_searchInfo")){
-        eval(con+"_searchInfo(result)")//对不同的id设置不同的发送数据
+        eval(con+"_searchInfo()")//对不同的id设置不同的发送数据
     }else{
         datas['data']={}
         $(tabId+" .search-info").each(function(){
@@ -164,6 +164,9 @@ function searchFun(url,datas,table,page,count){
  * @Desc: 弹出 global-modal 操作 new
  */
 $(document).on("click",".v-showmodal",function(){
+
+    var vtarget = $(this).data("vtarget")
+    vtarget = vtarget ? vtarget : $(this).parent(".status-con").data("vtarget");
     var url = $(this).data("url")
     url = url ? url : $(this).parent(".status-con").data("url");
     var con = $(this).data("con")
@@ -172,15 +175,13 @@ $(document).on("click",".v-showmodal",function(){
     gettype = gettype ? gettype : $(this).parent(".status-con").data("gettype");
     var title = $(this).data("title")
     title = title ? title : $(this).parent(".status-con").data("title");
-    var vtarget = $(this).data("vtarget")
-    vtarget = vtarget ? vtarget : $(this).parent(".status-con").data("vtarget");
+    
     var id = $(this).data("id")
     id = id ? id : $(this).parent(".status-con").data("id");
     datas.id = id
     datas.gettype = gettype
     datas.title = title
     datas.con = con
-    datas.gettype = gettype
     datas.reqType = con+"_modalOne"
     get(url,datas,function(result){
         // console.log(result)
@@ -202,11 +203,29 @@ $(document).on("click",".v-showmodal",function(){
  * @Desc: 所有状态选择按钮事件 
  */
 $(document).on("click",'.status-btn',function(){
-    $(this).parents(".status-group").children(".status-btn").removeClass("active");
-    $(this).addClass("active");
-    var val= $(this).attr("name");
-    $(this).parent(".status-group").children("input[name='status']").val(val);
+    set_status_btn(this)
 })
+//状态按钮设置函数
+function set_status_btn(this_btn){
+    var thisIndex = $(this_btn).index()-1;
+    $(this_btn).parents(".status-group").children(".status-btn").each(function(index){
+        $(this).removeClass("active");
+        var i = $(this).find("i")
+        if(index == thisIndex){
+            $(this).addClass("active");
+            if(i.hasClass("fa-square")){
+                i.removeClass("fa-square");
+                i.addClass("fa-check-square");
+            }
+        }else{
+            if(i.hasClass("fa-check-square")){
+                i.addClass("fa-square");
+                i.removeClass("fa-check-square");
+            }
+        }
+    })
+    $(this_btn).parent(".status-group").children("input[name='status']").val($(this_btn).attr("name"));
+}
 /** 
  * javascript comment 
  * @Author: vition 
@@ -249,6 +268,7 @@ $(document).on("click",'.save-info',function(){
             var title=$(this).attr("title");
             if(required=="required" && val==""){
                 notice(110,title,"输入异常");
+                throw title
             }else{
                 datas["data"][name]=val;
             }
@@ -264,6 +284,7 @@ $(document).on("click",'.save-info',function(){
     post(url,datas,function(result){
         // notice(result.errCode,result.error);
         if(result.errCode==0){
+            notice(result.errCode,result.error);
             // var url=$("#"+search).data("url");
             // var con2=$("#"+search).data("con");
             // if(con2==undefined){
@@ -358,14 +379,23 @@ $(document).on("click",".submit-status",function(){
     post(url,data,function(result){
         notice(result.errCode,result.error);
         if(result.errCode==0){
-            if(fun_is_exits(con+"SearchFuns")){
-                eval(con+"SearchFuns()");//对不同的id设置不同的发送数据
-                var table=con+"Table";
-                var page=con+"Page";
-                var count=con+"Count";
-                datas.reqType=con+"List";
-                searchFun(url,datas,table,page,count);
+            if(fun_is_exits(con+"_searchInfo")){
+                eval(con+"_searchInfo(result)")//对不同的id设置不同的发送数据
+            }else{
+                datas['data']={}
+                $(tabId+" .search-info").each(function(){
+                    var name=$(this).attr("name");
+                    var val=$(this).val();
+                    if(val!=""){
+                        datas['data'][name]=val
+                    }
+                })
             }
+            var table=con+"-table";
+            var page=con+"-page";
+            var count=con+"-count";
+            datas.reqType=con+"List";
+            searchFun(url,datas,table,page,count);
         }
     })
 })
@@ -547,7 +577,7 @@ function notice(status){
     $("#v-notice-window .box-solid .box-body").html(content);
     $("#v-notice-window").removeClass("none");
     if(seconds>0){
-        setTimeout(function(){$("#v-notice-window").addClass("none");$("#v-notice-window .box-solid").removeClass(color);if(status>0){throw content;};},Number(seconds)*1000)
+        setTimeout(function(){$("#v-notice-window").addClass("none");$("#v-notice-window .box-solid").removeClass(color);},Number(seconds)*1000)
     }else{
         
     }

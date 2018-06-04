@@ -60,7 +60,7 @@
                             </div>
                         </div>
                         <div class="box-footer">
-                            <button type="button"  class="btn btn-primary save-info" data-con="bankstock" data-reqtype="Edit" data-url="{$url}">更新金额</button>
+                            <button type="button"  class="btn btn-primary save-info" data-con="bankstock" data-gettype="Edit" data-url="{$url}">更新金额</button>
                         </div>
                     </form>
                 </div>
@@ -110,7 +110,7 @@
                             </div>
                         </div>
                         <div class="box-footer">
-                            <button type="button"  class="btn btn-primary save-info" data-con="cashstock" data-reqtype="Edit" data-url="{$url}">更新金额</button>
+                            <button type="button"  class="btn btn-primary save-info" data-con="cashstock" data-gettype="Edit" data-url="{$url}">更新金额</button>
                         </div>
                     </form>
                 </div>
@@ -132,10 +132,10 @@
                 $(tabId+" ."+dataClass+"-count").before(tr);
             })
         })
-        function bankstockInfoFuns(){
+        function bankstock_getInfo(){
             stockInfo(".bank-info")
         }
-        function cashstockInfoFuns(){
+        function cashstock_getInfo(){
             stockInfo(".cash-info")
         }
         function stockInfo(stockName){
@@ -150,10 +150,10 @@
             })
         }
 
-        function bankstockSearchFuns(result){
+        function bankstock_searchInfo(result){
             stockSearch(result,".bank-info");
         }
-        function cashstockSearchFuns(result){
+        function cashstock_searchInfo(result){
             stockSearch(result,".cash-info");
         }
         function stockSearch(result,stockName){

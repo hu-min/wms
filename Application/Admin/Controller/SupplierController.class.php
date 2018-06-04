@@ -9,10 +9,11 @@ namespace Admin\Controller;
 class SupplierController extends BaseController{
     protected $pageSize=10;
     public function _initialize() {
+        $this->statusType = [0=>"未启用",1=>"启用",3=>"无效",4=>"删除"];
         parent::_initialize();
         $this->basicCom=getComponent('Basic');
         $this->supplierCom=getComponent('Supplier');
-        $this->statusType=["0"=>"未启用","1"=>"启用"];
+        
     }
     //内部公用方法
     /** 
@@ -64,12 +65,35 @@ class SupplierController extends BaseController{
      */    
     function supType(){
         $reqType=I('reqType');
+        $this->assign("controlName","supType");
+        $this->assign('dbName',"Basic");
         if($reqType){
             $this->$reqType();
         }else{
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            
             $this->returnHtml();
         }
+    }
+    function supType_modalOne(){
+        $title = "新建供应商类型";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑供应商类型";
+            $btnTitle = "保存数据";
+            $redisName="supTypeList";
+            $resultData=$this->basicCom->redis_one($redisName,"basicId",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"supTypeModal",
+        ];
+        $this->modalOne($modalPara);
     }
     /** 
      * @Author: vition 
@@ -87,6 +111,11 @@ class SupplierController extends BaseController{
         if($data['alias']){
             $where['alias']=['LIKE','%'.$data['alias'].'%'];
         }
+        if(isset($data['status'])){
+            $where['status']=$data['status'];
+        }else{
+            $where['status']=["lt",3];
+        }
         $parameter=[
             'where'=>$where,
             'page'=>$p,
@@ -94,49 +123,41 @@ class SupplierController extends BaseController{
             'orderStr'=>"basicId DESC",
         ];
         $basicResult=$this->basicCom->getBasicList($parameter);
-        if($basicResult){
-            $basicRed="supTypeList";
-            $this->Redis->set($basicRed,json_encode($basicResult['list']),3600);
-            $page = new \Think\VPage($basicResult['count'], $this->pageSize);
-            $pageShow = $page->show();
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
-            $this->assign('list',$basicResult['list']);
-            $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Supplier/supplierTable/supTypeList'),'page'=>$pageShow,"count"=>$count]);
-        }
-        $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
+        $this->tablePage($basicResult,'Supplier/supplierTable/supTypeList',"supTypeList");
+
     }
     /** 
      * @Author: vition 
      * @Date: 2018-05-27 15:12:06 
      * @Desc: 供应商类型one 
      */    
-    function supTypeOne(){
-        $id	=I("id");
-        $parameter=[
-            'basicId'=>$id,
-        ];
-        $blistRed="supTypeList";
-        $supTypeList=$this->Redis->get($blistRed);
-        $blist=[];
-        if($supTypeList){
-            foreach ($supTypeList as $supType) {
-               if($supType['basicId']==$id){
-                $blist=$supType;
-                break;
-               }
-            }
-        }
-        if(empty($blist)){
-            $basicResult=$this->basicCom->getOne($parameter);
-            if($basicResult->errCode==0){
-                $blist=$basicResult->data;
-            }
-        }
-        if(!empty($blist)){
-            $this->ajaxReturn(['errCode'=>0,'info'=>$blist]);
-        }
-        $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
-    }
+    // function supTypeOne(){
+    //     $id	=I("id");
+    //     $parameter=[
+    //         'basicId'=>$id,
+    //     ];
+    //     $blistRed="supTypeList";
+    //     $supTypeList=$this->Redis->get($blistRed);
+    //     $blist=[];
+    //     if($supTypeList){
+    //         foreach ($supTypeList as $supType) {
+    //            if($supType['basicId']==$id){
+    //             $blist=$supType;
+    //             break;
+    //            }
+    //         }
+    //     }
+    //     if(empty($blist)){
+    //         $basicResult=$this->basicCom->getOne($parameter);
+    //         if($basicResult->errCode==0){
+    //             $blist=$basicResult->data;
+    //         }
+    //     }
+    //     if(!empty($blist)){
+    //         $this->ajaxReturn(['errCode'=>0,'info'=>$blist]);
+    //     }
+    //     $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
+    // }
     /** 
      * @Author: vition 
      * @Date: 2018-05-27 15:12:20 
@@ -160,6 +181,9 @@ class SupplierController extends BaseController{
             }
             if(isset($datas['remark'])){
                 $data['remark']=$datas['remark'];
+            }
+            if(isset($datas['status'])){
+                $data['status']=$datas['status'];
             }
             return ["where"=>$where,"data"=>$data];
         }
@@ -200,15 +224,37 @@ class SupplierController extends BaseController{
      */    
     function companyControl(){
         $reqType=I('reqType');
-        $this->assign('statusType',$this->statusType);
+        $this->assign("controlName","sup_company");
+        $this->assign("supTypeList",$this->getSupType());
+        $this->assign("province",$this->basicCom->get_provinces());
         if($reqType){
             $this->$reqType();
         }else{
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
-            $this->assign("supTypeList",$this->getSupType());
-            $this->assign("province",$this->basicCom->get_provinces());
+            
+            
             $this->returnHtml();
         }
+    }
+    function sup_company_modalOne(){
+        $title = "新建供应商";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑供应商";
+            $btnTitle = "保存数据";
+            $redisName="sup_companyList";
+            $resultData=$this->supplierCom->redis_one($redisName,"companyId",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"companyModal",
+        ];
+        $this->modalOne($modalPara);
     }
     /** 
      * @Author: vition 
@@ -243,7 +289,7 @@ class SupplierController extends BaseController{
      * @Date: 2018-05-09 23:51:01 
      * @Desc: 供应商列表 
      */    
-    function companyList(){
+    function sup_companyList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
         $where=[];
@@ -275,17 +321,7 @@ class SupplierController extends BaseController{
         ];
         
         $listResult=$this->supplierCom->getCompanyList($parameter);
-        if($listResult){
-            $companyRed="supcompanyList";
-            $this->Redis->set($companyRed,json_encode($listResult['list']),3600);
-            $page = new \Think\VPage($listResult['count'], $this->pageSize);
-            $pageShow = $page->show();
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
-            $this->assign('list',$listResult['list']);
-
-            $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Supplier/supplierTable/companyList'),'page'=>$pageShow]);
-        }
-        $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
+        $this->tablePage($listResult,'Supplier/supplierTable/companyList',"sup_companyList");
     }
     /** 
      * @Author: vition 
@@ -295,11 +331,11 @@ class SupplierController extends BaseController{
     function manageCompanyInfo(){
         $reqType=I("reqType");
         $datas=I("data");
-        if($reqType=="supcompanyAdd"){
+        if($reqType=="sup_supcompanyAdd"){
             $datas['addTime']=time();
             unset($datas['companyId']);
             return $datas;
-        }else if($reqType=="supcompanyEdit"){
+        }else if($reqType=="sup_supcompanyEdit"){
             $where=["companyId"=>$datas['companyId']];
             $data=[];
             if(isset($datas['company'])){
@@ -335,7 +371,7 @@ class SupplierController extends BaseController{
      * @Date: 2018-05-09 23:46:44 
      * @Desc: 添加供应商信息 
      */    
-    function supcompanyAdd(){
+    function sup_supcompanyAdd(){
         $dataInfo=$this->manageCompanyInfo();
         if($dataInfo){
             $insertResult=$this->supplierCom->insertCompany($dataInfo);
@@ -350,33 +386,33 @@ class SupplierController extends BaseController{
      * @Date: 2018-05-09 23:59:28 
      * @Desc: 获取单一条供应商信息 
      */    
-    function supcompanyOne(){
-        $id	=I("id");
-        $parameter=[
-            'companyId'=>$id,
-        ];
-        $pListRed="supcompanyList";
-        $companyList=$this->Redis->get($pListRed);
-        $plist=[];
-        if($companyList){
-            foreach ($companyList as $company) {
-               if($company['companyId']==$id){
-                $plist=$company;
-                break;
-               }
-            }
-        }
-        if(empty($plist)){
-            $companyResult=$this->supplierCom->getCompanyList($parameter,true);
-            if($companyResult->errCode==0){
-                $plist=$companyResult->data;
-            }
-        }
-        if(!empty($plist)){
-            $this->ajaxReturn(['errCode'=>0,'info'=>$plist]);
-        }
-        $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
-    }
+    // function sup_supcompanyOne(){
+    //     $id	=I("id");
+    //     $parameter=[
+    //         'companyId'=>$id,
+    //     ];
+    //     $pListRed="supcompanyList";
+    //     $companyList=$this->Redis->get($pListRed);
+    //     $plist=[];
+    //     if($companyList){
+    //         foreach ($companyList as $company) {
+    //            if($company['companyId']==$id){
+    //             $plist=$company;
+    //             break;
+    //            }
+    //         }
+    //     }
+    //     if(empty($plist)){
+    //         $companyResult=$this->supplierCom->getCompanyList($parameter,true);
+    //         if($companyResult->errCode==0){
+    //             $plist=$companyResult->data;
+    //         }
+    //     }
+    //     if(!empty($plist)){
+    //         $this->ajaxReturn(['errCode'=>0,'info'=>$plist]);
+    //     }
+    //     $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
+    // }
     /** 
      * @Author: vition 
      * @Date: 2018-05-10 00:02:10 
@@ -397,21 +433,41 @@ class SupplierController extends BaseController{
      */    
     function contactControl(){
         $reqType=I('reqType');
+        $this->assign("controlName","supcontact");
+        $this->assign("supplierList",$this->getSupplier());
         if($reqType){
             $this->$reqType();
         }else{
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
-            $this->assign('statusType',$this->statusType);
-            $this->assign("supplierList",$this->getSupplier());
             $this->returnHtml();
         }
+    }
+    function supcontact_modalOne(){
+        $title = "新建供应商联系人";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑供应商联系人";
+            $btnTitle = "保存数据";
+            $redisName="supcontactList";
+            $resultData=$this->supplierCom->redis_one($redisName,"contactId",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"contactModal",
+        ];
+        $this->modalOne($modalPara);
     }
     /** 
      * @Author: vition 
      * @Date: 2018-05-09 23:51:01 
      * @Desc: 供应商列表 
      */    
-    function contactList(){
+    function supcontactList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
         $where=[];
@@ -431,17 +487,7 @@ class SupplierController extends BaseController{
         ];
         
         $listResult=$this->supplierCom->getSupplierList($parameter);
-        if($listResult){
-            $contactRed="supcontactList";
-            $this->Redis->set($contactRed,json_encode($listResult['list']),3600);
-            $page = new \Think\VPage($listResult['count'], $this->pageSize);
-            $pageShow = $page->show();
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
-            $this->assign('list',$listResult['list']);
-
-            $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Supplier/supplierTable/contactList'),'page'=>$pageShow]);
-        }
-        $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
+        $this->tablePage($listResult,'Supplier/supplierTable/contactList',"supcontactList");
     }
     /** 
      * @Author: vition 
@@ -504,33 +550,33 @@ class SupplierController extends BaseController{
      * @Date: 2018-05-09 23:59:28 
      * @Desc: 获取单一条供应商联系人信息 
      */    
-    function supcontactOne(){
-        $id	=I("id");
-        $parameter=[
-            'contactId'=>$id,
-        ];
-        $pListRed="supcontactList";
-        $contactList=$this->Redis->get($pListRed);
-        $plist=[];
-        if($contactList){
-            foreach ($contactList as $contact) {
-               if($contact['contactId']==$id){
-                $plist=$contact;
-                break;
-               }
-            }
-        }
-        if(empty($plist)){
-            $contactResult=$this->supplierCom->getUser($parameter);
-            if($contactResult->errCode==0){
-                $plist=$contactResult->data;
-            }
-        }
-        if(!empty($plist)){
-            $this->ajaxReturn(['errCode'=>0,'info'=>$plist]);
-        }
-        $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
-    }
+    // function supcontactOne(){
+    //     $id	=I("id");
+    //     $parameter=[
+    //         'contactId'=>$id,
+    //     ];
+    //     $pListRed="supcontactList";
+    //     $contactList=$this->Redis->get($pListRed);
+    //     $plist=[];
+    //     if($contactList){
+    //         foreach ($contactList as $contact) {
+    //            if($contact['contactId']==$id){
+    //             $plist=$contact;
+    //             break;
+    //            }
+    //         }
+    //     }
+    //     if(empty($plist)){
+    //         $contactResult=$this->supplierCom->getUser($parameter);
+    //         if($contactResult->errCode==0){
+    //             $plist=$contactResult->data;
+    //         }
+    //     }
+    //     if(!empty($plist)){
+    //         $this->ajaxReturn(['errCode'=>0,'info'=>$plist]);
+    //     }
+    //     $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
+    // }
     /** 
      * @Author: vition 
      * @Date: 2018-05-10 00:02:10 

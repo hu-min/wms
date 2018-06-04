@@ -20,12 +20,11 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">供应商列表</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <if condition="$processAuth['level'] gt 0">
-                            <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加供应商" data-target="#modal-supcompanyInfo" data-con="supcompany" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增供应商</button>
-                        </if>
-                        
+                        <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 7">
+                            <button type="button" data-gettype="Add" data-toggle="modal"  data-url="{$url}" data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info info-edit v-showmodal"><i class="fa fa-fw fa-user-plus "></i> 新增供应商 </button>
+                        </if>                      
                     </div>
-                    <div class="box-body search-body" id="supcompany-search-box">
+                    <div class="box-body search-body">
                         <div class="col-md-12">
                             <form class="form-inline">
                                 <div class="form-group"> 
@@ -69,8 +68,8 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <button type="button" data-url="{$url}" id="supcompany-search" data-reqtype="companyList" data-con="supcompany" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
-                                    <button type="button" class="btn bg-teal search-refresh" data-con="supcompany"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 </div>
                             </form>
                             <br>
@@ -97,92 +96,21 @@
                             <th>操作</th>
                         </tr>
                     </thead>
-                    <tbody id="supcompanyTable">
+                    <tbody class="{$controlName}-table">
                         {$tables}
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="dataTables_wrapper">
-            <div id="supcompanyPage" class="row page-div" data-url="{$url}" data-reqtype="companyList" data-con="supcompany">
+            <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
                 {$pages}
             </div>
         </div>
     </section>
-    <div class="modal fade" id="modal-supcompanyInfo">
+    <div class="modal fade global-modal">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-            <div class="modal-header">
-                <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Default Modal</h4>
-            </div>
-            <div class="modal-body">
-                <form role="form">
-                    <div class="box-body">
-                        <div class="form-group">
-                            <label for="info-title">供应商名称：</label>
-                            <input  class="modal-info" title="companyId" name="companyId" type="hidden">
-                            <input class="form-control modal-info"  name="company" title="供应商名称"  placeholder="供应商名称" type="text">
-                        </div>
-                        <div class="form-group"> 
-                            <label class="control-label">供应商类型：</label>
-                            <select class="form-control modal-info chosen-suptype chosen-select" title="供应商类型" name="type">
-                                <option value="">全部</option>
-                                <volist name="supTypeList" id="item">
-                                    <option value="{$item.basicId}">{$item.name}</option>
-                                </volist>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">供应商别名：</label>
-                            <input class="form-control modal-info" required="required" name="alias" title="供应商别名" placeholder="供应商别名" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label >省份：</label>
-                            <select class="form-control modal-info input-sm" data-city="modal-info" title="省份" name="provinceId">
-                                <option value="">省份</option>
-                                <volist name="province" id="item">
-                                    <option value="{$item.pid}">{$item.province}</option>
-                                </volist>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label >城市：</label>
-                            <select class="form-control modal-info input-sm" title="省份" name="cityId">
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">联系地址：</label>
-                            <input class="form-control modal-info" name="address" title="联系地址" placeholder="联系地址" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">备注：</label>
-                            <input class="form-control modal-info" name="remarks" title="备注" placeholder="备注" type="text">
-                        </div>
-                        <div class="form-group">
-                            <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
-                                <input class="modal-info" value="0" name="status" type="hidden">
-                                <button type="button" name="0" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
-                                <if condition="$processAuth['level'] gt 1">
-                                    <button type="button" name="1" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-green"> 同意启用 </i>
-                                </if>
-                                
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>            
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-                <if condition="$processAuth['level'] gt 0">
-                    <button type="button" class="btn btn-primary save-info" data-con="supcompany" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
-                </if>
-                
-            </div>
-            </div>
+            <div class="modal-content"></div>
         </div>
     </div>
    
@@ -228,20 +156,16 @@
                     }
                 },false)
         }
-        //function companyResetFuns(){}
-        function supcompanyReFuns(){
-
-        }
-        function supcompanySearchFuns(){
-            datas['data']={}
-            $(tabId+" .search-info").each(function(){
-                var name=$(this).attr("name");
-                var val=$(this).val();
-                if(val!=""){
-                    datas['data'][name]=val
-                }
-            })
-        }
+        // function supcompanySearchFuns(){
+        //     datas['data']={}
+        //     $(tabId+" .search-info").each(function(){
+        //         var name=$(this).attr("name");
+        //         var val=$(this).val();
+        //         if(val!=""){
+        //             datas['data'][name]=val
+        //         }
+        //     })
+        // }
         function supcompanyInfoFuns(){
             datas["data"]={}
             $(tabId+" .modal-info").each(function(){
@@ -258,7 +182,7 @@
             })
         }
         /*设置编辑用户信息*/
-        function supcompanyShowFuns(info){
+        function sup_company_setInfo(info){
 
             $(tabId+" .modal-info[name='companyId']").val(info['companyId']);
             $(tabId+" .modal-info[name='company']").val(info['company']);
@@ -269,9 +193,7 @@
             $(tabId+" .modal-info[name='type']").html('<option value="'+info['basicId']+'">'+info['typeName']+'</option>');
             $(tabId+" .modal-info[name='type']").trigger("chosen:updated");
 
-            $(tabId+" .modal-status .status-btn").removeClass("active");
-            $(tabId+" .modal-status .status-btn[name='"+info['status']+"']").addClass("active");
-            $(tabId+" .modal-info[name='status']").val(info['status']);
+            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
 
             $(tabId+" .modal-info[name='provinceId']").find("option[value='"+info['provinceId']+"']").prop("selected",true);
             setCityOption(info['provinceId'],"modal-info")

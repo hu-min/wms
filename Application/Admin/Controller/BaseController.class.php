@@ -358,5 +358,30 @@ class BaseController extends \Common\Controller\BaseController{
         $html=$this->fetch($templets);
 
         $this->ajaxReturn(['html'=>$html,"data"=>$data,"errCode"=>$errCode,"error"=>$error]);
-    }    
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-06-03 14:28:59 
+     * @Desc: 返回表格和分页数据 
+     */    
+    function tablePage($data,$templet,$redisName="",$pageSize=false,$countStr=""){
+        $returnData=['errCode'=>0];
+        if($data){
+            if($redisName){
+                $this->Redis->set($redisName,json_encode($data['list']),3600);
+            }
+            $page = new \Think\VPage($data['count'], $pageSize ? $pageSize : $this->pageSize);
+            $pageShow = $page->show();
+            $this->assign('list',$data['list']);
+            $returnData["table"]=$this->fetch($templet);
+            $returnData["page"]=$pageShow;
+            if($countStr){
+                $returnData["count"]=$countStr;
+            }
+        }else{
+            $returnData["table"]="无数据";
+            $returnData["page"]="";
+        }
+        $this->ajaxReturn($returnData);
+    }
 }

@@ -23,7 +23,7 @@
                 <div class="box-header">
                     <i class="fa fa-plus-square"></i>
                     <h4 class="box-title">费用类别列表</h4>
-                    <button type="button" class="btn btn-info margin pull-right" data-toggle="modal" data-title="新建费用类别" data-target="#modal-feeTypeInfo">新建费用类别</button>
+                    <button type="button" data-gettype="Add" data-toggle="modal" data-url="{$url}"  data-vtarget=".global-modal" data-con="{$controlName}" class="btn margin pull-right btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 新建费用类别</button>
                 </div>
                 <div class='box-body'>
                     <div class="row">
@@ -46,68 +46,21 @@
             </div>
         </div>
     </section>
-    <div class="modal fade" id="modal-feeTypeInfo">
-        <div class="modal-dialog">
-            <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Default Modal</h4>
-            </div>
-            <div class="modal-body">
-                <form role="form">
-                    <div class="box-body">
-                        <div class="form-group">
-                            <label >费用类别名称：</label>
-                            <input class="modal-info" title="费用类别Id" name="basicId" type="hidden">
-                            <input class="form-control modal-info"  name="name" title="费用类别名称" placeholder="费用类别名称" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label >费用类别别名：</label>
-                            <input class="form-control modal-info" name="alias" title="费用类别别名" placeholder="费用类别别名" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label >费用类别备注：</label>
-                            <input class="form-control modal-info" name="remark" title="费用类别备注" placeholder="费用类别备注" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label >上级费用类别：</label>
-                            <select class="form-control modal-info" id="feeTypePid" title="上级费用类别" name="pId">
-                                
-                            </select>
-                        </div>
-                    </div>
-                </form>            
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary save-info" data-con="feeType" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
-            </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="modal-icon">
-        <div class="modal-dialog">
-            <div class="modal-content">
-            <div class="modal-body">
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
-            </div>
-            </div>
+    <div class="modal fade global-modal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
         </div>
     </div>
     <script>
         //获取费用类别数据
         function getfeeTypeTree() {
             var tree=[]
-            datas["reqType"]="feeTypeList";
+            datas["reqType"]="{$controlName}List";
             get("{$url}",datas,function(result){
                 // console.log(result);
                 tree=result.tree
             },false)
-            intPfeeTypeSelect(tree);
+            // intPfeeTypeSelect(tree);
             return tree;
         }
          //生成费用类别树和费用类别树选中的事件
@@ -115,23 +68,49 @@
             $(tabId+' #feeTypetree').treeview({showButton: true,highlightSelected:false,data: getfeeTypeTree(),levels:1,color: "#428bca",});
             //费用类别编辑
             $(tabId+' #feeTypetree').on("click",'li button',function(){
-                $(tabId+" #modal-feeTypeInfo h4").text("费用类别编辑");
-                $(tabId+" #modal-feeTypeInfo .save-info").data("reqtype","Edit");
-                $(tabId+" #modal-feeTypeInfo .save-info").text("费用类别编辑");
+                datas={}
                 var feeTypeData= $(tabId+' #feeTypetree').treeview('getNode', $(this).parent(".node-feeTypetree").data("nodeid"));
-                datas["basicId"]=feeTypeData.id;
-                datas["reqType"]='feeTypeOne';
+                datas.id = feeTypeData.id;
+                var gettype = "Edit"
+                datas.gettype = gettype
+                var con = "{$controlName}"
+                datas.con = con
+                datas.reqType = datas.con+"_modalOne"
                 get("{$url}",datas,function(result){
+                    // console.log(result)
                     if(result.errCode==0){
-                        $(tabId+" .modal-info[name='name']").val(result.info['name']);
-                        $(tabId+" .modal-info[name='alias']").val(result.info['alias']);
-                        $(tabId+" .modal-info[name='basicId']").val(result.info['basicId']);
-                        $(tabId+" .modal-info[name='remark']").val(result.info['remark']);
-                        $(tabId+" #feeTypePid").find("option[value='"+result.info['pId']+"']").prop("selected",true);
-                        $(tabId+" #feeTypePid").trigger('chosen:updated');
+                        $(tabId+" .global-modal .modal-content").html(result.html);
+                        $(tabId+" .global-modal").modal('toggle')
+                        $(tabId+" .modal-info[name='name']").val(result.data['name']);
+                        $(tabId+" .modal-info[name='alias']").val(result.data['alias']);
+                        $(tabId+" .modal-info[name='basicId']").val(result.data['basicId']);
+                        $(tabId+" .modal-info[name='remark']").val(result.data['remark']);
+                        $(tabId+" .modal-info[name='pId']").find("option[value='"+result.data['pId']+"']").prop("selected",true);
+                        $(tabId+" .modal-info[name='pId']").trigger('chosen:updated');
+                        // if(gettype=="Edit"){
+                        //     if(fun_is_exits(con+"_setInfo")){
+                        //         eval(con+"_setInfo(result.data)");//对不同的模块设置不同的响应数据
+                        //     }
+                        // }
                     }
                 })
-                $(tabId+" #modal-feeTypeInfo").modal('show')
+                // $(tabId+" #modal-feeTypeInfo h4").text("费用类别编辑");
+                // $(tabId+" #modal-feeTypeInfo .save-info").data("reqtype","Edit");
+                // $(tabId+" #modal-feeTypeInfo .save-info").text("费用类别编辑");
+                // var feeTypeData= $(tabId+' #feeTypetree').treeview('getNode', $(this).parent(".node-feeTypetree").data("nodeid"));
+                // datas["basicId"]=feeTypeData.id;
+                // datas["reqType"]='feeTypeOne';
+                // get("{$url}",datas,function(result){
+                //     if(result.errCode==0){
+                //         $(tabId+" .modal-info[name='name']").val(result.info['name']);
+                //         $(tabId+" .modal-info[name='alias']").val(result.info['alias']);
+                //         $(tabId+" .modal-info[name='basicId']").val(result.info['basicId']);
+                //         $(tabId+" .modal-info[name='remark']").val(result.info['remark']);
+                //         $(tabId+" #feeTypePid").find("option[value='"+result.info['pId']+"']").prop("selected",true);
+                //         $(tabId+" #feeTypePid").trigger('chosen:updated');
+                //     }
+                // })
+                // $(tabId+" #modal-feeTypeInfo").modal('show')
                 
             })
         }
@@ -147,7 +126,6 @@
                 }]);
             })
             //上级费用类别chosen
-            $(tabId+" #feeTypePid").chosen({search_contains:true,width: '100%'});
             //新增费用类别
             $(tabId+" .box-header button").on("click",function(){
                 $(tabId+" .modal-info").val("");
@@ -161,28 +139,28 @@
             })
         })
         //初始化父费用类别的select数据
-        function intPfeeTypeSelect(data){
-            var option='<option value="0">根Root</option>';
-            data.forEach(ele => {
-                option+=getfeeType(ele,0);
-            });
-            $(tabId+" #feeTypePid").html(option);
-        }
+        // function intPfeeTypeSelect(data){
+        //     var option='<option value="0">根Root</option>';
+        //     data.forEach(ele => {
+        //         option+=getfeeType(ele,0);
+        //     });
+        //     $(tabId+" #feeTypePid").html(option);
+        // }
         //递归获取费用类别
-        function getfeeType(element,level){
-            var option=""
-            var strs="";
-            for (let index = 0; index < level; index++) {
-                strs+="——";
-            }
-            if(typeof(element.nodes)=='object'){
-                level++
-                element.nodes.forEach(elementSub => {
-                    option+=getfeeType(elementSub,level);
-                });
-            }
-            return '<option value="'+element.id+'">'+strs+element.text+'</option>'+option;
-        }
+        // function getfeeType(element,level){
+        //     var option=""
+        //     var strs="";
+        //     for (let index = 0; index < level; index++) {
+        //         strs+="——";
+        //     }
+        //     if(typeof(element.nodes)=='object'){
+        //         level++
+        //         element.nodes.forEach(elementSub => {
+        //             option+=getfeeType(elementSub,level);
+        //         });
+        //     }
+        //     return '<option value="'+element.id+'">'+strs+element.text+'</option>'+option;
+        // }
         //费用类别信息
         function feeTypeInfoFuns(){
             datas["data"]={}
@@ -204,7 +182,7 @@
          * @Date: 2018-02-23 10:08:52 
          * @Desc: 刷新费用类别 
          */        
-        function feeTypeSearchFuns(){
+        function basic_feeType_searchInfo(){
             createfeeTypeTree()
         }
     </script>

@@ -31,7 +31,7 @@
                         </div>
                     </div>
                         <div class="form-group">
-                            <input class="form-control" id="input-expand-node" placeholder="搜索角色" value="" type="input">
+                            <input class="form-control" id="input-expand-node"  placeholder="搜索角色" value="" type="input">
                         </div>
                     <div>
                         <div id="roletree"></div>
@@ -52,55 +52,58 @@
                                 <span class="tree-minus handle" data-id="#roletree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
                             </div>
                         </div>
-                        <form class="form-horizontal" id="role-info">
+                        <form class="form-horizontal" >
                             <div class="box-body">
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">上级</label>
                     
                                     <div class="col-sm-9">
-                                        <input class="form-control superior"  readonly placeholder="上级名称" type="text">
+                                        <input class="form-control superior" name="superior"  readonly placeholder="上级名称" type="text">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">原名称</label>
                                     <div class="col-sm-9">
-                                        <input class="form-control rolename" readonly  placeholder="角色名称" type="text">
-                                        <input class="role-info" name="roleId"  title="角色id" type="hidden">
+                                        <input class="form-control rolename" name="oldrolename" readonly  placeholder="角色名称" type="text">
+                                        <input class=" modal-info" name="roleId"  title="角色id" type="hidden">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">新名称</label>
                                     <div class="col-sm-9">
-                                        <input class="form-control nrolename role-info" name="roleName" title="角色名称" type="text">
+                                        <input class="form-control nrolename modal-info" name="roleName" title="角色名称" type="text">
                                         
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label col-sm-3">目标上级</label>
                                     <div class="col-sm-9">
-                                        <select class="form-control role-info" title="目标上级" id="nsuperior" name="rolePid">
+                                        <select class="form-control modal-info" title="目标上级" id="nsuperior" name="rolePid">
                                         </select>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label col-sm-3">备注</label>
                                     <div class="col-sm-9">
-                                        <textarea class="form-control  role-info" rows="2" title="备注"  name="remark"></textarea>
+                                        <textarea class="form-control  modal-info" rows="2" title="备注"  name="remark"></textarea>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">角色状态</label>
-                                    <div class="btn-group role-status status-group col-sm-9" data-toggle="btn-toggle">
+                                    <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
+                                        <input class="modal-info"  value="0" name="status" type="hidden">
                                         <button type="button" name="0" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-default"></i> 未激活 </button>
                                         <button type="button" name="1" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-green"> 激活 </i>
                                         </button>
+                                        <button type="button" name="2" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-info"></i> 冻结 </button>
+                                        <button type="button" name="3" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-red"></i> 删除 </button>
                                     </div>
                                 </div>
                             </div>
                             <!-- /.box-body -->
                             <div class="box-footer">
-                                <button type="button" class="btn btn-success save-info" data-con="role" data-reqtype="Add" data-url="{$url}" data-modal="false">新增</button>
-                                <button type="button" class="btn btn-info pull-right save-info" data-con="role" data-reqtype="Edit" data-url="{$url}" data-modal="false">修改</button>
+                                <button type="button" class="btn btn-success save-info" data-con="role" data-gettype="Add" data-url="{$url}" data-modal="false">新增</button>
+                                <button type="button" class="btn btn-info pull-right save-info" data-con="role" data-gettype="Edit" data-url="{$url}" data-modal="false">修改</button>
                             </div>
                             <!-- /.box-footer -->
                         </form>
@@ -115,7 +118,7 @@
             </div>
         </div>
     </section>
-    <div class="modal fade" id="modal-role-node">
+    <div class="modal fade global-modal" id="modal-role-node">
         <div class="modal-dialog">
             <div class="modal-content">
             <div class="modal-body">
@@ -123,7 +126,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary save-info" data-con="role" data-reqtype="rNodeEdit" data-url="{$url}" data-modal="false">修改</button>
+                <button type="button" class="btn btn-primary save-info" data-con="{$controlName}" data-gettype="Edit" data-url="{$url}" data-modal="true" >修改</button>
             </div>
             </div>
         </div>
@@ -164,7 +167,7 @@
             })
         })
         //新增修改信息处理
-        function roleInfoFuns(){
+        function rolerNode_getInfo(){
             datas.data={}
             $(tabId+" #role-info .role-info").each(function(){
                 var name=$(this).attr("name");
@@ -187,13 +190,17 @@
             if(datas.reqType=="rolerNodeEdit"){
                 datas.roleId=roleId;
                 datas.data={}
-                $("#modal-role-node .modal-body .auth-val").each(function(){
+                $(tabId+" .global-modal .modal-body .auth-val").each(function(){
                     datas.data[$(this).data("id")]=$(this).val()
                 })
             }
             // console.log(datas)
         }
-        function roleSearchFuns(){
+        function rolerNode_searchInfo(){
+            createRoleTree()
+            clearRoleInfo()
+        }
+        function role_searchInfo(){
             createRoleTree()
             clearRoleInfo()
         }
@@ -202,20 +209,25 @@
             $(tabId+' #roletree').treeview({showButton: true,butTitle:'权限',data: getRoleTree(),levels:1,color: "#428bca",onNodeSelected:function(event, node){
                 if(node.parentId==undefined){
                     var superior=node.text
+                    var pid = 0
                 }else{
                     var parent= $(tabId+' #roletree').treeview('getNode', node.parentId);
                     var superior=parent.text
-                    
+                    var pid = parent.id
                 }
-                $(tabId+" #role-info .rolename").val(node.text)
-                $(tabId+" #role-info .superior").val(superior)
+                $(tabId+" input[name='oldrolename']").val(node.text)
+                $(tabId+" input[name='roleName']").val(node.text)
+                $(tabId+" input[name='superior']").val(superior)
                 var id=node.id
                 var status=node.status
                 var remark=node.remark
-                $(tabId+" .role-info[name='remark']").val(remark);
-                $(tabId+" #role-info input[name='roleId']").val(id);
-                $(tabId+" #role-info .role-status .status-btn").removeClass("active");
-                $(tabId+" #role-info .role-status .status-btn[name='"+status+"']").addClass("active");
+                $(tabId+" .modal-info[name='remark']").val(remark);
+                $(tabId+" .modal-info[name='roleId']").val(id);
+                $(tabId+" .modal-info[name='rolePid']").find("option[value='"+pid+"']").prop("selected",true);
+
+                // $(tabId+" #role-info .role-status .status-btn").removeClass("active");
+                // $(tabId+" #role-info .role-status .status-btn[name='"+status+"']").addClass("active");
+                set_status_btn($(tabId+" .modal-status .status-btn[name='"+status+"']"))
             },onNodeUnselected:function(){
                 clearRoleInfo()
             }});
@@ -228,8 +240,8 @@
 
                 get("{$url}",datas,function(result){
                     if(result.errCode==0){
-                        $(tabId+" #modal-role-node .modal-body").html(result.info);
-                        $(tabId+" #modal-role-node").modal("show");
+                        $(tabId+" .global-modal .modal-body").html(result.info);
+                        $(tabId+" .global-modal").modal("show");
                     }
                     
                 })
@@ -237,9 +249,7 @@
         }
         //清空角色数据
         function clearRoleInfo(){
-            $(tabId+" #role-info .role-info").val("")
-            $(tabId+" #role-info input").val("")
-            $(tabId+" #role-info input").val("")
+            $(tabId+" input").val("")
         }
     </script>
 </body>

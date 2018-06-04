@@ -6,11 +6,22 @@
         <td>{$item['email']}</td>
         <td>{$item['address']}</td>
         <td>{$item['remarks']}</td>
-        <if condition="$item['status'] eq 0">
-            <td><span class="label bg-black">{$statusType[$item['status']]}</span></td>
-        <elseif condition="$item['status'] eq 1"/>
-            <td><span class="label label-success">{$statusType[$item['status']]}</span></td>
-        </if>
-        <td><button type="button" data-show="One" data-reqtype="Edit"  data-id="{$item['contactId']}" data-url="{$url}" data-con="supcontact" data-toggle="modal" data-target="#modal-supcontactInfo" data-title="编辑联系人" class="btn btn-sm btn-primary info-edit">编辑</button></td>
+        <td><span class="label bg-{$statusLabel[$item['status']]}">{$statusType[$item['status']]}</span></td>
+        <td class="status-con" data-db="{$dbName}" data-con="{$controlName}" data-id="{$item['companyId']}" data-url="{$url}" >
+            <button type="button" data-gettype="Edit" data-toggle="modal"  data-url="{$url}" data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-primary btn-sm v-showmodal"><i class="fa fa-fw fa-eye "></i> 查看 </button>
+
+            <if condition="in_array($userId,explode(',',$item['examine'])) eq true and $item['status'] eq 2" >
+
+            <else/>
+                <if condition="$processAuth['level'] gt 1 and ($item['status'] eq 0 or  $item['status'] eq 2 )  ">
+                    <button type="button" class="btn btn-success submit-status btn-sm" data-status="1" name="approve" >批准</button>  
+                    <button type="button" class="btn btn-warning submit-status btn-sm" data-status="3" name="refuse">拒绝</button>
+                </if>
+            </if>
+            
+            <if condition="$nodeAuth egt 4 ">
+                <button type="button" class="btn btn-danger btn-sm status-info" data-status="4" data-reqtype="Del"  >删除</button>
+            </if>
+        </td>
     </tr>
 </volist>

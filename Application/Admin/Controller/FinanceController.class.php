@@ -49,11 +49,13 @@ class FinanceController extends BaseController{
                 if($stockList[$basicId]["alias"] != $value['val'] || $stockList[$basicId]["name"]!=$value['company']){
                     $Info=["basicId"=>$basicId,"name"=>$value['company'],"alias"=>$value['val']];
                     // print_r($Info);
+                    $logInfo["describe"]="";
                     $res= $this->basicCom->updateBasic($Info);
                     if($stockList[$basicId]["name"] != $value['company']){
-                        $logInfo["describe"]="将子公司名 原名【".$stockList[$basicId]["name"]."】修改为：【".$value['company']."】";
-                    }else{
-                        $logInfo["describe"]="将【{$value['company']}】的原值【".$stockList[$basicId]["alias"]."】修改为：【".$value['val']."】";
+                        $logInfo["describe"].="将子公司名 原名【".$stockList[$basicId]["name"]."】修改为：【".$value['company']."】;";
+                    }
+                    if($stockList[$basicId]["alias"] != $value['val']){
+                        $logInfo["describe"].="将【{$value['company']}】的原值【".$stockList[$basicId]["alias"]."】修改为：【".$value['val']."】;";
                     }
                     
                 }

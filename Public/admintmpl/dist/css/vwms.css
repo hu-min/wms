@@ -17,6 +17,8 @@
 	position: absolute;
 	top: 50%;
 	transform: translateY(-50%);
+	margin-left: -180px;
+	margin-top: -72px;
 }
 .tab-clo{
 	position: absolute;

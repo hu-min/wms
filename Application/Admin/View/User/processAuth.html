@@ -55,13 +55,15 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group">
-				    <input type="hidden" class="modal-info" name="nodeId" value="0" />
-				    <select class="form-control input-sm chosen-process chosen-select modal-info" multiple="multiple" title="审核流程" name="processIds"><option value=""></option></select>                                    
+                                    <input type="hidden" class="modal-info" name="nodeId" value="0" />
+                                    <select class="form-control input-sm chosen-process chosen-select modal-info" multiple="multiple" title="审核流程" name="processIds">
+                                        <option value=""></option>
+                                    </select>                                    
                                 </div>
                             </div>
                         </div>
                         <div class="box-footer">
-				<button type="button" class="btn btn-primary save-info" data-con="processAuth" data-reqtype="Edit" data-url="{$url}">更新节点审核流程</button>
+				            <button type="button" class="btn btn-primary save-info" data-con="{$controlName}" data-gettype="Edit" data-url="{$url}">更新节点审核流程</button>
                         </div>
                     </div>
                 </div>

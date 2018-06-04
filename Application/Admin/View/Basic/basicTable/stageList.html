@@ -1,8 +1,14 @@
-<volist name="stageList" id="item">
+<volist name="list" id="item">
     <tr>
         <td>{$item['name']}</td>
         <td>{$item['alias']}</td>
         <td>{$item['remark']}</td>
-        <td><button type="button" data-show="One" data-reqtype="Edit"  data-id="{$item['basicId']}" data-url="{$url}" data-con="stage" data-toggle="modal" data-target="#modal-stageInfo" data-title="编辑阶段" class="btn btn-primary info-edit btn-sm">编辑</button></td>
+        <td><span class="label bg-{$statusLabel[$item['status']]}">{$statusType[$item['status']]}</span></td>
+        <td class="status-con" data-db="{$dbName}" data-con="{$controlName}" data-id="{$item['basicId']}" data-url="{$url}" >
+            <button type="button" data-gettype="Edit" data-toggle="modal"  data-url="{$url}" data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-primary btn-sm v-showmodal"><i class="fa fa-fw fa-eye "></i> 查看 </button>            
+            <if condition="$nodeAuth egt 4 ">
+                <button type="button" class="btn btn-danger btn-sm status-info" data-status="4" data-reqtype="Del"  >删除</button>
+            </if>
+        </td>
     </tr>
 </volist>

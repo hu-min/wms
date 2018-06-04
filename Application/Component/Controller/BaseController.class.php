@@ -122,7 +122,7 @@ class BaseController extends \Common\Controller\BaseController{
     /** 
      * @Author: vition 
      * @Date: 2018-06-02 00:34:18 
-     * @Desc: 从redis中获取单一数据 
+     * @Desc: 从redis中获取单一数据，没有就查指定数据库id 
      */    
     function redis_one($redisName,$key,$id){
         $listRedisName=$redisName;
@@ -134,6 +134,12 @@ class BaseController extends \Common\Controller\BaseController{
                     $itemData=$item;
                     break;
                 }
+            }
+        }
+        if(empty($itemData)){
+            $questResult=$this->getOne([$key=>$id]);
+            if($questResult->errCode==0){
+                $itemData=$questResult["list"];
             }
         }
         return $itemData;

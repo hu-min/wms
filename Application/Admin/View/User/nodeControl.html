@@ -86,10 +86,15 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <div class="btn-group user-status status-group" data-toggle="btn-toggle">
-                                <button type="button" name="0" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-default"></i> 未激活 </button>
-                                <button type="button" name="1" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-green"> 激活 </i>
-                                </button>
+                            <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
+                                <input class="modal-info"  value="0" name="status" type="hidden">
+                                <if condition="$nodeAuth egt 3">
+                                    <button  type="button" name="0" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
+                                    <button type="button" name="1" class="btn btn-success btn-sm status-btn"><i class="fa fa-square text-default"> 启用 </i></button>
+                                </if>
+                                <if condition="$nodeAuth egt 4 ">
+                                    <button type="button" name="4" class="btn btn-danger btn-sm status-btn"><i class="fa fa-square text-default"> 删除 </i></button>
+                                </if>
                             </div>
                         </div>
                     </div>
@@ -97,7 +102,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary save-info" data-con="node" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
+                <button type="button" class="btn btn-primary save-info" data-con="node" data-gettype="Add" data-url="{$url}" data-modal="true">Save changes</button>
             </div>
             </div>
         </div>
@@ -132,7 +137,7 @@
             //节点编辑
             $(tabId+' #nodetree').on("click",'li button',function(){
                 $(tabId+" #modal-nodeInfo h4").text("节点编辑");
-                $(tabId+" #modal-nodeInfo .save-info").data("reqtype","Edit");
+                $(tabId+" #modal-nodeInfo .save-info").data("gettype","Edit");
                 $(tabId+" #modal-nodeInfo .save-info").text("节点编辑");
                 var nodeData= $(tabId+' #nodetree').treeview('getNode', $(this).parent(".node-nodetree").data("nodeid"));
 
@@ -140,7 +145,7 @@
                 datas["reqType"]='nodeOne';
                 get("{$url}",datas,function(result){
                     if(result.errCode==0){
-                        console.log(result.info);
+                        // console.log(result.info);
                         $(tabId+" .modal-info[name='nodeNames']").val(result.info['nodeNames']);
                         $(tabId+" .modal-info[name='nodeTitle']").val(result.info['nodeTitle']);
                         $(tabId+" .modal-info[name='nodeId']").val(result.info['nodeId']);
@@ -148,8 +153,7 @@
                         $(tabId+" .modal-info[name='nodeIcon']").val(result.info['nodeIcon']);
                         $(tabId+" .modal-info[name='sort']").val(result.info['sort']);
                         $(tabId+" .modal-info[name='nodePid']").val(result.info['nodePid']);
-                        $(tabId+" .status-btn").removeClass("active");
-                        $(tabId+" .status-btn[name='"+result.info['status']+"']").addClass("active");
+                        set_status_btn($(tabId+" .modal-status .status-btn[name='"+result.info['status']+"']"))
                         $(tabId+" #nodePid").find("option[value='"+result.info['nodePid']+"']").prop("selected",true);
                         $(tabId+" #nodePid").trigger('chosen:updated');
                     }
@@ -175,7 +179,7 @@
             $(tabId+" .box-header button").on("click",function(){
                 $(tabId+" .modal-info").val("");
                 $(tabId+" #modal-nodeInfo h4").text("新增节点");
-                $(tabId+" #modal-nodeInfo .save-info").data("reqtype","Add");
+                $(tabId+" #modal-nodeInfo .save-info").data("gettype","Add");
                 $(tabId+" #modal-nodeInfo .save-info").text("新增节点");
                 $(tabId+" #nodePid").find("option[value='0']").prop("selected",true);
                 $(tabId+" #nodePid").trigger('chosen:updated');
@@ -224,7 +228,7 @@
             return '<option value="'+element.id+'">'+strs+element.text+'</option>'+option;
         }
         //节点信息
-        function nodeInfoFuns(){
+        function node_setInfo(){
             datas["data"]={}
             $(tabId+" .modal-info").each(function(){
                 var name =$(this).attr("name");
@@ -244,8 +248,9 @@
          * @Date: 2018-02-23 10:08:52 
          * @Desc: 刷新节点 
          */        
-        function nodeSearchFuns(){
+        function node_searchInfo(){
             createNodeTree()
+            $("#modal-nodeInfo").modal('toggle')
         }
     </script>
 </body>

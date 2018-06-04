@@ -20,9 +20,11 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">审核流程列表</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加审核流程" data-target="#modal-processInfo" data-con="process" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增审核流程</button>
+                        <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 7">
+                            <button type="button" data-gettype="Add" data-toggle="modal"  data-url="{$url}" data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info info-edit v-showmodal"><i class="fa fa-fw fa-user-plus "></i> 新增审核流程 </button>
+                        </if>
                     </div>
-                    <div class="box-body search-body" id="process-search-box">
+                    <div class="box-body search-body">
                         <div class="col-md-12">
                             <form class="form-inline">
                                 <div class="form-group"> 
@@ -34,8 +36,8 @@
                                     <input class="form-control search-info input-sm" name="processDepict" placeholder="审核流程描述" type="text">
                                 </div>
                                 <div class="form-group">
-                                    <button type="button" data-url="{$url}" id="process-search" data-reqtype="processList" data-con="process" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
-                                    <button type="button" class="btn bg-teal search-refresh" data-con="process"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 </div>
                             </form>
                             <br>
@@ -48,7 +50,7 @@
             <div class="col-sm-12" style="font-size:1em;overflow-x: auto;">
                 <div class="count-div" id="processCount" style="margin:10px;font-weight: 800;">
                 </div>
-                <table id="" class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>审核流程名称</th>
@@ -59,63 +61,23 @@
                             <th>操作</th>
                         </tr>
                     </thead>
-                    <tbody id="processTable">
+                    <tbody class="{$controlName}-table">
                         {$tables}
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="dataTables_wrapper">
-            <div id="processPage" class="row page-div" data-url="{$url}" data-reqtype="processList" data-con="process">
+            <div class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
                 {$pages}
             </div>
         </div>
     </section>
-    <div class="modal fade" id="modal-processInfo">
+    <div class="modal fade global-modal">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-            <div class="modal-header">
-                <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Default Modal</h4>
-            </div>
-            <div class="modal-body">
-                <form role="form">
-                    <div class="box-body">
-                        <div class="form-group">
-                            <label for="info-title">审核流程名称：</label>
-                            <input  class="modal-info"  name="processId" type="hidden">
-                            <input class="form-control modal-info"  name="processName" title="审核流程名称"  placeholder="审核流程名称" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="info-title">审核流程配置[审核顺序从上往下]：<i class="fa fa-fw fa-plus-square text-aqua add-processnode" title="新增流程节点" data-target=".bankstock-tab" style="cursor: pointer;"></i></label>
-
-                            <table class="table table-bordered">
-                                <tbody class="process-tab">
-                                            
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="form-group">
-                            <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
-                                <input class="modal-info" value="0" name="status" type="hidden">
-                                <button type="button" name="0" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
-                                <button type="button" name="1" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-green"> 启用 </i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>            
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary save-info" data-con="process" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
-            </div>
-            </div>
+            <div class="modal-content"></div>
         </div>
     </div>
-   
     <script>
 	    var groupOption='{$groupData}';
         var roleOption='{$roleData}';
@@ -123,7 +85,7 @@
         //获取分类数据
         $(function(){
             //新增审核流程
-            $(tabId+" .box-header button").on("click",function(){
+            $(tabId).on("click",".box-header button",function(){
                 $(tabId+" .modal-info").val("");
                 $(tabId+" .process-tab").children("tr").remove()
 		        $(tabId+" .modal-info[name='status']").val(0);
@@ -131,7 +93,7 @@
                 $(tabId+" .status-btn[name='0']").addClass("active");
             })
             //新增审核流程输入框
-            $(tabId+" .add-processnode").on("click",function(){
+            $(tabId).on("click",".add-processnode",function(){
                 createProcess()
             })
             //切换角色类型            
@@ -162,18 +124,18 @@
             })
         })
         //搜索字段新增
-        function processSearchFuns(){
-            datas['data']={}
-            $(tabId+" .search-info").each(function(){
-                var name=$(this).attr("name");
-                var val=$(this).val();
-                if(val!=""){
-                    datas['data'][name]=val
-                }
-            })
-        }
+        // function user_process_searchInfo(){
+        //     datas['data']={}
+        //     $(tabId+" .search-info").each(function(){
+        //         var name=$(this).attr("name");
+        //         var val=$(this).val();
+        //         if(val!=""){
+        //             datas['data'][name]=val
+        //         }
+        //     })
+        // }
         //新增保存表单数据
-        function processInfoFuns(){
+        function user_process_getInfo(){
             datas["data"]={}
             $(tabId+" .modal-info").each(function(){
                 var name = $(this).attr("name")
@@ -203,11 +165,11 @@
             })
          }
         // /*设置编辑审核流程信息*/
-        function processShowFuns(info){
+        function user_process_setInfo(info){
             $(tabId+" .process-tab").children("tr").remove()
             $(tabId+" .modal-info[name='processId']").val(info['processId']);
             $(tabId+" .modal-info[name='processName']").val(info['processName']);
-            
+            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
             JSON.parse(info['processOption']).forEach(function(process,index){
                 console.log(index)
                 console.log(process)

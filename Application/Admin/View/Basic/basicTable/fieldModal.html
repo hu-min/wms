@@ -1,0 +1,42 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{$title}</h4>
+</div>
+<div class="modal-body">
+    <form role="form">
+        <div class="box-body">
+            <div class="form-group">
+                <label >场地名称：</label>
+                <input  class="modal-info" title="basicId" name="basicId" type="hidden">
+                <input class="form-control modal-info"  name="name" title="场地名称" placeholder="场地名称" type="text">
+            </div>
+            <div class="form-group">
+                <label >场地别名：</label>
+                <input class="form-control modal-info" name="alias" title="场地别名" placeholder="场地别名" type="text">
+            </div>
+            <div class="form-group">
+                <label >场地备注：</label>
+                <input class="form-control modal-info" name="remark" title="场地备注" placeholder="场地备注" type="text">
+            </div>
+            <div class="form-group">
+                <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
+                    <input class="modal-info"  value="0" name="status" type="hidden">
+                    <if condition="$nodeAuth egt 3">
+                        <button  type="button" name="0" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
+                        <button type="button" name="1" class="btn btn-success btn-sm status-btn"><i class="fa fa-square text-default"> 启用 </i></button>
+                    </if>
+                    <if condition="$nodeAuth egt 4 ">
+                        <button type="button" name="4" class="btn btn-danger btn-sm status-btn"><i class="fa fa-square text-default"> 删除 </i></button>
+                    </if>
+                </div>
+            </div>
+        </div>
+    </form>            
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+    <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 7">
+        <button type="button" class="btn btn-primary save-info" data-con="{$controlName}" data-gettype="{$gettype}" data-url="{$url}" data-modal="true">{$btnTitle}</button>
+    </if>
+</div>

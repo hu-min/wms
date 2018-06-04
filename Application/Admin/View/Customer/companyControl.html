@@ -20,7 +20,7 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">公司列表</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <if condition="$processAuth['level'] gt 0">
+                        <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 7">
                             <button type="button" data-gettype="Add" data-toggle="modal"  data-url="{$url}" data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info info-edit v-showmodal"><i class="fa fa-fw fa-user-plus "></i> 新增公司 </button>
                         </if>
                         
@@ -107,7 +107,6 @@
             <div class="modal-content"></div>
         </div>
     </div>
-   
     <script>
         // var E = window.wangEditor
         // var editor = new E(tabId+' .art-editor')
@@ -152,14 +151,14 @@
                 },false)
         }
         //function companyResetFuns(){}
-        function companyReFuns(){
-            var year=(new Date()).getFullYear()
-            var month=(new Date()).getMonth()
-            var day=(new Date()).getDate()
-            var hours=(new Date()).getHours()
-            var minutes=(new Date()).getMinutes()
-            $(tabId+" .modal-info[name='code']").val(prefix+year+formatMonth(month)+formatDate(day)+hours+minutes);
-        }
+        // function companyReFuns(){
+        //     var year=(new Date()).getFullYear()
+        //     var month=(new Date()).getMonth()
+        //     var day=(new Date()).getDate()
+        //     var hours=(new Date()).getHours()
+        //     var minutes=(new Date()).getMinutes()
+        //     $(tabId+" .modal-info[name='code']").val(prefix+year+formatMonth(month)+formatDate(day)+hours+minutes);
+        // }
         // function companySearchFuns(){
         //     datas['data']={}
         //     $(tabId+" .search-info").each(function(){
@@ -192,11 +191,14 @@
             $(tabId+" .modal-info[name='alias']").val(info['alias']);
             $(tabId+" .modal-info[name='address']").val(info['address']);
             $(tabId+" .modal-info[name='remarks']").val(info['remarks']);
-            $(tabId+" .modal-status .status-btn").removeClass("active");
-            $(tabId+" .modal-status .status-btn[name='"+info['status']+"']").addClass("active");
-            $(tabId+" .modal-info[name='status']").val(info['status']);
+            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
             if((info['processLevel'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7){
                 $(tabId+" .modal-info").prop("disabled",true)
+            }
+            if(info['author'] == "{$Think.session.userId}"){
+                $(tabId+" .status-btn[name='3']").addClass("none")
+            }else{
+                $(tabId+" .status-btn[name='3']").removeClass("none")
             }
             $(tabId+" .modal-info[name='provinceId']").find("option[value='"+info['provinceId']+"']").prop("selected",true);
             setCityOption(info['provinceId'],"modal-info",info['cityId'])

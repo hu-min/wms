@@ -63,10 +63,8 @@ class CustomerController extends BaseController{
         if($gettype=="Edit"){
             $title = "编辑客户公司";
             $btnTitle = "保存数据";
-            $parameter=[
-                'where'=>["companyId"=>$id],
-            ];
-            $resultData=$this->customerCom->getCompanyList($parameter,true);
+            $redisName="sup_companyList";
+            $resultData=$this->customerCom->redis_one($redisName,"companyId",$id);
         }
         $modalPara=[
             "data"=>$resultData,
@@ -121,14 +119,15 @@ class CustomerController extends BaseController{
         ];
         
         $listResult=$this->customerCom->getCompanyList($parameter);
-        if($listResult){
-            $page = new \Think\VPage($listResult['count'], $this->pageSize);
-            $pageShow = $page->show();
-            $this->assign('list',$listResult['list']);
-            $this->assign('dbName',"CustomerCompany");
-            $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Customer/customerTable/companyList'),'page'=>$pageShow]);
-        }
-        $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
+        $this->tablePage($listResult,'Customer/customerTable/companyList',"cust_companyList");
+        // if($listResult){
+        //     $page = new \Think\VPage($listResult['count'], $this->pageSize);
+        //     $pageShow = $page->show();
+        //     $this->assign('list',$listResult['list']);
+        //     $this->assign('dbName',"CustomerCompany");
+        //     $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Customer/customerTable/companyList'),'page'=>$pageShow]);
+        // }
+        // $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
     }
     /** 
      * @Author: vition 
@@ -259,10 +258,8 @@ class CustomerController extends BaseController{
         if($gettype=="Edit"){
             $title = "编辑客户联系人";
             $btnTitle = "保存数据";
-            $parameter=[
-                'where'=>["contactId"=>$id],
-            ];
-            $resultData=$this->customerCom->getCustomerList($parameter,true);
+            $redisName="cust_contactList";
+            $resultData=$this->customerCom->redis_one($redisName,"contactId",$id);
         }
         $modalPara=[
             "data"=>$resultData,
@@ -310,16 +307,7 @@ class CustomerController extends BaseController{
         ];
         
         $listResult=$this->customerCom->getCustomerList($parameter);
-        // echo $this->customerCom->M()->_sql();
-        // print_r($listResult);
-        if($listResult){
-            $page = new \Think\VPage($listResult['count'], $this->pageSize);
-            $pageShow = $page->show();
-            $this->assign('list',$listResult['list']);
-            $this->assign('dbName',"CustomerContact");
-            $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Customer/customerTable/contactList'),'page'=>$pageShow]);
-        }
-        $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
+        $this->tablePage($listResult,'Customer/customerTable/contactList',"cust_contactList");
     }
     /** 
      * @Author: vition 

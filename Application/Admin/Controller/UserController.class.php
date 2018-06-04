@@ -24,6 +24,10 @@ class UserController extends BaseController{
         $userStatus=C("userStatus");
         $regFrom=C("regFrom");
         $reqType=I('reqType');
+        $this->assign("controlName","user");
+        $this->assign('userType',$userType);
+        $this->assign('userStatus',$userStatus);
+        $this->assign('regFrom',$regFrom);
         $where=[
             'rolePid'=>['gt',0],
             'status'=>['eq',1],
@@ -41,13 +45,30 @@ class UserController extends BaseController{
         $this->assign('roleList',$roleResult['list']);
         if($reqType){
             $this->$reqType();
-        }else{
-            $this->assign('userType',$userType);
-            $this->assign('userStatus',$userStatus);
-            $this->assign('regFrom',$regFrom);
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+        }else{   
             $this->returnHtml();
         }
+    }
+    function user_modalOne(){
+        $title = "新建用户";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑用户";
+            $btnTitle = "保存数据";
+            $redisName="userList";
+            $resultData=$this->userCom->redis_one($redisName,"userId",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"userModal",
+        ];
+        $this->modalOne($modalPara);
     }
     /** 
      * @Author: vition 
@@ -172,16 +193,17 @@ class UserController extends BaseController{
         ];
         
         $userResult=$this->userCom->getUserList($parameter);
-        if($userResult){
-            $uListRed="userList_".session("userId");
-            $this->Redis->set($uListRed,json_encode($userResult['list']),3600);
-            $page = new \Think\VPage($userResult['count'], $this->pageSize);
-            $pageShow = $page->show();
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
-            $this->assign('userList',$userResult['list']);
-            $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('User/userTable/userList'),'page'=>$pageShow]);
-        }
-        $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
+        $this->tablePage($userResult,'User/userTable/userList',"userList");
+        // if($userResult){
+        //     $uListRed="userList_".session("userId");
+        //     $this->Redis->set($uListRed,json_encode($userResult['list']),3600);
+        //     $page = new \Think\VPage($userResult['count'], $this->pageSize);
+        //     $pageShow = $page->show();
+            
+        //     $this->assign('userList',$userResult['list']);
+        //     $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('User/userTable/userList'),'page'=>$pageShow]);
+        // }
+        // $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
 
     }
     /** 
@@ -218,10 +240,12 @@ class UserController extends BaseController{
     function roleControl(){
         $regFrom=C("regFrom");
         $reqType=I('reqType');
+        
+        $this->assign("controlName","rolerNode");
         if($reqType){
             $this->$reqType();
         }else{
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            
             $this->returnHtml();
         }
     }
@@ -293,7 +317,6 @@ class UserController extends BaseController{
             $rnodeResult=$this->rNodeCom->getRoleNodeOne($parameter);
             if($rnodeResult){
                 $rnodeResult["list"]["authority"]=$authority;
-                // $this->log($rnodeResult["list"]);
                 $result=$this->rNodeCom->updateRoleNode(["where"=>["rnId"=>$rnodeResult["list"]["rnId"]],"data"=>$rnodeResult["list"]]);
             }else{
                 $result=$this->rNodeCom->insertRoleNode(["roleId"=>$roleId,"nodeId"=>$nodeId,"authority"=>$authority]);
@@ -361,7 +384,7 @@ class UserController extends BaseController{
         if($reqType){
             $this->$reqType();
         }else{
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            
             $this->returnHtml();
         }
     }
@@ -509,16 +532,39 @@ class UserController extends BaseController{
 
     function processControl(){
         $reqType=I('reqType');
+        $this->assign("controlName","user_process");
+        $this->assign("groupData",$this->getRoles(1));
+	    $this->assign("roleData",$this->getRoles(2));
         if($reqType){
             $this->$reqType();
         }else{
-	    $this->assign("groupData",$this->getRoles(1));
-	    $this->assign("roleData",$this->getRoles(2));
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+	    
+            
             $this->returnHtml();
         }
     }
-    function processList(){
+    function user_process_modalOne(){
+        $title = "新建审核流程";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑审核流程";
+            $btnTitle = "保存数据";
+            $redisName="user_processList";
+            $resultData=$this->processCom->redis_one($redisName,"processId",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"processModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    function user_processList(){
 	    $data=I("data");
         $p=I("p")?I("p"):1;
         $where=[];
@@ -538,16 +584,17 @@ class UserController extends BaseController{
         ];
         
         $processResult=$this->processCom->getProcessList($parameter);
-        if($processResult){
-            $pListRed="processList_".session("userId");
-            $this->Redis->set($pListRed,json_encode($processResult['list']),3600);
-            $page = new \Think\VPage($processResult['count'], $this->pageSize);
-            $pageShow = $page->show();
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
-            $this->assign('list',$processResult['list']);
-            $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('User/userTable/processList'),'page'=>$pageShow]);
-        }
-        $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
+        $this->tablePage($processResult,'User/userTable/processList',"user_processList");
+        // if($processResult){
+        //     $pListRed="processList_".session("userId");
+        //     $this->Redis->set($pListRed,json_encode($processResult['list']),3600);
+        //     $page = new \Think\VPage($processResult['count'], $this->pageSize);
+        //     $pageShow = $page->show();
+            
+        //     $this->assign('list',$processResult['list']);
+        //     $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('User/userTable/processList'),'page'=>$pageShow]);
+        // }
+        // $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
 
     }
     function getRolesList(){
@@ -600,11 +647,11 @@ class UserController extends BaseController{
 
         $datas["processOption"]=json_encode($datas["Option"],JSON_UNESCAPED_UNICODE);
         unset($datas["Option"]);
-        if($reqType=="processAdd"){
+        if($reqType=="user_processAdd"){
 	    $datas["addTime"]=time();
             unset($datas['processId']);
             return $datas;
-        }else if($reqType=="processEdit"){
+        }else if($reqType=="user_processEdit"){
             $where=["processId"=>$datas['processId']];
             $data=[];
             if(isset($datas['processName'])){
@@ -624,7 +671,7 @@ class UserController extends BaseController{
         }
     }
 
-    function processAdd(){
+    function user_processAdd(){
 	    $Info=$this->manageProcessInfo();
         $insertResult=$this->processCom->insertProcess($Info);
         if($insertResult->errCode==0){
@@ -632,39 +679,40 @@ class UserController extends BaseController{
         }
         $this->ajaxReturn(['errCode'=>100,'error'=>getError(100),'reqType'=>$reqType]);
     }
-    function processEdit(){
+    function user_processEdit(){
         $Info=$this->manageProcessInfo();
         $updateResult=$this->processCom->updateProcess($Info);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
-    function processOne(){
-        $id	=I("id");
-        $parameter=[
-            'processId'=>$id,
-        ];
-        $ListRed="processList_".session("userId");
-        $List=$this->Redis->get($ListRed);
-        if($List){
-            foreach ($List as $process) {
-               if($process['processId']==$id){
-                $this->ajaxReturn(['errCode'=>0,'info'=>$process]);
-               }
-            }
-        }
-        $Result=$this->processCom->getProcess($parameter);
-        if($Result->errCode==0){
-            $this->ajaxReturn(['errCode'=>0,'info'=>$Result->data]);
-        }
-        $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
-    }
+    // function processOne(){
+    //     $id	=I("id");
+    //     $parameter=[
+    //         'processId'=>$id,
+    //     ];
+    //     $ListRed="processList_".session("userId");
+    //     $List=$this->Redis->get($ListRed);
+    //     if($List){
+    //         foreach ($List as $process) {
+    //            if($process['processId']==$id){
+    //             $this->ajaxReturn(['errCode'=>0,'info'=>$process]);
+    //            }
+    //         }
+    //     }
+    //     $Result=$this->processCom->getProcess($parameter);
+    //     if($Result->errCode==0){
+    //         $this->ajaxReturn(['errCode'=>0,'info'=>$Result->data]);
+    //     }
+    //     $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
+    // }
 
     function processAuth(){
         $reqType=I('reqType');
+        $this->assign("controlName","process_auth");
         if($reqType){
             $this->$reqType();
         }else{
 	    $this->assign("processData",$this->getProcess());
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            
             $this->returnHtml();
         }
     }
@@ -707,7 +755,7 @@ class UserController extends BaseController{
         }
         return $result['list'] ? $result['list'] : [];
     }
-    function processAuthEdit(){
+    function process_authEdit(){
         $datas =I("data");
         $nodeInfo=[
             "nodeId"=>$datas["nodeId"],
