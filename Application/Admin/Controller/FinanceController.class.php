@@ -11,9 +11,11 @@ class FinanceController extends BaseController{
     public function _initialize() {
         parent::_initialize();
         $this->basicCom=getComponent('Basic');
+        $this->fixExpenCom=getComponent('FixldExpense');
     }
     function stockControl(){
         $reqType=I('reqType');
+        $this->assign('dbName',"Basic");//删除数据的时候需要
         if($reqType){
             $this->$reqType();
         }else{
@@ -84,4 +86,152 @@ class FinanceController extends BaseController{
         }
         $this->ajaxReturn(['errCode'=>100,'error'=>"更新失败"]);
     }
+
+     //固定费用支出开始
+    /** 
+     * @Author: vition 
+     * @Date: 2018-06-05 23:05:28 
+     * @Desc: 固定费用之支出 
+     */    
+    function fix_expenseControl(){
+        $reqType=I('reqType');
+        $this->assign("controlName","fix_expense");
+        $this->assign('dbName',"FixldExpense");//删除数据的时候需要
+        $parameter=[
+            'where'=>["class"=>"expenClas"],
+            'page'=>1,
+            'pageSize'=>99999,
+            'orderStr'=>"basicId DESC",
+        ];
+        $basicResult=$this->basicCom->getList($parameter);
+        $this->assign("expenClasArr",$basicResult["list"]);//固定支出类别
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    function fix_expense_modalOne(){
+        $title = "新建固定支出";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑固定支出";
+            $btnTitle = "保存数据";
+            $redisName="fix_expenseList";
+            $resultData=$this->supplierCom->redis_one($redisName,"id",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"fix_expenseModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    function fix_expenseList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $where=[];
+        if($data['expenClas']){
+            $where['expenClas']=$data['expenClas'];
+        }
+        $parameter=[
+            'fields'=>"`id`,`companyId`,`expenClas`,`finanAccount`,`toObject`,`content`,`startDate`,`endDate`,`fee`,`payment`,noPayment,payTime,remark,addTime,status,processLevel,author,examine",
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>"id DESC",
+            // "joins"=>"LEFT JOIN (SELECT companyId cid,company FROM v_supplier_company WHERE status=1) c ON c.cid=companyId",
+        ];
+        
+        $listResult=$this->fixExpenCom->getList($parameter);
+        $this->tablePage($listResult,'Finance/financeTable/fix_expenseList',"fix_expenseList");
+    }
+    function manageFixExpenInfo(){
+        $reqType=I("reqType");
+        $datas=I("data");
+        if($reqType=="fix_expenseAdd"){
+            $datas['addTime']=time();
+            $datas['author']=session("userId");
+            unset($datas['id']);
+            return $datas;
+        }else if($reqType=="fix_expenseEdit"){
+            $where=["id"=>$datas['id']];
+            $data=[];
+            $data['updateTime']=time();
+            if(isset($datas['expenClas'])){
+                $data['expenClas']=$datas['expenClas'];
+            }
+            if(isset($datas['finanAccount'])){
+                $data['finanAccount']=$datas['finanAccount'];
+            }
+            if(isset($datas['toObject'])){
+                $data['toObject']=$datas['toObject'];
+            }
+            if(isset($datas['content'])){
+                $data['content']=$datas['content'];
+            }
+            if(isset($datas['startDate'])){
+                $data['startDate']=$datas['startDate'];
+            }
+            if(isset($datas['endDate'])){
+                $data['endDate']=$datas['endDate'];
+            }
+            if(isset($datas['fee'])){
+                $data['fee']=$datas['fee'];
+            }
+            if(isset($datas['payment'])){
+                $data['payment']=$datas['payment'];
+            }
+            if(isset($datas['noPayment'])){
+                $data['noPayment']=$datas['noPayment'];
+            }
+            if(isset($datas['payTime'])){
+                $data['payTime']=$datas['payTime'];
+            }
+            if(isset($datas['remark'])){
+                $data['remark']=$datas['remark'];
+            }
+            if(isset($datas['status'])){
+                $parameter=[
+                    'where'=>["id"=>$id],
+                ];
+                $result=$this->fixExpenCom->getList($parameter,true);
+                if($result["examine"]==""){
+                    $data['examine']=session("userId");
+                }else{
+                    $data['examine'].=",".session("userId");
+                }
+		        if($datas['status']==1 && $this->processAuth["level"] == $this->processAuth["allLevel"]){
+                    $data['status']=$datas['status'];
+                    $data['processLevel'] = 0;
+                }else if($datas['status']==1){
+                    $data['status']=2;
+                    $data['processLevel'] = $this->processAuth["level"];
+                }
+            }
+            return ["where"=>$where,"data"=>$data];
+        }
+        return "";
+    }
+    function fix_expenseAdd(){
+        $Info=$this->manageFixExpenInfo();
+        if($Info){
+            $insertResult=$this->fixExpenCom->insert($Info);
+            if($insertResult && $insertResult->errCode==0){
+                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+            }
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    } 
+    function fix_expenseEdit(){
+        $Info=$this->manageFixExpenInfo();
+        $updateResult=$this->fixExpenCom->update($Info);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+    //固定费用支出结束
 }

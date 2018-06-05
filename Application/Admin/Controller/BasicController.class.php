@@ -10,7 +10,7 @@ class BasicController extends BaseController{
     public function _initialize() {
         $this->statusType = [0=>"未启用",1=>"启用",3=>"无效",4=>"删除"];
         parent::_initialize();
-        $this->basicCom=getComponent('Basic');
+        // $this->basicCom=getComponent('Basic');
         $this->assign('dbName',"Basic");//删除数据的时候需要
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
@@ -947,4 +947,107 @@ class BasicController extends BaseController{
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
     //承接模块管理结束
+    //固定支出分类开始
+    function expenClasControl(){
+        $reqType=I('reqType');
+        $this->assign("controlName","expenClas");
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    function expenClas_modalOne(){
+        $title = "新建固定支出类别";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑固定支出类别";
+            $btnTitle = "保存数据";
+            $redisName="expenClasList";
+            $resultData=$this->basicCom->redis_one($redisName,"basicId",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"expenClasModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-20 22:45:25 
+     * @Desc: 品牌列表 
+     */    
+    function expenClasList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $where=["class"=>"expenClas"];
+
+        if($data['name']){
+            $where['name']=['LIKE','%'.$data['name'].'%'];
+        }
+        if($data['alias']){
+            $where['alias']=['LIKE','%'.$data['alias'].'%'];
+        }
+        if(isset($data['status'])){
+            $where['status']=$data['status'];
+        }else{
+            $where['status']=["lt",3];
+        }
+        $parameter=[
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>"basicId DESC",
+        ];
+        $basicResult=$this->basicCom->getBasicList($parameter);
+        $this->tablePage($basicResult,'Basic/basicTable/expenClasList',"expenClasList");
+    }
+    function manageExpenClasInfo(){
+        $reqType=I("reqType");
+        $datas=I("data");
+        if($reqType=="expenClasAdd"){
+            $datas['class']="expenClas";
+            unset($datas['basicId']);
+            return $datas;
+        }else if($reqType=="expenClasEdit"){
+            $where=["basicId"=>$datas['basicId']];
+            $data=[];
+            if(isset($datas['name'])){
+                $data['name']=$datas['name'];
+            }
+            if(isset($datas['alias'])){
+                $data['alias']=$datas['alias'];
+            }
+            if(isset($datas['remark'])){
+                $data['remark']=$datas['remark'];
+            }
+            if(isset($datas['status'])){
+                $data['status']=$datas['status'];
+            }
+            return ["where"=>$where,"data"=>$data];
+        }
+        return "";
+    }
+    function expenClasAdd(){
+        $Info=$this->manageExpenClasInfo();
+        if($Info){
+            $insertResult=$this->basicCom->insertBasic($Info);
+            if($insertResult && $insertResult->errCode==0){
+                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+            }
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    } 
+    function expenClasEdit(){
+        $Info=$this->manageExpenClasInfo();
+        $updateResult=$this->basicCom->updateBasic($Info);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+    //固定支出分类结束
 }

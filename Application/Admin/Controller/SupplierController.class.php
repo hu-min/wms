@@ -70,7 +70,6 @@ class SupplierController extends BaseController{
         if($reqType){
             $this->$reqType();
         }else{
-            
             $this->returnHtml();
         }
     }
@@ -227,6 +226,7 @@ class SupplierController extends BaseController{
         $this->assign("controlName","sup_company");
         $this->assign("supTypeList",$this->getSupType());
         $this->assign("province",$this->basicCom->get_provinces());
+        $this->assign('dbName',"SupplierCompany");//删除数据的时候需要
         if($reqType){
             $this->$reqType();
         }else{
@@ -435,6 +435,7 @@ class SupplierController extends BaseController{
         $reqType=I('reqType');
         $this->assign("controlName","supcontact");
         $this->assign("supplierList",$this->getSupplier());
+        $this->assign('dbName',"SupplierContact");//删除数据的时候需要
         if($reqType){
             $this->$reqType();
         }else{

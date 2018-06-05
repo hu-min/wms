@@ -29,6 +29,7 @@ class BaseController extends \Common\Controller\BaseController{
         $this->nodeCom=getComponent('Node');
         $this->authority=C('authority');
         $this->nodeAuth=session('nodeAuth');
+        $this->basicCom=getComponent('Basic');
         $this->exemption=[//排除的控制器
             'Admin/Index/Login',
             'Admin/Index/Main',
@@ -383,5 +384,8 @@ class BaseController extends \Common\Controller\BaseController{
             $returnData["page"]="";
         }
         $this->ajaxReturn($returnData);
+    }
+    function statusProcess(){
+
     }
 }

@@ -192,6 +192,10 @@ $(document).on("click",".v-showmodal",function(){
                 if(fun_is_exits(con+"_setInfo")){
                     eval(con+"_setInfo(result.data)");//对不同的模块设置不同的响应数据
                 }
+            }else{
+                if(fun_is_exits(con+"_initInfo")){
+                    eval(con+"_initInfo()");//
+                } 
             }
         }
     })

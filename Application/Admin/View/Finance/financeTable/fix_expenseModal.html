@@ -1,0 +1,63 @@
+<div class="modal-header">
+    <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{$title}</h4>
+</div>
+<div class="modal-body">
+    <form role="form">
+        <div class="box-body">
+            <input class="modal-info" value="0" name="id" type="hidden">
+            <div class="form-group"> 
+                <label class="control-label">固定支出类别：</label>
+                <select class="form-control search-info chosen-expenclas chosen-select" title="固定支出类别" name="expenClas">
+                    <volist name="expenClasArr" id="item">
+                        <option value="{$item.basicId}">{$item.name}</option>
+                    </volist>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="info-title">公司账户：</label>
+                <input class="form-control modal-info" required="required" name="contact" title="公司账户" placeholder="公司账户" type="text">
+            </div>
+            <div class="form-group">
+                <label for="info-title">支付对象：</label>
+                <input class="form-control modal-info datetime" required="required" name="phone" title="支付对象" placeholder="支付对象" type="text">
+            </div>
+            <div class="form-group">
+                <label for="info-title">内容：</label>
+                <input class="form-control modal-info" name="email" title="内容" placeholder="内容" type="text">
+            </div>
+            <div class="form-group">
+                <label for="info-title">联系地址：</label>
+                <input class="form-control modal-info" name="address" title="联系地址" placeholder="联系地址" type="text">
+            </div>
+            <div class="form-group">
+                <label for="info-title">备注：</label>
+                <input class="form-control modal-info" name="remarks" title="备注" placeholder="备注" type="text">
+            </div>
+            <div class="form-group">
+                <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
+                    <input class="modal-info" value="0" name="status" type="hidden">
+                    <if condition="$nodeAuth eq 7">
+                        <button type="button" name="0" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
+                    </if>
+                    
+                    <if condition="$processAuth['level'] gt 1">
+                        <button type="button" name="1" class="btn btn-success btn-sm status-btn"><i class="fa fa-square text-default"> 批准 </i></button>
+                        <button type="button" name="3" class="btn btn-warning btn-sm status-btn"><i class="fa fa-square text-default"> 拒绝 </i></button>
+                        <button type="button" name="4" class="btn btn-danger btn-sm status-btn"><i class="fa fa-square text-default"> 删除 </i></button>
+                    </if>
+                    
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>            
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+    <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 7">
+        <button type="button" class="btn btn-primary save-info" data-con="{$controlName}" data-gettype="{$gettype}" data-url="{$url}" data-modal="true">{$btnTitle}</button>
+    </if>
+</div>

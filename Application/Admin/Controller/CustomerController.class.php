@@ -41,6 +41,7 @@ class CustomerController extends BaseController{
     function companyControl(){
         $reqType=I('reqType');
         $this->assign("province",$this->basicCom->get_provinces());
+        $this->assign('dbName',"CustomerCompany");//删除数据的时候需要
         $this->assign("controlName","cust_company");//名字对应cust_company_modalOne，和cust_companyModal.html
         if($reqType){
             $this->$reqType();
@@ -240,6 +241,7 @@ class CustomerController extends BaseController{
     function contactControl(){
         $reqType=I('reqType');
         $this->assign("cusCompanyList",$this->getCusCompany());
+        $this->assign('dbName',"CustomerContact");//删除数据的时候需要
         $this->assign("controlName","cust_contact");//名字对应cust_company_modalOne，和cust_companyModal.html
         if($reqType){
             $this->$reqType();
