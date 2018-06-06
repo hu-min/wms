@@ -69,6 +69,7 @@
                             <th>类别</th>
                             <th>公司账户</th>
                             <th>支付对象</th>
+                            <th>内容</th>
                             <th>起始日</th>
                             <th>结束日</th>
                             <th>总额</th>
@@ -76,6 +77,8 @@
                             <th>剩余未付</th>
                             <th>支付时间</th>
                             <th>财务备注</th>
+                            <th>状态</th>
+                            <th>操作</th>
                         </tr>
                     </thead>
                     <tbody class="{$controlName}-table">
@@ -97,7 +100,8 @@
     </div>
     <script>
         function fix_expense_initInfo(){
-            $(tabId+" .global-modal .modal-content .chosen-expenclas").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
+            $(tabId+" .global-modal .modal-content .chosen-select").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
+            init_date();
         }
 
         $(function(){
@@ -119,6 +123,23 @@
             //     }
             // })
         })
+        function fix_expense_setInfo(info){
+            $(tabId+" .modal-info[name='expenClas']").find("option[value='"+info['expenClas']+"']").prop("selected",true)
+            $(tabId+" .modal-info[name='finanAccount']").find("option[value='"+info['finanAccount']+"']").prop("selected",true)
+            $(tabId+" .global-modal .modal-content .chosen-select").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
+            init_date();
+            $(tabId+" .modal-info[name='id']").val(info['id']);
+            $(tabId+" .modal-info[name='toObject']").val(info['toObject']);
+            $(tabId+" .modal-info[name='content']").val(info['content']);
+            $(tabId+" .modal-info[name='startDate']").val(info['startDate']);
+            $(tabId+" .modal-info[name='endDate']").val(info['endDate']);
+            $(tabId+" .modal-info[name='fee']").val(info['fee']);
+            $(tabId+" .modal-info[name='payment']").val(info['payment']);
+            $(tabId+" .modal-info[name='noPayment']").val(info['noPayment']);
+            $(tabId+" .modal-info[name='payTime']").val(info['payTime']);
+            $(tabId+" .modal-info[name='remark']").val(info['remark']);
+            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
+        }
         // function setCityOption(pid,whereCity,cityId){
         //     datas["reqType"]="getCityList";
         //     datas["pid"]=pid

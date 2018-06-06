@@ -90,3 +90,9 @@
 #v-notice-window .box-title{
 	font-size: 15px;
 }
+.pad-left-0{
+	padding-left:0;
+}
+.pad-right-0{
+	padding-right:0;
+}

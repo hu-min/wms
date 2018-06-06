@@ -8,6 +8,7 @@ var filesData={};
 function get(url,datas,callBack){
     setLoad()
     asyncs=arguments[3]!=undefined?arguments[3]:true;
+    datas["vtabId"]=tabId
     $.ajax({
         url:url,
         type:'get',
@@ -28,6 +29,7 @@ function get(url,datas,callBack){
 function post(url,datas,callBack){
     asyncs=arguments[3]!=undefined?arguments[3]:true;
     setLoad()
+    datas["vtabId"]=tabId
     $.ajax({
         url:url,
         type:'post',
@@ -597,3 +599,21 @@ $("#v-notice-window .v-close").on("click",function(){
         $("#v-notice-window").addClass("none");
     } 
 })
+/** 
+ * javascript comment 
+ * @Author: vition 
+ * @Date: 2018-06-06 23:54:32 
+ * @Desc: 整合日期插件 
+ */
+function init_date(){
+    var opt = arguments[0]
+    $(tabId+" .date-input").each(function(){
+        var option =opt ? opt : {theme: '#3C8DBC'}
+        var thisId = $(this).attr("id")
+        option["elem"] = option["elem"] ? option["elem"] : "#"+thisId
+        if(thisId){
+            // console.log(thisId)
+            laydate.render(option);
+        }
+    })
+}

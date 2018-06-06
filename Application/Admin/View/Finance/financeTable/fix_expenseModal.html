@@ -10,7 +10,7 @@
             <input class="modal-info" value="0" name="id" type="hidden">
             <div class="form-group"> 
                 <label class="control-label">固定支出类别：</label>
-                <select class="form-control search-info chosen-expenclas chosen-select" title="固定支出类别" name="expenClas">
+                <select class="form-control modal-info chosen-expenclas chosen-select" title="固定支出类别" name="expenClas">
                     <volist name="expenClasArr" id="item">
                         <option value="{$item.basicId}">{$item.name}</option>
                     </volist>
@@ -18,23 +18,74 @@
             </div>
             <div class="form-group">
                 <label for="info-title">公司账户：</label>
-                <input class="form-control modal-info" required="required" name="contact" title="公司账户" placeholder="公司账户" type="text">
+                <select class="form-control modal-info chosen-accName chosen-select" title="公司账户" name="finanAccount">
+                    <volist name="companyAccount" id="item">
+                        <option value="{$item.basicId}">{$item.accName}:{$item.name}</option>
+                    </volist>
+                </select>
             </div>
             <div class="form-group">
                 <label for="info-title">支付对象：</label>
-                <input class="form-control modal-info datetime" required="required" name="phone" title="支付对象" placeholder="支付对象" type="text">
+                <input class="form-control modal-info datetime" required="required" name="toObject" title="支付对象" placeholder="支付对象" type="text">
             </div>
             <div class="form-group">
                 <label for="info-title">内容：</label>
-                <input class="form-control modal-info" name="email" title="内容" placeholder="内容" type="text">
+                <input class="form-control modal-info" name="content" title="内容" placeholder="内容" type="text">
+            </div>
+            <div class="col-md-6 pad-left-0">
+                <div class="form-group">
+                    <label>起始日期:</label>
+                    <div class="input-group date">
+                        <div class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <input class="form-control pull-right date-input modal-info" name="startDate" id="{$vtabId}-startDate" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 pad-right-0">
+                <div class="form-group">
+                    <label>结束日期:</label>
+                    <div class="input-group date">
+                        <div class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <input class="form-control pull-right date-input modal-info" name="endDate" id="{$vtabId}-endDate" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 pad-left-0">
+                <div class="form-group">
+                    <label for="info-title">总额：</label>
+                    <input class="form-control modal-info" name="fee" title="总额" placeholder="总额" type="text">
+                </div>
+            </div>
+            <div class="col-md-6 pad-right-0">
+                <div class="form-group">
+                    <label for="info-title">当月已付：</label>
+                    <input class="form-control modal-info" name="payment" title="当月已付" placeholder="当月已付" type="text">
+                </div>
+            </div>
+            <div class="col-md-6 pad-left-0">
+                <div class="form-group">
+                    <label for="info-title">剩余未付：</label>
+                    <input class="form-control modal-info" name="noPayment" title="剩余未付" placeholder="剩余未付" type="text">
+                </div>
+            </div>
+            <div class="col-md-6 pad-right-0">
+                <div class="form-group">
+                    <label>支付日期:</label>
+                    <div class="input-group date">
+                        <div class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <input class="form-control pull-right date-input modal-info" name="payTime" id="{$vtabId}-payDate" type="text">
+                    </div>
+                </div>
             </div>
             <div class="form-group">
-                <label for="info-title">联系地址：</label>
-                <input class="form-control modal-info" name="address" title="联系地址" placeholder="联系地址" type="text">
-            </div>
-            <div class="form-group">
-                <label for="info-title">备注：</label>
-                <input class="form-control modal-info" name="remarks" title="备注" placeholder="备注" type="text">
+                <label for="info-title">财务备注：</label>
+                <input class="form-control modal-info" name="remark" title="财务备注" placeholder="财务备注" type="text">
             </div>
             <div class="form-group">
                 <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
@@ -42,10 +93,13 @@
                     <if condition="$nodeAuth eq 7">
                         <button type="button" name="0" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
                     </if>
-                    
+
                     <if condition="$processAuth['level'] gt 1">
                         <button type="button" name="1" class="btn btn-success btn-sm status-btn"><i class="fa fa-square text-default"> 批准 </i></button>
-                        <button type="button" name="3" class="btn btn-warning btn-sm status-btn"><i class="fa fa-square text-default"> 拒绝 </i></button>
+                        <if condition="$gettype eq 'Edit'">
+                            <button type="button" name="3" class="btn btn-warning btn-sm status-btn"><i class="fa fa-square text-default"> 拒绝 </i></button>
+                        </if>
+                        
                         <button type="button" name="4" class="btn btn-danger btn-sm status-btn"><i class="fa fa-square text-default"> 删除 </i></button>
                     </if>
                     

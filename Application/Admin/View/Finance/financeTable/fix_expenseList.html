@@ -1,0 +1,31 @@
+<volist name="list" id="item">
+    <tr>
+        <td>{$item['expenClass']}</td>
+        <td>{$item['finanAccs']}</td>
+        <td>{$item['toObject']}</td>
+        <td>{$item['content']}</td>
+        <td><if condition="$item['startDate'] gt 0">{$item['startDate']|date="Y-m-d",###}</if></td>
+        <td><if condition="$item['endDate'] gt 0">{$item['endDate']|date="Y-m-d",###}</if></td>
+        <td>{$item['fee']}</td>
+        <td>{$item['payment']}</td>
+        <td>{$item['noPayment']}</td>
+        <td><if condition="$item['payTime'] gt 0">{$item['payTime']|date="Y-m-d",###}</if></td>
+        <td>{$item['remark']}</td>
+        <td><span class="label bg-{$statusLabel[$item['status']]}">{$statusType[$item['status']]}</span></td>
+        <td class="status-con" data-db="{$dbName}" data-con="{$controlName}" data-id="{$item['id']}" data-url="{$url}" >
+            <button type="button" data-gettype="Edit" data-toggle="modal" data-vtarget=".global-modal" class="btn btn-sm btn-primary v-showmodal">编辑</button>
+            <if condition="in_array($userId,explode(',',$item['examine'])) eq true and $item['status'] eq 2" >
+
+            <else/>
+                <if condition="$processAuth['level'] gt 1 and ($item['status'] eq 0 or  $item['status'] eq 2 )  ">
+                    <button type="button" class="btn btn-success submit-status btn-sm" data-status="1" name="approve" >批准</button>  
+                    <button type="button" class="btn btn-warning submit-status btn-sm" data-status="3" name="refuse">拒绝</button>
+                </if>
+            </if>
+            <if condition="$nodeAuth egt 4 ">
+                <button type="button" class="btn btn-danger btn-sm status-info" data-status="4" data-reqtype="Del"  >删除</button>
+            </if>
+        </td>
+        </td>
+    </tr>
+</volist>

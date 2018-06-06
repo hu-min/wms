@@ -105,6 +105,15 @@ class FinanceController extends BaseController{
         ];
         $basicResult=$this->basicCom->getList($parameter);
         $this->assign("expenClasArr",$basicResult["list"]);//固定支出类别
+        $parameter=[
+            'where'=>["class"=>["IN",["bankstock","cashstock"]]],
+            "fields"=>"basicId,name,CASE class WHEN 'bankstock' THEN '银行库存' ELSE '现金库存' END accName",
+            'page'=>1,
+            'pageSize'=>99999,
+            'orderStr'=>"basicId DESC",
+        ];
+        $stockResult=$this->basicCom->getList($parameter);
+        $this->assign("companyAccount",$stockResult["list"]);//账户类型
         if($reqType){
             $this->$reqType();
         }else{
@@ -122,8 +131,11 @@ class FinanceController extends BaseController{
             $title = "编辑固定支出";
             $btnTitle = "保存数据";
             $redisName="fix_expenseList";
-            $resultData=$this->supplierCom->redis_one($redisName,"id",$id);
+            $resultData=$this->fixExpenCom->redis_one($redisName,"id",$id);
         }
+        $resultData["startDate"] = date("Y-m-d",$resultData["startDate"] );
+        $resultData["endDate"] = date("Y-m-d",$resultData["endDate"] );
+        $resultData["payTime"] = date("Y-m-d",$resultData["payTime"] );
         $modalPara=[
             "data"=>$resultData,
             "title"=>$title,
@@ -140,12 +152,12 @@ class FinanceController extends BaseController{
             $where['expenClas']=$data['expenClas'];
         }
         $parameter=[
-            'fields'=>"`id`,`companyId`,`expenClas`,`finanAccount`,`toObject`,`content`,`startDate`,`endDate`,`fee`,`payment`,noPayment,payTime,remark,addTime,status,processLevel,author,examine",
+            'fields'=>"`id`,`expenClas`,expenClass,`finanAccount`,finanAccs,`toObject`,`content`,`startDate`,`endDate`,`fee`,`payment`,noPayment,payTime,remark,addTime,status,processLevel,author,examine",
             'where'=>$where,
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"id DESC",
-            // "joins"=>"LEFT JOIN (SELECT companyId cid,company FROM v_supplier_company WHERE status=1) c ON c.cid=companyId",
+            "joins"=>["LEFT JOIN (SELECT basicId , `name` expenClass FROM v_basic WHERE status=1 AND class='expenClas' ) bt ON bt.basicId=expenClas","LEFT JOIN (SELECT basicId , `name` finanAccs FROM v_basic WHERE class in ('bankstock','cashstock') ) bf ON bf.basicId=finanAccount"],
         ];
         
         $listResult=$this->fixExpenCom->getList($parameter);
@@ -154,6 +166,15 @@ class FinanceController extends BaseController{
     function manageFixExpenInfo(){
         $reqType=I("reqType");
         $datas=I("data");
+        if(isset($datas['startDate'])){
+            $datas['startDate']=strtotime($datas['startDate']);
+        }
+        if(isset($datas['endDate'])){
+            $datas['endDate']=strtotime($datas['endDate']);
+        }
+        if(isset($datas['payTime'])){
+            $datas['payTime']=strtotime($datas['payTime']);
+        }
         if($reqType=="fix_expenseAdd"){
             $datas['addTime']=time();
             $datas['author']=session("userId");
@@ -176,7 +197,7 @@ class FinanceController extends BaseController{
                 $data['content']=$datas['content'];
             }
             if(isset($datas['startDate'])){
-                $data['startDate']=$datas['startDate'];
+                $data['startDate']= $datas['startDate'];
             }
             if(isset($datas['endDate'])){
                 $data['endDate']=$datas['endDate'];

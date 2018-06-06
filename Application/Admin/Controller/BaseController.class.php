@@ -55,6 +55,10 @@ class BaseController extends \Common\Controller\BaseController{
                 $this->prompt(1,'警告!','您不具备访问此页面的权限，如果您认为值得拥有，请联系管理员！');
                 exit;
             }
+            $vtabId	= I("vtabId");
+            if($vtabId){
+                $this->assign('vtabId',ltrim($vtabId,"#"));
+            }
             $this->processAuth=$this->iniProcessAuth();
             $this->assign('nodeAuth',$this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]);
             $this->assign('userId',session("userId"));
