@@ -124,7 +124,7 @@ class BaseController extends \Common\Controller\BaseController{
      * @Date: 2018-06-02 00:34:18 
      * @Desc: 从redis中获取单一数据，没有就查指定数据库id 
      */    
-    function redis_one($redisName,$key,$id){
+    function redis_one($redisName,$key,$id,$db=false){
         $listRedisName=$redisName;
         $listRedis=$this->Redis->get($listRedisName);
         $itemData=[];
@@ -137,7 +137,10 @@ class BaseController extends \Common\Controller\BaseController{
             }
         }
         if(empty($itemData)){
-            $questResult=$this->getOne([$key=>$id]);
+            if($db){
+                $questResult=$this->selfDB = $this->$db;
+            }
+            $questResult=$this->getOne(["where"=>[$key=>$id]]);
             if($questResult->errCode==0){
                 $itemData=$questResult["list"];
             }

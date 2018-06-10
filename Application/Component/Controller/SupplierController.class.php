@@ -11,8 +11,16 @@ class SupplierController extends BaseController{
 
     function getCompanyList($parameter=[],$one=false){
         $this->selfDB=$this->companyDB;
+        $redisName="sup_companyList";
         if($one){
-            return $this->getOne($parameter);
+            $itemData=$this->redis_one($redisName,"companyId",$id,"companyDB");
+            if(empty($itemData)){
+                $result=$this->getOne($parameter);
+                if(isset($result["list"])){
+                    $itemData=$result["list"]; 
+                }
+            }
+            return $itemData;
         }
         return $this->getList($parameter);
     }
@@ -26,8 +34,16 @@ class SupplierController extends BaseController{
     }
     function getSupplierList($parameter=[],$one=false){
         $this->selfDB=$this->contactDB;
+        $redisName="sup_contactList";
         if($one){
-            return $this->getOne($parameter);
+            $itemData=$this->redis_one($redisName,"contactId",$id,"contactDB");
+            if(empty($itemData)){
+                $result=$this->getOne($parameter);
+                if(isset($result["list"])){
+                    $itemData=$result["list"]; 
+                }
+            }
+            return $itemData;
         }
         return $this->getList($parameter);
     }

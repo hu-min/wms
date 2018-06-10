@@ -19,10 +19,7 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">联系人列表</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <if condition="$processAuth['level'] gt 0">
-                            <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加联系人" data-target="#modal-contactInfo" data-con="supcontact" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 新增联系人</button>
-                        </if>
-                        
+                        {:add_btn(get_defined_vars(),"新增联系人")}                           
                     </div>
                     <div class="box-body search-body" id="supcontact-search-box">
                         <div class="col-md-12">
@@ -53,11 +50,6 @@
                                     <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
                                     <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 </div>
-                                <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 7">
-                                    <div class="form-group">
-                                        <button type="button" data-gettype="Add" data-toggle="modal"  data-url="{$url}" data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info info-edit v-showmodal"><i class="fa fa-fw fa-user-plus "></i> 新增联系人 </button>
-                                    </div>
-                                </if>
                             </div>
                             <br>
                         </div>
@@ -158,7 +150,7 @@
             $(tabId+" .modal-info[name='email']").val(info['email']);
             $(tabId+" .modal-info[name='address']").val(info['address']);
             $(tabId+" .modal-info[name='remarks']").val(info['remarks']);
-            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
+            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"),info,"{$Think.session.userId}","{$nodeAuth}")
             
         }
         // //初始分类的select数据

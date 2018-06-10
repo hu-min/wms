@@ -142,6 +142,11 @@ function setLevelTree($param=[]){
     }
     return [$nodes=>_setTree($nodeLevel,1,$id,$pid,$nodes)];
 }
+/** 
+ * @Author: vition 
+ * @Date: 2018-06-09 23:01:27 
+ * @Desc: utf8格式的截取字符串 
+ */
 function utf8_substr($str,$length,$middle=false){
     $suf="";
     if(mb_strlen($str)>$length){
@@ -153,3 +158,93 @@ function utf8_substr($str,$length,$middle=false){
     }
     return mb_substr($str,0,$length,"utf8").$suf;
 }
+
+//各类权限按钮全局函数开始
+/** 
+ * @Author: vition 
+ * @Date: 2018-06-09 23:01:13 
+ * @Desc: list列表中的按钮状态 
+ */
+function list_btn($defind_vars,$id){
+    $statusLabel = $defind_vars["statusLabel"];
+    $statusType = $defind_vars["statusType"];
+    $item = $defind_vars["item"];
+    $dbName = $defind_vars["dbName"];
+    $controlName = $defind_vars["controlName"];
+    $url = $defind_vars["url"];
+    $userId = $defind_vars["userId"];
+    $nodeAuth = $defind_vars["nodeAuth"];
+    $processAuth = $defind_vars["processAuth"];
+    echo "<td><span class='label bg-{$statusLabel[$item['status']]}'>{$statusType[$item['status']]}</span></td>";
+    echo "<td class='status-con' data-db='{$dbName}' data-con='{$controlName}' data-id='".$item[$id]."' data-url='{$url}' >";
+    if($nodeAuth >= 1){
+        echo "<button type='button' data-gettype='Edit' data-toggle='modal' data-vtarget='.global-modal' class='btn btn-sm btn-primary v-showmodal'>查看</button>";
+    }
+    if($processAuth['level'] > 1 && ($item['status'] == 0 or  $item['status'] == 2 )){
+        echo "  <button type='button' class='btn btn-success submit-status btn-sm' data-status='1' name='approve' >批准</button>";
+        if($item['author'] != $userId){
+            echo "  <button type='button' class='btn btn-warning submit-status btn-sm' data-status='3' name='refuse' >拒绝</button>";
+        }
+    }
+    if($nodeAuth >= 4){
+        echo "  <button type='button' class='btn btn-danger btn-sm status-info' data-status='4' data-reqtype='Del'  >删除</button>";
+    }
+    echo "</td>";
+}
+/** 
+ * @Author: vition 
+ * @Date: 2018-06-09 23:57:37 
+ * @Desc: modal里按钮权限 
+ */
+function modal_btn($defind_vars){
+    $userId = $defind_vars["userId"];
+    $nodeAuth = $defind_vars["nodeAuth"];
+    $processAuth = $defind_vars["processAuth"];
+    $gettype = $defind_vars["gettype"];
+    $item = $defind_vars["data"];
+    if($nodeAuth >= 7){
+        echo "<button  type='button' name='0' class='btn btn-default btn-sm active status-btn'><i class='fa fa-square text-default'></i> 未启用 </button>";
+    }
+    if($processAuth['level'] > 1 && !in_array($userId,explode(',',$item['examine'])) || $item['status'] == 1 || $nodeAuth>= 7){
+        echo "<button type='button' name='1' class='btn btn-success btn-sm status-btn'><i class='fa fa-square text-default'> 批准 </i></button>";
+    }
+    if($processAuth['level'] > 1 && ($item['status'] == 0 ||  $item['status'] == 2 ) && !in_array($userId,explode(',',$item['examine'])) || ($nodeAuth>= 7 && $gettype == "Edit")){
+        echo "<button type='button' name='3' class='btn btn-warning btn-sm status-btn'><i class='fa fa-square text-default'> 拒绝 </i></button>";
+    }
+    if($nodeAuth >= 4){
+        echo "  <button type='button' name='4' class='btn btn-danger btn-sm status-btn'><i class='fa fa-square text-default'> 删除 </i></button>";
+    }
+}
+/** 
+ * @Author: vition 
+ * @Date: 2018-06-10 00:42:43 
+ * @Desc: 新增保存按钮权限 
+ */
+function save_btn($defind_vars){
+    $processAuth = $defind_vars["processAuth"];
+    $nodeAuth = $defind_vars["nodeAuth"];
+    $controlName = $defind_vars["controlName"];
+    $gettype = $defind_vars["gettype"];
+    $btnTitle = $defind_vars["btnTitle"];
+    $item = $defind_vars["data"];
+    $userId = $defind_vars["userId"];
+    $url = $defind_vars["url"];
+    if((($item["author"] == $userId && $item['status'] == 0) || ($gettype == "Add" && $processAuth['level'] > 0) || (($processAuth['level'] -1) == $item["processLevel"] && $item["processLevel"] > 0))  || $nodeAuth>= 7){
+        echo "<button type='button' class='btn btn-primary save-info' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' data-modal='true'>{$btnTitle}</button>";
+    }
+}
+/** 
+ * @Author: vition 
+ * @Date: 2018-06-10 08:59:16 
+ * @Desc: 新增的按钮权限 
+ */
+function add_btn($defind_vars,$title="新增"){
+    $processAuth = $defind_vars["processAuth"];
+    $nodeAuth = $defind_vars["nodeAuth"];
+    $url = $defind_vars["url"];
+    $controlName = $defind_vars["controlName"];
+    if(($processAuth['level'] > 0 && $nodeAuth >= 2) || $nodeAuth >= 7){
+        echo "<button type='button' data-gettype='Add' data-toggle='modal'  data-url='{$url}' data-vtarget='.global-modal' data-con='{$controlName}' class='btn btn-info info-edit v-showmodal'><i class='fa fa-fw fa-user-plus '></i> {$title} </button>";
+    }
+}
+//各类权限按钮全局函数结束

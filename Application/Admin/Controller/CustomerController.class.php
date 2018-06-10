@@ -65,7 +65,7 @@ class CustomerController extends BaseController{
             $title = "编辑客户公司";
             $btnTitle = "保存数据";
             $redisName="sup_companyList";
-            $resultData=$this->customerCom->redis_one($redisName,"companyId",$id);
+            $resultData=$this->customerCom->redis_one($redisName,"companyId",$id,"companyDB");
         }
         $modalPara=[
             "data"=>$resultData,
@@ -164,21 +164,10 @@ class CustomerController extends BaseController{
             }
             if(isset($datas['status'])){
                 $parameter=[
-                    'where'=>["companyId"=>$id],
+                    'where'=>["companyId"=>$datas['companyId']],
                 ];
                 $result=$this->customerCom->getCompanyList($parameter,true);
-                if($result["examine"]==""){
-                    $data['examine']=session("userId");
-                }else{
-                    $data['examine'].=",".session("userId");
-                }
-		        if($datas['status']==1 && $this->processAuth["level"] == $this->processAuth["allLevel"]){
-                    $data['status']=$datas['status'];
-                    $data['processLevel'] = 0;
-                }else if($datas['status']==1){
-                    $data['status']=2;
-                    $data['processLevel'] = $this->processAuth["level"];
-                }
+                $data = $this->status_update($result,$datas["status"],$data);
             }
             $data['upateTime']=time();
             if(isset($datas['remarks'])){
@@ -261,7 +250,7 @@ class CustomerController extends BaseController{
             $title = "编辑客户联系人";
             $btnTitle = "保存数据";
             $redisName="cust_contactList";
-            $resultData=$this->customerCom->redis_one($redisName,"contactId",$id);
+            $resultData=$this->customerCom->redis_one($redisName,"contactId",$id,"contactDB");
         }
         $modalPara=[
             "data"=>$resultData,
@@ -319,13 +308,13 @@ class CustomerController extends BaseController{
     function manageContactInfo(){
         $reqType=I("reqType");
         $datas=I("data");
-        if($reqType=="contactAdd"){
+        if($reqType=="cust_contactAdd"){
             $datas['addTime']=time();
             $datas['processLevel']=$this->processAuth["level"];
             $datas['author']=session("userId");
             unset($datas['contactId']);
             return $datas;
-        }else if($reqType=="contactEdit"){
+        }else if($reqType=="cust_contactEdit"){
             $where=["contactId"=>$datas['contactId']];
             $data=[];
             $data['updateTime']=time();
@@ -349,21 +338,10 @@ class CustomerController extends BaseController{
             }
             if(isset($datas['status'])){
                 $parameter=[
-                    'where'=>["contactId"=>$id],
+                    'where'=>["contactId"=>$datas['contactId']],
                 ];
                 $result=$this->customerCom->getCustomerList($parameter,true);
-                if($result["examine"]==""){
-                    $data['examine']=session("userId");
-                }else{
-                    $data['examine'].=",".session("userId");
-                }
-                if($datas['status']==1 && $this->processAuth["level"] == $this->processAuth["allLevel"]){
-                    $data['status']=$datas['status'];
-                    $data['processLevel'] = 0;
-                }else if($datas['status']==1){
-                    $data['status']=2;
-                    $data['processLevel'] = $this->processAuth["level"];
-                }
+                $data = $this->status_update($result,$datas["status"],$data);
             }
             $data['upateTime']=time();
             return ["where"=>$where,"data"=>$data];

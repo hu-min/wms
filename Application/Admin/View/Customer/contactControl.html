@@ -18,6 +18,8 @@
                     <div class="box-header">
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">联系人列表</h4>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        {:add_btn(get_defined_vars(),"新增联系人")} 
                     </div>
                     <div class="box-body search-body" id="contact-search-box">
                         <div class="col-md-12">
@@ -49,11 +51,8 @@
                                     <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
                                     <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 </div>
-                                <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 7">
-                                    <div class="form-group">
-                                        <button type="button" data-gettype="Add" data-toggle="modal"  data-url="{$url}" data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info info-edit v-showmodal"><i class="fa fa-fw fa-user-plus "></i> 新增联系人 </button>
-                                    </div>
-                                </if>
+                                
+
                                 
                             </div>
                             <br>
@@ -109,7 +108,7 @@
                 $(tabId+" .status-btn").removeClass("active");
                 $(tabId+" .status-btn[name='0']").addClass("active");
                 $(tabId+" .modal-info").prop("disabled",false)
-                set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
+                set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"),info,"{$Think.session.userId}","{$nodeAuth}")
             })
             //供应商列表
             $(tabId+" .chosen-cusCompany").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true,ajax_load:{url:"{$url}",data:{reqType:"getCusCompanyList"},value:"companyId",text:"company"}})

@@ -212,7 +212,7 @@ $(document).on("click",'.status-btn',function(){
     set_status_btn(this)
 })
 //状态按钮设置函数
-function set_status_btn(this_btn){
+function set_status_btn(this_btn,info,userId,nodeAuth){
     var thisIndex = $(this_btn).index()-1;
     $(this_btn).parents(".status-group").children(".status-btn").each(function(index){
         $(this).removeClass("active");
@@ -231,6 +231,11 @@ function set_status_btn(this_btn){
         }
     })
     $(this_btn).parent(".status-group").children("input[name='status']").val($(this_btn).attr("name"));
+    if(info){
+        if(((info['status'] == 1 || info['processLevel'] == 2) || info['author'] != userId )  && nodeAuth<7){
+            $(tabId+" .modal-info").prop("disabled",true)
+        }
+    }
 }
 /** 
  * javascript comment 
@@ -559,9 +564,9 @@ function setLoad(){
  * notice(status,content,title,seconds)
  */
 function notice(status){
-    // ["box-warning","box-danger","box-primary"].forEach(function(col){
-    //     $("#v-notice-window .box-solid").removeClass(col);
-    // })
+    ["box-warning","box-danger","box-primary"].forEach(function(col){
+        $("#v-notice-window .box-solid").removeClass(col);
+    })
     var color="box-warning"
     var title = "";
     var content = "";

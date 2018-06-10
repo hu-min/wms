@@ -146,7 +146,7 @@ class BaseController extends \Common\Controller\BaseController{
             session('userName',$userInfo['userName']);
             session('roleId',$userInfo['roleId']);
             session('rolePid',$userInfo['rolePid']);
-	    $this->vlog(1);
+	        $this->vlog(1);
             if($userInfo['avatar']==""){
                 $userInfo['avatar']=U(__ROOT__.'/Public'.'/admintmpl'."/dist/img/avatar/avatar".rand(1,5).".png",'','');
             }else{
@@ -311,19 +311,7 @@ class BaseController extends \Common\Controller\BaseController{
             ];
             $findResult=$dbObject->where($updateData)->find();
             $updateData['processLevel'] = $this->processAuth["level"];
-            if($findResult["examine"]==""){
-                $updateData['examine']=session("userId");
-            }else{
-                $updateData['examine']=$findResult['examine'].",".session("userId");
-            }
-            if($status==1 && $this->processAuth["level"] == $this->processAuth["allLevel"]){
-                $updateData['status']=$status;
-                $updateData['processLevel'] = 0;
-            }else if($status==1){
-                $updateData['status']=2;
-            }else if($status==3){
-                $updateData['status']=$status;
-            }
+            $updateData = $this->status_update($findResult,$status,$updateData);
             
             $updateData["updateTime"]=time();
             $conResult = $conResult=$dbObject->save($updateData);
@@ -350,7 +338,7 @@ class BaseController extends \Common\Controller\BaseController{
         $assign["btnTitle"] = $parameter["btnTitle"] ? $parameter["btnTitle"] : ($gettype=="Add" ? "新增":"编辑");
 
         $data = $parameter["data"] ? $parameter["data"] : [];
-
+        $assign["data"] = $parameter["data"] ? $parameter["data"] : [];
         $tpFolder = $parameter["tpFolder"] ? $parameter["tpFolder"] : CONTROLLER_NAME;
         $folder = $parameter["folder"] ? $parameter["folder"] : strtolower(CONTROLLER_NAME).'Table';
         $templet = $parameter["templet"] ? $parameter["templet"] : strtolower($control).'Modal';
@@ -389,7 +377,33 @@ class BaseController extends \Common\Controller\BaseController{
         }
         $this->ajaxReturn($returnData);
     }
-    function statusProcess(){
-
+    /** 
+     * @Author: vition 
+     * @Date: 2018-06-10 10:16:00 
+     * @Desc: 修改状态值 
+     */    
+    function status_update($result,$status,$data){
+        if($status > 0){
+            if($result["examine"]==""){
+                $data['examine']=session("userId");
+            }else{
+                $examineArr = explode(",",$result["examine"]);
+                if(!in_array(session("userId"),$examineArr)){
+                    array_push($examineArr,session("userId"));
+                    $data['examine']=implode(",",$examineArr);
+                }
+            }
+        }
+        
+        if($status==1 && $this->processAuth["level"] == $this->processAuth["allLevel"]){
+            $data['status']=$status;
+            $data['processLevel'] = 0;
+        }else if($status==1){
+            $data['status']=2;
+            $data['processLevel'] = $this->processAuth["level"];
+        }else if($status==3){
+            $updateData['status']=$status;
+        }
+        return $data;
     }
 }

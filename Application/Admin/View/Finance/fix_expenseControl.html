@@ -20,7 +20,7 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">固定支出列表</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 7">
+                        <if condition="$processAuth['level'] gt 0 and $nodeAuth egt 2 or $nodeAuth egt 7">
                             <button type="button" data-gettype="Add" data-toggle="modal"  data-url="{$url}" data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info info-edit v-showmodal"><i class="fa fa-fw fa-user-plus "></i> 新增固定支出 </button>
                         </if>
                         

@@ -246,7 +246,7 @@ class SupplierController extends BaseController{
             $title = "编辑供应商";
             $btnTitle = "保存数据";
             $redisName="sup_companyList";
-            $resultData=$this->supplierCom->redis_one($redisName,"companyId",$id);
+            $resultData=$this->supplierCom->redis_one($redisName,"companyId",$id,"companyDB");
         }
         $modalPara=[
             "data"=>$resultData,
@@ -333,6 +333,8 @@ class SupplierController extends BaseController{
         $datas=I("data");
         if($reqType=="sup_supcompanyAdd"){
             $datas['addTime']=time();
+            $datas['processLevel']=$this->processAuth["level"];
+            $datas['author']=session("userId");
             unset($datas['companyId']);
             return $datas;
         }else if($reqType=="sup_supcompanyEdit"){
@@ -353,14 +355,22 @@ class SupplierController extends BaseController{
             if(isset($datas['address'])){
                 $data['address']=$datas['address'];
             }
-            if(isset($datas['status'])){
-                $data['status']=$datas['status'];
-            }
             if(isset($datas['remarks'])){
                 $data['remarks']=$datas['remarks'];
             }
             if(isset($datas['type'])){
                 $data['type']=$datas['type'];
+            }
+            if(isset($datas['status'])){
+                $parameter=[
+                    'where'=>["companyId"=>$datas['companyId']],
+                ];
+                $result=$this->customerCom->getCompanyList($parameter,true);
+                $data = $this->status_update($result,$datas["status"],$data);
+            }
+            $data['upateTime']=time();
+            if(isset($datas['remarks'])){
+                $data['remarks']=$datas['remarks'];
             }
             return ["where"=>$where,"data"=>$data];
         }
@@ -452,8 +462,8 @@ class SupplierController extends BaseController{
         if($gettype=="Edit"){
             $title = "编辑供应商联系人";
             $btnTitle = "保存数据";
-            $redisName="supcontactList";
-            $resultData=$this->supplierCom->redis_one($redisName,"contactId",$id);
+            $redisName="sup_contactList";
+            $resultData=$this->supplierCom->redis_one($redisName,"contactId",$id,"contactDB");
         }
         $modalPara=[
             "data"=>$resultData,
@@ -488,7 +498,7 @@ class SupplierController extends BaseController{
         ];
         
         $listResult=$this->supplierCom->getSupplierList($parameter);
-        $this->tablePage($listResult,'Supplier/supplierTable/contactList',"supcontactList");
+        $this->tablePage($listResult,'Supplier/supplierTable/contactList',"sup_contactList");
     }
     /** 
      * @Author: vition 

@@ -20,9 +20,7 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">供应商列表</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 7">
-                            <button type="button" data-gettype="Add" data-toggle="modal"  data-url="{$url}" data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info info-edit v-showmodal"><i class="fa fa-fw fa-user-plus "></i> 新增供应商 </button>
-                        </if>                      
+                        {:add_btn(get_defined_vars(),"新增供应商")}                     
                     </div>
                     <div class="box-body search-body">
                         <div class="col-md-12">
@@ -166,21 +164,21 @@
         //         }
         //     })
         // }
-        function supcompanyInfoFuns(){
-            datas["data"]={}
-            $(tabId+" .modal-info").each(function(){
-                var name =$(this).attr("name");
-                var val =$(this).val();
-                var required=$(this).attr("required");
-                var title=$(this).attr("title");
-                if(required=="required" && val==""){
-                    alert(title+"不能为空");
-                    throw title+"不能为空";
-                }else if (name!==undefined){
-                    datas["data"][name]=val;
-                }
-            })
-        }
+        // function supcompanyInfoFuns(){
+        //     datas["data"]={}
+        //     $(tabId+" .modal-info").each(function(){
+        //         var name =$(this).attr("name");
+        //         var val =$(this).val();
+        //         var required=$(this).attr("required");
+        //         var title=$(this).attr("title");
+        //         if(required=="required" && val==""){
+        //             alert(title+"不能为空");
+        //             throw title+"不能为空";
+        //         }else if (name!==undefined){
+        //             datas["data"][name]=val;
+        //         }
+        //     })
+        // }
         /*设置编辑用户信息*/
         function sup_company_setInfo(info){
 
@@ -193,7 +191,7 @@
             $(tabId+" .modal-info[name='type']").html('<option value="'+info['basicId']+'">'+info['typeName']+'</option>');
             $(tabId+" .modal-info[name='type']").trigger("chosen:updated");
 
-            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
+            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"),info,"{$Think.session.userId}","{$nodeAuth}")
 
             $(tabId+" .modal-info[name='provinceId']").find("option[value='"+info['provinceId']+"']").prop("selected",true);
             setCityOption(info['provinceId'],"modal-info")

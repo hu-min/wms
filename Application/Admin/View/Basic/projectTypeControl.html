@@ -40,7 +40,7 @@
                                     <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
                                     <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 </div>
-                                <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 7">
+                                <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 2">
                                     <div class="form-group">
                                         <button type="button" data-gettype="Add" data-toggle="modal" data-url="{$url}"  data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 添加品牌</button>
                                     </div>

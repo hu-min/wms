@@ -23,7 +23,11 @@
                 <div class="box-header">
                     <i class="fa fa-plus-square"></i>
                     <h4 class="box-title">费用类别列表</h4>
-                    <button type="button" data-gettype="Add" data-toggle="modal" data-url="{$url}"  data-vtarget=".global-modal" data-con="{$controlName}" class="btn margin pull-right btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 新建费用类别</button>
+                    <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 2">
+                        <div class="form-group">
+                            <button type="button" data-gettype="Add" data-toggle="modal" data-url="{$url}"  data-vtarget=".global-modal" data-con="{$controlName}" class="btn margin pull-right btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 新建费用类别</button>
+                        </div>
+                    </if>
                 </div>
                 <div class='box-body'>
                     <div class="row">

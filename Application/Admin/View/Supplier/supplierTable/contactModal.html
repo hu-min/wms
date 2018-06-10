@@ -40,17 +40,7 @@
             <div class="form-group">
                 <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
                     <input class="modal-info" value="0" name="status" type="hidden">
-                    <if condition="$nodeAuth eq 7">
-                        <button type="button" name="0" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
-                    </if>
-                    
-                    <if condition="$processAuth['level'] gt 1">
-                        <button type="button" name="1" class="btn btn-success btn-sm status-btn"><i class="fa fa-square text-default"> 批准 </i></button>
-                        <button type="button" name="3" class="btn btn-warning btn-sm status-btn"><i class="fa fa-square text-default"> 拒绝 </i></button>
-                        <button type="button" name="4" class="btn btn-danger btn-sm status-btn"><i class="fa fa-square text-default"> 删除 </i></button>
-                    </if>
-                    
-                    </button>
+                    {:modal_btn(get_defined_vars())}
                 </div>
             </div>
         </div>
@@ -58,7 +48,5 @@
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-    <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 7">
-        <button type="button" class="btn btn-primary save-info" data-con="{$controlName}" data-gettype="{$gettype}" data-url="{$url}" data-modal="true">{$btnTitle}</button>
-    </if>
+    {:save_btn(get_defined_vars())}
 </div>

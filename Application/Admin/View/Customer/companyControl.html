@@ -20,9 +20,7 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">公司列表</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 7">
-                            <button type="button" data-gettype="Add" data-toggle="modal"  data-url="{$url}" data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info info-edit v-showmodal"><i class="fa fa-fw fa-user-plus "></i> 新增公司 </button>
-                        </if>
+                        {:add_btn(get_defined_vars(),"新增客户公司")}
                         
                     </div>
                     <div class="box-body search-body company-search-box">
@@ -191,10 +189,8 @@
             $(tabId+" .modal-info[name='alias']").val(info['alias']);
             $(tabId+" .modal-info[name='address']").val(info['address']);
             $(tabId+" .modal-info[name='remarks']").val(info['remarks']);
-            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
-            if((info['processLevel'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7){
-                $(tabId+" .modal-info").prop("disabled",true)
-            }
+            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"),info,"{$Think.session.userId}","{$nodeAuth}")
+
             if(info['author'] == "{$Think.session.userId}"){
                 $(tabId+" .status-btn[name='3']").addClass("none")
             }else{

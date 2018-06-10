@@ -7,6 +7,7 @@ class UserController extends BaseController{
         parent::_initialize();
         $this->selfDB = D('Component/User');
         $this->nodeDB = D('Component/Node');
+        $this->roleDB = D('Component/Role');
     }
     /** 
      * @Author: vition 
@@ -36,6 +37,13 @@ class UserController extends BaseController{
                 return $res;
 
             }
+            if($userResult['roleId']<=0){
+                $res->errCode=10004;
+                $res->error=getError(10004);
+                return $res;
+            }
+            $roleResult = $this->roleDB->getOne(["where"=>["roleId"=>$userResult['roleId']],"fields"=>"rolePid"]);
+            $userResult['rolePid'] = $roleResult["rolePid"];
             $this->getUserNode($userResult['userId']);
             $res->errCode=0;
             $res->error=getError(0);

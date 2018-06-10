@@ -11,7 +11,7 @@ class CustomerController extends BaseController{
 
     function getCompanyList($parameter=[],$one=false){
         $this->selfDB=$this->companyDB;
-        $redisName="cuscompanyList";
+        $redisName="cust_companyList";
         $parameter["fields"]="`companyId`,`company`,`alias`,`provinceId`,`cityId`,`province`,`city`,`address`,`remarks`,`addTime`,`updateTime`,`status`,`author`,`examine`,processLevel";
         $joins=["LEFT JOIN v_province p ON p.pid=provinceId","LEFT JOIN v_city c ON c.pid=p.pid AND c.cid=cityId"];
         if(isset($parameter["joins"])){
@@ -25,7 +25,7 @@ class CustomerController extends BaseController{
             $parameter["joins"]=$joins;
         }
         if($one){
-            $itemData=$this->redis_one($redisName,"companyId",$id);
+            $itemData=$this->redis_one($redisName,"companyId",$id,"companyDB");
             if(empty($itemData)){
                 $result=$this->getOne($parameter);
                 if(isset($result["list"])){
@@ -34,11 +34,7 @@ class CustomerController extends BaseController{
             }
             return $itemData;
         }
-        $listResult=$this->getList($parameter);
-        if($listResult){
-            $this->Redis->set($redisName,json_encode($listResult['list']),$this->expire);
-        }
-        
+
         return $this->getList($parameter);
     }
     function insertCompany($parameter){
@@ -52,7 +48,7 @@ class CustomerController extends BaseController{
     function getCustomerList($parameter=[],$one=false){
         $this->selfDB=$this->contactDB;
         $parameter["fields"]="`contactId`,`companyId`,`contact`,`phone`,`email`,`address`,`remarks`,`addTime`,`updateTime`,`status`,company,`author`,`examine`,processLevel";
-        $redisName="cuscontactList";
+        $redisName="cust_contactList";
         $joins=["LEFT JOIN (SELECT companyId cid,company FROM v_customer_company WHERE status=1) c ON c.cid=companyId"];
         if(isset($parameter["joins"])){
             if(is_array($parameter["joins"])){
@@ -65,7 +61,7 @@ class CustomerController extends BaseController{
             $parameter["joins"]=$joins;
         }
         if($one){
-            $itemData=$this->redis_one($redisName,"contactId",$id);
+            $itemData=$this->redis_one($redisName,"contactId",$id,"contactDB");
             if(empty($itemData)){
                 $result=$this->getOne($parameter);
                 if(isset($result["list"])){
@@ -74,11 +70,7 @@ class CustomerController extends BaseController{
             }
             return $itemData;
         }
-        $listResult=$this->getList($parameter);
-        if($listResult){
-            $this->Redis->set($redisName,json_encode($listResult['list']),$this->expire);
-        }
-        return $listResult;
+        return $this->getList($parameter);
     }
     function insertContact($parameter){
         $this->selfDB=$this->contactDB;
