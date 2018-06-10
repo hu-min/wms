@@ -91,7 +91,7 @@ class BaseController extends \Common\Controller\BaseController{
             }
         }
         $logType=$this->LogCom->getType(strtolower($reqType));	
-        if($logType>2){
+        if($logType>2 && $logType<=8){
             if(I("delType")=="deepDel"){
                 $logType=6;
             }

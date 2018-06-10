@@ -24,15 +24,15 @@ class LogController extends BaseController{
 		$this->selfDB->insert($logInfo);
     }
     protected function formatDesc($type){
-		$userName=session("userName");
-		$time=date("Y-m-d H:i:s");
-		$moduleCon=MODULE_NAME.'/'.CONTROLLER_NAME.'/'.ACTION_NAME;
-		if(in_array($type,[0,1,4,8])){
-			$request="";
-		}else{
-			$request=json_encode($_REQUEST,JSON_UNESCAPED_UNICODE);
-		}
-		return sprintf($this->desc[$type],$userName,$time,$moduleCon,$request);
+			$userName=session("userName");
+			$time=date("Y-m-d H:i:s");
+			$moduleCon=MODULE_NAME.'/'.CONTROLLER_NAME.'/'.ACTION_NAME;
+			if(in_array($type,[0,1,4,8])){
+				$request="";
+			}else{
+				$request=json_encode($_REQUEST,JSON_UNESCAPED_UNICODE);
+			}
+			return sprintf($this->desc[$type],$userName,$time,$moduleCon,$request);
     }
     function getType($class){
 		if($class=="list" || $class=="one"){

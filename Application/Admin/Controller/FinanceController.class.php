@@ -222,18 +222,7 @@ class FinanceController extends BaseController{
                     'where'=>["id"=>$id],
                 ];
                 $result=$this->fixExpenCom->getList($parameter,true);
-                if($result["examine"]==""){
-                    $data['examine']=session("userId");
-                }else{
-                    $data['examine'].=",".session("userId");
-                }
-		        if($datas['status']==1 && $this->processAuth["level"] == $this->processAuth["allLevel"]){
-                    $data['status']=$datas['status'];
-                    $data['processLevel'] = 0;
-                }else if($datas['status']==1){
-                    $data['status']=2;
-                    $data['processLevel'] = $this->processAuth["level"];
-                }
+                $data = $this->status_update($result,$datas["status"],$data);
             }
             return ["where"=>$where,"data"=>$data];
         }
