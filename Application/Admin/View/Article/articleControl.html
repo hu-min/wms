@@ -18,40 +18,42 @@
                     <div class="box-header">
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">文章列表</h4>
-                        <button type="button" data-reqtype="Add" data-toggle="modal" data-title="添加文章" data-target="#modal-articleInfo" data-con="article" class="btn btn-info info-edit"><i class="fa fa-fw fa-user-plus "></i> 添加文章</button>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        {:add_btn(get_defined_vars(),"添加文章")}
                     </div>
-                    <div class="box-body search-body" id="article-search-box">
+                    <div class="box-body search-body">
                         <div class="col-md-12">
                             <div class="form-inline">
-                                <label for="a-title" class="control-label">标题：</label>
+                                <label  class="control-label">标题：</label>
                                 <div class="form-group">
-                                    <input class="form-control search-info" id="a-title" name="title" placeholder="标题" type="text">
+                                    <input class="form-control search-info" name="title" placeholder="标题" type="text">
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <label for="a-author" class="control-label">作者：</label>
+                                <label  class="control-label">作者：</label>
                                 <div class="form-group">
-                                    <input class="form-control search-info" id="a-author" name="author" placeholder="作者" type="text">
+                                    <input class="form-control search-info"  name="author" placeholder="作者" type="text">
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                 <div class="form-group">
                                     <label >上级分类：</label>
-                                    <select class="form-control search-info artclass" title="上级分类" name="class">
+                                    <select class="form-control search-info" title="上级文章分类" name="class">
+                                        {$classOption}
                                     </select>
                                 </div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                 <div class="form-group">
                                     <label >状态：</label>
-                                    <select class="form-control search-info" title="状态" name="status">
+                                    <select class="form-control search-info input-sm" title="状态" name="status">
                                         <option value="">全部</option>
-                                        <option value="0">未启用</option>
-                                        <option value="1">启用</option>
-                                        <option value="2">冻结</option>
-                                        <option value="3">删除</option>
+                                        <volist name="statusType" id="item">
+                                            <option value="{$key}">{$item}</option>
+                                        </volist>
                                     </select>
                                 </div>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <button type="button" data-url="{$url}" id="article-search" data-reqtype="articleList" data-con="article" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
-                                <button type="button" class="btn bg-teal search-refresh" data-con="article"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                <div class="form-group">
+                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                </div>
                             </div>
                             <br>
                         </div>
@@ -76,140 +78,104 @@
                             <th>操作</th>
                         </tr>
                     </thead>
-                    <tbody id="articleTable">
+                    <tbody class="{$controlName}-table">
                         {$tables}
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="dataTables_wrapper">
-            <div id="userPage" class="row page-div" data-url="{$url}" data-reqtype="articleList" data-con="article">
+            <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
                 {$pages}
             </div>
         </div>
     </section>
-    <div class="modal fade" id="modal-articleInfo">
+    <div class="modal fade global-modal">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-            <div class="modal-header">
-                <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Default Modal</h4>
-            </div>
-            <div class="modal-body">
-                <form role="form">
-                    <div class="box-body">
-                        <div class="form-group">
-                            <label for="info-title">标题：</label>
-                            <input id="info-userId" class="modal-info" title="articleId" name="articleId" type="hidden">
-                            <input class="form-control modal-info" id="info-title" name="title" title="标题" placeholder="标题" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label for="article-cover">封面：</label>
-                            <input class="form-control modal-info" id="article-cover" name="cover" title="封面" placeholder="封面" type="text">
-                            <input class="fileupdate" data-input="#article-cover" type="file">
-                        </div>
-                        <div class="form-group">
-                            <label>分类：</label>
-                                <select class="form-control modal-info artclass" title="分类" name="class">
-                                </select>
-                        </div>
-                        <div class="form-group">
-                            <label>标签：</label>
-                            <input class="form-control modal-info" title="标签" name="tags" placeholder="标签" type="text">
-                        </div>
-                        <div class="form-group">
-                            <div class="btn-group user-status status-group" data-toggle="btn-toggle">
-
-                                <button type="button" name="0" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
-                                <button type="button" name="1" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-green"> 启用 </i>
-                                </button>
-                                <button type="button" name="2" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-info"></i> 冻结 </button>
-                                <button type="button" name="3" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-red"></i> 删除 </button>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="art-editor"></div>
-                        </div>
-                    </div>
-                </form>            
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary save-info" data-con="article" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
-            </div>
-            </div>
+            <div class="modal-content"></div>
         </div>
     </div>
     <script src="__ADMINT__/bower_components/wangeditor/wangEditor.js?a=3"></script>
     <script>
-        var E = window.wangEditor
-        var editor = new E(tabId+' .art-editor')
-        //获取分类数据
-        function getArtClsTree() {
-            var tree=[]
-            datas["reqType"]="artclassList";
-            get("{$url}",datas,function(result){
-                tree=result.tree
-            },false)
-            intPClsSelect(tree);
-            return tree;
-        }
-        $(function(){
-            getArtClsTree();
-            //新增文章
-            $(tabId+" .box-header button").on("click",function(){
-                $(tabId+" .modal-info").val("");
-                $(tabId+" #modal-artclass h4").text("新增文章");
-                $(tabId+" #modal-artclass .save-info").data("reqtype","Add");
-                $(tabId+" #modal-artclass .save-info").text("新增文章");
-                $(tabId+" .modal-dialog .artclass").find("option[value='0']").prop("selected",true);
-                $(tabId+" .modal-dialog .artclass").trigger('chosen:updated');
-                $(tabId+" .status-btn").removeClass("active");
-                $(tabId+" .status-btn[name='1']").addClass("active");
-                editor.txt.html("")
+        function article_initInfo(){
+            $(".art-editor").find('div[id^="text"]').blur(function(){
+                // var editorContent=editor.txt.html()
+                console.log("editorContent");
             })
+            var E = window.wangEditor
+            var editor = new E(tabId+' .art-editor')
             editor.customConfig.uploadImgShowBase64 = true
             editor.create()
+            $(tabId).on("blur",".art-editor div[id^='text']",function(){
+                var editorContent=editor.txt.html()
+                $(tabId+" .modal-info[name='content']").val(editorContent)
+                console.log(editorContent);
+            })
+        }
+        
+        //获取分类数据
+        // function getArtClsTree() {
+        //     var tree=[]
+        //     datas["reqType"]="artclassList";
+        //     get("{$url}",datas,function(result){
+        //         tree=result.tree
+        //     },false)
+        //     intPClsSelect(tree);
+        //     return tree;
+        // }
+        $(function(){
+            // getArtClsTree();
+            //新增文章
+            // $(tabId+" .box-header button").on("click",function(){
+            //     $(tabId+" .modal-info").val("");
+            //     $(tabId+" #modal-artclass h4").text("新增文章");
+            //     $(tabId+" #modal-artclass .save-info").data("reqtype","Add");
+            //     $(tabId+" #modal-artclass .save-info").text("新增文章");
+            //     $(tabId+" .modal-dialog .artclass").find("option[value='0']").prop("selected",true);
+            //     $(tabId+" .modal-dialog .artclass").trigger('chosen:updated');
+            //     $(tabId+" .status-btn").removeClass("active");
+            //     $(tabId+" .status-btn[name='1']").addClass("active");
+            //     editor.txt.html("")
+            // })
+            // editor.customConfig.uploadImgShowBase64 = true
+            // editor.create()
         })
         function articleReFuns(){
 
         }
-        function articleSearchFuns(){
-            datas['data']={}
-            $(tabId+" .search-info").each(function(){
-                var name=$(this).attr("name");
-                var val=$(this).val();
-                if(val!=""){
-                    datas['data'][name]=val
-                }
-            })
-        }
-        function articleInfoFuns(){
-            datas["data"]={}
-            $(tabId+" .modal-info").each(function(){
-                var name =$(this).attr("name");
-                var val =$(this).val();
-                if(name=="title" && val==""){
-                    alert("标题不能为空");
-                    throw "标题不能为空";
-                }else if(name=="class" && val<=0){
-                    alert("必须选择分类");
-                    throw "必须选择分类";
-                }else if(val!=""){
-                    datas["data"][name]=val;
-                }
+        // function articleSearchFuns(){
+        //     datas['data']={}
+        //     $(tabId+" .search-info").each(function(){
+        //         var name=$(this).attr("name");
+        //         var val=$(this).val();
+        //         if(val!=""){
+        //             datas['data'][name]=val
+        //         }
+        //     })
+        // // }
+        // function article_getInfo(){
+        //     datas["data"]={}
+        //     $(tabId+" .modal-info").each(function(){
+        //         var name =$(this).attr("name");
+        //         var val =$(this).val();
+        //         if(name=="title" && val==""){
+        //             alert("标题不能为空");
+        //             throw "标题不能为空";
+        //         }else if(name=="class" && val<=0){
+        //             alert("必须选择分类");
+        //             throw "必须选择分类";
+        //         }else if(val!=""){
+        //             datas["data"][name]=val;
+        //         }
                 
-            })
-            var editorContent=editor.txt.html()
-            if(editorContent!=""){
-                datas["data"]["content"]=editorContent
-            }
-            datas["data"].status=$(tabId+" .status-group .active").attr("name")
-        }
+        //     })
+        //     var editorContent=editor.txt.html()
+        //     if(editorContent!=""){
+        //         datas["data"]["content"]=editorContent
+        //     }
+        // }
         /*设置编辑用户信息*/
-        function articleShowFuns(info){
+        function article_setInfo(info){
 
             $(tabId+" .modal-info[name='articleId']").val(info['articleId']);
             $(tabId+" .modal-info[name='title']").val(info['title']);
@@ -220,13 +186,13 @@
             editor.txt.html(info['content'])
         }
         //初始分类的select数据
-        function intPClsSelect(data){
-            var option='<option value="0">根Root</option>';
-            data.forEach(ele => {
-                option+=getArtClsNode(ele,0);
-            });
-            $(tabId+" .artclass").html(option);
-        }
+        // function intPClsSelect(data){
+        //     var option='<option value="0">根Root</option>';
+        //     data.forEach(ele => {
+        //         option+=getArtClsNode(ele,0);
+        //     });
+        //     $(tabId+" .artclass").html(option);
+        // }
     </script>
 </body>
 </html>

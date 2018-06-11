@@ -10,6 +10,8 @@ class ArticleController extends BaseController{
     protected $pageSize=15;
 
     public function _initialize() {
+        $this->statusType = [0=>"未启用",1=>"启用",3=>"无效",4=>"删除"];
+        $this->processType=[0=>"未启用",1=>"启用",4=>"删除"];
         parent::_initialize();
         $this->articleCom=getComponent('Article');
         $this->classCom=getComponent('ArticleClass');
@@ -23,12 +25,48 @@ class ArticleController extends BaseController{
      */    
     function articleControl(){
         $reqType=I('reqType');
+        $option='<option value="0">根Root</option>';
+        foreach ($this->getArtClsTree() as $key => $value) {
+            $option.=$this->getArtCls($value,0);
+        }
+        $this->assign("classOption",$option);
+        $this->assign('dbName',"Article");//删除数据的时候需要
+        $this->assign("controlName","article");//名字对应cust_company_modalOne，和cust_companyModal.html
+
+        $reqType=I('reqType');
         if($reqType){
             $this->$reqType();
         }else{
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            
             $this->returnHtml();
         }
+    }
+    function article_modalOne(){
+        $title = "新建文章";
+        $btnTitle = "添加";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑文章";
+            $btnTitle = "保存数据";
+            $redisName="articleList";
+            $resultData=$this->articleCom->redis_one($redisName,"articleId",$id);
+            $resultData['content'] = isset($resultData['content']) ? htmlspecialchars_decode($resultData['content']) :'';
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"articleModal",
+        ];
+        $option='<option value="0">根Root</option>';
+        foreach ($this->getArtClsTree() as $key => $value) {
+            $option.=$this->getArtCls($value,0);
+        }
+        $this->assign("classOption",$option);
+        $this->modalOne($modalPara);
     }
     /** 
      * @Author: vition 
@@ -37,13 +75,82 @@ class ArticleController extends BaseController{
      */    
     function classControl(){
         $reqType=I('reqType');
+        $this->assign("controlName","artclass");
+        // $fee_t_main=$this->classCom->get_class_data("FTMClass");//文章分类主类
+        // $main_array=array_combine(array_column($fee_t_main,"basicId"),array_column($fee_t_main,"name"));
+        // $this->assign("fee_main",$fee_t_main);
+        // $this->assign("main_array",$main_array);
         if($reqType){
             $this->$reqType();
         }else{
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->returnHtml();
         }
     }
+    function artclass_modalOne(){
+        $title = "新建文章分类";
+        $btnTitle = "添加分类";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑文章分类";
+            $btnTitle = "保存数据";
+            $redisName="artclassList";
+            $resultData=$this->classCom->redis_one($redisName,"classId",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"artclassModal",
+        ];
+        $option='<option value="0">根Root</option>';
+        foreach ($this->getArtClsTree() as $key => $value) {
+            $option.=$this->getArtCls($value,0);
+        }
+        $this->assign("classOption",$option);
+        $this->modalOne($modalPara);
+    }
+    protected function getArtCls($element,$level){
+        $option="";
+        $strs="";
+        for ($i=0; $i < $level; $i++) { 
+            $strs.="——";
+        }
+        if(is_array($element["nodes"])){
+            $level++;
+            foreach ($element["nodes"] as $key => $value) {
+                $option.= $this->getArtCls($value,$level);
+            }
+        }
+        return '<option value="'.$element["id"].'">'.$strs.$element["text"].'</option>'.$option;
+    }
+    function getArtClsTree(){
+        $parameter=[
+            'page'=>0,
+            'pageSize'=>9999,
+            'orderStr'=>'level DESC,classId ASC',
+        ];
+        $result=$this->classCom->getArticleClassList($parameter);
+        $nodeTree=[];
+        $level=[];
+        
+        $nodeArray=$result["list"];
+        foreach ($nodeArray AS $key => $nodeInfo) {
+            $level[$nodeInfo["level"]][$nodeInfo["classPid"]][]= $nodeInfo;
+            unset($nodeArray[$key]);
+        }
+        $this->Redis->set("artClsArray",json_encode($result["list"]),3600);
+        asort($level);
+        
+        $this->levelTree->setKeys(["idName"=>"classId","pidName"=>"classPid"]);
+        $this->levelTree->setReplace(["className"=>"text","classId"=>"id"]);
+        $this->levelTree->switchOption(["beNode"=>false,"idAsKey"=>false]);
+        $nodeTree=$this->levelTree->createTree($result["list"]);
+        return $nodeTree;
+    }
+
     /** 
      * @Author: vition 
      * @Date: 2018-03-31 23:01:55 
@@ -118,41 +225,42 @@ class ArticleController extends BaseController{
             'orderStr'=>"articleId DESC"
         ];
         
-        $articleResult=$this->articleCom->getArticleList($parameter);
-        if($articleResult){
-            $articleRed="articleList_".session("userId");
-            $this->Redis->set($articleRed,json_encode($articleResult['list']),3600);
-            $page = new \Think\VPage($articleResult['count'], $this->pageSize);
-            $pageShow = $page->show();
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
-            $this->assign('articleList',$articleResult['list']);
-            $this->assign('artClsList',$this->getArtClsList());
-            $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Article/articleTable/articleList'),'page'=>$pageShow]);
-        }
-        $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
+        $listResult=$this->articleCom->getArticleList($parameter);
+        $this->tablePage($listResult,'Article/articleTable/articleList',"articleList");
+        // if($articleResult){
+        //     $articleRed="articleList_".session("userId");
+        //     $this->Redis->set($articleRed,json_encode($articleResult['list']),3600);
+        //     $page = new \Think\VPage($articleResult['count'], $this->pageSize);
+        //     $pageShow = $page->show();
+            
+        //     $this->assign('articleList',$articleResult['list']);
+        //     $this->assign('artClsList',$this->getArtClsList());
+        //     $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Article/articleTable/articleList'),'page'=>$pageShow]);
+        // }
+        // $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
     }
-    function articleOne(){
-        $id	=I("id");
-        $parameter=[
-            'articleId'=>$id,
-        ];
-        $articleRed="articleList_".session("userId");
-        $articleList=$this->Redis->get($articleRed);
-        if($articleList){
-            foreach ($articleList as $article) {
-               if($article['articleId']==$id){
-                $article['content'] = htmlspecialchars_decode($article['content']);
-                $this->ajaxReturn(['errCode'=>0,'info'=>$article]);
-               }
-            }
-        }
-        $articleResult=$this->articleCom->getArticleOne($parameter);
-        if($articleResult->errCode==0){
-            $htmlResult->data['content']=htmlspecialchars_decode($articleResult->data['content']);
-            $this->ajaxReturn(['errCode'=>0,'info'=>$articleResult->data]);
-        }
-        $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
-    }
+    // function articleOne(){
+    //     $id	=I("id");
+    //     $parameter=[
+    //         'articleId'=>$id,
+    //     ];
+    //     $articleRed="articleList_".session("userId");
+    //     $articleList=$this->Redis->get($articleRed);
+    //     if($articleList){
+    //         foreach ($articleList as $article) {
+    //            if($article['articleId']==$id){
+    //             $article['content'] = htmlspecialchars_decode($article['content']);
+    //             $this->ajaxReturn(['errCode'=>0,'info'=>$article]);
+    //            }
+    //         }
+    //     }
+    //     $articleResult=$this->articleCom->getArticleOne($parameter);
+    //     if($articleResult->errCode==0){
+    //         $htmlResult->data['content']=htmlspecialchars_decode($articleResult->data['content']);
+    //         $this->ajaxReturn(['errCode'=>0,'info'=>$articleResult->data]);
+    //     }
+    //     $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
+    // }
     function articleAdd(){
         $articleInfo=$this->manageArticleInfo();
         if($articleInfo){
@@ -168,31 +276,7 @@ class ArticleController extends BaseController{
         $updateResult=$this->articleCom->updateArticle($nodeInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
-    function getArtClsTree(){
-        $parameter=[
-            'page'=>0,
-            'pageSize'=>9999,
-            'orderStr'=>'level DESC,classId ASC',
-        ];
-        $nodeResult=$this->classCom->getArticleClassList($parameter);
-        $nodeTree=[];
-        $level=[];
-        $newAllNodes=[];
-        
-        $nodeArray=$nodeResult["list"];
-        foreach ($nodeArray AS $key => $nodeInfo) {
-            $level[$nodeInfo["level"]][$nodeInfo["classPid"]][]= $nodeInfo;
-            unset($nodeArray[$key]);
-        }
-        $this->Redis->set("artClsArray",json_encode($nodeResult["list"]),3600);
-        asort($level);
-        
-        $this->levelTree->setKeys(["idName"=>"classId","pidName"=>"classPid"]);
-        $this->levelTree->setReplace(["className"=>"text","classId"=>"id"]);
-        $this->levelTree->switchOption(["beNode"=>false,"idAsKey"=>false]);
-        $nodeTree=$this->levelTree->createTree($nodeResult["list"]);
-        return $nodeTree;
-    }
+    
     function getArtClsList(){
         $artClsRed="artClsArray";
         $artClsArray=$this->Redis->get($artClsRed);
@@ -212,14 +296,14 @@ class ArticleController extends BaseController{
         }
         return $artClsList;
     }
-    function artClsOne(){
-        $classId=I("classId");
-        $nodeInfo=$this->getArtClsOne($classId);
-        if(!empty($nodeInfo)){
-            $this->ajaxReturn(['errCode'=>0,'info'=>$nodeInfo]);
-        }
-        $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
-    }
+    // function artClsOne(){
+    //     $classId=I("classId");
+    //     $nodeInfo=$this->getArtClsOne($classId);
+    //     if(!empty($nodeInfo)){
+    //         $this->ajaxReturn(['errCode'=>0,'info'=>$nodeInfo]);
+    //     }
+    //     $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
+    // }
     function getArtClsOne($classId){
         $parameter=[
             'classId'=>$classId,
@@ -276,16 +360,16 @@ class ArticleController extends BaseController{
      * @Desc: 添加文章分类 
      */    
     function artclassAdd(){
-        $classInfo=$this->manageClassInfo();
-        $insertResult=$this->classCom->insertArticleClass($classInfo);
-        if($insertResult->errCode==0){
+        $info=$this->manageClassInfo();
+        $result=$this->classCom->insertArticleClass($info);
+        if($result->errCode==0){
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
         }
         $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
     }
     function artclassEdit(){
-        $nodeInfo=$this->manageClassInfo();
-        $updateResult=$this->classCom->updateArticleClass($nodeInfo);
+        $info=$this->manageClassInfo();
+        $updateResult=$this->classCom->updateArticleClass($info);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
 }

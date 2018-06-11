@@ -1,0 +1,46 @@
+<div class="modal-header">
+    <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{$title}</h4>
+</div>
+<div class="modal-body">
+    <form role="form">
+        <div class="box-body">
+            <div class="form-group">
+                <label for="info-title">标题：</label>
+                <input id="info-userId" class="modal-info" title="articleId" name="articleId" type="hidden">
+                <input class="form-control modal-info" id="info-title" name="title" title="标题" placeholder="标题" type="text">
+            </div>
+            <div class="form-group">
+                <label for="article-cover">封面：</label>
+                <input class="form-control modal-info" id="article-cover" name="cover" title="封面" placeholder="封面" type="text">
+                <input class="fileupdate" data-input="#article-cover" type="file">
+            </div>
+            <div class="form-group">
+                <label>分类：</label>
+                <select class="form-control modal-info" title="上级文章分类" name="class">
+                    {$classOption}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>标签：</label>
+                <input class="form-control modal-info" title="标签" name="tags" placeholder="标签" type="text">
+            </div>
+            <div class="form-group">
+                <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
+                    <input class="modal-info"  value="0" name="status" type="hidden">
+                    {:modal_btn(get_defined_vars())}
+                </div>
+            </div>
+            <div class="form-group">
+                <input class="modal-info"  value="" name="content" type="hidden">
+                <div class="art-editor"></div>
+            </div>
+        </div>
+    </form>            
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+    {:save_btn(get_defined_vars())}
+</div>

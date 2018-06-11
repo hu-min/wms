@@ -706,40 +706,40 @@ class BasicController extends BaseController{
         }
         return '<option value="'.$element["id"].'">'.$strs.$element["text"].'</option>'.$option;
     }
-    function feeTypeOne(){
-        $basicId = I("basicId");
+    // function feeTypeOne(){
+    //     $basicId = I("basicId");
 
-        $feeTypeInfo=$this->getFeeTypeOne($basicId);
-        if(!empty($feeTypeInfo)){
-            $this->ajaxReturn(['errCode'=>0,'info'=>$feeTypeInfo]);
-        }
-        $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
+    //     $feeTypeInfo=$this->getFeeTypeOne($basicId);
+    //     if(!empty($feeTypeInfo)){
+    //         $this->ajaxReturn(['errCode'=>0,'info'=>$feeTypeInfo]);
+    //     }
+    //     $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
 
-        $parameter=[
-            'basicId'=>$id,
-        ];
-        $blistRed="feeTypeList";
-        $feeTypeList=$this->Redis->get($blistRed);
-        $blist=[];
-        if($feeTypeList){
-            foreach ($feeTypeList as $feeType) {
-               if($feeType['basicId']==$id){
-                $blist=$feeType;
-                break;
-               }
-            }
-        }
-        if(empty($blist)){
-            $basicResult=$this->basicCom->getOne($parameter);
-            if($basicResult->errCode==0){
-                $blist=$basicResult->data;
-            }
-        }
-        if(!empty($blist)){
-            $this->ajaxReturn(['errCode'=>0,'info'=>$blist]);
-        }
-        $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
-    }
+    //     $parameter=[
+    //         'basicId'=>$id,
+    //     ];
+    //     $blistRed="feeTypeList";
+    //     $feeTypeList=$this->Redis->get($blistRed);
+    //     $blist=[];
+    //     if($feeTypeList){
+    //         foreach ($feeTypeList as $feeType) {
+    //            if($feeType['basicId']==$id){
+    //             $blist=$feeType;
+    //             break;
+    //            }
+    //         }
+    //     }
+    //     if(empty($blist)){
+    //         $basicResult=$this->basicCom->getOne($parameter);
+    //         if($basicResult->errCode==0){
+    //             $blist=$basicResult->data;
+    //         }
+    //     }
+    //     if(!empty($blist)){
+    //         $this->ajaxReturn(['errCode'=>0,'info'=>$blist]);
+    //     }
+    //     $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
+    // }
     function getFeeTypeOne($basicId){
         $parameter=[
             'basicId'=>$basicId,

@@ -168,6 +168,8 @@ function utf8_substr($str,$length,$middle=false){
 function list_btn($defind_vars,$id){
     $statusLabel = $defind_vars["statusLabel"];
     $statusType = $defind_vars["statusType"];
+    $processType = $defind_vars["processType"];
+    
     $item = $defind_vars["item"];
     $dbName = $defind_vars["dbName"];
     $controlName = $defind_vars["controlName"];
@@ -181,13 +183,13 @@ function list_btn($defind_vars,$id){
         echo "<button type='button' data-gettype='Edit' data-toggle='modal' data-vtarget='.global-modal' class='btn btn-sm btn-primary v-showmodal'>查看</button>";
     }
     if($processAuth['level'] > 1 && ($item['status'] == 0 or  $item['status'] == 2 )){
-        echo "  <button type='button' class='btn btn-success submit-status btn-sm' data-status='1' name='approve' >批准</button>";
-        if($item['author'] != $userId){
-            echo "  <button type='button' class='btn btn-warning submit-status btn-sm' data-status='3' name='refuse' >拒绝</button>";
+        echo "  <button type='button' class='btn btn-success submit-status btn-sm' data-status='1' name='approve' >{$processType[1]}</button>";
+        if($item['author'] != $userId && isset($processType[3])){
+            echo "  <button type='button' class='btn btn-warning submit-status btn-sm' data-status='3' name='refuse' >{$processType[3]}</button>";
         }
     }
     if($nodeAuth >= 4){
-        echo "  <button type='button' class='btn btn-danger btn-sm status-info' data-status='4' data-reqtype='Del'  >删除</button>";
+        echo "  <button type='button' class='btn btn-danger btn-sm status-info' data-status='4' data-reqtype='Del'  >{$processType[4]}</button>";
     }
     echo "</td>";
 }
@@ -202,17 +204,19 @@ function modal_btn($defind_vars){
     $processAuth = $defind_vars["processAuth"];
     $gettype = $defind_vars["gettype"];
     $item = $defind_vars["data"];
+    $processType = $defind_vars["processType"];
+    
     if($nodeAuth >= 7){
         echo "<button  type='button' name='0' class='btn btn-default btn-sm active status-btn'><i class='fa fa-square text-default'></i> 未启用 </button>";
     }
     if($processAuth['level'] > 1 && !in_array($userId,explode(',',$item['examine'])) || $item['status'] == 1 || $nodeAuth>= 7){
-        echo "<button type='button' name='1' class='btn btn-success btn-sm status-btn'><i class='fa fa-square text-default'> 批准 </i></button>";
+        echo "<button type='button' name='1' class='btn btn-success btn-sm status-btn'><i class='fa fa-square text-default'> $processType[1] </i></button>";
     }
-    if($processAuth['level'] > 1 && ($item['status'] == 0 ||  $item['status'] == 2 ) && !in_array($userId,explode(',',$item['examine'])) || ($nodeAuth>= 7 && $gettype == "Edit")){
-        echo "<button type='button' name='3' class='btn btn-warning btn-sm status-btn'><i class='fa fa-square text-default'> 拒绝 </i></button>";
+    if($processAuth['level'] > 1 && ($item['status'] == 0 ||  $item['status'] == 2 ) && !in_array($userId,explode(',',$item['examine'])) || ($nodeAuth>= 7 && $gettype == "Edit") && isset($processType[3])){
+        echo "<button type='button' name='3' class='btn btn-warning btn-sm status-btn'><i class='fa fa-square text-default'> {$processType[3]} </i></button>";
     }
     if($nodeAuth >= 4){
-        echo "  <button type='button' name='4' class='btn btn-danger btn-sm status-btn'><i class='fa fa-square text-default'> 删除 </i></button>";
+        echo "  <button type='button' name='4' class='btn btn-danger btn-sm status-btn'><i class='fa fa-square text-default'> {$processType[4]} </i></button>";
     }
 }
 /** 

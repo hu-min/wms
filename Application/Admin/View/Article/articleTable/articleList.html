@@ -1,22 +1,18 @@
-<volist name="articleList" id="item">
-        <tr>
-            <td>{$item['articleId']}</td>
-            <td>{$item['title']}</td>
-            <td data-avatar="{$item['cover']}" class="users-avatar-td"><if condition="$item['cover'] neq ''"><img src="__UPLOADS__/{$item['cover']}"></if></td>
-            <td>{$item['author']}</td>
-            <td>{$artClsList[$item['class']]}</td>
-            <td>{$item['content']|htmlspecialchars_decode|strip_tags|mb_substr=0,30}</td>
-            <td><neq name="item['addTime']" value="" >{$item['addTime']|date='Y-m-d H:i:s',###}</neq></td>
-            <td><neq name="item['updateTime']" value="" >{$item['updateTime']|date='Y-m-d H:i:s',###}</neq></td>
-            <if condition="$item['status'] eq 0">
-                <td><span class="label bg-black">{:C('userStatus.'.$item['status'])}</span></td>
-            <elseif condition="$item['status'] eq 1"/>
-                <td><span class="label label-success">{:C('userStatus.'.$item['status'])}</span></td>
-            <elseif condition="$item['status'] eq 2"/>
-                <td><span class="label label-warning">{:C('userStatus.'.$item['status'])}</span></td>
-            <else/>
-                <td><span class="label label-danger">{:C('userStatus.'.$item['status'])}</span></td>
+<volist name="list" id="item">
+    <tr>
+        <td>{$item['articleId']}</td>
+        <td>{$item['title']}</td>
+        <td>{$item['cover']}</td>
+        <td>{$item['author']}</td>
+        <td>{$item['class']}</td>
+        <td>{$item['content']|utf8_substr=100}</td>
+        <td>{$item['addTime']|date="Y-m-d H:i:s",###}</td>
+        <td>
+            <if condition="$item['updateTime'] gt 0">
+                {$item['updateTime']|date="Y-m-d H:i:s",###}
             </if>
-            <td><button type="button" data-show="One" data-reqtype="Edit"  data-id="{$item['articleId']}" data-url="{$url}" data-con="article" data-toggle="modal" data-target="#modal-articleInfo" data-title="编辑文章" class="btn btn-primary info-edit">编辑</button></td>
-        </tr>
-    </volist>
+            
+        </td>
+        {:list_btn(get_defined_vars(),"articleId")}
+    </tr>
+</volist>

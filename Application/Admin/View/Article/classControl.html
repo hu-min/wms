@@ -10,6 +10,11 @@
     </eq>
     <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
     <link rel="stylesheet" href="__ADMINT__/bower_components/chosen/css/chosen.min.css">
+    <style>
+        #modal-icon .modal-dialog {position: absolute;top: 0;bottom: 0;left: 0;right: 0;} 
+        #modal-icon .modal-content {position: absolute;top: 0;bottom: 0;width: 100%;} 
+        #modal-icon .modal-body {overflow-y: scroll;position: absolute;top: 55px;bottom: 65px;width: 100%;} 
+    </style>
 </head>
 <body>
     <section class="content">
@@ -17,23 +22,25 @@
             <div class="box box-success">
                 <div class="box-header">
                     <i class="fa fa-plus-square"></i>
-                    <h4 class="box-title">分类列表</h4>
-                    <button type="button" class="btn btn-info margin pull-right" data-toggle="modal" data-title="新建分类" data-target="#modal-artclass">新建分类</button>
+                    <h4 class="box-title">文章分类列表</h4>
+                    <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 2">
+                        <button type="button" data-gettype="Add" data-toggle="modal" data-url="{$url}"  data-vtarget=".global-modal" data-con="{$controlName}" class="btn margin pull-right btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 新建文章分类</button>
+                    </if>
                 </div>
                 <div class='box-body'>
                     <div class="row">
                         <div class="col-sm-2">
                             <div class="form-group">
-                                <input class="form-control input-expand-artclass" placeholder="搜索分类" value="" type="input">
+                                <input class="form-control input-expand-feeType" placeholder="搜索文章分类" value="" type="input">
                             </div>
                         </div>
                         <div class="col-sm-2">
-                            <span class="tree-plus handle" data-id="#artclasstree"><i class="fa fa-fw fa-plus-square"></i>收起</span>
-                            <span class="tree-minus handle" data-id="#artclasstree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
+                            <span class="tree-plus handle" data-id="#artClasstree"><i class="fa fa-fw fa-plus-square"></i>收起</span>
+                            <span class="tree-minus handle" data-id="#artClasstree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
                         </div>
                     </div>
                     <div class="col-sm-4">
-                        <div id="artclasstree"></div>
+                        <div id="artClasstree"></div>
                     </div>
                     <div class="box-footer">
                     </div>
@@ -41,148 +48,75 @@
             </div>
         </div>
     </section>
-    <div class="modal fade" id="modal-artclass">
-        <div class="modal-dialog">
-            <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Default Modal</h4>
-            </div>
-            <div class="modal-body">
-                <form role="form">
-                    <div class="box-body">
-                        <div class="form-group">
-                            <label >分类名称：</label>
-                            <input class="modal-info" title="分类Id" name="classId" type="hidden">
-                            <input class="form-control modal-info"  name="className" title="分类名称" placeholder="分类名称" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label >分类别名：</label>
-                            <input class="form-control modal-info" name="alias" title="分类别名" placeholder="分类别名" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label >上级分类：</label>
-                            <select class="form-control modal-info" id="classPid" title="上级分类" name="classPid">
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>分类备注：</label>
-                            <textarea class="form-control modal-info" name="remark" rows="3" placeholder="分类备注"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <div class="btn-group user-status status-group" data-toggle="btn-toggle">
-                                <button type="button" name="0" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-default"></i> 未激活 </button>
-                                <button type="button" name="1" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-green"> 激活 </i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>            
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary save-info" data-con="artclass" data-reqtype="Add" data-url="{$url}" data-modal="true">Save changes</button>
-            </div>
-            </div>
+    <div class="modal fade global-modal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
         </div>
     </div>
     <script>
-        //获取分类数据
-        function getArtClsTree() {
+        function artclass_initInfo(){
+            $(tabId+" .modal-info[name='classPid']").chosen({search_contains:true,width: '100%'});
+        }
+        //获取文章分类数据
+        function getArtClassTree() {
             var tree=[]
-            datas["reqType"]="artclassList";
+            datas["reqType"]="{$controlName}List";
             get("{$url}",datas,function(result){
                 // console.log(result);
                 tree=result.tree
             },false)
-            intPClsSelect(tree);
+            // intPfeeTypeSelect(tree);
             return tree;
         }
-         //生成分类树和分类树选中的事件
-         function createArtClsTree(){
-            $(tabId+' #artclasstree').treeview({showButton: true,highlightSelected:false,data: getArtClsTree(),levels:1,color: "#428bca",});
-            //分类编辑
-            $(tabId+' #artclasstree').on("click",'li button',function(){
-                $(tabId+" #modal-artclass h4").text("分类编辑");
-                $(tabId+" #modal-artclass .save-info").data("reqtype","Edit");
-                $(tabId+" #modal-artclass .save-info").text("分类编辑");
-                var nodeData= $(tabId+' #artclasstree').treeview('getNode', $(this).parent(".node-artclasstree").data("nodeid"));
-                datas["classId"]=nodeData.id;
-                datas["reqType"]='artClsOne';
+         //生成文章分类树和文章分类树选中的事件
+         function createArtClassTree(){
+            $(tabId+' #artClasstree').treeview({showButton: true,highlightSelected:false,data: getArtClassTree(),levels:1,color: "#428bca",});
+            //文章分类编辑
+            $(tabId+' #artClasstree').on("click",'li button',function(){
+                datas={}
+                var artClassData= $(tabId+' #artClasstree').treeview('getNode', $(this).parent(".node-artClasstree").data("nodeid"));
+                datas.id = artClassData.id;
+                var gettype = "Edit"
+                datas.gettype = gettype
+                var con = "{$controlName}"
+                datas.con = con
+                datas.reqType = datas.con+"_modalOne"
                 get("{$url}",datas,function(result){
+                    // console.log(result)
                     if(result.errCode==0){
-                        $(tabId+" .modal-info[name='className']").val(result.info['className']);
-                        $(tabId+" .modal-info[name='classId']").val(result.info['classId']);
-                        $(tabId+" .modal-info[name='alias']").val(result.info['alias']);
-                        $(tabId+" .modal-info[name='classPid']").val(result.info['classPid']);
-                        $(tabId+" .modal-info[name='remark']").val(result.info['remark']);
-                        $(tabId+" .status-btn").removeClass("active");
-                        $(tabId+" .status-btn[name='"+result.info['status']+"']").addClass("active");
-                        $(tabId+" #classPid").find("option[value='"+result.info['classPid']+"']").prop("selected",true);
-                        $(tabId+" #classPid").trigger('chosen:updated');
+                        $(tabId+" .global-modal .modal-content").html(result.html);
+                        $(tabId+" .global-modal").modal('toggle')
+                        $(tabId+" .modal-info[name='className']").val(result.data['className']);
+                        $(tabId+" .modal-info[name='alias']").val(result.data['alias']);
+                        $(tabId+" .modal-info[name='classId']").val(result.data['classId']);
+                        $(tabId+" .modal-info[name='remark']").val(result.data['remark']);
+                        $(tabId+" .modal-info[name='classPid']").find("option[value='"+result.data['classPid']+"']").prop("selected",true);
+                        $(tabId+" .modal-info[name='classPid']").trigger('chosen:updated');
+                        set_status_btn($(tabId+" .modal-status .status-btn[name='"+result.data['status']+"']"))
                     }
                 })
-                $(tabId+" #modal-artclass").modal('show')
                 
             })
         }
         $(function(){
-            createArtClsTree()
-            //搜索分类
-            $(tabId+' .input-expand-artclass').on("input",function(){
-                $(tabId+' #artclasstree').treeview('collapseAll', { silent: true });
-                var prveNode=$('#artclasstree').treeview('search', [$(tabId+' .input-expand-artclass').val(), {
+            createArtClassTree()
+            //搜索文章分类
+            $(tabId+' .input-expand-feeType').on("input",function(){
+                $(tabId+' #artClasstree').treeview('collapseAll', { silent: true });
+                var prvefeeType=$('#artClasstree').treeview('search', [$(tabId+' .input-expand-feeType').val(), {
                     ignoreCase: false,     // case insensitive
                     exactMatch: false,    // like or equals
-                    revealResults: true,  // reveal matching nodes
+                    revealResults: true,  // reveal matching feeTypes
                 }]);
             })
-            //上级分类chosen
-            $(tabId+" #classPid").chosen({search_contains:true,width: '100%'});
-            //新增分类
-            $(tabId+" .box-header button").on("click",function(){
-                $(tabId+" .modal-info").val("");
-                $(tabId+" #modal-artclass h4").text("新增分类");
-                $(tabId+" #modal-artclass .save-info").data("reqtype","Add");
-                $(tabId+" #modal-artclass .save-info").text("新增分类");
-                $(tabId+" #classPid").find("option[value='0']").prop("selected",true);
-                $(tabId+" #classPid").trigger('chosen:updated');
-                $(tabId+" .status-btn").removeClass("active");
-                $(tabId+" .status-btn[name='1']").addClass("active");
-            })
         })
-        //初始化父分类的select数据
-        function intPClsSelect(data){
-            var option='<option value="0">根Root</option>';
-            data.forEach(ele => {
-                option+=getArtClsNode(ele,0);
-            });
-            $(tabId+" #classPid").html(option);
-        }
-        //分类信息
-        function artclassInfoFuns(){
-            datas["data"]={}
-            $(tabId+" .modal-info").each(function(){
-                var name =$(this).attr("name");
-                var val =$(this).val();
-                if(name=="className" && val==""){
-                    alert("分类名称不能为空");
-                    throw "分类名称不能为空";
-                }else if(val!=""){
-                    datas["data"][name]=val;
-                }
-                
-            })
-            datas["data"].status=$(tabId+" .status-group .active").attr("name")
-        }
         /** 
          * @Author: vition 
          * @Date: 2018-02-23 10:08:52 
-         * @Desc: 刷新分类 
+         * @Desc: 刷新文章分类 
          */        
-        function artclassSearchFuns(){
-            createArtClsTree()
+        function artclass_searchInfo(){
+            createArtClassTree()
         }
     </script>
 </body>
