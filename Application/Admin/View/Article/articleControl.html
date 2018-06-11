@@ -98,18 +98,15 @@
     <script src="__ADMINT__/bower_components/wangeditor/wangEditor.js?a=3"></script>
     <script>
         function article_initInfo(){
-            $(".art-editor").find('div[id^="text"]').blur(function(){
-                // var editorContent=editor.txt.html()
-                console.log("editorContent");
-            })
             var E = window.wangEditor
             var editor = new E(tabId+' .art-editor')
             editor.customConfig.uploadImgShowBase64 = true
             editor.create()
+            editor.txt.html($(tabId+" .modal-info[name='content']").val())
+            
             $(tabId).on("blur",".art-editor div[id^='text']",function(){
                 var editorContent=editor.txt.html()
                 $(tabId+" .modal-info[name='content']").val(editorContent)
-                console.log(editorContent);
             })
         }
         
@@ -181,9 +178,9 @@
             $(tabId+" .modal-info[name='title']").val(info['title']);
             $(tabId+" .modal-info[name='tags']").val(info['tags']);
             $(tabId+" .modal-info[name='cover']").val(info['cover']);
-            $(tabId+" .status-btn[name='"+info['status']+"']").addClass("active");
             $(tabId+" .modal-info[name='class']").find("option[value='"+info['class']+"']").prop("selected",true);
-            editor.txt.html(info['content'])
+            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
+            $(tabId+" .modal-info[name='content']").val(info['content'])
         }
         //初始分类的select数据
         // function intPClsSelect(data){

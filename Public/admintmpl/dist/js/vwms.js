@@ -188,16 +188,16 @@ $(document).on("click",".v-showmodal",function(){
     get(url,datas,function(result){
         // console.log(result)
         if(result.errCode==0){
+             
             $(tabId+" .global-modal .modal-content").html(result.html);
             $(tabId+" "+vtarget).modal('toggle')
             if(gettype=="Edit"){
                 if(fun_is_exits(con+"_setInfo")){
                     eval(con+"_setInfo(result.data)");//对不同的模块设置不同的响应数据
                 }
-            }else{
-                if(fun_is_exits(con+"_initInfo")){
-                    eval(con+"_initInfo()");//
-                } 
+            }
+            if(fun_is_exits(con+"_initInfo")){
+                eval(con+"_initInfo()");//
             }
         }
     })
