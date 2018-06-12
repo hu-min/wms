@@ -15,12 +15,12 @@ $CONFIG=array(
     'REDIS_PORT'            => 6379,
     'DATA_CACHE_TIME'       => 3600,
     'DATA_CACHE_PREFIX'     => 'vwms_',
-    //'DEFAULT_MODULE'        =>'Admin',
-    'APP_SUB_DOMAIN_DEPLOY' => 1,
-    'APP_SUB_DOMAIN_RULES' => [
-	'twsh' => 'Admin',
-	'www'  => 'Home'
-    ],
+    'DEFAULT_MODULE'        =>'Admin',
+    //'APP_SUB_DOMAIN_DEPLOY' => 1,
+    //'APP_SUB_DOMAIN_RULES' => [
+//	'twsh' => 'Admin',
+//	'www'  => 'Home'
+  //  ],
     'DEFAULT_CONTROLLER'        =>'Index',
     'DEFAULT_ACTION'        =>'Index',
     'TMPL_PARSE_STRING'=>[
