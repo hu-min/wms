@@ -169,7 +169,6 @@ function list_btn($defind_vars,$id){
     $statusLabel = $defind_vars["statusLabel"];
     $statusType = $defind_vars["statusType"];
     $processType = $defind_vars["processType"];
-    
     $item = $defind_vars["item"];
     $dbName = $defind_vars["dbName"];
     $controlName = $defind_vars["controlName"];
@@ -212,9 +211,12 @@ function modal_btn($defind_vars){
     if($processAuth['level'] > 1 && !in_array($userId,explode(',',$item['examine'])) || $item['status'] == 1 || $nodeAuth>= 7){
         echo "<button type='button' name='1' class='btn btn-success btn-sm status-btn'><i class='fa fa-square text-default'> $processType[1] </i></button>";
     }
-    if($processAuth['level'] > 1 && ($item['status'] == 0 ||  $item['status'] == 2 ) && !in_array($userId,explode(',',$item['examine'])) || ($nodeAuth>= 7 && $gettype == "Edit") && isset($processType[3])){
+    if(isset($processType[3]) && $item['author']!= $userId && $gettype!="Add" && $item['status']!=1){
         echo "<button type='button' name='3' class='btn btn-warning btn-sm status-btn'><i class='fa fa-square text-default'> {$processType[3]} </i></button>";
     }
+    // if($processAuth['level'] > 1 && ($item['status'] == 0 ||  $item['status'] == 2 ) && !in_array($userId,explode(',',$item['examine'])) || ($nodeAuth>= 7 && $gettype == "Edit") && isset($processType[3]) && $gettype != "Add"){
+    //     echo "<button type='button' name='3' class='btn btn-warning btn-sm status-btn'><i class='fa fa-square text-default'> {$processType[3]} </i>{$gettype}</button>";
+    // }
     if($nodeAuth >= 4){
         echo "  <button type='button' name='4' class='btn btn-danger btn-sm status-btn'><i class='fa fa-square text-default'> {$processType[4]} </i></button>";
     }

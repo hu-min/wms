@@ -677,17 +677,16 @@
         var tab_content=$('#main-navs .tab-content')
         tabPrev.addClass('active');
         conPrev.addClass('active');
-        var id=tabPrev.children("a").attr("href");
-        if(id!=undefined){
-            var nowId=id.replace("#vtabs","");
+        var newId=tabPrev.children("a").attr("href");
+        if(newId!=undefined){
+            var nowId=newId.replace("#vtabs","");
             if(nowId>0){
                 chUrlAction(nowId)
             }
         }
         
-        
-        if(breadData[id]!=undefined){
-            $('.breadcrumb').html(breadData[id])
+        if(breadData[newId]!=undefined){
+            $('.breadcrumb').html(breadData[newId])
         }else{
             $('.breadcrumb').html("")
             var url=window.location.href.match(/([\S]*)\?/)
