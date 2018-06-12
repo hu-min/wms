@@ -406,8 +406,10 @@ class BaseController extends \Common\Controller\BaseController{
             $data['status']=2;
             $data['processLevel'] = $this->processAuth["level"];
         }else if($status==3){
-            $updateData['status']=$status;
-        }
+            $data['status']=$status;
+        }else{
+	   $data['status']=$status;	
+	}
         return $data;
     }
 }
