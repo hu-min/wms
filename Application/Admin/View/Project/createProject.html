@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">立项/添加场次</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="box-group" id="{$vtabId}-accordion">
+                            <!-- we are adding the .panel class so bootstrap.js collapse plugin detects it -->
+                            <div class="panel box box-primary">
+                                <div class="box-header with-border">
+                                    <h4 class="box-title">
+                                        <a data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#collapseOne">
+                                        项目基础
+                                        </a>
+                                    </h4>
+                                </div>
+                            <div id="collapseOne" class="panel-collapse collapse in">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label >立项或添加项目场次：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="立项或添加场次" name="projectId">
+                                                    <option value="">立项</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">总场次：</label>
+                                                <input class="form-control modal-info datetime" required="required" name="toObject" title="总场次" placeholder="总场次" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">当前场次：</label>
+                                                <input class="form-control modal-info datetime" required="required" name="toObject" title="当前场次" placeholder="当前场次" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">合同金额：</label>
+                                                <input class="form-control modal-info datetime" required="required" name="toObject" title="合同金额" placeholder="合同金额" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label >品牌：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="品牌" name="projectId">
+                                                    <option value="">立项</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">项目编号：</label>
+                                                <input class="form-control modal-info datetime" required="required" name="toObject" title="当前场次" placeholder="当前场次" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">项目日期：</label>
+                                                <div class="input-group date">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-calendar"></i>
+                                                    </div>
+                                                    <input class="form-control pull-right date-input modal-info" name="project-date" id="{$vtabId}-project-date" type="text">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">项目天数：</label>
+                                                <input class="form-control modal-info datetime" required="required" name="toObject" title="项目天数" placeholder="项目天数" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">项目名称：</label>
+                                                <input class="form-control modal-info datetime" required="required" name="toObject" title="当前场次" placeholder="当前场次" type="text">
+                                            </div>                        
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">签约公司：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="立项或添加场次" name="projectId">
+                                                    <option value="">公司</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">客户担当：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="立项或添加场次" name="projectId">
+                                                    <option value="">客户</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">客户其他人员：</label>
+                                                <input class="form-control modal-info datetime" required="required" name="toObject" title="当前场次" placeholder="当前场次" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel box box-danger">
+                            <div class="box-header with-border">
+                                <h4 class="box-title">
+                                    <a data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#collapseTwo">
+                                    项目前期基本信息
+                                    </a>
+                                </h4>
+                            </div>
+                                <div id="collapseTwo" class="panel-collapse collapse">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">项目省份：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="立项或添加场次" name="projectId">
+                                                    <option value="">省份</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">项目城市：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="立项或添加场次" name="projectId">
+                                                    <option value="">城市</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">项目场地：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="立项或添加场次" name="projectId">
+                                                    <option value="">场地</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">立项日期：</label>
+                                                <div class="input-group date">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-calendar"></i>
+                                                    </div>
+                                                    <input class="form-control pull-right date-input modal-info" name="project-date" id="{$vtabId}-create-date" type="text">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">立项人：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="立项或添加场次" name="projectId">
+                                                    <option value="">立项人</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">是否竞标：</label>
+                                                <div class="radio">
+                                                    <label>
+                                                        <input type="radio" name="" id=""> 需要 
+                                                    </label>
+                                                    <label>
+                                                        <input type="radio" name="" id=""> 不需要 
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">竞标类型：</label>
+                                                <select class="form-control modal-info" title="竞标类型" name="projectId">
+                                                    <option value="">竞标类型</option>
+                                                    <option value="">技术标</option>
+                                                    <option value="">商务标</option>
+                                                    <option value="">区域标</option>
+                                                    <option value="">其它标项</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">竞标（提案）日期：</label>
+                                                <div class="input-group date">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-calendar"></i>
+                                                    </div>
+                                                    <input class="form-control pull-right date-input modal-info" name="project-date" id="{$vtabId}-tian-date" type="text">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="info-title">竞标提案日期：</label>
+                                                <div class="input-group date">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-calendar"></i>
+                                                    </div>
+                                                    <input class="form-control pull-right date-input modal-info" name="project-date" id="{$vtabId}-jbta-date" type="text">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                            <div class="panel box box-success">
+                                <div class="box-header with-border">
+                                    <h4 class="box-title">
+                                        <a data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#collapseThree">
+                                        TW执行信息内部安排
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div id="collapseThree" class="panel-collapse collapse">
+                                    <div class="box-body">
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label for="info-title">营业主担：</label>
+                                                    <select class="form-control modal-info chosen-project chosen-select" title="营业主担" name="projectId">
+                                                        <option value="">营业主担</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label for="info-title">项目主担：</label>
+                                                    <select class="form-control modal-info chosen-project chosen-select" title="项目主担" name="projectId">
+                                                        <option value="">项目主担</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label for="info-title">执行类型：</label>
+                                                    <select class="form-control modal-info chosen-project chosen-select" title="执行类型" name="projectId">
+                                                        <option value="">执行类型</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label for="info-title">执行类型-子项：</label>
+                                                    <select class="form-control modal-info chosen-project chosen-select" title="执行类型-子项" name="projectId">
+                                                        <option value="">执行类型-子项</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label for="info-title">项目类型：</label>
+                                                    <select class="form-control modal-info chosen-project chosen-select" title="项目类型" name="projectId">
+                                                        <option value="">项目类型</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label for="info-title">项目阶段：</label>
+                                                    <select class="form-control modal-info chosen-project chosen-select" title="项目阶段" name="projectId">
+                                                        <option value="">项目阶段</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label for="info-title">前期项目人员：</label>
+                                                    <select class="form-control modal-info chosen-project chosen-select" title="前期项目人员" name="projectId">
+                                                        <option value="前期项目人员"></option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label for="info-title">TW现场执行人员：</label>
+                                                    <select class="form-control modal-info chosen-project chosen-select" title="TW现场执行人员" name="projectId">
+                                                        <option value="TW现场执行人员"></option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <!-- /.box-body -->
+                    <button type="button" class="btn btn-primary">Submit</button>
+                </div>
+              <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+    </section>
+    <script>
+        $(function(){
+            $(tabId+" .chosen-select").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
+            init_date();
+        })
+    </script>
+</body>
+</html>

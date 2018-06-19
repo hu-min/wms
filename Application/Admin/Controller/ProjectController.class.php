@@ -36,6 +36,20 @@ class ProjectController extends BaseController{
             $this->returnHtml();
         }
     }
+    
+    function createProject(){
+        $reqType=I('reqType');
+        $this->assign('processArr',$this->processArr);
+        $project=$this->configCom->get_val("project");
+        $this->assign("project",$project);
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            $this->assign('responList',$this->getResponsList());
+            $this->returnHtml();
+        }
+    }
     /** 
      * @Author: vition 
      * @Date: 2018-05-06 11:00:23 
