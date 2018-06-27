@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <!-- <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css"> -->
+    <!-- daterange picker -->
+    <!-- <link rel="stylesheet" href="__ADMINT__/bower_components/bootstrap-daterangepicker/daterangepicker.css"> -->
+    <!-- <link rel="stylesheet" href="__ADMINT__/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css"> -->
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-header">
+                        <i class="fa fa-plus-square"></i>
+                        <h4 class="box-title">项目列表</h4>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        {:add_btn(get_defined_vars(),"立项/添加场次")}
+                    </div>
+                    <div class="box-body search-body">
+                        <div class="col-md-12">
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <label class="control-label">项目名称：</label>
+                                    <input class="form-control search-info input-sm" name="name" placeholder="项目名称" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label >状态：</label>
+                                    <select class="form-control search-info input-sm" title="状态" name="status">
+                                        <option value="">全部</option>
+                                        <volist name="statusType" id="item">
+                                            <option value="{$key}">{$item}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                </div>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" style="font-size:0.95em;overflow-x: auto;">
+                <div class="count-div" style="margin:10px;font-weight: 800;">
+                </div>
+                <table id="" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>品牌</th>
+                            <th>项目编号</th>
+                            <th>项目日期</th>
+                            <th>项目名称</th>
+                            <th>签约公司</th>
+                            <th>客户担当</th>
+                            <th>营业主担</th>
+                            <th>项目主担</th>
+                            <th>项目类型</th>
+                            <th>总场次</th>
+                            <th>合同额</th>
+                            <th>成本</th>
+                            <th>纯利</th>
+                            <th>纯利率</th>
+                            <th>项目阶段</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="{$controlName}-table">
+                        {$tables}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="dataTables_wrapper">
+            <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+                {$pages}
+            </div>
+        </div>
+    </section>
+    <div class="modal fade global-modal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+    <!-- date-range-picker -->
+    <script>
+        $(function(){
+
+        })
+        function project_initInfo(){
+            $(tabId+" .chosen-select").each(function(){
+                var type = $(this).attr('name')
+                var value = $(this).data('value')
+                var text = $(this).data('text')
+                var option = {inherit_select_classes:true,search_contains:true,allow_single_deselect:true}
+    
+                if(text!=undefined && value!=undefined){
+                    var ajax_json = {url:"{$url}",data:{reqType:"getOptionList",type:type},value:value,text:text}
+                    var pname = $(this).data('pname')
+                    if(pname!=undefined){
+                        ajax_json["pelement"] = $(tabId+" .chosen-select[name='"+pname+"']")
+                    }
+                    var noupdate = $(this).data('noupdate')
+                    if(noupdate!=undefined){
+                        ajax_json["noupdate"] = true
+                    }
+                    option["ajax_load"] = ajax_json
+                }
+                var cname = $(this).data('cname')
+                if(cname!=undefined){
+                    option["child"] = $(tabId+" .chosen-select[name='"+cname+"']")
+                }
+                var disSearch = $(this).data('dis-search')
+                if(disSearch!=undefined){
+                    option["disable_search"] = true
+                }
+                
+                $(this).chosen(option)
+            })
+            init_date();
+        }
+
+        function project_setInfo(info){
+            //立项和场次
+            if(info["project_id"] == 0){
+                $(tabId+" .chosen-select[name='project_id']").find("option[value='']").prop("selected",true);
+            }else{
+                var projectChosen= $(tabId+" .chosen-select[name='project_id']")
+                var projectId = info["projectId"]
+                if(projectChosen.find("option[value='"+info["projectId"]+"']").length==0){
+                    projectChosen.append("<option value='"+info["project_pid"]+"'>"+info["project_name"]+"</option>")
+                    projectId = info["project_pid"]
+                }
+                projectChosen.find("option[value='"+projectId+"']").prop("selected",true);
+                projectChosen.trigger("chosen:updated");
+            }
+            ["projectId","session_all","session_cur","amount","code","project_time","days","name","customer_other","create_time","bid_date","bid_time"].forEach(element => {
+                if(info[element]!=null){
+                    $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
+                }
+                
+            });
+            ["brand","customer_com","customer_cont","province","city","field","create_user","is_bid","bidding","business","leader","execute","execute_sub","type","stage"].forEach(element => {
+                var select= $(tabId+" .modal-info[name='"+element+"']")
+                if(info[element]>0){
+                    if(select.find("option[value='"+info[element]+"']").length==0){
+                        if(element=="city"){
+                            var city_optoin = '<option value="">城市</option>'
+                            info["citys"].forEach(city => {
+                                city_optoin+='<option value="'+city["cid"]+'">'+city["city"]+'</option>'
+                            });
+                            select.html(city_optoin);
+                        }else{
+                            select.append("<option value='"+info[element]+"'>"+info[element+"_name"]+"</option>")
+                        }
+                    }
+                    select.find("option[value='"+info[element]+"']").prop("selected",true);
+                    if(select.hasClass("chosen-select")){
+                        select.trigger("chosen:updated");
+                    }
+                }
+            });
+            ["earlier_user","scene_user"].forEach(element => {
+                if(info[element]!=null){
+                    var select= $(tabId+" .modal-info[name='"+element+"']")
+                    var user_chosen = info[element].split(",")
+                    info["user_ids"].forEach(userinfo => {
+                        if(select.find("option[value='"+userinfo["userId"]+"']").length==0){
+                            elect.append('<option value="'+userinfo["userId"]+'">【'+userinfo["roleName"]+'】'+userinfo["userName"]+'</option>')
+                        }
+                    });
+                    user_chosen.forEach(chosenval=>{
+                        select.find("option[value='"+chosenval+"']").prop("selected",true);
+                    })
+                    if(select.hasClass("chosen-select")){
+                        select.trigger("chosen:updated");
+                    }
+                }
+            });
+            if((info['processLevel'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7){
+                $(tabId+" .modal-info").prop("disabled",true)
+            }
+        }
+        // var E = window.wangEditor
+        // var editor = new E(tabId+' .art-editor')
+        //获取分类数据
+        // var prefix ="{$project['prefix']}";
+        // var tempCompany="";
+        // var followUpArr=[];
+        // var businessArr=[];
+        // var leaderArr=[];
+        // $(function(){
+            // getCompanyData()
+            // getUserData("followUp")
+            // getUserData("business")
+            // getUserData("leader")
+            // $(tabId+' .project-time').daterangepicker({
+            //     "startDate":moment().year()+"-01-01",
+            //     "endDate":moment().year()+"-"+(moment().month()+1)+"-"+moment().dates(),
+            //     "locale": {
+            //         format: 'YYYY-MM-DD',
+            //         separator: ' ~ ',
+            //         applyLabel: "应用",
+            //         cancelLabel: "取消",
+            //         resetLabel: "重置",
+            //         daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],
+            //         monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月','七月', '八月', '九月', '十月', '十一月', '十二月' ],
+            //     },showDropdowns: true,
+            // })
+            // $(tabId+' .datetime').datepicker({
+            //     autoclose: true,
+            //     format: 'yyyy-mm-dd',
+            //     language:"cn",
+            //     clearBtn:true,
+            // })
+            //计算纯利
+            // $(tabId+" input[name='cost']").on("input",function(){
+            //     var profit=$(tabId+" input[name='amount']").val()-$(tabId+" input[name='cost']").val()
+            //     $(tabId+" input[name='profit']").val(profit)
+            // })
+            // //计算纯利率
+            // $(tabId+" input[name='cost']").on("input",function(){
+            //     var profitRate=$(tabId+" input[name='profit']").val()/$(tabId+" input[name='amount']").val()
+            //     $(tabId+" input[name='profitRate']").val(Math.round(profitRate * 100))
+            // })
+            //客户列表
+            // $(tabId+" .modal-info[name='toCompany']").chosen({search_contains:true,width: '100%',allow_single_deselect:true}).on("chosen:results_single",function(evt, params){
+            //     var key = $(this).nextAll().find(".chosen-search-input").val()
+            //     if(tempCompany!=key){
+            //         getCompanyData(key)
+            //         $(this).nextAll().find(".chosen-search-input").val(key)
+            //     }else if(key==""){
+            //         getCompanyData()
+            //         $(this).nextAll().find(".chosen-search-input").val(tempCompany)
+            //     }
+            // });
+            // //followUp
+            // setMulSelect("followUp")
+            // setMulSelect("business")
+            // setMulSelect("leader")
+            // $(tabId+" .modal-info[name='followUp']").chosen({search_contains:true,width: '100%'}).on("chosen:results_single",function(evt, params){
+            //     var key = $(this).nextAll().find(".chosen-search-input").val()
+            //     if(tempCompany!=key){
+            //         getUserData("followUp",key)
+            //         $(this).nextAll().find(".chosen-search-input").val(key)
+            //     }else if(key==""){
+            //         getUserData("followUp")
+            //         $(this).nextAll().find(".chosen-search-input").val(tempCompany)
+            //     }
+            // }).on("chosen:no_results",function(evt, params){
+            //     var key = $(this).nextAll().find(".chosen-search-input").val()
+            //     if(tempCompany!=key){
+            //         getUserData("followUp",key)
+            //         // $(this).nextAll().find(".chosen-search-input").val(key)
+            //     }else if(key==""){
+            //         getUserData("followUp")
+            //         $(this).nextAll().find(".chosen-search-input").val(tempCompany)
+            //     }
+            // }).on("change",function(selected,deselected){
+            //     if(deselected.selected!=undefined){
+            //         followUpArr.push(deselected.selected)
+            //     }
+                
+            // });
+
+        // })
+        //function projectResetFuns(){}
+        // function projectReFuns(){
+        //     var year=(new Date()).getFullYear()
+        //     var month=(new Date()).getMonth()
+        //     var day=(new Date()).getDate()
+        //     var hours=(new Date()).getHours()
+        //     var minutes=(new Date()).getMinutes()
+        //     $(tabId+" .modal-info[name='code']").val(prefix+year+formatMonth(month)+formatDate(day)+hours+minutes);
+        // }
+        // function projectSearchFuns(){
+        //     datas['data']={}
+        //     $(tabId+" .search-info").each(function(){
+        //         var name=$(this).attr("name");
+        //         var val=$(this).val();
+        //         if(val!=""){
+        //             datas['data'][name]=val
+        //         }
+        //     })
+        // }
+        // function projectInfoFuns(){
+        //     datas["data"]={}
+        //     $(tabId+" .modal-info").each(function(){
+        //         var name =$(this).attr("name");
+        //         var val =$(this).val();
+        //         if(name=="title" && val==""){
+        //             alert("标题不能为空");
+        //             throw "标题不能为空";
+        //         }else if(name=="class" && val<=0){
+        //             alert("必须选择分类");
+        //             throw "必须选择分类";
+        //         }else if(val!=""){
+        //             datas["data"][name]=val;
+        //         }
+        //     })
+        //     datas["data"].status=$(tabId+" .status-group .active").attr("name")
+        // }
+        // /*设置编辑用户信息*/
+        // function projectShowFuns(info){
+        //     $(tabId+" .modal-info[name='projectId']").val(info['projectId']);
+        //     $(tabId+" .modal-info[name='code']").val(info['code']);
+        //     $(tabId+" .modal-info[name='name']").val(info['name']);
+        //     // $(tabId+" .modal-info[name='toCompany']").val(info['toCompany']);
+        //     $(tabId+" .modal-info[name='toCompany']").html("<option value='"+info['toCompany']+"' selected>"+info['toCompanyStr']+"-"+info['toContactStr']+"</option>");
+        //     $(tabId+" .modal-info[name='toCompany']").trigger('chosen:updated');
+        //     // $(tabId+" .modal-info[name='toCompany']").find("option[value='"+info['toCompany']+"']").prop("selected",true);
+            
+        //     followUpArr=info['followUp'].split(",")
+        //     var followUp=""
+        //     followUpArr.forEach(function(ele){
+        //         followUp+="<option value='"+ele+"' selected>"+ele+"</option>"
+        //     })
+        //     $(tabId+" .modal-info[name='followUp']").html(followUp);
+        //     $(tabId+" .modal-info[name='followUp']").trigger('chosen:updated');
+
+        //     $(tabId+" .modal-info[name='time']").val(info['time']);
+
+        //     // $(tabId+" .modal-info[name='business']").val(info['business']);
+        //     businessArr=info['business'].split(",")
+        //     var business=""
+        //     businessArr.forEach(function(ele){
+        //         business+="<option value='"+ele+"' selected>"+ele+"</option>"
+        //     })
+        //     $(tabId+" .modal-info[name='business']").html(business);
+        //     $(tabId+" .modal-info[name='business']").trigger('chosen:updated');
+
+        //     // $(tabId+" .modal-info[name='leader']").val(info['leader']);
+        //     leaderArr=info['leader'].split(",")
+        //     var leader=""
+        //     leaderArr.forEach(function(ele){
+        //         leader+="<option value='"+ele+"' selected>"+ele+"</option>"
+        //     })
+        //     $(tabId+" .modal-info[name='leader']").html(leader);
+        //     $(tabId+" .modal-info[name='leader']").trigger('chosen:updated');
+
+        //     var responsibleArr=info['responsible'].split(",")
+        //     // var responsible=""
+        //     $(tabId+" .modal-info[name='responsible']").prop("selected",false);
+        //     responsibleArr.forEach(function(ele){
+        //         // responsible+="<option value='"+ele+"' selected>"+ele+"</option>"
+        //         $(tabId+" .modal-info[name='responsible']").find("option[value='"+ele+"']").prop("selected",true)
+        //     })
+        //     // $(tabId+" .modal-info[name='responsible']").html(responsible);
+        //     // $(tabId+" .modal-info[name='responsible']").val(info['responsible']);
+        //     $(tabId+" .modal-info[name='num']").val(info['num']);
+        //     $(tabId+" .modal-info[name='invoice']").val(info['invoice']);
+        //     $(tabId+" .modal-info[name='paySign']").val(info['paySign']);
+        //     if(info['advanceDate']>0){
+        //         $(tabId+" .modal-info[name='advanceDate']").val(info['advanceDate']);
+        //     }
+        //     $(tabId+" .modal-info[name='amount']").val(info['amount']);
+        //     $(tabId+" .modal-info[name='advance']").val(info['advance']);
+        //     $(tabId+" .modal-info[name='surplus']").val(info['surplus']);
+        //     $(tabId+" .modal-info[name='cost']").val(info['cost']);
+        //     $(tabId+" .modal-info[name='profit']").val(info['profit']);
+        //     $(tabId+" .modal-info[name='profitRate']").val(info['profitRate']);
+        //     $(tabId+" .status-btn").removeClass("active");
+        //     $(tabId+" .status-btn[name='"+info['status']+"']").addClass("active");
+        //     // $(tabId+" .modal-info[name='class']").find("option[value='"+info['class']+"']").prop("selected",true);
+        // }
+        // //获取客户信息并且select数据
+        // function getCompanyData(thisCompany) {
+        //     if(thisCompany){
+        //         datas["data"]={company:thisCompany}
+        //     }
+        //     var tree=[]
+        //     datas["reqType"]="customerList";
+        //     get("{$url}",datas,function(result){
+        //         if(result.list){
+        //             var option='<option value="">请选择签约公司</option>';
+        //             result.list.forEach(ele => {
+        //                 option+="<option value="+ele.customerId+">"+ele.company+"-"+ele.contact+"</option>'"
+        //             });
+        //             $(tabId+" .modal-info[name='toCompany']").html(option);
+        //             $(tabId+" .modal-info[name='toCompany']").trigger('chosen:updated');
+        //         }
+        //     },false)
+        // }
+        // function getUserData(name,thisUser) {
+        //     if(thisUser){
+        //         datas["data"]={userName:thisUser}
+        //     }
+        //     var tree=[]
+        //     datas["reqType"]="userList";
+        //     get("{$url}",datas,function(result){
+        //         if(result.list){
+        //             var option='<option value="">请选择用户</option>';
+        //             var followUpAll=$.unique(eval(name+"Arr").concat(result.list))
+        //             followUpAll.forEach(userName => {
+        //                 if($.inArray(userName,eval(name+"Arr"))>=0){
+        //                     // console.log(eval(name+"Arr"))
+        //                     // console.log(userName)
+        //                     option+="<option value="+userName+" selected>"+userName+"</option>'"
+        //                 }else{
+        //                     option+="<option value="+userName+">"+userName+"</option>'"
+        //                 }
+                        
+        //             });
+        //             $(tabId+" .modal-info[name='"+name+"']").html(option);
+        //             $(tabId+" .modal-info[name='"+name+"']").trigger('chosen:updated');
+        //         }
+        //     },false)
+        // }
+        // function setMulSelect(name){
+        //     $(tabId+" .modal-info[name='"+name+"']").chosen({search_contains:true,width: '100%'}).on("chosen:results_single",function(evt, params){
+        //         var key = $(this).nextAll().find(".chosen-search-input").val()
+        //         if(tempCompany!=key){
+        //             getUserData(name,key)
+        //             $(this).nextAll().find(".chosen-search-input").val(key)
+        //         }else if(key==""){
+        //             getUserData(name)
+        //             $(this).nextAll().find(".chosen-search-input").val(tempCompany)
+        //         }
+        //     }).on("chosen:no_results",function(evt, params){
+        //         var key = $(this).nextAll().find(".chosen-search-input").val()
+        //         if(tempCompany!=key){
+        //             getUserData(name,key)
+        //             // $(this).nextAll().find(".chosen-search-input").val(key)
+        //         }else if(key==""){
+        //             getUserData(name)
+        //             $(this).nextAll().find(".chosen-search-input").val(tempCompany)
+        //         }
+        //     }).on("change",function(selected,deselected){
+        //         if(deselected.selected!=undefined){
+        //             eval(name+"Arr").push(deselected.selected)
+        //         }
+                
+        //     });
+        // }
+    </script>
+</body>
+</html>

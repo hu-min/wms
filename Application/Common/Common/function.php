@@ -165,7 +165,7 @@ function utf8_substr($str,$length,$middle=false){
  * @Date: 2018-06-09 23:01:13 
  * @Desc: list列表中的按钮状态 
  */
-function list_btn($defind_vars,$id){
+function list_btn($defind_vars,$id,$inlink=[]){
     $statusLabel = $defind_vars["statusLabel"];
     $statusType = $defind_vars["statusType"];
     $processType = $defind_vars["processType"];
@@ -179,7 +179,16 @@ function list_btn($defind_vars,$id){
     echo "<td><span class='label bg-{$statusLabel[$item['status']]}'>{$statusType[$item['status']]}</span></td>";
     echo "<td class='status-con' data-db='{$dbName}' data-con='{$controlName}' data-id='".$item[$id]."' data-url='{$url}' >";
     if($nodeAuth >= 1){
-        echo "<button type='button' data-gettype='Edit' data-toggle='modal' data-vtarget='.global-modal' class='btn btn-sm btn-primary v-showmodal'>查看</button>";
+        if(empty($inlink)){
+            echo "<button type='button' data-gettype='Edit' data-toggle='modal' data-vtarget='.global-modal' class='btn btn-sm btn-primary v-showmodal'>查看</button>";
+        }else{
+            if(isset($inlink["title"])){
+                $title = 'data-title="'.$inlink["title"].'"';
+            }
+
+            echo '<a class="btn btn-sm btn-primary nodeOn" role="button" data-id="'.$item[$id].'" '.$title.' data-nodeid="'.$inlink["nodeid"].'" href="'.$inlink["href"].'"><span>查看</span></a>';
+        }
+        
     }
     if($processAuth['level'] > 1 && ($item['status'] == 0 or  $item['status'] == 2 )){
         echo "  <button type='button' class='btn btn-success submit-status btn-sm' data-status='1' name='approve' >{$processType[1]}</button>";
@@ -235,8 +244,9 @@ function save_btn($defind_vars){
     $item = $defind_vars["data"];
     $userId = $defind_vars["userId"];
     $url = $defind_vars["url"];
+    $noModal = $defind_vars["noModal"] ? "" : "data-modal='true'";
     if((($item["author"] == $userId && $item['status'] == 0) || ($gettype == "Add" && $processAuth['level'] > 0) || (($processAuth['level'] -1) == $item["processLevel"] && $item["processLevel"] > 0))  || $nodeAuth>= 7){
-        echo "<button type='button' class='btn btn-primary save-info' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' data-modal='true'>{$btnTitle}</button>";
+        echo "<button type='button' class='btn btn-primary save-info' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>{$btnTitle}</button>";
     }
 }
 /** 

@@ -1,0 +1,360 @@
+<div class="modal-header">
+    <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{$title}</h4>
+</div>
+<div class="modal-body">
+    <form role="form">
+        <div class="box-body">
+            <div class="box box-solid">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="box-group" id="{$vtabId}-accordion">
+                        <!-- we are adding the .panel class so bootstrap.js collapse plugin detects it -->
+                        <div class="panel box box-primary">
+                            <div class="box-header with-border">
+                                <h4 class="box-title">
+                                    <a data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#collapseOne">
+                                    项目基础
+                                    </a>
+                                </h4>
+                            </div>
+                        <div id="collapseOne" class="panel-collapse collapse in">
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label >立项或添加项目场次：</label>
+                                            <select class="form-control modal-info chosen-project chosen-select" title="立项或添加场次" data-value="projectId"  data-text="name" name="project_id">
+                                                <option value="">立项</option>
+                                                <volist name="projectArr" id="item">
+                                                    <option value="{$item['projectId']}">{$item['name']}</option>
+                                                </volist>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">总场次：</label>
+                                            <input class="form-control modal-info datetime" name="session_all" title="总场次" placeholder="总场次" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">当前场次：</label>
+                                            <input class="form-control modal-info datetime" name="session_cur" title="当前场次" placeholder="当前场次" type="text">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">合同金额：</label>
+                                            <input class="form-control modal-info datetime" name="amount" title="合同金额" placeholder="合同金额" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label >品牌：</label>
+                                            <select class="form-control modal-info chosen-project chosen-select" title="品牌" data-value="basicId"  data-text="name" name="brand">
+                                                <option value="">品牌</option>
+                                                <volist name="brandArr" id="item">
+                                                    <option value="{$item['basicId']}">{$item['name']}</option>
+                                                </volist>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">项目编号：</label>
+                                            <input class="form-control modal-info datetime" name="code" title="项目编号" required="required" value="" placeholder="项目编号" type="text">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">项目日期：</label>
+                                            <div class="input-group date">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-calendar"></i>
+                                                </div>
+                                                <input class="form-control pull-right date-input modal-info" name="project_time" id="{$vtabId}-project-time" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">项目天数：</label>
+                                            <input class="form-control modal-info datetime" name="days" title="项目天数" placeholder="项目天数" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">项目名称：</label>
+                                            <input class="form-control modal-info datetime" name="name" title="当前场次" required="required" placeholder="当前场次" type="text">
+                                        </div>                        
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">签约公司：</label>
+                                            <select class="form-control modal-info chosen-project chosen-select" data-value="companyId" required="required"  data-text="company" data-cname="customer_cont" title="签约公司" name="customer_com">
+                                                <option value="">公司</option>
+                                                <volist name="cusComArr" id="item">
+                                                    <option value="{$item['companyId']}">{$item['company']}</option>
+                                                </volist>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">客户担当：</label>
+                                            <select class="form-control modal-info chosen-project chosen-select" title="客户担当" data-value="contactId"  data-text="contact" data-pname="customer_com" name="customer_cont">
+                                                <option value="">客户</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">客户其他人员：</label>
+                                            <input class="form-control modal-info datetime" name="customer_other" title="当前场次" placeholder="当前场次" type="text">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel box box-danger">
+                        <div class="box-header with-border">
+                            <h4 class="box-title">
+                                <a data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#collapseTwo">
+                                项目前期基本信息
+                                </a>
+                            </h4>
+                        </div>
+                            <div id="collapseTwo" class="panel-collapse collapse">
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">项目省份：</label>
+                                            <select class="form-control modal-info chosen-project chosen-select" title="项目省份" name="province" data-cname="city">
+                                                <option value="">省份</option>
+                                                <volist name="provinceArr" id="item">
+                                                    <option value="{$item['pid']}">{$item['province']}</option>
+                                                </volist>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">项目城市：</label>
+                                            <select class="form-control modal-info chosen-project chosen-select" data-value="cid"  data-text="city" data-noupdate="true" data-pname="province" title="城市" name="city">
+                                                <option value="">城市</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">项目场地：</label>
+                                            <select class="form-control modal-info chosen-project chosen-select" title="项目场地" name="field" data-value="basicId"  data-text="name">
+                                                <option value="">场地</option>
+                                                <volist name="fieldArr" id="item">
+                                                    <option value="{$item['basicId']}">{$item['name']}</option>
+                                                </volist>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">立项日期：</label>
+                                            <div class="input-group date">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-calendar"></i>
+                                                </div>
+                                                <input class="form-control pull-right date-input modal-info" name="create_time" id="{$vtabId}-create-date" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">立项人：</label>
+                                            <select class="form-control modal-info chosen-project chosen-select" title="立项人" name="create_user" data-value="userId"  data-text="userName">
+                                                <option value="">立项人</option>
+                                                <volist name="userArr" id="item">
+                                                    <option value="{$item['userId']}">【{$item['roleName']}】{$item['userName']}</option>
+                                                </volist>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">是否竞标：</label>
+                                            <select class="form-control modal-info" title="是否竞标" name="is_bid" >
+                                                <option value="1">需要</option>
+                                                <option value="0">不需要</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">竞标类型：</label>
+                                            <select class="form-control modal-info" title="竞标类型" name="bidding">
+                                                <option value="">竞标类型</option>
+                                                <option value="1">技术标</option>
+                                                <option value="2">商务标</option>
+                                                <option value="3">区域标</option>
+                                                <option value="4">其它标项</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">竞标（提案）日期：</label>
+                                            <div class="input-group date">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-calendar"></i>
+                                                </div>
+                                                <input class="form-control pull-right date-input modal-info" name="bid_date" id="{$vtabId}-tian-date" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">竞标提案时间：</label>
+                                            <div class="input-group date">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-calendar"></i>
+                                                </div>
+                                                <input class="form-control pull-right date-input modal-info" name="bid_time" data-type="time" id="{$vtabId}-jbta-date" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        <div class="panel box box-success">
+                            <div class="box-header with-border">
+                                <h4 class="box-title">
+                                    <a data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#collapseThree">
+                                    TW执行信息内部安排
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseThree" class="panel-collapse collapse">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">营业主担：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="营业主担" name="business" data-value="userId"  data-text="userName">
+                                                    <option value="">营业主担</option>
+                                                    <volist name="userArr" id="item">
+                                                        <option value="{$item['userId']}">【{$item['roleName']}】{$item['userName']}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">项目主担：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="项目主担" name="leader" data-value="userId"  data-text="userName">
+                                                    <option value="">项目主担</option>
+                                                    <volist name="userArr" id="item">
+                                                        <option value="{$item['userId']}">【{$item['roleName']}】{$item['userName']}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">执行类型：</label>
+                                                <select class="form-control modal-info chosen-select" title="执行类型" name="execute" data-cname="execute_sub" data-dis-search="true">
+                                                    <option value="">执行类型</option>
+                                                    <volist name="exeRootdArr" id="item">
+                                                        <option value="{$item['basicId']}">{$item['name']}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">执行类型-子项：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="执行类型-子项" name="execute_sub" data-value="basicId"  data-text="name" data-pname="execute" >
+                                                    <option value="">执行类型-子项</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">项目类型：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="项目类型" name="type" data-value="basicId"  data-text="name">
+                                                    <option value="">项目类型</option>
+                                                    <volist name="ptypeArr" id="item">
+                                                        <option value="{$item['basicId']}">{$item['name']}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">项目阶段：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="项目阶段" name="stage" data-value="basicId"  data-text="name">
+                                                    <option value="">项目阶段</option>
+                                                    <volist name="stageArr" id="item">
+                                                        <option value="{$item['basicId']}">{$item['name']}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">前期项目人员：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="前期项目人员" name="earlier_user" multiple="multiple"  data-value="userId"  data-text="userName">
+                                                    <option value="前期项目人员"></option>
+                                                    <volist name="userArr" id="item">
+                                                        <option value="{$item['userId']}">【{$item['roleName']}】{$item['userName']}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">TW现场执行人员：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="TW现场执行人员" name="scene_user" multiple="multiple"  data-value="userId"  data-text="userName">
+                                                    <option value="TW现场执行人员"></option>
+                                                    <volist name="userArr" id="item">
+                                                        <option value="{$item['userId']}">【{$item['roleName']}】{$item['userName']}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <!-- /.box-body -->
+            </div>
+        </div>
+    </form>            
+</div>
+<div class="modal-footer">
+        
+    <input class="modal-info" name="projectId" value="0" type="hidden">
+    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+    {:save_btn(get_defined_vars())}
+</div>

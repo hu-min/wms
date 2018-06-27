@@ -573,12 +573,13 @@
     $(document).ready(function () {
         $('.sidebar-menu').tree()
         //菜单点击事件
-        $('.nodeOn').on('click',function(e){
+        $(document).on('click','.nodeOn',function(e){
             var urlParam=""
             urlParam=getUrlAction()
             e.preventDefault();
             var level = $(this).data('level')
-            var title = $(this).children('span').text();
+            var id = $(this).data('id') ? $(this).data('id') : 0
+            var title = $(this).data('title') ? $(this).data('title') : $(this).children('span').text();
             var el=$(this)
             var nodeid=$(this).data("nodeid");
             breadcrumb(el,title,level);
@@ -590,7 +591,7 @@
                     if(cMatch!=null && cMatch[1]!=urlParam){
                         setUrlAction(cMatch[1],cMatch[1]);
                     }
-                    get(controller,{authNodeId:nodeid},function(result){
+                    get(controller,{authNodeId:nodeid,id:id},function(result){
                         createTab(title,"vtabs"+nodeid,result.html);
                     });
                     

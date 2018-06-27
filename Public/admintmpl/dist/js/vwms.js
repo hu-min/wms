@@ -5,15 +5,15 @@ var filesData={};
  * @Date: 2018-01-23 00:41:37 
  * @Desc: get方式获取数据 
  */    
-function get(url,datas,callBack){
+function get(url,indata,callBack){
     setLoad()
     asyncs=arguments[3]!=undefined?arguments[3]:true;
-    datas["vtabId"]=tabId
+    indata["vtabId"]=tabId
     $.ajax({
         url:url,
         type:'get',
         dataType:'json',
-        data:datas,
+        data:indata,
         async:asyncs,
     }).done(function(result) {callBack(result);})
       .always(function() { setLoad();datas={};})
@@ -26,15 +26,15 @@ function get(url,datas,callBack){
  * @Date: 2018-01-27 22:43:43 
  * @Desc: post发送 
  */
-function post(url,datas,callBack){
+function post(url,indata,callBack){
     asyncs=arguments[3]!=undefined?arguments[3]:true;
     setLoad()
-    datas["vtabId"]=tabId
+    indata["vtabId"]=tabId
     $.ajax({
         url:url,
         type:'post',
         dataType:'json',
-        data:datas,
+        data:indata,
         async:asyncs,
     }).done(function(result) {callBack(result);})
     .always(function() { setLoad();datas={};})
@@ -291,7 +291,7 @@ $(document).on("click",'.save-info',function(){
     if(JSON.stringify(datas["data"])=="{}"){
         notice(110,"没有更新数据")
     }
-    // console.log(datas);
+    
     post(url,datas,function(result){
         // notice(result.errCode,result.error);
         if(result.errCode==0){
@@ -438,6 +438,11 @@ $(function(){
         }
         
     // }
+    
+    $(window).resize(function(){
+        var width = $(".chosen-container").parent(".form-group").width()
+        $(".chosen-container").width(width+"px")
+    })
 })
 /** 
  * javascript comment 
@@ -615,6 +620,10 @@ function init_date(){
     $(tabId+" .date-input").each(function(){
         var option =opt ? opt : {theme: '#3C8DBC'}
         var thisId = $(this).attr("id")
+        var type = $(this).data("type")
+        if(type){
+            option["type"] = type
+        }
         option["elem"] = option["elem"] ? option["elem"] : "#"+thisId
         if(thisId){
             // console.log(thisId)

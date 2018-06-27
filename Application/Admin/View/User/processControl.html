@@ -171,8 +171,6 @@
             $(tabId+" .modal-info[name='processName']").val(info['processName']);
             set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
             JSON.parse(info['processOption']).forEach(function(process,index){
-                console.log(index)
-                console.log(process)
                 createProcess()
                 $(tabId+" .role-type").eq(index).find("option[value='"+process["type"]+"']").prop("selected",true);
                 var tempChosen = $(tabId+" .role-type").eq(index).parent("td").next("td").find(".chosen-roles")
