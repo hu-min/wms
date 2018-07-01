@@ -100,6 +100,7 @@ class ProjectController extends BaseController{
         $title = "立项/添加场次";
         $btnTitle = "添加数据";
         $gettype = I("gettype");
+        $onlydata = I("onlydata");
         $resultData=[];
         $id = I("id");
         if($gettype=="Edit"){
@@ -122,6 +123,7 @@ class ProjectController extends BaseController{
                     "LEFT JOIN (SELECT basicId execute_sub_id,name execute_sub_name FROM v_basic WHERE class = 'execute' ) e ON e.execute_sub_id = execute_sub",
                     "LEFT JOIN (SELECT basicId type_id,name type_name FROM v_basic WHERE class = 'projectType' ) pt ON pt.type_id = type",
                     "LEFT JOIN (SELECT basicId stage_id,name stage_name FROM v_basic WHERE class = 'stage' ) s ON s.stage_id = stage",
+                    "LEFT JOIN (SELECT project_id project_sid,COUNT(projectId) session_count FROM v_project WHERE projectId = 0 GROUP BY project_id) sc ON sc.project_sid = projectId",
                 ]
             ];
             $resultData = $this->projectCom->getOne($parameter)["list"];
@@ -147,6 +149,9 @@ class ProjectController extends BaseController{
             ];
             $result=$this->userCom->getUserList($parameter);
             $resultData["user_ids"]=$result["list"];
+        }
+        if($onlydata){
+            $this->ajaxReturn(["data"=>$resultData]);
         }
         $modalPara=[
             "data"=>$resultData,
@@ -589,10 +594,22 @@ class ProjectController extends BaseController{
      * @Date: 2018-06-20 23:54:57 
      * @Desc: 生成项目编码 
      */    
-    function createCode(){
+    function createCodeOne($companyId=0){
         $prefix = "TWSH";
-        $numResult = $this->projectCom->M()->where(["project_id"=>0])->count();
-
-        return $prefix.($numResult+1);
+        $retData = "";
+        $cId = $companyId >0 ? $companyId : I('id');
+        $numResult = $this->projectCom->M()->where(["project_id"=>0,'status'=>1])->count();
+        $comNumResult = $this->projectCom->M()->where(["customer_com"=>$cId,'status'=>1])->count();
+        $parameter=[
+            'where'=>["companyId"=>$cId],
+        ];
+        $companyResult=$this->customerCom->getCompanyList($parameter,true);
+        $retData = $prefix.($numResult+1).$companyResult['alias'].($comNumResult+1).date("YmdH");
+        if($companyId>0){
+            return $retData;
+        }else{
+            $this->ajaxReturn(['errCode'=>0,'data' => $retData]);
+        }
+        
     }
 }

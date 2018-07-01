@@ -96,7 +96,44 @@
     <!-- date-range-picker -->
     <script>
         $(function(){
-
+            $(tabId).on("change",".modal-info[name='project_id']",function(){
+                var project_id = $(this).val()
+                if(project_id==0){
+                    $(tabId+" .modal-info").val("");
+                    $(tabId+" .modal-info[name='session_all']").val(1)
+                    $(tabId+" .modal-info[name='session_cur']").val(1)
+                    // $(tabId+" .modal-info").val("");
+                    // $(tabId+" .modal-info").prop("disabled",false)
+                    $(tabId+" select").each(function() {
+                        $(this).find("option[value='']").prop("selected",true);
+                        $(this).trigger("chosen:updated");
+                    });
+                    var id = $(tabId+" .modal-info[name='customer_cont']").val()
+                    if(id>0){
+                        get_project_code(id)
+                    }
+                    
+                }else{
+                    datas["reqType"]='project_modalOne';
+                    datas["onlydata"]='true';
+                    datas["gettype"]='Edit';
+                    datas["id"]=project_id;
+                    get("{$url}",datas,function(result){
+                        if(result.data){
+                            result.data.session_cur = Number(result.data.session_cur) + 1;
+                            project_setInfo(result.data)
+                        }
+                    })
+                }
+            })
+            $(tabId).on("change",".modal-info[name='customer_com']",function(){
+                var id = $(this).val()
+                if(id>0){
+                    get_project_code(id)
+                }else{
+                    $(tabId+" .modal-info[name='code']").val("")
+                }
+            })
         })
         function project_initInfo(){
             $(tabId+" .chosen-select").each(function(){
@@ -188,9 +225,21 @@
                     }
                 }
             });
-            if((info['processLevel'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7){
+            if((info['processLevel'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7 && "{$gettype}" == "Edit"){
                 $(tabId+" .modal-info").prop("disabled",true)
             }
+        }
+        function get_project_code(id){
+            datas["reqType"]='createCodeOne';
+            datas["id"]=id
+            get("{$url}",datas,function(result){
+                console.log(result.data);
+                if(result.errCode==0){
+                    $(tabId+" .modal-info[name='code']").val(result.data)
+                }else{
+                    $(tabId+" .modal-info[name='code']").val("")
+                }
+            })
         }
         // var E = window.wangEditor
         // var editor = new E(tabId+' .art-editor')
