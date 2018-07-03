@@ -225,6 +225,10 @@
                     }
                 }
             });
+            // console.log(info['processLevel'])
+            // console.log(info['status'])
+            // console.log("{$nodeAuth}")
+            // console.log("{$gettype}")
             if((info['processLevel'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7 && "{$gettype}" == "Edit"){
                 $(tabId+" .modal-info").prop("disabled",true)
             }

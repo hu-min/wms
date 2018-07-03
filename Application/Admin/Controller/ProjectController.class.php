@@ -271,15 +271,18 @@ class ProjectController extends BaseController{
     function projectList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
+ 
+
         $userId = session("userId");
         $nodeAuth = $this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME];
         $where=[];
+        // $where['_string']=" (processLevel = ".($this->processAuth["level"]-1)." OR processLevel = 0 OR author = ".session("userId")." OR FIND_IN_SET(".session("userId").",examine)) OR (create_user = '{$userId}') OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}') ";
         if($data['name']){
             $where['name']=['LIKE','%'.$data['name'].'%'];
         }
         if($nodeAuth<7){
-            $where['_string'] = ' (create_user = '.$userId .')  OR FIND_IN_SET('.$userId.',business) OR FIND_IN_SET('.$userId.',leader) OR FIND_IN_SET('.$userId.',earlier_user) OR FIND_IN_SET('.$userId.',scene_user) OR (create_user = '.$userId .') ';
-        }
+            $where['_string'] = " ((create_user = {$userId})  OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) AND status =1) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}) OR (processLevel = ".($this->processAuth["level"]-1)." AND processLevel <>0) OR FIND_IN_SET({$userId},examine) OR (author = {$userId})";
+        }//OR processLevel = 0 OR author = {$userId} OR FIND_IN_SET({$userId},examine)
         // if($data['toCompany']){
         //     $where['toCompany']=['LIKE','%'.$data['toCompany'].'%'];
         // }
@@ -301,6 +304,9 @@ class ProjectController extends BaseController{
         // }
         if(isset($data['status'])){
             $where['status']=$data['status'];
+        }else{
+            
+            $where['_string'] = isset($where['_string']) ? $where['_string'].=" AND status < 3" : $where['_string'].=" status < 3";
         }
         $parameter=[
             'where'=>$where,
@@ -308,22 +314,46 @@ class ProjectController extends BaseController{
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"addTime DESC",
-            "joins"=>"",
+            "joins"=>[
+                "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = brand",
+                "LEFT JOIN (SELECT companyId company_id,company customer_com_name FROM v_customer_company ) c ON c.company_id = customer_com",
+                "LEFT JOIN (SELECT contactId contact_id,contact customer_cont_name FROM v_customer_contact ) c2 ON c2.contact_id = customer_cont",
+                "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = business",
+                "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = leader",
+                "LEFT JOIN (SELECT basicId stage_id,name stage_name FROM v_basic WHERE class = 'stage' ) s ON s.stage_id = stage",
+                "LEFT JOIN (SELECT basicId type_id,name type_name FROM v_basic WHERE class = 'projectType' ) t ON t.type_id = type",
+                "LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct ON ct.ctid = city AND ct.cpid = province",
+            ],
         ];
         $listResult=$this->projectCom->getProjectList($parameter);
-        $this->tablePage($listResult,'Project/projectTable/projectList',"projectList");
-        if($projectResult){
-            $projectRed="projectList";
-            $this->Redis->set($projectRed,json_encode($projectResult['list']),3600);
-            $page = new \Think\VPage($projectResult['count'], $this->pageSize);
-            $pageShow = $page->show();
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
-            $this->assign('projectList',$projectResult['list']);
-            $countResult=$this->projectCom->count($where);
-            $count="合同额：".number_format($countResult['totalAmount'])." | 总成本：".number_format($countResult['totalCost'])." | 总纯利：".number_format($countResult['totalProfit'])." | 总纯利率：".round($countResult['totalProfit']/$countResult['totalAmount']*100,2)."%";
-            $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Project/projectTable/projectList'),'page'=>$pageShow,"count"=>$count]);
+        // echo $this->projectCom->M()->_sql();
+        if( isset($data['template'])){
+            $listRedis = $data['template'].'List';
+            $template = 'Project/projectTable/'.$listRedis;
+            if($data['template'] == 'schedule'){
+                foreach ($listResult['list'] as $key => $project) {
+                    $uResult = $this->userCom->getUserOne(["fields"=>'group_concat(userName) earlier_users',"where"=>['userId'=>["IN",explode(",",$project["earlier_user"])]]]);
+                    // print_r($project);
+                    $listResult['list'][$key]["earlier_users"] = $uResult['list']['earlier_users'];
+                }
+            }
+        }else{
+            $listRedis = 'projectList';
+            $template = 'Project/projectTable/'.$listRedis;
         }
-        $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
+        $this->tablePage($listResult,$template,$listRedis);
+        // if($projectResult){
+        //     $projectRed="projectList";
+        //     $this->Redis->set($projectRed,json_encode($projectResult['list']),3600);
+        //     $page = new \Think\VPage($projectResult['count'], $this->pageSize);
+        //     $pageShow = $page->show();
+        //     $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+        //     $this->assign('projectList',$projectResult['list']);
+        //     $countResult=$this->projectCom->count($where);
+        //     $count="合同额：".number_format($countResult['totalAmount'])." | 总成本：".number_format($countResult['totalCost'])." | 总纯利：".number_format($countResult['totalProfit'])." | 总纯利率：".round($countResult['totalProfit']/$countResult['totalAmount']*100,2)."%";
+        //     $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Project/projectTable/projectList'),'page'=>$pageShow,"count"=>$count]);
+        // }
+        // $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
     }
     /** 
      * @Author: vition 
@@ -354,6 +384,7 @@ class ProjectController extends BaseController{
             $datas['addTime']=time();
             $datas['time']=strtotime($datas['time']);
             $datas['author']=session('userId');
+            $datas['processLevel']=$this->processAuth["level"];
             unset($datas['projectId']);
             return $datas;
         }else if($reqType=="projectEdit"){
@@ -361,16 +392,16 @@ class ProjectController extends BaseController{
             $data=[];
 
             $data['updateUser']=session('userId');
-            foreach (['project_id','amount','bid_date','bid_time','bidding','brand','city','code','create_time','create_user','customer_com','customer_cont','customer_other','days','earlier_user','execute_sub','execute','field','is_bid','leader','name','project_time','project_id','projectType','province','scene_user','session_all','session_cur','stage'] as  $key) {
+            foreach (['project_id','amount','bid_date','bid_time','bidding','brand','city','code','create_time','create_user','customer_com','customer_cont','customer_other','days','earlier_user','execute_sub','execute','field','is_bid','business','leader','name','project_time','project_id','projectType','province','scene_user','session_all','type','session_cur','stage'] as  $key) {
                 if(isset($datas[$key])){
                     $data[$key]=$datas[$key];
                 }
             }
             if(isset($datas['status'])){
                 $parameter=[
-                    'where'=>["companyId"=>$datas['companyId']],
+                    'where'=>["projectId"=>$datas['projectId']],
                 ];
-                $result=$this->projectCom->getOne($where);
+                $result=$this->projectCom->getOne($parameter);
                 $data = $this->status_update($result,$datas["status"],$data);
             }
             $data['upateTime']=time();
@@ -611,5 +642,60 @@ class ProjectController extends BaseController{
             $this->ajaxReturn(['errCode'=>0,'data' => $retData]);
         }
         
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-07-03 22:22:24 
+     * @Desc: 项目安排 
+     */    
+    function scheduleControl(){
+        $reqType=I('reqType');
+        $this->assign("controlName","project");//名字对应cust_company_modalOne，和cust_companyModal.html
+        $this->assign('processArr',$this->processArr);
+
+        $project=$this->configCom->get_val("project");
+        // $this->assign("gettype","Add");
+        //一堆立项初始化数据开始了
+        $this->assign('projectArr',$this->_getOption("project_id"));
+        $this->assign('brandArr',$this->_getOption("brand"));
+        $this->assign('fieldArr',$this->_getOption("field"));
+        $this->assign('exeRootdArr',$this->basicCom->get_exe_root());
+        // $this->assign('executedArr',$this->_getOption("execute_sub"));
+        $this->assign('cusComArr',$this->_getOption("customer_com"));
+        $this->assign('userArr',$this->_getOption("create_user"));
+        $this->assign('ptypeArr',$this->_getOption("projectType"));
+        $this->assign('stageArr',$this->_getOption("stage"));
+        $this->assign("provinceArr",$this->basicCom->get_provinces());
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            $this->returnHtml();
+        }
+    }
+    function businessControl(){
+        $reqType=I('reqType');
+        $this->assign("controlName","project");//名字对应cust_company_modalOne，和cust_companyModal.html
+        $this->assign('processArr',$this->processArr);
+
+        $project=$this->configCom->get_val("project");
+        // $this->assign("gettype","Add");
+        //一堆立项初始化数据开始了
+        $this->assign('projectArr',$this->_getOption("project_id"));
+        $this->assign('brandArr',$this->_getOption("brand"));
+        $this->assign('fieldArr',$this->_getOption("field"));
+        $this->assign('exeRootdArr',$this->basicCom->get_exe_root());
+        // $this->assign('executedArr',$this->_getOption("execute_sub"));
+        $this->assign('cusComArr',$this->_getOption("customer_com"));
+        $this->assign('userArr',$this->_getOption("create_user"));
+        $this->assign('ptypeArr',$this->_getOption("projectType"));
+        $this->assign('stageArr',$this->_getOption("stage"));
+        $this->assign("provinceArr",$this->basicCom->get_provinces());
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
+            $this->returnHtml();
+        }
     }
 }
