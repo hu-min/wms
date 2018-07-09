@@ -186,7 +186,6 @@
                 if(info[element]!=null){
                     $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
                 }
-                
             });
             ["brand","customer_com","customer_cont","province","city","field","create_user","is_bid","bidding","business","leader","execute","execute_sub","type","stage"].forEach(element => {
                 var select= $(tabId+" .modal-info[name='"+element+"']")
@@ -214,7 +213,7 @@
                     var user_chosen = info[element].split(",")
                     info["user_ids"].forEach(userinfo => {
                         if(select.find("option[value='"+userinfo["userId"]+"']").length==0){
-                            elect.append('<option value="'+userinfo["userId"]+'">【'+userinfo["roleName"]+'】'+userinfo["userName"]+'</option>')
+                            select.append('<option value="'+userinfo["userId"]+'">【'+userinfo["roleName"]+'】'+userinfo["userName"]+'</option>')
                         }
                     });
                     user_chosen.forEach(chosenval=>{

@@ -41,7 +41,7 @@ class SupplierController extends BaseController{
      * @Date: 2018-05-27 15:14:05 
      * @Desc: 内部获取供应商列表 
      */    
-    protected function getSupplier($key=""){
+    function getSupplier($key=""){
         $where=["status"=>"1"];
         if ($key!=""){
             $where["company"]=["LIKE","%{$key}%"];
@@ -271,7 +271,7 @@ class SupplierController extends BaseController{
      * @Desc: 接口获取供应商列表 
      */    
     function getSupplierList(){
-        $key=I("key");
+        $key=I("key") ? I("key") : '';
         $this->ajaxReturn(["data"=>$this->getSupplier($key)]);
     }
     /** 

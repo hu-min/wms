@@ -13,6 +13,7 @@ class ProjectController extends BaseController{
         $this->projectCom=getComponent('Project');
         $this->configCom=getComponent('Config');
         $this->customerCom=getComponent('Customer');
+        $this->supplierCom=getComponent('Supplier');
         $this->processArr=["0"=>"沟通","1"=>"完结","2"=>"裁决","3"=>"提案","4"=>"签约","5"=>"LOST","6"=>"筹备","7"=>"执行","8"=>"完成"];
         $this->dateArr=["0"=>"立项日期","1"=>"提案日期","2"=>"项目日期","3"=>"结束日期"];
         Vendor("levelTree.levelTree");
@@ -132,6 +133,7 @@ class ProjectController extends BaseController{
             $resultData["create_time"] = date("Y-m-d",$resultData["create_time"]);
             $resultData["bid_date"] = date("Y-m-d",$resultData["bid_date"]);
             $resultData["bid_time"] = date("H:i:s",$resultData["bid_time"]);
+            $resultData["end_date"] = date("Y-m-d",strtotime($resultData["project_time"]." +".$resultData["days"]."day"));
             $resultData["citys"] = $this->basicCom->get_citys($resultData["province"]);
             
             $parameter=[
@@ -185,9 +187,11 @@ class ProjectController extends BaseController{
                     return $result["list"];
                 }
                 break;
-            case 'brand': case 'field': case 'execute_sub':  case 'projectType': case 'stage':
+            case 'brand': case 'field': case 'execute_sub':  case 'projectType': case 'stage': case 'finance_id':
                 if($type=="execute_sub"){
                     $type = "execute";
+                }elseif($type == 'finance_id'){
+                    $type = "bankstock";
                 }
                 $where["class"]=$type;
                 $pid = I("pid");
@@ -253,6 +257,38 @@ class ProjectController extends BaseController{
                     'joins'=>'LEFT JOIN (SELECT roleId rid,roleName FROM v_role ) r ON r.rid = roleId',
                 ];
                 $result=$this->userCom->getUserList($parameter);
+                if($result){
+                    return $result["list"];
+                }
+                break;
+            case 'supplier_com':
+                if ($key!=""){
+                    $where["company"]=["LIKE","%{$key}%"];
+                }
+                $parameter=[
+                    'where'=>$where,
+                    'fields'=>'companyId,company,type ,typename',
+                    'orderStr'=>"companyId DESC",
+                    'joins'=>[
+                        "LEFT JOIN (SELECT basicId,name typename FROM v_basic WHERE class='supType') b ON b.basicId=type"
+                    ]
+                ];
+                $result = $this->supplierCom->getCompanyList($parameter);
+                if($result){
+                    return $result["list"];
+                }
+                break;
+            case 'supplier_cont':
+                $where["companyId"]=I("pid");
+                if ($key!=""){
+                    $where["contact"]=["LIKE","%{$key}%"];
+                }
+                $parameter=[
+                    'where'=>$where,
+                    'fields'=>'contactId,contact',
+                    'orderStr'=>"contactId DESC",
+                ];
+                $result = $this->supplierCom->getSupplierList($parameter);
                 if($result){
                     return $result["list"];
                 }
@@ -629,8 +665,8 @@ class ProjectController extends BaseController{
         $prefix = "TWSH";
         $retData = "";
         $cId = $companyId >0 ? $companyId : I('id');
-        $numResult = $this->projectCom->M()->where(["project_id"=>0,'status'=>1])->count();
-        $comNumResult = $this->projectCom->M()->where(["customer_com"=>$cId,'status'=>1])->count();
+        $numResult = $this->projectCom->M()->where(["project_id"=>0])->count();
+        $comNumResult = $this->projectCom->M()->where(["customer_com"=>$cId])->count();
         $parameter=[
             'where'=>["companyId"=>$cId],
         ];

@@ -148,7 +148,7 @@
                         var cityOption='<option value="">全部</option>';
                         
                         result.citys.forEach(ele => {
-                            cityOption+='<option value="'+ele.cid+' selected">'+ele.city+'</option>'
+                            cityOption+='<option value="'+ele.cid+'" selected>'+ele.city+'</option>'
                         })
                         $(tabId+" ."+whereCity+"[name='cityId']").html(cityOption)
                     }

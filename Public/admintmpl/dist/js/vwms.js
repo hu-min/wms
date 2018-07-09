@@ -549,7 +549,7 @@ function fun_is_exits(funcName){
  * @Date: 2018-06-02 19:14:20 
  * @Desc: 设置加载图标 
  */
-function setLoad(){
+function setLoad(timeOut){
     if($("#loadwaiting").hasClass("none")){
         $("#loadwaiting").removeClass("none")
     }else{
@@ -559,6 +559,12 @@ function setLoad(){
         $("#loadwaiting .overlay i").removeClass("fa-spin")
     }else{
         $("#loadwaiting .overlay i").addClass("fa-spin")
+        timeOut = timeOut ? timeOut*1000 : 5000;
+        setTimeout(function(){
+            if($("#loadwaiting").hasClass("fa-spin")){
+                setLoad()
+            }
+        },timeOut);
     }
 }
 /** 

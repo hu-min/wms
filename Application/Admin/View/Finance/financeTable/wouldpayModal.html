@@ -1,0 +1,229 @@
+<div class="modal-header">
+    <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{$title}</h4>
+</div>
+<div class="modal-body">
+    <form role="form">
+        <div class="box-body">
+            <input class="modal-info" value="0" name="id" type="hidden">
+            <input class="modal-info" value="0" name="project_id" type="hidden">
+            <div class="row">
+                <div class="col-md-4 create-rece">
+                    <div class="form-group">
+                        <label >立项或添加项目场次：</label>
+                        <select class="form-control chosen-project chosen-select" title="立项或添加场次" data-value="projectId"  data-text="name" name="project_id">
+                            <option value="">立项</option>
+                            <volist name="projectArr" id="item">
+                                <option value="{$item['projectId']}">{$item['name']}</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">品牌：</label>
+                        <input class="form-control project-info" readonly="readonly" name="brand_name" title="品牌" required="required" value="" placeholder="品牌" type="text">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">项目编号：</label>
+                        <input class="form-control project-info" readonly="readonly" name="code" title="项目编号" required="required" value="" placeholder="项目编号" type="text">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">项目日期：</label>
+                        <input class="form-control project-info" readonly="readonly" name="project_time" title="项目日期" required="required" value="" placeholder="项目日期" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">项目名称：</label>
+                        <input class="form-control project-info" readonly="readonly" name="name" title="项目名称" required="required" value="" placeholder="项目名称" type="text">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">结束日期：</label>
+                        <input class="form-control project-info" readonly="readonly" name="end_date" title=结束日期" required="required" value="" placeholder=结束日期" type="text">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">项目主担：</label>
+                        <input class="form-control project-info" readonly="readonly" name="leader_name" title="营业主担" required="required" value="" placeholder="营业主担" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">公司账户：</label>
+                        <select class="form-control modal-info chosen-select" required="required" title="公司账户" data-value="basicId"  data-text="name" name="finance_id">
+                            <option value="">公司账户</option>
+                            <volist name="financeArr" id="item">
+                                <option value="{$item['basicId']}">{$item['name']}</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">供应商名称：</label>
+                        <select class="form-control chosen-select modal-info" title="立项或添加场次" data-value="companyId" data-extra="typename"  data-text="company" data-cname="supplier_cont" name="supplier_com">
+                            <option value="">供应商名称</option>
+                            <volist name="supComArr" id="item">
+                                <option data-typename="{$item['typename']}" value="{$item['companyId']}">{$item['company']}</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">供应商类型：</label>
+                        <input class="form-control project-info" readonly="readonly" name="supplier_type" title="供应商类型" required="required" value="" placeholder="供应商类型" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">供应商联系人：</label>
+                        <select class="form-control chosen-select modal-info" title="立项或添加场次" data-value="contactId" data-extra="typename"  data-text="contact" data-pname="supplier_com" name="supplier_cont">
+                            <option value="">供应商联系人</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">付款方式：</label>
+                        <select class="form-control modal-info" title="立项或添加场次" name="pay_type">
+                            <option value="">付款方式</option>
+                            <volist name="payType" id="item" key="k">
+                                <option value="{$k}">{$item}</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">合同支付总额：</label>
+                        <input class="form-control modal-info"  name="contract_amount" title="合同支付总额" required="required" value="" placeholder="合同支付总额" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">合同最晚支付日期：</label>
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <input class="form-control pull-right date-input modal-info" name="late_pay_date" id="{$vtabId}-late_pay_date" type="text">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">预付款：</label>
+                        <input class="form-control modal-info" name="advance" title="预付款" required="required" value="" placeholder="预付款" type="text">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">预付款比：</label>
+                        <input class="form-control modal-info" name="advance_ratio" title="预付款比" required="required" value="" placeholder="预付款比" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">预付日期：</label>
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <input class="form-control pull-right date-input modal-info" name="advance_date" id="{$vtabId}-advance_date" type="text">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">未付款：</label>
+                        <input class="form-control modal-info" name="surplus" title="未付款" required="required" value="" placeholder="未付款" type="text">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">下次付款日期：</label>
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <input class="form-control pull-right date-input modal-info" name="next_date" id="{$vtabId}-next_date" type="text">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">未付占比：</label>
+                        <input class="form-control modal-info" name="surplus_ratio" title="预付款比" required="required" value="" placeholder="预付款比" type="text">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">支付优先级：</label>
+                        <select class="form-control modal-info" title="立项或添加场次" name="pay_grade">
+                            <option value="">支付优先级</option>
+                            <volist name="payGradeType" id="item" key="k">
+                                <option value="{$k}">{$item}</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">发票类型：</label>
+                        <select class="form-control modal-info" title="立项或添加场次" name="invoice_type">
+                            <option value="">发票类型</option>
+                            <volist name="invoiceType" id="item" key="k">
+                                <option value="{$k}">{$item }</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="info-title">采购内容详细说明：</label>
+                        <textarea  class="form-control modal-info" name="detail" ></textarea>
+                    </div>
+                </div>
+                
+                    
+            </div>
+            <div class="form-group">
+                <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
+                    <input class="modal-info" value="0" name="status" type="hidden">
+                    {:modal_btn(get_defined_vars())}
+                </div>
+            </div>
+        </div>
+    </form>            
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+    {:save_btn(get_defined_vars())}
+</div>

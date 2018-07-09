@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-header">
+                        <i class="fa fa-plus-square"></i>
+                        <h4 class="box-title">收款【应收客户】</h4>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        {:add_btn(get_defined_vars(),"新增收款")}
+                        
+                    </div>
+                    <div class="box-body search-body company-search-box">
+                        <div class="col-md-12">
+                            <div class="form-inline">
+                                
+                                <div class="form-group">
+                                    <label class="control-label">公司名称：</label>
+                                    <input class="form-control search-info input-sm" name="company" placeholder="公司名称" type="text">
+                                </div>
+                                
+                                <!-- <div class="form-group">
+                                    <label class="control-label">公司别名：</label>
+                                    <input class="form-control search-info input-sm" name="alias" placeholder="公司别名" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label >省份：</label>
+                                    <select class="form-control search-info input-sm" data-city="search-info" title="省份" name="provinceId">
+                                        <option value="">省份</option>
+                                        <volist name="province" id="item">
+                                            <option value="{$item.pid}">{$item.province}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label >城市：</label>
+                                    <select class="form-control search-info input-sm" title="省份" name="cityId">
+                                    </select>
+                                </div> -->
+                                <div class="form-group">
+                                    <label >状态：</label>
+                                    <select class="form-control search-info input-sm" title="状态" name="status">
+                                        <option value="">全部</option>
+                                        <volist name="statusType" id="item">
+                                            <option value="{$key}">{$item}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                </div>
+                                
+                            </div>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" style="font-size:0.95em;overflow-x: auto;">
+                <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;">
+                </div>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>品牌</th>
+                            <th>项目编号</th>
+                            <th>项目日期</th>
+                            <th>项目名称</th>
+                            <th>签约公司</th>
+                            <th>营业主担</th>
+                            <th>项目类型</th>
+                            <th>总场次</th>
+                            <th>合同金额</th>
+                            <th>合同支付日期</th>
+                            <th>付款金额</th>
+                            <th>支付日期</th>
+                            <th>预付款金额</th>
+                            <th>预付款日期</th>
+                            <th>未付款金额</th>
+                            <th>未付款日期</th>
+                            <th>下次付款日期</th>
+                            <th>财务备注</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="{$controlName}-table">
+                        {$tables}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="dataTables_wrapper">
+            <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+                {$pages}
+            </div>
+        </div>
+    </section>
+    <div class="modal fade global-modal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+    <script>
+        function receivable_initInfo(){
+            $(tabId+" .chosen-select").each(function(){
+                var type = $(this).attr('name')
+                var value = $(this).data('value')
+                var text = $(this).data('text')
+                var option = {inherit_select_classes:true,search_contains:true,allow_single_deselect:true}
+    
+                if(text!=undefined && value!=undefined){
+                    var ajax_json = {url:"{$url}",data:{reqType:"getOptionList",type:type},value:value,text:text}
+                    var pname = $(this).data('pname')
+                    if(pname!=undefined){
+                        ajax_json["pelement"] = $(tabId+" .chosen-select[name='"+pname+"']")
+                    }
+                    var noupdate = $(this).data('noupdate')
+                    if(noupdate!=undefined){
+                        ajax_json["noupdate"] = true
+                    }
+                    option["ajax_load"] = ajax_json
+                }
+                var cname = $(this).data('cname')
+                if(cname!=undefined){
+                    option["child"] = $(tabId+" .chosen-select[name='"+cname+"']")
+                }
+                var disSearch = $(this).data('dis-search')
+                if(disSearch!=undefined){
+                    option["disable_search"] = true
+                }
+                
+                $(this).chosen(option)
+            })
+            init_date();
+        }
+        function receivable_setInfo(info){
+            
+            ["brand_name","project_time","code","name","customer_com_name","business_name","type_name","session_all","amount"].forEach(element => {
+                $(tabId+" .project-info[name='"+element+"']").val(info[element]);
+            });
+            ["project_id","id","contract_date","pay_amount","pay_date","advance","advance_date","surplus","surplus_date","surplus_date","next_date",'remark'].forEach(element => {
+                if(info[element]!="0000-00-00"){
+                    $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
+                }
+                
+            });
+            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
+            var gettype= $(tabId+" .save-info").data("gettype");
+            if(gettype=="Add"){
+                $(tabId+" .create-rece").show();
+            }else{
+                $(tabId+" .create-rece").hide();
+            }
+
+            if((info['processLevel'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7 && "{$gettype}" == "Edit"){
+                $(tabId+" .modal-info").prop("disabled",true)
+            }
+            // var projectChosen= $(tabId+" .chosen-select[name='project_id']")
+            // ["brand_name","project_time","code","name","customer_com_name","business_name","type","session_all","amount"].forEach(element => {
+
+            //     // if(info[element]!=null){
+            //     //     $(tabId+" .project-info[name='"+element+"']").val(info[element]);
+            //     // }
+                
+            // })
+        }
+        $(function(){
+            $(tabId).on("change",".chosen-project[name='project_id']",function(){
+                var project_id = $(this).val()
+                if(project_id==0){
+                    $(tabId+" .project-info").val("");
+                    $(tabId+" .modal-info[name='project_id']").val(0);
+                }else{
+                    $(tabId+" .modal-info[name='project_id']").val(project_id);
+                    datas["reqType"]='project_modalOne';
+                    datas["onlydata"]='true';
+                    datas["gettype"]='Edit';
+                    datas["id"]=project_id;
+                    get("{:U('Project/projectItem')}",datas,function(result){
+                        if(result.data){
+                            result.data['project_id'] = result.data['projectId'];
+                            receivable_setInfo(result.data)
+                        }
+                    })
+                }
+            })
+        })
+    </script>
+</body>
+</html>

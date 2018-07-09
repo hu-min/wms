@@ -125,6 +125,7 @@ class BaseController extends \Common\Controller\BaseController{
      * @Desc: 从redis中获取单一数据，没有就查指定数据库id 
      */    
     function redis_one($redisName,$key,$id,$db=false){
+        
         $listRedisName=$redisName;
         $listRedis=$this->Redis->get($listRedisName);
         $itemData=[];
