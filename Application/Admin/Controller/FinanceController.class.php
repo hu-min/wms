@@ -273,8 +273,10 @@ class FinanceController extends BaseController{
             $btnTitle = "保存数据";
             $redisName="receivableList";
             $resultData=$this->receivableCom->redis_one($redisName,"id",$id);
-            if(isset($resultData["project_time"])){
-                $resultData["project_time"] = date ("Y-m-d",$resultData["project_time"]);
+            foreach (['project_time','advance_date','contract_date','next_date','pay_date','surplus_date'] as  $date) {
+                if(isset($resultData[$date])){
+                    $resultData[$date] = date ("Y-m-d",$resultData[$date]);
+                }
             }
         }
         $modalPara=[
@@ -290,7 +292,15 @@ class FinanceController extends BaseController{
         $datas=I("data");
 
         $datas['project_id'] = $datas['project_id'] ? $datas['project_id'] : 0;
-        
+        if(isset($datas['startDate'])){
+            $datas['startDate']=strtotime($datas['startDate']);
+        }
+        foreach (['advance_date','contract_date','next_date','pay_date','surplus_date'] as  $date) {
+            if(isset($datas[$date])){
+                $datas[$date]=strtotime($datas[$date]);
+            }
+        }
+
         if($reqType=="receivableAdd"){
             $datas['add_time']=time();
             $datas['time']=strtotime($datas['time']);
@@ -401,8 +411,10 @@ class FinanceController extends BaseController{
             $btnTitle = "保存数据";
             $redisName="wouldpayList";
             $resultData=$this->wouldpayCom->redis_one($redisName,"id",$id);
-            if(isset($resultData["project_time"])){
-                $resultData["project_time"] = date ("Y-m-d",$resultData["project_time"]);
+            foreach (['project_time','late_pay_date','advance_date','next_date'] as  $date) {
+                if(isset($resultData[$date])){
+                    $resultData[$date] = date ("Y-m-d",$resultData[$date]);
+                }
             }
         }
         $modalPara=[
@@ -418,7 +430,11 @@ class FinanceController extends BaseController{
         $datas=I("data");
 
         // $datas['project_id'] = $datas['project_id'] ? $datas['project_id'] : 0;
-        
+        foreach (['late_pay_date','advance_date','next_date'] as  $date) {
+            if(isset($datas[$date])){
+                $datas[$date]=strtotime($datas[$date]);
+            }
+        }
         if($reqType=="wouldpayAdd"){
             $datas['add_time']=time();
             $datas['author']=session('userId');

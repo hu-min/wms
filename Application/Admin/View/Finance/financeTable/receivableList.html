@@ -9,14 +9,14 @@
         <td>{$item['type_name']}</td>
         <td>{$item['session_all']}</td>
         <td>{$item['amount']|number_format}</td>
-        <td>{$item['contract_date']}</td>
+        <td>{$item['contract_date']|date="Y-m-d",###}</td>
         <td>{$item['pay_amount']|number_format}</td>
-        <td>{$item['pay_date']}</td>
+        <td>{$item['pay_date']|date="Y-m-d",###}</td>
         <td>{$item['advance_amount']|number_format}</td>
-        <td>{$item['advance_date']}</td>
+        <td>{$item['advance_date']|date="Y-m-d",###}</td>
         <td>{$item['surplus_amount']|number_format}</td>
-        <td>{$item['surplus_date']}</td>
-        <td>{$item['next_date']}</td>
+        <td>{$item['surplus_date']|date="Y-m-d",###}</td>
+        <td>{$item['next_date']|date="Y-m-d",###}</td>
         <td>{$item['remark']}</td>
         {:list_btn(get_defined_vars(),"id")}
     </tr>

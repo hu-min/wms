@@ -4,7 +4,7 @@
         <td>{$item['code']}</td>
         <td>{$item['project_time']|date="Y-m-d",###}</td>
         <td title="{$item['name']}">{$item['name']}</td>
-        <td>{$item['end_date']}</td>
+        <td>{$item['end_date']|date="Y-m-d",###}</td>
         <td>{$item['leader_name']}</td>
         <td>{$item['finance_name']}</td>
         <td>{$item['supplier_com_name']}</td>
@@ -13,12 +13,12 @@
         <td>{$item['supplier_cont_name']}</td>
         <td>{$payType[$item['pay_type']]}</td>
         <td>{$item['contract_amount']}</td>
-        <td>{$item['late_pay_date']}</td>
+        <td>{$item['late_pay_date']|date="Y-m-d",###}</td>
         <td>{$item['advance']}</td>
         <td>{$item['advance_ratio']}</td>
-        <td>{$item['advance_date']}</td>
+        <td>{$item['advance_date']|date="Y-m-d",###}</td>
         <td>{$item['surplus']}</td>
-        <td>{$item['next_date']}</td>
+        <td>{$item['next_date']|date="Y-m-d",###}</td>
         <td>{$item['surplus_ratio']}</td>
         <td>{$payGradeType[$item['pay_grade']]}</td>
         <td>{$invoiceType[$item['invoice_type']]}</td>
