@@ -625,7 +625,9 @@ function init_date(){
     var opt = arguments[0]
     $(tabId+" .date-input").each(function(){
         var option =opt ? opt : {theme: '#3C8DBC'}
-        var thisId = $(this).attr("id")
+        var name = $(this).attr("name")
+        var thisId = tabId.replace("#","")+"-"+name
+        $(this).attr("id",thisId);
         var type = $(this).data("type")
         if(type){
             option["type"] = type

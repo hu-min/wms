@@ -14,6 +14,7 @@ class FinanceController extends BaseController{
         $this->fixExpenCom=getComponent('FixldExpense');
         $this->receivableCom=getComponent('Receivable');
         $this->wouldpayCom=getComponent('Wouldpay');
+        $this->purchaCom=getComponent('Purcha');
     }
     function stockControl(){
         $reqType=I('reqType');
@@ -523,4 +524,139 @@ class FinanceController extends BaseController{
         $project->project_modalOne();
     }
     //应付款项结束
+
+    //采购系统开始
+    /** 
+     * @Author: vition 
+     * @Date: 2018-07-10 23:42:27 
+     * @Desc: 采购 
+     */    
+    function purchaControl(){
+        $reqType=I('reqType');
+        $this->assign('dbName',"Purcha");//删除数据的时候需要
+        $this->assign("controlName","purcha");//名字对应cust_company_modalOne，\
+        $this->assign('projectArr',A("Project")->_getOption("project_id"));
+        $this->assign("supComArr",A("Project")->_getOption("supplier_com"));
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    function purcha_modalOne(){
+        $title = "新建采购";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑采购";
+            $btnTitle = "保存数据";
+            $redisName="purchaList";
+            $resultData=$this->purchaCom->redis_one($redisName,"id",$id);
+            foreach (['project_time','late_pay_date','advance_date','next_date'] as  $date) {
+                if(isset($resultData[$date])){
+                    $resultData[$date] = date ("Y-m-d",$resultData[$date]);
+                }
+            }
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"purchaModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    function managePurchaInfo(){
+        $reqType=I("reqType");
+        $datas=I("data");
+
+        // $datas['project_id'] = $datas['project_id'] ? $datas['project_id'] : 0;
+        foreach (['sign_date'] as  $date) {
+            if(isset($datas[$date])){
+                $datas[$date]=strtotime($datas[$date]);
+            }
+        }
+        if($reqType=="purchaAdd"){
+            $datas['add_time']=time();
+            $datas['author']=session('userId');
+            $datas['processLevel']=$this->processAuth["level"];
+            unset($datas['id']);
+            return $datas;
+        }else if($reqType=="purchaEdit"){
+            $where=["id"=>$datas['id']];
+            $data=[];
+
+            $data['updateUser']=session('userId');
+            foreach (['project_id','supplier_com','supplier_cont','sign_date','contract_amount','contract','remark'] as  $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
+            }
+            if(isset($datas['status'])){
+                $parameter=[
+                    'where'=>["id"=>$datas['id']],
+                ];
+                $result=$this->purchaCom->getOne($parameter);
+                $data = $this->status_update($result,$datas["status"],$data);
+            }
+            $data['upate_time']=time();
+            
+            return ["where"=>$where,"data"=>$data];
+        }
+        return "";
+    }
+    function purchaList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $where=[];
+
+        $parameter=[
+            'fields'=>"*",
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>"add_time DESC",
+            "joins"=>[
+                "LEFT JOIN (SELECT projectId, name project_name FROM v_project ) p ON p.projectId = project_id ",
+                "LEFT JOIN (SELECT companyId company_id,company supplier_com_name,type,provinceId,cityId FROM v_supplier_company ) c ON c.company_id = supplier_com",
+                "LEFT JOIN (SELECT contactId contact_id,contact supplier_cont_name FROM v_supplier_contact ) sc ON sc.contact_id = supplier_cont",
+                "LEFT JOIN (SELECT basicId,name type_name FROM v_basic WHERE class='supType') sb ON sb.basicId=c.type",
+                "LEFT JOIN (SELECT pid ,province FROM v_province ) pr ON pr.pid = c.provinceId",
+                "LEFT JOIN (SELECT cid ctid ,city,pid cpid FROM v_city ) ct ON ct.ctid = c.cityId AND ct.cpid = c.provinceId",
+                "LEFT JOIN (SELECT project_id wproject_id , COUNT(*) pay_num FROM v_wouldpay GROUP BY project_id) pn ON pn.wproject_id = project_id",
+                "LEFT JOIN (SELECT project_id aproject_id , SUM(advance) advance FROM v_wouldpay GROUP BY project_id) pa ON pa.aproject_id = project_id",
+                "LEFT JOIN (SELECT project_id pproject_id , SUM(pay_amount) paid FROM v_wouldpay GROUP BY project_id) pp ON pp.pproject_id = project_id",
+                "LEFT JOIN (SELECT project_id dproject_id , next_date FROM v_wouldpay ORDER BY id DESC LIMIT 1) dp ON dp.dproject_id=project_id",
+            ],
+        ];
+        
+        $listResult=$this->purchaCom->getList($parameter);
+        // print_r( $listResult);
+        $this->tablePage($listResult,'Finance/financeTable/purchaList',"purchaList");
+    }
+    function purchaAdd(){
+        $info=$this->managePurchaInfo();
+        if($info){
+            $insertResult=$this->purchaCom->insertPurcha($info);
+            // echo $this->wouldpayCom->M()->_sql();
+            if($insertResult && $insertResult->errCode==0){
+                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+            }
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-08 20:58:39 
+     * @Desc: 修改 
+     */    
+    function purchaEdit(){
+        $info=$this->managePurchaInfo();
+        $updateResult=$this->purchaCom->updatePurcha($info);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+    //采购系统结束
 }

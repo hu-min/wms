@@ -267,10 +267,12 @@ class ProjectController extends BaseController{
                 }
                 $parameter=[
                     'where'=>$where,
-                    'fields'=>'companyId,company,type ,typename',
+                    'fields'=>'companyId,company,type ,typename,provinceId,province,cityId,city',
                     'orderStr'=>"companyId DESC",
                     'joins'=>[
-                        "LEFT JOIN (SELECT basicId,name typename FROM v_basic WHERE class='supType') b ON b.basicId=type"
+                        "LEFT JOIN (SELECT basicId,name typename FROM v_basic WHERE class='supType') b ON b.basicId=type",
+                        "LEFT JOIN (SELECT pid ,province FROM v_province ) p ON p.pid = provinceId",
+                        "LEFT JOIN (SELECT cid ctid ,city,pid cpid FROM v_city ) ct ON ct.ctid = cityId AND ct.cpid = provinceId",
                     ]
                 ];
                 $result = $this->supplierCom->getCompanyList($parameter);

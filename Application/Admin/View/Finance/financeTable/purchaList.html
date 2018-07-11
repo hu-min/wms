@@ -1,0 +1,25 @@
+<volist name="list" id="item">
+    <tr>
+        <td>{$item['project_name']}</td>
+        <td>{$item['supplier_com_name']}</td>
+        <td>{$item['type_name']}</td>
+        <td>{$item['province']}-{$item['city']}</td>
+        <td>{$item['supplier_cont_name']}</td>
+        <td>暂无</td>
+        <td>{$item['sign_date']|date="Y-m-d",###}</td>
+        <td>{$item['contract_amount']}</td>
+        <td>暂无</td>
+        <td>{$item['pay_num']|default=0}</td>
+        <td>{$item['advance']|default=0}</td>
+        <td>{:round($item['advance']/$item['contract_amount'],2)*100}</td>
+        <td>暂无</td>
+        <td>{$item['paid']|default=0}</td>
+        <td>{$item['contract_amount']-$item['paid']}</td>
+        <td>
+            <if condition="$item['next_date'] gt 0">
+                {$item['next_date']|date="Y-m-d",###}
+            </if>
+        </td>
+        {:list_btn(get_defined_vars(),"id")}
+    </tr>
+</volist>
