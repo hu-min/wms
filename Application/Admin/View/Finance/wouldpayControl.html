@@ -233,6 +233,12 @@
                             wouldpay_setInfo(result.data)
                         }
                     })
+                    get("{$url}",datas,function(result){
+                        if(result.data){
+                            result.data['project_id'] = result.data['projectId'];
+                            wouldpay_setInfo(result.data)
+                        }
+                    })
                 }
             })
             $(tabId).on("change",".modal-info[name='supplier_com']",function(){

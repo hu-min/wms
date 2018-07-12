@@ -162,11 +162,21 @@
         }
         function purcha_setInfo(info){
             
-            ["brand_name","project_time","code","name","leader_name","end_date"].forEach(element => {
-                
-                $(tabId+" .project-info[name='"+element+"']").val(info[element]);
+            ["supplier_type","project_name","province",].forEach(element => {
+                if(element=="province"){
+                    $(tabId+" .project-info[name='region']").val(info[element]+"-"+info["city"]);
+                }else{
+                    $(tabId+" .project-info[name='"+element+"']").val(info[element]);
+                }
             });
-            ["project_id","id","finance_id","pay_type","pay_grade",'invoice_type',"contract_amount","advance_ratio","contract_date","pay_amount","pay_date","advance","advance_date","late_pay_date","surplus","surplus_date","surplus_ratio","next_date","supplier_type",'detail'].forEach(element => {
+            ["contract_amount","paid","paid",].forEach(element => {
+                if(element=="province"){
+                    $(tabId+" .modal-info[name='"+element+"']").val(info[element]+"-"+info["city"]);
+                }else{
+                    $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
+                }
+            });
+            ["sign_date","id",""].forEach(element => {
                 if(element=="supplier_type"){
                     $(tabId+" .project-info[name='"+element+"']").val(info[element+"_name"]);
                 }

@@ -24,7 +24,7 @@
                 <div class="col-md-4 project-name">
                     <div class="form-group">
                         <label for="info-title">项目名称：</label>
-                        <input class="form-control project-info" readonly="readonly" name="project-name" title="项目名称"  value="" placeholder="项目名称" type="text">
+                        <input class="form-control project-info" readonly="readonly" name="project_name" title="项目名称"  value="" placeholder="项目名称" type="text">
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -88,13 +88,13 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="info-title">付款次数：</label>
-                        <input class="form-control purcha-info"  name="paid" title="付款次数" required="required" value="" placeholder="付款次数" readonly="readonly" type="text">
+                        <input class="form-control purcha-info"  name="pay_num" title="付款次数" required="required" value="" placeholder="付款次数" readonly="readonly" type="text">
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="info-title">预付款：</label>
-                        <input class="form-control purcha-info"  name="paid" title="预付款" required="required" value="" placeholder="预付款" readonly="readonly" type="text">
+                        <input class="form-control purcha-info"  name="advance" title="预付款" required="required" value="" placeholder="预付款" readonly="readonly" type="text">
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -106,7 +106,7 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="info-title">预付款比例：</label>
-                        <input class="form-control purcha-info"  name="paid" title="预付款比例" required="required" value="" placeholder="预付款比例" readonly="readonly" type="text">
+                        <input class="form-control purcha-info"  name="advance_ratio" title="预付款比例" required="required" value="" placeholder="预付款比例" readonly="readonly" type="text">
                     </div>
                 </div>
             </div>
@@ -132,48 +132,51 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="info-title">未付款比例：</label>
-                        <input class="form-control purcha-info"  name="paid" title="未付款比例" required="required" value="" placeholder="未付款比例" readonly="readonly" type="text">
+                        <input class="form-control purcha-info"  name="surplus_ratio" title="未付款比例" required="required" value="" placeholder="未付款比例" readonly="readonly" type="text">
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="info-title">付款金额：</label>
-                        <input class="form-control purcha-info"  name="paid" title="付款金额" required="required" value="" placeholder="付款金额" readonly="readonly" type="text">
+            <div class="paid-list">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="info-title">付款金额：</label>
+                            <input class="form-control purcha-info"  name="paid" title="付款金额" required="required" value="" placeholder="付款金额" readonly="readonly" type="text">
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="info-title">付款比例：</label>
-                        <input class="form-control purcha-info"  name="paid" title="付款比例" required="required" value="" placeholder="付款比例" readonly="readonly" type="text">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="info-title">付款比例：</label>
+                            <input class="form-control purcha-info"  name="paid_ratio" title="付款比例" required="required" value="" placeholder="付款比例" readonly="readonly" type="text">
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="info-title">付款日期：</label>
-                        <input class="form-control purcha-info"  name="paid" title="付款日期" required="required" value="" placeholder="付款日期" readonly="readonly" type="text">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="info-title">付款日期：</label>
+                            <input class="form-control purcha-info"  name="paid_date" title="付款日期" required="required" value="" placeholder="付款日期" readonly="readonly" type="text">
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="info-title">付款方式：</label>
-                        <input class="form-control purcha-info"  name="paid" title="付款方式" required="required" value="" placeholder="付款方式" readonly="readonly" type="text">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="info-title">付款方式：</label>
+                            <input class="form-control purcha-info"  name="paid_type" title="付款方式" required="required" value="" placeholder="付款方式" readonly="readonly" type="text">
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="info-title">发票类型：</label>
-                        <input class="form-control purcha-info"  name="paid" title="发票类型" required="required" value="" placeholder="发票类型" readonly="readonly" type="text">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="info-title">发票类型：</label>
+                            <input class="form-control purcha-info"  name="invoice_type" title="发票类型" required="required" value="" placeholder="发票类型" readonly="readonly" type="text">
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="info-title">付款备注：</label>
-                        <input class="form-control purcha-info"  name="paid" title="付款备注" required="required" value="" placeholder="付款备注" readonly="readonly" type="text">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="info-title">付款备注：</label>
+                            <input class="form-control purcha-info"  name="paid_remark" title="付款备注" required="required" value="" placeholder="付款备注" readonly="readonly" type="text">
+                        </div>
                     </div>
                 </div>
             </div>
+            
             </eq>
             <div class="row">
                 <div class="col-md-12">

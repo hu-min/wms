@@ -555,7 +555,7 @@ class FinanceController extends BaseController{
             $btnTitle = "保存数据";
             $redisName="purchaList";
             $resultData=$this->purchaCom->redis_one($redisName,"id",$id);
-            foreach (['project_time','late_pay_date','advance_date','next_date'] as  $date) {
+            foreach (['project_time','late_pay_date','advance_date','next_date','sign_date'] as  $date) {
                 if(isset($resultData[$date])){
                     $resultData[$date] = date ("Y-m-d",$resultData[$date]);
                 }
@@ -623,7 +623,7 @@ class FinanceController extends BaseController{
                 "LEFT JOIN (SELECT projectId, name project_name FROM v_project ) p ON p.projectId = project_id ",
                 "LEFT JOIN (SELECT companyId company_id,company supplier_com_name,type,provinceId,cityId FROM v_supplier_company ) c ON c.company_id = supplier_com",
                 "LEFT JOIN (SELECT contactId contact_id,contact supplier_cont_name FROM v_supplier_contact ) sc ON sc.contact_id = supplier_cont",
-                "LEFT JOIN (SELECT basicId,name type_name FROM v_basic WHERE class='supType') sb ON sb.basicId=c.type",
+                "LEFT JOIN (SELECT basicId,name supplier_type FROM v_basic WHERE class='supType') sb ON sb.basicId=c.type",
                 "LEFT JOIN (SELECT pid ,province FROM v_province ) pr ON pr.pid = c.provinceId",
                 "LEFT JOIN (SELECT cid ctid ,city,pid cpid FROM v_city ) ct ON ct.ctid = c.cityId AND ct.cpid = c.provinceId",
                 "LEFT JOIN (SELECT project_id wproject_id , COUNT(*) pay_num FROM v_wouldpay GROUP BY project_id) pn ON pn.wproject_id = project_id",
