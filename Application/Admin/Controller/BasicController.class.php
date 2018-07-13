@@ -543,7 +543,7 @@ class BasicController extends BaseController{
      * @Date: 2018-05-20 22:45:25 
      * @Desc: 品牌列表 
      */    
-    function executeList(){
+    function basic_executeList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
         $where=["class"=>"execute"];
