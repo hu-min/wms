@@ -117,39 +117,9 @@
     </div>
     <script>
         function purcha_initInfo(){
-            $(tabId+" .chosen-select").each(function(){
-                var type = $(this).attr('name')
-                var value = $(this).data('value')
-                var text = $(this).data('text')
-                var option = {inherit_select_classes:true,search_contains:true,allow_single_deselect:true}
-    
-                if(text!=undefined && value!=undefined){
-                    var ajax_json = {url:"{$url}",data:{reqType:"getOptionList",type:type},value:value,text:text}
-                    var pname = $(this).data('pname')
-                    if(pname!=undefined){
-                        ajax_json["pelement"] = $(tabId+" .chosen-select[name='"+pname+"']")
-                    }
-                    var noupdate = $(this).data('noupdate')
-                    if(noupdate!=undefined){
-                        ajax_json["noupdate"] = true
-                    }
-                    var extra = $(this).data("extra")
-                    if(extra!=undefined){
-                        ajax_json["extra"] = extra
-                    }
-                    option["ajax_load"] = ajax_json
-                }
-                var cname = $(this).data('cname')
-                if(cname!=undefined){
-                    option["child"] = $(tabId+" .chosen-select[name='"+cname+"']")
-                }
-                var disSearch = $(this).data('dis-search')
-                if(disSearch!=undefined){
-                    option["disable_search"] = true
-                }
-                
-                $(this).chosen(option)
-            })
+            var reqType = "getOptionList";
+            init_chosen("{$url}","getOptionList",".global-modal");
+
             var gettype= $(tabId+" .save-info").data("gettype");
             if(gettype=="Add"){
                 $(tabId+" .create-rece").show();
@@ -162,21 +132,25 @@
         }
         function purcha_setInfo(info){
             
-            ["supplier_type","project_name","province",].forEach(element => {
+            ["supplier_type","project_name","province","pay_num","advance","advance_date","advance_ratio","paid_amount"].forEach(element => {
                 if(element=="province"){
                     $(tabId+" .project-info[name='region']").val(info[element]+"-"+info["city"]);
+                }else if(element=="paid_amount"){
+                    var paid_amount = parseFloat(info[element])+parseFloat(info["advance"])
+                    if(paid_amount>0){
+                        $(tabId+" .project-info[name='"+element+"']").val(paid_amount);
+                        $(tabId+" .project-info[name='paid_ratio']").val(float(paid_amount/parseFloat(info["contract_amount"])*100));
+                        $(tabId+" .project-info[name='surplus_amount']").val(float((parseFloat(info["contract_amount"])-paid_amount)));
+                        $(tabId+" .project-info[name='surplus_ratio']").val(float((parseFloat(info["contract_amount"])-paid_amount)/parseFloat(info["contract_amount"])*100));
+                    }
                 }else{
                     $(tabId+" .project-info[name='"+element+"']").val(info[element]);
                 }
             });
-            ["contract_amount","paid","paid",].forEach(element => {
-                if(element=="province"){
-                    $(tabId+" .modal-info[name='"+element+"']").val(info[element]+"-"+info["city"]);
-                }else{
-                    $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
-                }
+            ["contract_amount","paid",].forEach(element => {
+                $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
             });
-            ["sign_date","id",""].forEach(element => {
+            ["sign_date","late_pay_date",""].forEach(element => {
                 if(element=="supplier_type"){
                     $(tabId+" .project-info[name='"+element+"']").val(info[element+"_name"]);
                 }
@@ -195,7 +169,6 @@
                         }
                         select.html(optoin);
                         select.append("<option value='"+info[element]+"'>"+info[element+"_name"]+"</option>")
-                        
                     }
                     select.find("option[value='"+info[element]+"']").prop("selected",true);
                     if(select.hasClass("chosen-select")){
@@ -203,6 +176,27 @@
                     }
                 }
             })
+            if(info["paid-list"] && info["paid-list"].length>0){
+                var paidList = $(tabId+" .global-modal .paid-list")
+                paidList.toggleClass("none");
+                if(info["paid-list"].length>1){
+                    for (let index = 1; index < info["paid-list"].length; index++) {
+                        var clone = paidList.eq(0).clone();
+                        paidList.append(clone);
+                    }
+                }
+                info["paid-list"].forEach(function(paidInfo,index){
+                    
+                    for (const key in paidInfo) {
+                        paidList.eq(index).find("input[name='"+key+"']").val(paidInfo[key]);
+                        // console.log(paidInfo[key]);
+                        // console.log(key);
+                    }
+                //    console.log(index);
+                //    console.log(paidInfo);
+                });
+                
+            }
             set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
             
             

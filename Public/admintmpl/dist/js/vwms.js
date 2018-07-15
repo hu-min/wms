@@ -633,9 +633,75 @@ function init_date(){
             option["type"] = type
         }
         option["elem"] = option["elem"] ? option["elem"] : "#"+thisId
+        // console.log(option)
+        // console.log($("#"+thisId))
         if(thisId){
             // console.log(thisId)
             laydate.render(option);
         }
     })
 }
+/** 
+ * javascript comment 
+ * @Author: vition 
+ * @Date: 2018-07-14 15:25:20 
+ * @Desc: 整合chosen 
+ */
+function init_chosen(url,reqType,parental){
+    $(tabId+" "+parental+" .chosen-select").each(function(){
+        var type = $(this).attr('name')
+        var value = $(this).data('value')
+        var text = $(this).data('text')
+        var req =$(this).data('req');
+        reqType = req ? req : reqType;
+        var subUrl = $(this).data('url')
+        url = subUrl ? subUrl : url;
+        var option = {inherit_select_classes:true,search_contains:true,allow_single_deselect:true}
+
+        if(text!=undefined && value!=undefined && reqType!=undefined){
+            var ajax_json = {url:url,data:{reqType:reqType,type:type},value:value,text:text}
+            var pname = $(this).data('pname')
+            if(pname!=undefined){
+                ajax_json["pelement"] = $(tabId+" .chosen-select[name='"+pname+"']")
+            }
+            var noupdate = $(this).data('noupdate')
+            if(noupdate!=undefined){
+                ajax_json["noupdate"] = true
+            }
+            var extra = $(this).data("extra")
+            if(extra!=undefined){
+                ajax_json["extra"] = extra
+            }
+            option["ajax_load"] = ajax_json
+        }
+        var cname = $(this).data('cname')
+        if(cname!=undefined){
+            option["child"] = $(tabId+" .chosen-select[name='"+cname+"']")
+        }
+        var disSearch = $(this).data('dis-search')
+        if(disSearch!=undefined){
+            option["disable_search"] = true
+        }
+        
+        $(this).chosen(option)
+    })
+}
+function float(num,place) {
+    var result = parseFloat(num);
+    if (isNaN(result)) {
+    //   alert('传递参数错误，请检查！');
+      return false;
+    }
+    result = Math.round(num * 100) / 100;
+    var s_x = result.toString();
+    var pos_decimal = s_x.indexOf('.');
+    if (pos_decimal < 0) {
+      pos_decimal = s_x.length;
+      s_x += '.';
+    }
+    place = place > 0 ? place : 2 
+    while (s_x.length <= pos_decimal + place) {
+      s_x += '0';
+    }
+    return parseFloat(s_x);
+  }

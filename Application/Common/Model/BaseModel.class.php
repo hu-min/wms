@@ -71,7 +71,14 @@ class BaseModel extends Model{
      * @Date: 2018-01-14 21:43:21 
      * @Desc: 统计数量 
      */    
-    public function countList($where_arra, $groupBy = null){
+    public function countList($where_arra,$joins,$groupBy = null){
+        if(is_array($joins)){
+            foreach ($joins as $join) {
+                $this->join( $join);
+            }
+        }else{
+            $this->join($joins);
+        }
         if($groupBy){
           $subQuery = $this->where($where_arra)->group($groupBy)->buildSql();
           return $this->table($subQuery)->alias('t')->count();

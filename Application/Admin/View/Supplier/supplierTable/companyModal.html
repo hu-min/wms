@@ -27,16 +27,23 @@
             </div>
             <div class="form-group">
                 <label >省份：</label>
-                <select class="form-control modal-info input-sm" data-city="modal-info" title="省份" name="provinceId">
+                <select class="form-control modal-info chosen-select" title="项目省份" name="provinceId" data-cname="cityId" data-req="getOptionList">
+                    <option value="">省份</option>
+                    <volist name="province" id="item">
+                        <option value="{$item['pid']}">{$item['province']}</option>
+                    </volist>
+                </select>
+                <!-- <select class="form-control modal-info input-sm" data-city="modal-info" title="省份" name="provinceId">
                     <option value="">省份</option>
                     <volist name="province" id="item">
                         <option value="{$item.pid}">{$item.province}</option>
                     </volist>
-                </select>
+                </select> -->
             </div>
             <div class="form-group">
                 <label >城市：</label>
-                <select class="form-control modal-info input-sm" title="城市" name="cityId">
+                <select class="form-control modal-info chosen-select" data-value="cid"  data-text="city" data-noupdate="true" data-pname="provinceId" title="城市" data-req="getOptionList" name="cityId">
+                    <option value="">城市</option>
                 </select>
             </div>
             <div class="form-group">

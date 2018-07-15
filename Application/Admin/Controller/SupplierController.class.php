@@ -331,13 +331,13 @@ class SupplierController extends BaseController{
     function manageCompanyInfo(){
         $reqType=I("reqType");
         $datas=I("data");
-        if($reqType=="sup_supcompanyAdd"){
+        if($reqType=="sup_companyAdd"){
             $datas['addTime']=time();
             $datas['processLevel']=$this->processAuth["level"];
             $datas['author']=session("userId");
             unset($datas['companyId']);
             return $datas;
-        }else if($reqType=="sup_supcompanyEdit"){
+        }else if($reqType=="sup_companyEdit"){
             $where=["companyId"=>$datas['companyId']];
             $data=[];
             if(isset($datas['company'])){
@@ -381,7 +381,7 @@ class SupplierController extends BaseController{
      * @Date: 2018-05-09 23:46:44 
      * @Desc: 添加供应商信息 
      */    
-    function sup_supcompanyAdd(){
+    function sup_companyAdd(){
         $dataInfo=$this->manageCompanyInfo();
         if($dataInfo){
             $insertResult=$this->supplierCom->insertCompany($dataInfo);
@@ -597,5 +597,12 @@ class SupplierController extends BaseController{
         $contactInfo=$this->manageContactInfo();
         $updateResult=$this->supplierCom->updateContact($contactInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+
+    function getOptionList(){
+        $key=I("key");
+        $type=I("type");
+        $project = A("Project");
+        $this->ajaxReturn(["data"=>$project->_getOption($type,$key)]);
     }
 }

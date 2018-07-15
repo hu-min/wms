@@ -91,6 +91,8 @@
                             <th>供应商联系人</th>
                             <!-- <th>采购内容</th> -->
                             <th>付款方式</th>
+                            <th>付款金额</th>
+                            <th>付款日期</th>
                             <th>合同支付总额</th>
                             <th>合同最晚支付日期</th>
                             <th>预付款</th>
@@ -124,74 +126,50 @@
     </div>
     <script>
         function wouldpay_initInfo(){
-            $(tabId+" .chosen-select").each(function(){
-                var type = $(this).attr('name')
-                var value = $(this).data('value')
-                var text = $(this).data('text')
-                var option = {inherit_select_classes:true,search_contains:true,allow_single_deselect:true}
-    
-                if(text!=undefined && value!=undefined){
-                    var ajax_json = {url:"{$url}",data:{reqType:"getOptionList",type:type},value:value,text:text}
-                    var pname = $(this).data('pname')
-                    if(pname!=undefined){
-                        ajax_json["pelement"] = $(tabId+" .chosen-select[name='"+pname+"']")
-                    }
-                    var noupdate = $(this).data('noupdate')
-                    if(noupdate!=undefined){
-                        ajax_json["noupdate"] = true
-                    }
-                    var extra = $(this).data("extra")
-                    if(extra!=undefined){
-                        ajax_json["extra"] = extra
-                    }
-                    option["ajax_load"] = ajax_json
-                }
-                var cname = $(this).data('cname')
-                if(cname!=undefined){
-                    option["child"] = $(tabId+" .chosen-select[name='"+cname+"']")
-                }
-                var disSearch = $(this).data('dis-search')
-                if(disSearch!=undefined){
-                    option["disable_search"] = true
-                }
-                
-                $(this).chosen(option)
-            })
+            init_chosen("{$url}","getOptionList",".global-modal");
             init_date();
         }
         function wouldpay_setInfo(info){
             
-            ["brand_name","project_time","code","name","leader_name","end_date"].forEach(element => {
-                
+            ["brand_name","project_time","code","project_name","leader_name","end_date","paid_amount","contract_amount","late_pay_date"].forEach(element => {
                 $(tabId+" .project-info[name='"+element+"']").val(info[element]);
             });
-            ["project_id","id","finance_id","pay_type","pay_grade",'invoice_type',"contract_amount","advance_ratio","contract_date","pay_amount","pay_date","advance","advance_date","late_pay_date","surplus","surplus_date","surplus_ratio","next_date","supplier_type",'detail'].forEach(element => {
-                if(element=="supplier_type"){
-                    $(tabId+" .project-info[name='"+element+"']").val(info[element+"_name"]);
-                }
-                if(info[element]!="0000-00-00"){
+            ["cost_id","id","pay_grade",'invoice_type',"contract_date","pay_amount","pay_date","surplus","surplus_date","surplus_ratio","next_date","supplier_type",'detail'].forEach(element => {
+                
+                if(info[element]!="0"){
                     $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
                 }
             });
-            ['supplier_com','supplier_cont'].forEach(element => {
-                var select= $(tabId+" .modal-info[name='"+element+"']")
-                if(info[element]>0){
-                    if(select.find("option[value='"+info[element]+"']").length==0){
-                        if(element=="supplier_com"){
-                            var optoin = '<option value="">供应商名称</option>'
-                        }else if(element=="supplier_cont"){
-                            var optoin = '<option value="">供应商联系人</option>'
-                        }
-                        select.html(optoin);
-                        select.append("<option value='"+info[element]+"'>"+info[element+"_name"]+"</option>")
-                        
-                    }
-                    select.find("option[value='"+info[element]+"']").prop("selected",true);
-                    if(select.hasClass("chosen-select")){
-                        select.trigger("chosen:updated");
-                    }
+            ["advance_ratio","advance","advance_date","pay_amount","pay_ratio","pay_date","finance_id","pay_type"].forEach(element=>{
+                $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
+                if(info[element] !=undefined && (info[element] > 0 || info[element] !="")  && "{$nodeAuth}"<7){
+                    $(tabId+" .modal-info[name='"+element+"']").prop("disabled",true)
+                }else{
+                    $(tabId+" .modal-info[name='"+element+"']").prop("disabled",false)
                 }
-            })
+            });
+            ["supplier_type","supplier_com","supplier_cont"].forEach(element => {
+                $(tabId+" .project-info[name='"+element+"']").val(info[element+"_name"]);
+            });
+            // ['supplier_com','supplier_cont'].forEach(element => {
+            //     var select= $(tabId+" .modal-info[name='"+element+"']")
+            //     if(info[element]>0){
+            //         if(select.find("option[value='"+info[element]+"']").length==0){
+            //             if(element=="supplier_com"){
+            //                 var optoin = '<option value="">供应商名称</option>'
+            //             }else if(element=="supplier_cont"){
+            //                 var optoin = '<option value="">供应商联系人</option>'
+            //             }
+            //             select.html(optoin);
+            //             select.append("<option value='"+info[element]+"'>"+info[element+"_name"]+"</option>")
+                        
+            //         }
+            //         select.find("option[value='"+info[element]+"']").prop("selected",true);
+            //         if(select.hasClass("chosen-select")){
+            //             select.trigger("chosen:updated");
+            //         }
+            //     }
+            // })
             set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
             var gettype= $(tabId+" .save-info").data("gettype");
             if(gettype=="Add"){
@@ -203,6 +181,7 @@
             if((info['processLevel'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7 && "{$gettype}" == "Edit"){
                 $(tabId+" .modal-info").prop("disabled",true)
             }
+            
             // var projectChosen= $(tabId+" .chosen-select[name='project_id']")
             // ["brand_name","project_time","code","name","customer_com_name","business_name","type","session_all","amount"].forEach(element => {
 
@@ -213,29 +192,25 @@
             // })
         }
         $(function(){
-            $(tabId).on("change",".chosen-project[name='project_id']",function(){
-                var project_id = $(this).val()
-                if(project_id==0){
-                    $(tabId+" .project-info").val("");
+            $(tabId).on("change",".chosen-project[name='cost_id']",function(){
+                var cost_id = $(this).val()
+                $(tabId+" .project-info").val("");
+                $(tabId+" .modal-info").val("");
+                if(cost_id==0){
                     $(tabId+" .modal-info[name='supplier_com']").find("option[value='']").prop("selected",true);
                     $(tabId+" .modal-info[name='modal-info']").find("option[value='']").prop("selected",true);
                     $(tabId+" .modal-info[name='supplier_com']").trigger("chosen:updated")
-                    $(tabId+" .modal-info[name='project_id']").val(0);
+                    $(tabId+" .modal-info[name='cost_id']").val(0);
+                    ["advance_ratio","advance","advance_date","pay_amount","pay_ratio","pay_date","finance_id","pay_type"].forEach(element=>{
+                        $(tabId+" .modal-info[name='"+element+"']").prop("disabled",false)
+                    });
                 }else{
-                    $(tabId+" .modal-info[name='project_id']").val(project_id);
-                    datas["reqType"]='project_modalOne';
+                    $(tabId+" .modal-info[name='cost_id']").val(cost_id);
+                    datas["reqType"]='purchaList';
                     datas["onlydata"]='true';
-                    datas["gettype"]='Edit';
-                    datas["id"]=project_id;
-                    get("{:U('Project/projectItem')}",datas,function(result){
-                        if(result.data){
-                            result.data['project_id'] = result.data['projectId'];
-                            wouldpay_setInfo(result.data)
-                        }
-                    })
+                    datas["id"]=cost_id;
                     get("{$url}",datas,function(result){
                         if(result.data){
-                            result.data['project_id'] = result.data['projectId'];
                             wouldpay_setInfo(result.data)
                         }
                     })
@@ -245,7 +220,95 @@
                 var typename = $(this).find("option:selected").data("typename");
                 $(tabId+" .project-info[name='supplier_type']").val(typename)
             })
+            //预付款计算比率
+            $(tabId+" .global-modal").on("input",".modal-info[name='advance']",function(){
+                compute($(this).attr("name"))
+            })
+            //比率计算预付款
+            $(tabId+" .global-modal").on("input",".modal-info[name='advance_ratio']",function(){
+                compute($(this).attr("name"))
+            })
+            //付款计算比率
+            $(tabId+" .global-modal").on("input",".modal-info[name='pay_amount']",function(){
+                compute($(this).attr("name"))
+            })
+            //比率计算付款
+            $(tabId+" .global-modal").on("input",".modal-info[name='pay_ratio']",function(){
+                compute($(this).attr("name"))
+            })         
         })
+        function compute(name){
+            var advance = $(tabId+" .global-modal .modal-info[name='advance']").val()
+            advance = advance ? parseFloat(advance) : 0
+            var advanceRatio = $(tabId+" .global-modal .modal-info[name='advance_ratio']").val()
+            advanceRatio = advanceRatio ? parseFloat(advanceRatio) : 0
+            var amount = $(tabId+" .global-modal .project-info[name='contract_amount']").val()
+            amount = amount ? parseFloat(amount) : 0
+            var paid = $(tabId+" .global-modal .project-info[name='paid_amount']").val()
+            paid = paid ? parseFloat(paid) : 0
+            var pay = $(tabId+" .global-modal .modal-info[name='pay_amount']").val()
+            pay = pay ? parseFloat(pay) : 0
+            var payRatio = $(tabId+" .global-modal .modal-info[name='pay_ratio']").val()
+            payRatio = payRatio ? parseFloat(payRatio) : 0
+            var surplus = float(amount - paid - advance - pay)
+            if((name=="advance" || name=="pay_amount")){
+                
+                if(surplus >=0){
+                    if(name=="advance"){
+                        $(tabId+" .global-modal .modal-info[name='advance_ratio']").val(float(advance/amount*100))
+                    }else{
+                        $(tabId+" .global-modal .modal-info[name='pay_ratio']").val(float(pay/amount*100))
+                    }
+                    $(tabId+" .global-modal .project-info[name='surplus']").val(float(surplus))
+                    $(tabId+" .global-modal .project-info[name='surplus_ratio']").val(float(surplus/amount*100))
+                }else{
+                    if(name=="advance"){
+                        $(tabId+" .global-modal .modal-info[name='"+name+"']").val(float(amount - paid - pay))
+                    }else{
+                        $(tabId+" .global-modal .modal-info[name='"+name+"']").val(float(amount - paid - advance))
+                    }
+                    compute(name)
+                }
+                
+                
+            }else if((name == "advance_ratio" || name=="pay_ratio")){
+                if(advanceRatio>=0 && advanceRatio<=100 && amount>0){
+                    if(name=="advance_ratio"){
+                        advanceTemp = float(advanceRatio/100*amount);
+                        if(advanceTemp>advance && (advanceTemp - advance)<=surplus){
+                            advance = advanceTemp
+                            $(tabId+" .global-modal .modal-info[name='advance']").val(advance)
+                            
+                        }else{
+                            $(tabId+" .global-modal .modal-info[name='advance']").val(0)
+                            if((advanceTemp - advance) > float(amount - paid - advance)){
+                                $(tabId+" .global-modal .modal-info[name='"+name+"']").val(float(float(amount - paid - advance)/amount*100))
+                            }
+                            compute(name)
+                        }
+                        
+                    }else{
+                        payTemp = float(payRatio/100*amount);
+                        if(payTemp>pay && (payTemp - pay)<=surplus){
+                            pay = payTemp
+                            $(tabId+" .global-modal .modal-info[name='pay_amount']").val(pay)
+                            
+                        }else{
+                            $(tabId+" .global-modal .modal-info[name='pay_amount']").val(0)
+                            if((payTemp - pay) > float(amount - paid - advance)){
+                                $(tabId+" .global-modal .modal-info[name='"+name+"']").val(float(float(amount - paid - advance)/amount*100))
+                            }
+                            compute(name)
+                        }
+                        
+                    }
+                    surplus = float(amount - paid - advance - pay)
+                    $(tabId+" .global-modal .project-info[name='surplus']").val(float(surplus))
+                    
+                    $(tabId+" .global-modal .project-info[name='surplus_ratio']").val(float(surplus/amount*100))
+                }
+            }
+        }
     </script>
 </body>
 </html>

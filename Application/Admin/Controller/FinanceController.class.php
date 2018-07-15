@@ -15,6 +15,9 @@ class FinanceController extends BaseController{
         $this->receivableCom=getComponent('Receivable');
         $this->wouldpayCom=getComponent('Wouldpay');
         $this->purchaCom=getComponent('Purcha');
+        $this->payGradeType = ["1"=>"A级[高]","2"=>"B级[次]","3"=>"C级[中]","4"=>"D级[低]"];
+        $this->invoiceType = ["0"=>"无","1"=>"收据","2"=>"增值税普通","3"=>"增值税专用"];
+        $this->payType = ['1'=>'公对公','2'=>'现金付款','2'=>'支票付款'];
     }
     function stockControl(){
         $reqType=I('reqType');
@@ -379,20 +382,17 @@ class FinanceController extends BaseController{
 
     //应付款项开始wouldpayControl
     function wouldpayControl(){
-        $payGradeType = ["1"=>"A级[高]","2"=>"B级[次]","3"=>"C级[中]","4"=>"D级[低]"];
-        $invoiceType = ["0"=>"无","1"=>"收据","2"=>"增值税普通","3"=>"增值税专用"];
-        $payType = ['1'=>'公对公','2'=>'现金付款','2'=>'支票付款'];
-        
-        $this->assign("payGradeType",$payGradeType);
-        $this->assign("invoiceType",$invoiceType);
-        $this->assign("payType",$payType);
+       
+        $this->assign("payGradeType",$this->payGradeType);
+        $this->assign("invoiceType",$this->invoiceType);
+        $this->assign("payType",$this->payType);
         $supplier = A("Supplier");
         // print_r($supplier->getSupplier());
         $this->assign("supComArr",A("Project")->_getOption("supplier_com"));
         $reqType=I('reqType');
         $this->assign('dbName',"Wouldpay");//删除数据的时候需要
         $this->assign("controlName","wouldpay");//名字对应cust_company_modalOne，和cust_companyModal.html
-        $this->assign('projectArr',A("Project")->_getOption("project_id"));
+        $this->assign('costArr',A("Project")->_getOption("cost_id"));
         $this->assign('financeArr',A("Project")->_getOption("finance_id"));
         if($reqType){
             $this->$reqType();
@@ -412,8 +412,8 @@ class FinanceController extends BaseController{
             $btnTitle = "保存数据";
             $redisName="wouldpayList";
             $resultData=$this->wouldpayCom->redis_one($redisName,"id",$id);
-            foreach (['project_time','late_pay_date','advance_date','next_date'] as  $date) {
-                if(isset($resultData[$date])){
+            foreach (['project_time','late_pay_date','advance_date','next_date','pay_date'] as  $date) {
+                if(isset($resultData[$date]) && $resultData[$date] > 0){
                     $resultData[$date] = date ("Y-m-d",$resultData[$date]);
                 }
             }
@@ -431,7 +431,7 @@ class FinanceController extends BaseController{
         $datas=I("data");
 
         // $datas['project_id'] = $datas['project_id'] ? $datas['project_id'] : 0;
-        foreach (['late_pay_date','advance_date','next_date'] as  $date) {
+        foreach (['late_pay_date','advance_date','next_date','pay_date'] as  $date) {
             if(isset($datas[$date])){
                 $datas[$date]=strtotime($datas[$date]);
             }
@@ -447,7 +447,7 @@ class FinanceController extends BaseController{
             $data=[];
 
             $data['updateUser']=session('userId');
-            foreach (['finance_id','supplier_com','supplier_cont','pay_type','detail','contract_amount','late_pay_date','advance','advance_date','surplus','next_date','advance_ratio','surplus_ratio','pay_grade','invoice_type','remark'] as  $key) {
+            foreach (['finance_id','supplier_com','supplier_cont','pay_amount','pay_ratio','pay_date','detail','contract_amount','late_pay_date','advance','advance_date','surplus','next_date','advance_ratio','surplus_ratio','pay_grade','invoice_type','remark'] as  $key) {
                 if(isset($datas[$key])){
                     $data[$key]=$datas[$key];
                 }
@@ -471,17 +471,18 @@ class FinanceController extends BaseController{
         $where=[];
 
         $parameter=[
-            'fields'=>"* ,CASE pay_type	WHEN 1 THEN '公对公'  WHEN 2 THEN '现金付款' WHEN 3 THEN '支票付款' END pay_type_name",
+            'fields'=>"*",
             'where'=>$where,
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"add_time DESC",
             "joins"=>[
-                "LEFT JOIN (SELECT projectId,session_all,code,name,project_time,brand,customer_com,leader,type,amount,DATE_ADD(FROM_UNIXTIME(project_time,'%Y-%m-%d'),INTERVAL days day) end_date FROM v_project ) p ON p.projectId = project_id ",
+                "LEFT JOIN (SELECT id puId ,project_id,supplier_com,supplier_cont,sign_date,contract_amount,late_pay_date FROM v_purcha) pu ON pu.puId = cost_id",
+                "LEFT JOIN (SELECT projectId,session_all,code,name project_name,project_time,brand,customer_com,leader,type,amount,DATE_ADD(FROM_UNIXTIME(project_time,'%Y-%m-%d'),INTERVAL days day) end_date FROM v_project ) p ON p.projectId = pu.project_id ",
                 "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = p.brand",
-                "LEFT JOIN (SELECT companyId company_id,company supplier_com_name,type FROM v_supplier_company ) c ON c.company_id = supplier_com",
+                "LEFT JOIN (SELECT companyId company_id,company supplier_com_name,type FROM v_supplier_company ) c ON c.company_id = pu.supplier_com",
                 "LEFT JOIN (SELECT basicId,name type_name FROM v_basic WHERE class='supType') sb ON sb.basicId=c.type",
-                "LEFT JOIN (SELECT contactId contact_id,contact supplier_cont_name FROM v_supplier_contact ) sc ON sc.contact_id = c.company_id",
+                "LEFT JOIN (SELECT contactId contact_id,contact supplier_cont_name FROM v_supplier_contact ) sc ON sc.contact_id = pu.supplier_cont",
                 "LEFT JOIN (SELECT basicId bankstock_id,name finance_name FROM v_basic WHERE class = 'bankstock' ) bf ON bf.bankstock_id = finance_id",
                 "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
                 "LEFT JOIN (SELECT basicId type_id,name supplier_type_name FROM v_basic WHERE class = 'supType' ) t ON t.type_id = c.type",
@@ -549,7 +550,6 @@ class FinanceController extends BaseController{
         $gettype = I("gettype");
         $resultData=[];
         $id = I("id");
-        
         if($gettype=="Edit"){
             $title = "编辑采购";
             $btnTitle = "保存数据";
@@ -559,6 +559,27 @@ class FinanceController extends BaseController{
                 if(isset($resultData[$date])){
                     $resultData[$date] = date ("Y-m-d",$resultData[$date]);
                 }
+            }
+            if($resultData["id"] > 0){
+                $parameter=[
+                    'fields'=>"id,pay_date,pay_amount,pay_ratio,pay_type,invoice_type,remark",
+                    'where'=>["cost_id"=>$resultData["id"],"pay_amount"=>["gt",0]],
+                    'page'=>0,
+                    'pageSize'=>999,
+                    'orderStr'=>"add_time DESC",
+                ];
+                
+                $listResult=$this->wouldpayCom->getList($parameter);
+                if(isset($listResult["list"])){
+                    foreach ($listResult["list"] as $key => $value) {
+                        $listResult["list"][$key]["invoice_type"] = $this->invoiceType[$value["invoice_type"]];
+                        $listResult["list"][$key]["pay_type"] = $this->payType[$value["pay_type"]];
+                        if($value["pay_date"]>0){
+                            $listResult["list"][$key]["pay_type"] = date("Y-m-d",$value["pay_date"]);
+                        }
+                    }
+                }
+                $resultData["paid-list"] = $listResult["list"];
             }
         }
         $modalPara=[
@@ -611,8 +632,12 @@ class FinanceController extends BaseController{
     function purchaList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
+        $id = I("id");
+        $onlydata = I("onlydata");
         $where=[];
-
+        if($id>0){
+            $where["id"] = $id;
+        }
         $parameter=[
             'fields'=>"*",
             'where'=>$where,
@@ -620,20 +645,35 @@ class FinanceController extends BaseController{
             'pageSize'=>$this->pageSize,
             'orderStr'=>"add_time DESC",
             "joins"=>[
-                "LEFT JOIN (SELECT projectId, name project_name FROM v_project ) p ON p.projectId = project_id ",
+                "LEFT JOIN (SELECT projectId, name project_name,brand,code,project_time,DATE_ADD(FROM_UNIXTIME(project_time,'%Y-%m-%d'),INTERVAL days day) end_date,type,leader FROM v_project ) p ON p.projectId = project_id ",
                 "LEFT JOIN (SELECT companyId company_id,company supplier_com_name,type,provinceId,cityId FROM v_supplier_company ) c ON c.company_id = supplier_com",
                 "LEFT JOIN (SELECT contactId contact_id,contact supplier_cont_name FROM v_supplier_contact ) sc ON sc.contact_id = supplier_cont",
                 "LEFT JOIN (SELECT basicId,name supplier_type FROM v_basic WHERE class='supType') sb ON sb.basicId=c.type",
                 "LEFT JOIN (SELECT pid ,province FROM v_province ) pr ON pr.pid = c.provinceId",
                 "LEFT JOIN (SELECT cid ctid ,city,pid cpid FROM v_city ) ct ON ct.ctid = c.cityId AND ct.cpid = c.provinceId",
-                "LEFT JOIN (SELECT project_id wproject_id , COUNT(*) pay_num FROM v_wouldpay GROUP BY project_id) pn ON pn.wproject_id = project_id",
-                "LEFT JOIN (SELECT project_id aproject_id , SUM(advance) advance FROM v_wouldpay GROUP BY project_id) pa ON pa.aproject_id = project_id",
-                "LEFT JOIN (SELECT project_id pproject_id , SUM(pay_amount) paid FROM v_wouldpay GROUP BY project_id) pp ON pp.pproject_id = project_id",
-                "LEFT JOIN (SELECT project_id dproject_id , next_date FROM v_wouldpay ORDER BY id DESC LIMIT 1) dp ON dp.dproject_id=project_id",
+                "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = p.brand",
+                "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
+                "LEFT JOIN (SELECT basicId type_id,name supplier_type_name FROM v_basic WHERE class = 'supType' ) t ON t.type_id = c.type",
+                "LEFT JOIN (SELECT cost_id, advance,advance_date,advance_ratio FROM v_wouldpay WHERE advance > 0 limit 1 ) a ON a.cost_id = id",
+                "LEFT JOIN (SELECT cost_id, sum(pay_amount) paid_amount FROM v_wouldpay) pay ON pay.cost_id = id",
+                "LEFT JOIN (SELECT cost_id, count(*) pay_num FROM v_wouldpay) co ON co.cost_id = id",
+                // "LEFT JOIN (SELECT project_id wproject_id , COUNT(*) pay_num FROM v_wouldpay GROUP BY project_id) pn ON pn.wproject_id = project_id",
+                // "LEFT JOIN (SELECT project_id aproject_id , SUM(advance) advance FROM v_wouldpay GROUP BY project_id) pa ON pa.aproject_id = project_id",
+                // "LEFT JOIN (SELECT project_id pproject_id , SUM(pay_amount) paid FROM v_wouldpay GROUP BY project_id) pp ON pp.pproject_id = project_id",
+                // "LEFT JOIN (SELECT project_id dproject_id , next_date FROM v_wouldpay ORDER BY id DESC LIMIT 1) dp ON dp.dproject_id=project_id",
             ],
         ];
         
         $listResult=$this->purchaCom->getList($parameter);
+        // echo $this->purchaCom->M()->_sql();
+        if($onlydata && isset($listResult["list"][0])){
+            foreach (['project_time','late_pay_date','advance_date'] as  $date) {
+                if(isset($listResult["list"][0][$date]) && $listResult["list"][0][$date]>0){
+                    $listResult["list"][0][$date] = date ("Y-m-d",$listResult["list"][0][$date]);
+                }
+            }
+            $this->ajaxReturn(["data"=>$listResult["list"][0]]);
+        }
         // print_r( $listResult);
         $this->tablePage($listResult,'Finance/financeTable/purchaList',"purchaList");
     }
@@ -643,6 +683,13 @@ class FinanceController extends BaseController{
             $insertResult=$this->purchaCom->insertPurcha($info);
             // echo $this->wouldpayCom->M()->_sql();
             if($insertResult && $insertResult->errCode==0){
+                //添加成功，同时插入应付数据
+                $wouldInfo = [
+                    'cost_id' => $insertResult->data,
+                    'add_time' => time(),
+                    'status' => 1,
+                ];
+                $insertResult=$this->wouldpayCom->insertWouldpay($wouldInfo);
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
         }
@@ -659,4 +706,5 @@ class FinanceController extends BaseController{
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
     //采购系统结束
+    
 }

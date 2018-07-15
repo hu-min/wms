@@ -43,7 +43,7 @@ class BaseController extends \Common\Controller\BaseController{
 
         $classList=$this->selfDB->getList($where , $fields, $orderStr, $page, $pageNum, $groupBy,$joins);
         $this->log($this->selfDB->_sql());
-        $count=$this->selfDB->countList($where);
+        $count=$this->selfDB->countList($where,$joins);
         if($classList){
             return ['list'=>$classList,'count'=>$count];
         }
@@ -82,6 +82,7 @@ class BaseController extends \Common\Controller\BaseController{
         if($insertResult){
             $res->errCode=0;
             $res->error=getError(0);
+            $res->data=$insertResult;
             return $res;
         }
         $res->errCode=111;

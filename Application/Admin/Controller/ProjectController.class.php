@@ -14,6 +14,7 @@ class ProjectController extends BaseController{
         $this->configCom=getComponent('Config');
         $this->customerCom=getComponent('Customer');
         $this->supplierCom=getComponent('Supplier');
+        $this->purchaCom=getComponent('Purcha');
         $this->processArr=["0"=>"沟通","1"=>"完结","2"=>"裁决","3"=>"提案","4"=>"签约","5"=>"LOST","6"=>"筹备","7"=>"执行","8"=>"完成"];
         $this->dateArr=["0"=>"立项日期","1"=>"提案日期","2"=>"项目日期","3"=>"结束日期"];
         Vendor("levelTree.levelTree");
@@ -240,7 +241,7 @@ class ProjectController extends BaseController{
                     return $result["list"];
                 }
                 break;
-            case 'city':
+            case 'city': case 'cityId':
                 $result = $this->basicCom->get_citys(I("pid"));
                 if($result){
                     return $result;
@@ -293,6 +294,32 @@ class ProjectController extends BaseController{
                 $result = $this->supplierCom->getSupplierList($parameter);
                 if($result){
                     return $result["list"];
+                }
+                break;
+            case 'cost_id':
+                $where['status'] = 1;
+                if ($key!=""){
+                    $map["project_name"]=["LIKE","%{$key}%"];
+                    $map["supplier_com_name"]=["LIKE","%{$key}%"];
+                    $map['_logic'] = 'or';
+                    $where['_complex'] = $map;
+                }
+                $parameter=[
+                    'where'=>$where,
+                    'fields'=>'id,project_name,supplier_com,supplier_com_name',
+                    'orderStr'=>"id DESC",
+                    "joins"=>[
+                        "LEFT JOIN (SELECT projectId,name project_name FROM v_project ) p ON p.projectId = project_id ",
+                        "LEFT JOIN (SELECT companyId company_id,company supplier_com_name FROM v_supplier_company ) c ON c.company_id = supplier_com",
+                    ],
+                ];
+                $result = $this->purchaCom->getList($parameter);
+                if($result){
+                    $costs = [];
+                    foreach ($result["list"] as $key => $item) {
+                        $costs[$key] = ["id"=>$item["id"],"name"=>$item['project_name']."-".$item['supplier_com_name']];
+                    }
+                    return $costs;
                 }
                 break;
             default:
