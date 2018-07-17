@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-header">
+                        <i class="fa fa-plus-square"></i>
+                        <h4 class="box-title">个人报销</h4>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        {:add_btn(get_defined_vars(),"新增报销")}
+                        
+                    </div>
+                    <div class="box-body search-body company-search-box">
+                        <div class="col-md-12">
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <label >项目名称：</label>
+                                    <select class="form-control search-info input-sm" data-city="search-info" title="项目名称" name="provinceId">
+                                        <option value="">项目名称</option>
+                                        <volist name="province" id="item">
+                                            <option value="{$item.pid}">{$item.province}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label >清算状态：</label>
+                                    <select class="form-control search-info input-sm" data-city="search-info" title="清算状态" name="provinceId">
+                                        <option value="">清算状态</option>
+                                        <volist name="province" id="item">
+                                            <option value="{$item.pid}">{$item.province}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">提交报销：</label>
+                                    <input class="form-control search-info input-sm" readonly="readonly" name="company" placeholder="提交报销" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">报销金额：</label>
+                                    <input class="form-control search-info input-sm" readonly="readonly" name="company" placeholder="报销金额" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">已报销：</label>
+                                    <input class="form-control search-info input-sm" readonly="readonly" name="company" placeholder="已报销" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">未报销：</label>
+                                    <input class="form-control search-info input-sm" readonly="readonly" name="company" placeholder="未报销" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                </div>
+                                
+                            </div>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" style="font-size:0.95em;overflow-x: auto;">
+                <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;">
+                </div>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>项目编号</th>
+                            <th>项目名称</th>
+                            <th>项目日期</th>
+                            <th>营业主担</th>
+                            <th>项目主担</th>
+                            <th>报销提交日期</th>
+                            <th>报销总项</th>
+                            <th>报销金额</th>
+                            <th>收款账户类别</th>
+                            <th>预计放款日期</th>
+                            <th>发票或凭证</th>
+                            <th>审批记录</th>
+                            <th>备注</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="{$controlName}-table">
+                        {$tables}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="dataTables_wrapper">
+            <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+                {$pages}
+            </div>
+        </div>
+    </section>
+    <div class="modal fade global-modal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+    <script>
+    </script>
+</body>
+</html>

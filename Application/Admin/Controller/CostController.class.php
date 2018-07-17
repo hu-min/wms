@@ -27,62 +27,120 @@ class CostController extends BaseController{
         if($reqType){
             $this->$reqType();
         }else{
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->returnHtml();
         }
     }
     /** 
      * @Author: vition 
-     * @Date: 2018-05-17 00:33:48 
-     * @Desc: 获取表单了 
+     * @Date: 2018-07-16 00:17:35 
+     * @Desc: 借支控制 
      */    
-    function formOne(){
-        $form=I('form');
-        $this->ajaxReturn(['html'=>$this->fetch("Cost/form/".$form),'errCode'=>0,'error'=>getError(0)]);
+    function debitControl(){
+        $reqType=I('reqType');
+        $this->assign("controlName","debit");
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
     }
-    function testList(){
+    function debit_modalOne(){
+        $title = "新增借支";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
         
-        // header('content-type:text/atext/event-streamContent-Type');
-        // header('Content-Type: text/event-stream; charset=utf-8');
-        // // // header('content-type:text/event-stream');
-        // header('cache-control:no-cache');
+        if($gettype=="Edit"){
+            $title = "编辑借支";
+            $btnTitle = "保存数据";
+            $redisName="debitList";
+            // $resultData=$this->fixExpenCom->redis_one($redisName,"id",$id);
+            $resultData=[];
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"debitModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-07-18 01:06:00 
+     * @Desc: 借支管理 
+     */    
+    function finance_debitControl(){
+        $reqType=I('reqType');
+        $this->assign("controlName","finance_debit");
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    function finance_debit_modalOne(){
+        $title = "借支控制";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
         
-        // while (true) {
-        //     $rand=rand(1,10);
-        //     if($rand<5){
-        //         $time = date("Y-m-d H:i:s");
-        //         echo "data: The server time is: {$time}\n\n";
-        //     }
-        //     ob_flush();
-        //     flush();
-        //     sleep(1);
-        // }
-        // $time = date("Y-m-d H:i:s");
-        // // ob_start();
-        // echo "data: The server time is: {$time}\n\n";
-        // echo PHP_EOL;
-        // ob_flush();
-        // flush();
-        // ob_end_flush();
-        // flush();
-        header("Content-Type:text/event-stream\n\n"); 
-        $counter = rand(1, 10);
-        while (1) {  
-        // Every second, sent a "ping"event.     
-        echo "event: ping\n";  
-        $curDate = date(DATE_ISO8601);  
-        echo 'data: {"time": "' .$curDate . '"}';  
-        echo "\n\n";     
-        // Send a simple message at randomintervals.     
-        $counter--;     
-        if (!$counter) {    
-            echo'data: This is a message at time ' .
-            $curDate. "\n\n";    
-            $counter = rand(1, 10);  
-        }     
-        ob_flush();  
-        flush();  
-        sleep(1);
+        if($gettype=="Edit"){
+            $title = "编辑借支";
+            $btnTitle = "保存数据";
+            $redisName="finance_debitList";
+            // $resultData=$this->fixExpenCom->redis_one($redisName,"id",$id);
+            $resultData=[];
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"financedebitModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+
+    function expenseControl(){
+        $reqType=I('reqType');
+        $this->assign("controlName","expense");
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    function expense_modalOne(){
+        $title = "个人报销";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑报销";
+            $btnTitle = "保存数据";
+            $redisName="finance_debitList";
+            // $resultData=$this->fixExpenCom->redis_one($redisName,"id",$id);
+            $resultData=[];
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"expenseModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    function fin_expenseControl(){
+        $reqType=I('reqType');
+        $this->assign("controlName","fin_expense");
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
         }
     }
 }

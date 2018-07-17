@@ -1,0 +1,112 @@
+<div class="modal-header">
+    <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{$title}</h4>
+</div>
+<div class="modal-body">
+    <form role="form">
+        <div class="box-body">
+            <input class="modal-info" value="0" name="id" type="hidden">
+            <input class="modal-info" value="0" name="project_id" type="hidden">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label >选择项目：</label>
+                        <select class="form-control chosen-project chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
+                            <option value="0">其他</option>
+                            <volist name="projectArr" id="item">
+                                <option value="{$item['projectId']}">{$item['name']}</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="info-title">项目编号：</label>
+                        <input class="form-control project-info" readonly="readonly" name="project_name" title="项目编号"  value="" placeholder="项目编号" type="text">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="info-title">项目名称：</label>
+                        <input class="form-control project-info" readonly="readonly" name="project_name" title="项目名称"  value="" placeholder="项目名称" type="text">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="info-title">项目日期：</label>
+                        <input class="form-control project-info" readonly="readonly" name="project_name" title="项目日期"  value="" placeholder="项目日期" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="info-title">营业主担：</label>
+                        <input class="form-control project-info" readonly="readonly" name="project_name" title="营业主担"  value="" placeholder="营业主担" type="text">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="info-title">借支金额：</label>
+                        <input class="form-control project-info" name="project_name" title="借支金额"  value="" placeholder="借支金额" type="text">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label >费用类别：</label>
+                        <select class="form-control chosen-project chosen-select" title="费用类别" data-value="projectId"  data-text="name" name="project_id">
+                            <option value="0">其他</option>
+                            <volist name="projectArr" id="item">
+                                <option value="{$item['projectId']}">{$item['name']}</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="info-title">借支说明：</label>
+                        <input class="form-control project-info" readonly="readonly" name="project_name" title="借支说明"  value="" placeholder="借支说明" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="info-title">要求放款日期：</label>
+                        <input class="form-control project-info" readonly="readonly" name="project_name" title="要求放款日期"  value="" placeholder="要求放款日期" type="text">
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label >收款账户类型：</label>
+                        <select class="form-control chosen-project chosen-select" title="收款账户类型" data-value="projectId"  data-text="name" name="project_id">
+                            <option value="0">其他</option>
+                            <volist name="projectArr" id="item">
+                                <option value="{$item['projectId']}">{$item['name']}</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="info-title">收款账户详细：</label>
+                        <input class="form-control project-info" name="project_name" title="收款账户详细"  value="" placeholder="收款账户详细" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
+                    <input class="modal-info" value="0" name="status" type="hidden">
+                    {:modal_btn(get_defined_vars())}
+                </div>
+            </div>
+        </div>
+    </form>            
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+    {:save_btn(get_defined_vars())}
+</div>
