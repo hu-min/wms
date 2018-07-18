@@ -10,7 +10,16 @@
     </eq>
     <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
     <!-- iCheck for checkboxes and radio inputs -->
-  <link rel="stylesheet" href="__ADMINT__/plugins/iCheck/all.css">
+    <link rel="stylesheet" href="__ADMINT__/plugins/iCheck/all.css">
+    <style>
+        .bank-remove{
+            position: absolute;
+            right: 25px;
+            margin-top: -31px;
+            color: red;
+            font-size: 30px;
+        };
+    </style>
 </head>
 <body>
     <section class="content">
@@ -32,7 +41,7 @@
                                     </thead>
                                     <tbody class="bankstock-tab">
                                         <volist name="bankstockList" id="item">
-                                            <tr><td><input class='form-control input-info bank-info' name="{$item.basicId}" placeholder='子公司名称' value="{$item.name}" type='text' /></td><td><input class='form-control input-info' placeholder='库存金额' value="{$item.alias}" type='text' /></td></tr>
+                                            <tr><td><input class='form-control input-info bank-info' name="{$item.basicId}" placeholder='子公司名称' value="{$item.name}" type='text' /></td><td><input class='form-control input-info' placeholder='库存金额' value="{$item.alias}" type='text' /><button type="button" class="close bank-remove"><span>×</span></button></td></tr>
                                         </volist>
                                         <tr class="bank-info-count"><td>总金额：</td><td>{$bankstockCount}</td></tr>
                                     </tbody>
@@ -59,8 +68,16 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="box-footer">
-                            <button type="button"  class="btn btn-primary save-info" data-con="bankstock" data-gettype="Edit" data-url="{$url}">更新金额</button>
+                        <div class="box-footer form-horizontal">
+                            <div class="form-group">
+                                <label for="inputPassword3" class="col-sm-2 control-label">填写更新原因</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control bank-info" name="remark"  placeholder="填写更新原因" type="text">
+                                </div>
+                                <div class="col-sm-2">
+                                    <button type="button"  class="btn btn-primary save-info" data-con="bankstock" data-gettype="Edit" data-url="{$url}">更新金额</button>
+                                </div>
+                            </div>                          
                         </div>
                     </form>
                 </div>
@@ -82,7 +99,7 @@
                                     </thead>
                                     <tbody class="cashstock-tab">
                                         <volist name="cashstockList" id="item">
-                                            <tr><td><input class='form-control input-info cash-info' name="{$item.basicId}" placeholder='子公司名称' value="{$item.name}" type='text' /></td><td><input class='form-control input-info' placeholder='库存金额' value="{$item.alias}" type='text' /></td></tr>
+                                            <tr><td><input class='form-control input-info cash-info' name="{$item.basicId}" placeholder='子公司名称' value="{$item.name}" type='text' /></td><td><input class='form-control input-info' placeholder='库存金额' value="{$item.alias}" type='text' /><button type="button" class="close bank-remove"><span>×</span></button></td></tr>
                                         </volist>
                                         <tr class="cash-info-count"><td>总金额：</td><td>{$cashstockCount}</td></tr>
                                     </tbody>
@@ -109,8 +126,16 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="box-footer">
-                            <button type="button"  class="btn btn-primary save-info" data-con="cashstock" data-gettype="Edit" data-url="{$url}">更新金额</button>
+                        <div class="box-footer form-horizontal">
+                            <div class="form-group">
+                                <label for="inputPassword3" class="col-sm-2 control-label">填写更新原因</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control cash-info" name="remark"  placeholder="填写更新原因" type="text">
+                                </div>
+                                <div class="col-sm-2">
+                                    <button type="button"  class="btn btn-primary save-info" data-con="cashstock" data-gettype="Edit" data-url="{$url}">更新金额</button>
+                                </div>
+                            </div>                          
                         </div>
                     </form>
                 </div>
@@ -128,8 +153,27 @@
                 }else{
                     var dataClass="cash-info";
                 }
-                var tr="<tr><td><input class='form-control input-info "+dataClass+"' name='new"+Number($("."+dataClass).length+1)+"' placeholder='子公司名称' type='text' /></td><td><input class='form-control input-info' placeholder='库存金额' type='text' /></td></tr>";
+                var tr="<tr><td><input class='form-control input-info "+dataClass+"' name='new"+Number($("."+dataClass).length+1)+"' placeholder='子公司名称' type='text' /></td><td><input class='form-control input-info' placeholder='库存金额' type='text' /><button type='button' class='close bank-remove'><span>×</span></button></td></tr>";
                 $(tabId+" ."+dataClass+"-count").before(tr);
+            })
+            $(tabId+" .content").on("click"," .bank-remove",function(){
+                
+                // console.log("a")
+                var thisTr = $(this).parents("tr");
+                var id = thisTr.find(".input-info").eq(0).attr("name");
+                var val = thisTr.find(".input-info").eq(0).val();
+                if(Number(id)>0){
+                    var confirmRes = confirm(val+"已经写入数据库，是否还执行删除")
+                    if(confirmRes){
+                        post("{$url}",{reqType:"stockDelete",basicId:id},function(result){
+                            if(result.errCode==0){
+                                $(".nodeOn[href='/Admin/Finance/stockControl.html']").trigger("click")
+                            }
+                        })
+                    }
+                }else{
+                    thisTr.remove()
+                }
             })
         })
         function bankstock_getInfo(){
@@ -144,9 +188,14 @@
                 var name = $(this).attr("name");
                 var company = $(this).val();
                 var val = $(this).parent().next().children("input").val();
-                if(company!="" && val != ""){
-                    datas["data"][name]={company:company,val:val};
+                if(name=="remark"){
+                    datas["remark"]=company
+                }else{
+                    if(company!="" && val != ""){
+                        datas["data"][name]={company:company,val:val};
+                    }
                 }
+                
             })
         }
 
@@ -157,52 +206,9 @@
             stockSearch(result,".cash-info");
         }
         function stockSearch(result,stockName){
-            $(tabId+" ."+result.stock+"-log").html(result.html);
-            // $(tabId+" "+stockName).each(function(){
-            //     if($(this).prop("disabled")==false){
-            //         $(this).prop("disabled",true);
-            //     }
-            // })
+            // $(tabId+" ."+result.stock+"-log").html(result.html);
+            $(".nodeOn[href='/Admin/Finance/stockControl.html']").trigger("click")
         }
-        
-        // function projectConfInfoFuns(){
-        //     datas["data"]={}
-        //     $(tabId+" .input-info").each(function(){
-        //         var name =$(this).attr("name");
-        //         var val =$(this).val();
-        //         datas["data"][name]=val;
-        //     })
-        //     var checked=$(tabId+" input[name='manual']").is(":checked");
-        //     if(checked==true){
-        //         datas["data"]["manual"]="true";
-        //     }else{
-        //         datas["data"]["manual"]="false";
-        //     }
-        // }
-        // function responsibleInfoFuns(){
-        //     datas["data"]={}
-        //     var responSelect=$(tabId+" .modal-info[name='responsible']").val();
-        //     var responInput=$(tabId+" input[name='responsible-input']").val();
-        //     if(responInput=="" && datas["reqType"]!="responsibleDel"){
-        //         alert("承接模块名称不能为空")
-        //         throw "承接模块名称不能为空";
-        //     }
-        //     if(datas["reqType"]=="responsibleEdit" && responSelect==""){
-        //         datas["reqType"]="responsibleAdd";
-        //     }else if(datas["reqType"]=="responsibleEdit" || datas["reqType"]=="responsibleDel"){
-        //         datas["data"]["fromResponsible"]=responSelect
-        //     }
-        //     datas["data"]["responsible"]=responInput
-        // }
-        // function responsibleSearchFuns(){
-        //     datas["reqType"]="responsList";
-        //     get("{$url}",datas,function(result){
-        //         if(result.html){
-        //             $(tabId+" .modal-info[name='responsible']").html(result.html);
-        //             $(tabId+" input[name='responsible-input']").val("");
-        //         }
-        //     },false)
-        // }
     </script>
 </body>
 </html>

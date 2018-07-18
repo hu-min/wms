@@ -14,7 +14,7 @@
                         <div class="form-group">
                             <label >选择项目：</label>
                             <select class="form-control chosen-project chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
-                                <option value="0">其他</option>
+                                <option value="0">选择项目</option>
                                 <volist name="projectArr" id="item">
                                     <option value="{$item['projectId']}">{$item['name']}</option>
                                 </volist>
@@ -49,16 +49,29 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
+                            <label for="info-title">项目主担：</label>
+                            <input class="form-control project-info" readonly="readonly" name="project_name" title="项目主担"  value="" placeholder="项目主担" type="text">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
                             <label for="info-title">报销金额合计：</label>
                             <input class="form-control project-info" name="project_name" title="报销金额合计"  value="" placeholder="报销金额合计" type="text">
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label for="info-title">要求放款日期：</label>
-                            <input class="form-control project-info" readonly="readonly" name="project_name" title="要求放款日期"  value="" placeholder="要求放款日期" type="text">
+                            <label >收款账户类别：</label>
+                            <select class="form-control chosen-project chosen-select" title="收款账户类别" data-value="projectId"  data-text="name" name="project_id">
+                                <option value="0">收款账户类别</option>
+                                <volist name="projectArr" id="item">
+                                    <option value="{$item['projectId']}">{$item['name']}</option>
+                                </volist>
+                            </select>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="info-title">收款账户详细：</label>

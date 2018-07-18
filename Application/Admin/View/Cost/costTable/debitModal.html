@@ -14,7 +14,7 @@
                     <div class="form-group">
                         <label >选择项目：</label>
                         <select class="form-control chosen-project chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
-                            <option value="0">其他</option>
+                            <option value="0">选择项目</option>
                             <volist name="projectArr" id="item">
                                 <option value="{$item['projectId']}">{$item['name']}</option>
                             </volist>
@@ -49,6 +49,12 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
+                        <label for="info-title">项目主担：</label>
+                        <input class="form-control project-info" readonly="readonly" name="project_name" title="项目主担"  value="" placeholder="项目主担" type="text">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
                         <label for="info-title">借支金额：</label>
                         <input class="form-control project-info" name="project_name" title="借支金额"  value="" placeholder="借支金额" type="text">
                     </div>
@@ -62,12 +68,6 @@
                                 <option value="{$item['projectId']}">{$item['name']}</option>
                             </volist>
                         </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="info-title">借支说明：</label>
-                        <input class="form-control project-info" readonly="readonly" name="project_name" title="借支说明"  value="" placeholder="借支说明" type="text">
                     </div>
                 </div>
             </div>
@@ -94,6 +94,12 @@
                     <div class="form-group">
                         <label for="info-title">收款账户详细：</label>
                         <input class="form-control project-info" name="project_name" title="收款账户详细"  value="" placeholder="收款账户详细" type="text">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="info-title">借支说明：</label>
+                        <input class="form-control project-info"  name="project_name" title="借支说明"  value="" placeholder="借支说明" type="text">
                     </div>
                 </div>
             </div>

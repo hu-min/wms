@@ -42,8 +42,16 @@ class FinanceController extends BaseController{
     function cashstockEdit(){
         $this->setStock("cashstock");
     }
+    function stockDelete(){
+        $delResult = $this->basicCom->del(["basicId"=>I("basicId")]);
+        if($delResult){
+            $this->ajaxReturn(['errCode'=>0,'error'=>"更新成功"]);
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>"更新失败"]);
+    }
     protected function setStock($stockName){
         $datas=I("data");
+        $remark=I("remark");
         $result=false;
         $stockRes=$this->basicCom->get_class_data($stockName);
         $stockList=[];
@@ -60,10 +68,10 @@ class FinanceController extends BaseController{
                     $logInfo["describe"]="";
                     $res= $this->basicCom->updateBasic($Info);
                     if($stockList[$basicId]["name"] != $value['company']){
-                        $logInfo["describe"].="将子公司名 原名【".$stockList[$basicId]["name"]."】修改为：【".$value['company']."】;";
+                        $logInfo["describe"].="子公司名 【".$stockList[$basicId]["name"]."】修改为：【".$value['company']."】;原因：".$remark;
                     }
                     if($stockList[$basicId]["alias"] != $value['val']){
-                        $logInfo["describe"].="将【{$value['company']}】的原值【".$stockList[$basicId]["alias"]."】修改为：【".$value['val']."】;";
+                        $logInfo["describe"].="【{$value['company']}】值【".$stockList[$basicId]["alias"]."】修改为：【".$value['val']."】;原因：".$remark;
                     }
                     
                 }
@@ -74,7 +82,7 @@ class FinanceController extends BaseController{
                     "alias"=>$value['val'],
                 ];
                 $res= $this->basicCom->insertBasic($Info);
-                $logInfo["describe"]="新增{$value['company']}，值为:{$value['val']}";
+                $logInfo["describe"]="新增{$value['company']}，值为:{$value['val']};原因：".$remark;
             }
             if ($res){
                 $this->LogCom->insert($logInfo);

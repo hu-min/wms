@@ -114,6 +114,24 @@ class BaseController extends \Common\Controller\BaseController{
     }
     /** 
      * @Author: vition 
+     * @Date: 2018-07-19 00:59:31 
+     * @Desc: 删除数据 
+     */    
+    public function del($where_arra){
+        $res=$this->initRes();
+        $modFlag = false;
+        $modFlag = $this->selfDB->where($where_arra)->delete();
+        if($modFlag){
+            $res->errCode=0;
+            $res->error=getError(0);
+            return $res;
+        }
+        $res->errCode=113;
+        $res->error=getError(113);
+        return $res;
+    }
+    /** 
+     * @Author: vition 
      * @Date: 2018-05-07 23:02:26 
      * @Desc: M方法 
      */    
