@@ -1,0 +1,23 @@
+<volist name="list" id="item">
+    <tr>
+        <td>{$item['brand_name']}</td>
+        <td>{$item['code']}</td>
+        <td>{$item['project_time']|date='Y-m-d',###}</td>
+        <td title="{$item['name']}">{$item['name']}</td>
+        <td>{$item['city_name']}</td>
+        <td>{$item['customer_com_name']}</td>
+        <td>{$item['customer_cont_name']}</td>
+        <td>{$item['leader_name']}</td>
+        <td>{$item['type_name']}</td>
+        <td>{$item['session_all']}</td>
+        <td>{$item['session_cur']}</td>
+        <td>{$item['amount']}</td>
+        <td>{$item['advance']}</td>
+        <td>{$item['surplus']}</td>
+        <td>{$item['cost']}</td>
+        <td>{$item['profit']}</td>
+        <td>{$item['profitRate']}</td>
+        <td>{$item['stage']}</td>
+        {:list_btn(get_defined_vars(),"projectId")}
+    </tr>
+</volist>

@@ -401,6 +401,8 @@ class ProjectController extends BaseController{
                     // print_r($project);
                     $listResult['list'][$key]["earlier_users"] = $uResult['list']['earlier_users'];
                 }
+            }elseif($data['template'] == 'business'){
+
             }
         }else{
             $listRedis = 'projectList';
@@ -740,7 +742,7 @@ class ProjectController extends BaseController{
     }
     function businessControl(){
         $reqType=I('reqType');
-        $this->assign("controlName","project");//名字对应cust_company_modalOne，和cust_companyModal.html
+        $this->assign("controlName","business");//名字对应cust_company_modalOne，和cust_companyModal.html
         $this->assign('processArr',$this->processArr);
 
         $project=$this->configCom->get_val("project");
@@ -762,5 +764,70 @@ class ProjectController extends BaseController{
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->returnHtml();
         }
+    }
+    function businessList(){
+        $this->projectList();
+    }
+    function business_modalOne(){
+        $title = "立项/添加场次";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        if($gettype=="Edit"){
+            $title = "项目营业数据汇总";
+            $btnTitle = "保存数据";
+            $redisName="businessList";
+
+            $parameter=[
+                "where" => ["projectId"=>$id],
+                "fields" => "*",
+                "joins" =>[
+                    "LEFT JOIN (SELECT projectId project_pid,name project_name FROM v_project ) p ON p.project_pid = project_id",
+                    "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = brand",
+                    "LEFT JOIN (SELECT companyId company_id,company customer_com_name FROM v_customer_company ) c ON c.company_id = customer_com",
+                    "LEFT JOIN (SELECT contactId contact_id,contact customer_cont_name FROM v_customer_contact ) c2 ON c2.contact_id = customer_cont",
+                    "LEFT JOIN (SELECT basicId field_id,name field_name FROM v_basic WHERE class = 'field' ) f ON f.field_id = field",
+                    "LEFT JOIN (SELECT userId user_id,userName create_user_name FROM v_user) cu ON cu.user_id = create_user",
+                    "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = business",
+                    "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = leader",
+                    "LEFT JOIN (SELECT basicId execute_sub_id,name execute_sub_name FROM v_basic WHERE class = 'execute' ) e ON e.execute_sub_id = execute_sub",
+                    "LEFT JOIN (SELECT basicId type_id,name type_name FROM v_basic WHERE class = 'projectType' ) pt ON pt.type_id = type",
+                    "LEFT JOIN (SELECT basicId stage_id,name stage_name FROM v_basic WHERE class = 'stage' ) s ON s.stage_id = stage",
+                    "LEFT JOIN (SELECT project_id project_sid,COUNT(projectId) session_count FROM v_project WHERE projectId = 0 GROUP BY project_id) sc ON sc.project_sid = projectId",
+                ]
+            ];
+            $resultData = $this->projectCom->getOne($parameter)["list"];
+
+            $resultData["project_time"] = date("Y-m-d",$resultData["project_time"]);
+            $resultData["create_time"] = date("Y-m-d",$resultData["create_time"]);
+            $resultData["bid_date"] = date("Y-m-d",$resultData["bid_date"]);
+            $resultData["bid_time"] = date("H:i:s",$resultData["bid_time"]);
+            $resultData["end_date"] = date("Y-m-d",strtotime($resultData["project_time"]." +".$resultData["days"]."day"));
+            $resultData["citys"] = $this->basicCom->get_citys($resultData["province"]);
+            
+            $parameter=[
+                'where'=>$where,
+                'fields'=>"basicId,name",
+                'orderStr'=>"basicId DESC",
+            ];
+            $result=$this->basicCom->getBasicList($parameter);
+            $resultData["execute_subs"] = $this->basicCom->get_citys($resultData["province"]);
+            $parameter=[
+                'where'=>["userId"=>["IN",array_unique(explode(",",$resultData["earlier_user"].",".$resultData["scene_user"]))]],
+                'fields'=>"userId,userName,roleName",
+                'orderStr'=>"userId DESC",
+                'joins'=>'LEFT JOIN (SELECT roleId rid,roleName FROM v_role ) r ON r.rid = roleId',
+            ];
+            $result=$this->userCom->getUserList($parameter);
+            $resultData["user_ids"]=$result["list"];
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"businessModal",
+        ];
+        $this->modalOne($modalPara);
     }
 }
