@@ -108,6 +108,7 @@
     </div>
     <script>
         $(function(){
+            $(tabId+" .search-list").trigger("click");
             $(tabId+" .chosen-select").each(function(){
                 var type = $(this).attr('name')
                 var value = $(this).data('value')

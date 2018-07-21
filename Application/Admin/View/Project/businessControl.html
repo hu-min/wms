@@ -117,35 +117,38 @@
     </div>
     <script>
         $(function(){
-            $(tabId+" .chosen-select").each(function(){
-                var type = $(this).attr('name')
-                var value = $(this).data('value')
-                var text = $(this).data('text')
-                var option = {inherit_select_classes:true,search_contains:true,allow_single_deselect:true}
+
+            $(tabId+" .search-list").trigger("click");
+            init_chosen("{$url}","getOptionList",".search-body");
+            // $(tabId+" .chosen-select").each(function(){
+            //     var type = $(this).attr('name')
+            //     var value = $(this).data('value')
+            //     var text = $(this).data('text')
+            //     var option = {inherit_select_classes:true,search_contains:true,allow_single_deselect:true}
     
-                if(text!=undefined && value!=undefined){
-                    var ajax_json = {url:"{$url}",data:{reqType:"getOptionList",type:type},value:value,text:text}
-                    var pname = $(this).data('pname')
-                    if(pname!=undefined){
-                        ajax_json["pelement"] = $(tabId+" .chosen-select[name='"+pname+"']")
-                    }
-                    var noupdate = $(this).data('noupdate')
-                    if(noupdate!=undefined){
-                        ajax_json["noupdate"] = true
-                    }
-                    option["ajax_load"] = ajax_json
-                }
-                var cname = $(this).data('cname')
-                if(cname!=undefined){
-                    option["child"] = $(tabId+" .chosen-select[name='"+cname+"']")
-                }
-                var disSearch = $(this).data('dis-search')
-                if(disSearch!=undefined){
-                    option["disable_search"] = true
-                }
+            //     if(text!=undefined && value!=undefined){
+            //         var ajax_json = {url:"{$url}",data:{reqType:"getOptionList",type:type},value:value,text:text}
+            //         var pname = $(this).data('pname')
+            //         if(pname!=undefined){
+            //             ajax_json["pelement"] = $(tabId+" .chosen-select[name='"+pname+"']")
+            //         }
+            //         var noupdate = $(this).data('noupdate')
+            //         if(noupdate!=undefined){
+            //             ajax_json["noupdate"] = true
+            //         }
+            //         option["ajax_load"] = ajax_json
+            //     }
+            //     var cname = $(this).data('cname')
+            //     if(cname!=undefined){
+            //         option["child"] = $(tabId+" .chosen-select[name='"+cname+"']")
+            //     }
+            //     var disSearch = $(this).data('dis-search')
+            //     if(disSearch!=undefined){
+            //         option["disable_search"] = true
+            //     }
                 
-                $(this).chosen(option)
-            })
+            //     $(this).chosen(option)
+            // })
             // init_date();
         })
             

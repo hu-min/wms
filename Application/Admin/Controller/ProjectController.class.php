@@ -342,31 +342,22 @@ class ProjectController extends BaseController{
         $nodeAuth = $this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME];
         $where=[];
         // $where['_string']=" (processLevel = ".($this->processAuth["level"]-1)." OR processLevel = 0 OR author = ".session("userId")." OR FIND_IN_SET(".session("userId").",examine)) OR (create_user = '{$userId}') OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}') ";
-        if($data['name']){
-            $where['name']=['LIKE','%'.$data['name'].'%'];
+
+        foreach (['name','code','customer_com_name','customer_cont_name','business_name','leader_name'] as $key) {
+            if(isset($data[$key])){
+                $where[$key]=['LIKE','%'.$data[$key].'%'];
+            }
         }
+        foreach (['brand'] as $key) {
+            if(isset($data[$key])){
+                $where[$key]=$data[$key];
+            }
+        }
+        // print_r($where);
         if($nodeAuth<7){
             $where['_string'] = " ((create_user = {$userId})  OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) AND status =1) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}) OR (processLevel = ".($this->processAuth["level"]-1)." AND processLevel <>0) OR FIND_IN_SET({$userId},examine) OR (author = {$userId})";
         }//OR processLevel = 0 OR author = {$userId} OR FIND_IN_SET({$userId},examine)
-        // if($data['toCompany']){
-        //     $where['toCompany']=['LIKE','%'.$data['toCompany'].'%'];
-        // }
-        // if($data['followUp']){
-        //     $where['followUp']=['LIKE','%'.$data['followUp'].'%'];
-        // }
-        // if($data['business']){
-        //     $where['business']=['LIKE','%'.$data['business'].'%'];
-        // }
-        // if($data['leader']){
-        //     $where['leader']=['LIKE','%'.$data['leader'].'%'];
-        // }
-        // if($data['responsible']){
-        //     $where['responsible']=['LIKE','%'.$data['responsible'].'%'];
-        // }
-        // if($data['time']){
-        //     $times=explode("~",$data['time']);
-        //     $where['time']=[["EGT",strtotime($times[0])],["ELT",strtotime($times[1])]];
-        // }
+
         if(isset($data['status'])){
             $where['status']=$data['status'];
         }else{

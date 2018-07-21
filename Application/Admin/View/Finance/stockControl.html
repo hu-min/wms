@@ -146,6 +146,7 @@
     <script src="__ADMINT__/plugins/iCheck/icheck.min.js"></script>
     <script>
         $(function(){
+            $(tabId+" .search-list").trigger("click");
             $(tabId+" .add-subcompany").on("click",function(){
                 var target = $(this).data("target");
                 if(target==".bankstock-tab"){

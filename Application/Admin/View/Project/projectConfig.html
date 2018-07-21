@@ -50,6 +50,7 @@
     <script src="__ADMINT__/plugins/iCheck/icheck.min.js"></script>
     <script>
         $(function(){
+            $(tabId+" .search-list").trigger("click");
             //初始化选框样式
             $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
                 checkboxClass: 'icheckbox_minimal-blue',

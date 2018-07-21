@@ -28,8 +28,37 @@
                         <div class="col-md-12">
                             <div class="form-inline">
                                 <div class="form-group">
+                                    <label >品牌：</label>
+                                    <select class="form-control search-info chosen-select " title="品牌" data-value="basicId"  data-text="name" name="brand">
+                                        <option value="">所有品牌</option>
+                                        <volist name="brandArr" id="item">
+                                            <option value="{$item['basicId']}">{$item['name']}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="info-title">项目编号：</label>
+                                    <input class="form-control search-info input-sm" name="code" title="项目编号" required="required" value="" placeholder="项目编号" type="text">
+                                </div>
+                                <div class="form-group">
                                     <label class="control-label">项目名称：</label>
                                     <input class="form-control search-info input-sm" name="name" placeholder="项目名称" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">签约公司：</label>
+                                    <input class="form-control search-info input-sm" name="customer_com_name" placeholder="签约公司" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">客户主担：</label>
+                                    <input class="form-control search-info input-sm" name="customer_cont_name" placeholder="客户主担" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">营业主担：</label>
+                                    <input class="form-control search-info input-sm" name="business_name" placeholder="营业主担" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">项目主担：</label>
+                                    <input class="form-control search-info input-sm" name="leader_name" placeholder="项目主担" type="text">
                                 </div>
                                 <div class="form-group">
                                     <label >状态：</label>
@@ -62,7 +91,7 @@
                             <th>项目日期</th>
                             <th>项目名称</th>
                             <th>签约公司</th>
-                            <th>客户担当</th>
+                            <th>客户主担</th>
                             <th>营业主担</th>
                             <th>项目主担</th>
                             <th>项目类型</th>
@@ -96,6 +125,8 @@
     <!-- date-range-picker -->
     <script>
         $(function(){
+            init_chosen("{$url}","getOptionList",".search-body");
+            $(tabId+" .search-list").trigger("click");
             $(tabId).on("change",".modal-info[name='project_id']",function(){
                 var project_id = $(this).val()
                 if(project_id==0){
@@ -136,35 +167,7 @@
             })
         })
         function project_initInfo(){
-            $(tabId+" .chosen-select").each(function(){
-                var type = $(this).attr('name')
-                var value = $(this).data('value')
-                var text = $(this).data('text')
-                var option = {inherit_select_classes:true,search_contains:true,allow_single_deselect:true}
-    
-                if(text!=undefined && value!=undefined){
-                    var ajax_json = {url:"{$url}",data:{reqType:"getOptionList",type:type},value:value,text:text}
-                    var pname = $(this).data('pname')
-                    if(pname!=undefined){
-                        ajax_json["pelement"] = $(tabId+" .chosen-select[name='"+pname+"']")
-                    }
-                    var noupdate = $(this).data('noupdate')
-                    if(noupdate!=undefined){
-                        ajax_json["noupdate"] = true
-                    }
-                    option["ajax_load"] = ajax_json
-                }
-                var cname = $(this).data('cname')
-                if(cname!=undefined){
-                    option["child"] = $(tabId+" .chosen-select[name='"+cname+"']")
-                }
-                var disSearch = $(this).data('dis-search')
-                if(disSearch!=undefined){
-                    option["disable_search"] = true
-                }
-                
-                $(this).chosen(option)
-            })
+            init_chosen("{$url}","getOptionList",".global-modal");
             init_date();
         }
 
@@ -233,10 +236,10 @@
             }
         }
         function get_project_code(id){
+            
             datas["reqType"]='createCodeOne';
             datas["id"]=id
             get("{$url}",datas,function(result){
-                console.log(result.data);
                 if(result.errCode==0){
                     $(tabId+" .modal-info[name='code']").val(result.data)
                 }else{

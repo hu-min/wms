@@ -192,6 +192,9 @@
             // })
         }
         $(function(){
+     
+            $(tabId+" .search-list").trigger("click");
+        
             $(tabId).on("change",".chosen-project[name='cost_id']",function(){
                 var cost_id = $(this).val()
                 $(tabId+" .project-info").val("");

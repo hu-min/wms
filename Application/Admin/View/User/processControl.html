@@ -84,6 +84,9 @@
 
         //获取分类数据
         $(function(){
+
+            $(tabId+" .search-list").trigger("click");
+        
             //新增审核流程
             $(tabId).on("click",".box-header button",function(){
                 $(tabId+" .modal-info").val("");

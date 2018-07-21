@@ -36,32 +36,39 @@
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="info-title">总场次：</label>
-                                            <input class="form-control modal-info datetime" value="1" name="session_all" title="总场次" placeholder="总场次" type="text">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">当前场次：</label>
-                                            <input class="form-control modal-info datetime" value="1" readonly name="session_cur" title="当前场次" placeholder="当前场次" type="text">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">合同金额：</label>
-                                            <input class="form-control modal-info datetime" name="amount" title="合同金额" placeholder="合同金额" type="text">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
                                             <label >品牌：</label>
                                             <select class="form-control modal-info chosen-project chosen-select" title="品牌" data-value="basicId"  data-text="name" name="brand">
                                                 <option value="">品牌</option>
                                                 <volist name="brandArr" id="item">
                                                     <option value="{$item['basicId']}">{$item['name']}</option>
                                                 </volist>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">项目名称：</label>
+                                            <input class="form-control modal-info datetime" name="name" title="项目名称" required="required" placeholder="项目名称" type="text">
+                                        </div>                        
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">签约公司：</label>
+                                            <select class="form-control modal-info chosen-project chosen-select" data-value="companyId" required="required"  data-text="company" data-cname="customer_cont" title="签约公司" name="customer_com">
+                                                <option value="">公司</option>
+                                                <volist name="cusComArr" id="item">
+                                                    <option value="{$item['companyId']}">{$item['company']}</option>
+                                                </volist>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">客户担当：</label>
+                                            <select class="form-control modal-info chosen-project chosen-select" title="客户担当" data-value="contactId"  data-text="contact" data-pname="customer_com" name="customer_cont">
+                                                <option value="">客户</option>
                                             </select>
                                         </div>
                                     </div>
@@ -92,29 +99,22 @@
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="info-title">项目名称：</label>
-                                            <input class="form-control modal-info datetime" name="name" title="项目名称" required="required" placeholder="项目名称" type="text">
-                                        </div>                        
+                                            <label for="info-title">总场次：</label>
+                                            <input class="form-control modal-info datetime" value="1" name="session_all" title="总场次" placeholder="总场次" type="text">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="info-title">签约公司：</label>
-                                            <select class="form-control modal-info chosen-project chosen-select" data-value="companyId" required="required"  data-text="company" data-cname="customer_cont" title="签约公司" name="customer_com">
-                                                <option value="">公司</option>
-                                                <volist name="cusComArr" id="item">
-                                                    <option value="{$item['companyId']}">{$item['company']}</option>
-                                                </volist>
-                                            </select>
+                                            <label for="info-title">当前场次：</label>
+                                            <input class="form-control modal-info datetime" value="1" readonly name="session_cur" title="当前场次" placeholder="当前场次" type="text">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="info-title">客户担当：</label>
-                                            <select class="form-control modal-info chosen-project chosen-select" title="客户担当" data-value="contactId"  data-text="contact" data-pname="customer_com" name="customer_cont">
-                                                <option value="">客户</option>
-                                            </select>
+                                            <label for="info-title">合同金额：</label>
+                                            <input class="form-control modal-info datetime" name="amount" title="合同金额" placeholder="合同金额" type="text">
                                         </div>
                                     </div>
                                     <div class="col-md-4">

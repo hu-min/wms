@@ -67,6 +67,9 @@
             // intPfeeTypeSelect(tree);
             return tree;
         }
+        function basic_feeType_initInfo(){
+            init_chosen("{$url}","",".global-modal");
+        }
          //生成费用类别树和费用类别树选中的事件
          function createfeeTypeTree(){
             $(tabId+' #feeTypetree').treeview({showButton: true,highlightSelected:false,data: getfeeTypeTree(),levels:1,color: "#428bca",});
@@ -120,6 +123,7 @@
         }
         $(function(){
             createfeeTypeTree()
+            $(tabId+" .search-list").trigger("click");
             //搜索费用类别
             $(tabId+' .input-expand-feeType').on("input",function(){
                 $(tabId+' #feeTypetree').treeview('collapseAll', { silent: true });

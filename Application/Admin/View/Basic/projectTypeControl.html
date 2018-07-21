@@ -82,6 +82,9 @@
         </div>
     </div>
     <script>
+        $(function(){
+            $(tabId+" .search-list").trigger("click");
+        })
         function basic_projectType_setInfo(info){
             $(tabId+" .modal-info[name='basicId']").val(info['basicId']);
             $(tabId+" .modal-info[name='name']").val(info['name']);

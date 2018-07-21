@@ -104,6 +104,9 @@
 
         $(function(){
             $(tabId+" .chosen-expenclas").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
+
+            $(tabId+" .search-list").trigger("click");
+        
             //新增固定支出
             // $(tabId+" .box-header button").on("click",function(){
             //     $(tabId+" .modal-info").val("");

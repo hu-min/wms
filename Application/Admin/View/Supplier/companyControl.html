@@ -122,6 +122,9 @@
         var prefix ="{$company['prefix']}";
 
         $(function(){
+
+            $(tabId+" .search-list").trigger("click");
+        
             //新增供应商
             $(tabId+" .box-header button").on("click",function(){
                 $(tabId+" .modal-info").val("");

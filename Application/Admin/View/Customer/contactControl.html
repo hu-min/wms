@@ -102,6 +102,8 @@
         // var prefix ="{$contact['prefix']}";
 
         $(function(){
+            $(tabId+" .search-list").trigger("click");
+
             //新增联系人
             $(tabId+" .box-header button").on("click",function(){
                 $(tabId+" .modal-info").val("");

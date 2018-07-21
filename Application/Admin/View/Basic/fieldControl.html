@@ -15,12 +15,27 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="box box-info">
-                    <div class="box-body search-body" id="field-search-box">
+                    <div class="box-body search-body">
                         <div class="col-md-12">
                             <div class="form-inline">                              
                                 <div class="form-group">
                                     <label class="control-label">场地名称：</label>
                                     <input class="form-control search-info" name="name" placeholder="场地名称" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label for="info-title">项目省份：</label>
+                                    <select class="form-control search-info chosen-project chosen-select" title="项目省份" name="province" data-cname="city">
+                                        <option value="">省份</option>
+                                        <volist name="provinceArr" id="item">
+                                            <option value="{$item['pid']}">{$item['province']}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="info-title">项目城市：</label>
+                                    <select class="form-control search-info chosen-project chosen-select" data-req="getCityList" data-value="cid"  data-text="city" data-noupdate="true" data-pname="province" title="城市" name="city">
+                                        <option value="">城市</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label">场地别名：</label>
@@ -53,10 +68,12 @@
         </div>
         <div class="row">
             <div class="col-sm-12">
-                <table id="" class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>场地名称</th>
+                            <th>场地所在省份</th>
+                            <th>场地所在城市</th>
                             <th>场地别名</th>
                             <th>场地备注</th>
                             <th>状态</th>
@@ -81,6 +98,13 @@
         </div>
     </div>
     <script>
+        $(function(){
+            init_chosen("{$url}","",".search-body");
+            $(tabId+" .search-list").trigger("click");
+        })
+        function basic_field_initInfo(){
+            init_chosen("{$url}","",".global-modal");
+        }
         /*查询列表函数*/
         // function fieldSearchFuns(){
         //     datas['data']={}
@@ -94,10 +118,35 @@
         // }
         /*设置编辑信息*/
         function basic_field_setInfo(info){
-            $(tabId+" .modal-info[name='basicId']").val(info['basicId']);
+            $(tabId+" .modal-info[name='id']").val(info['id']);
             $(tabId+" .modal-info[name='name']").val(info['name']);
             $(tabId+" .modal-info[name='alias']").val(info['alias']);
             $(tabId+" .modal-info[name='remark']").val(info['remark']);
+            ["id","name","alias","remark"].forEach(element => {
+                if(info[element]!=null){
+                    $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
+                }
+            });
+            ["province","city"].forEach(element => {
+                var select= $(tabId+" .modal-info[name='"+element+"']")
+                if(info[element]>0){
+                    if(select.find("option[value='"+info[element]+"']").length==0){
+                        if(element=="city"){
+                            var city_optoin = '<option value="">城市</option>'
+                            info["citys"].forEach(city => {
+                                city_optoin+='<option value="'+city["cid"]+'">'+city["city"]+'</option>'
+                            });
+                            select.html(city_optoin);
+                        }else{
+                            select.append("<option value='"+info[element]+"'>"+info[element+"_name"]+"</option>")
+                        }
+                    }
+                    select.find("option[value='"+info[element]+"']").prop("selected",true);
+                    if(select.hasClass("chosen-select")){
+                        select.trigger("chosen:updated");
+                    }
+                }
+            });
             set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
         }
         /*用户信息*/

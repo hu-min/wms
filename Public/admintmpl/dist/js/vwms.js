@@ -440,8 +440,13 @@ $(function(){
     // }
     
     $(window).resize(function(){
-        var width = $(".chosen-container").parent(".form-group").width()
-        $(".chosen-container").width(width+"px")
+        // var width = $(".chosen-container").parent(".form-group").width()-$(".chosen-container").parent(".form-group").find("label").width()
+        // console.log($(".form-group").width());
+        width = $(".form-group .form-control").width()
+        console.log($(".chosen-container").css("display"))
+        console.log("chosenwidth"+$(".chosen-container").width())
+        // width = width > 142 ? width : 142
+        $(".chosen-container").width("100%")
     })
 })
 /** 
@@ -648,7 +653,8 @@ function init_date(){
  * @Desc: 整合chosen 
  */
 function init_chosen(url,reqType,parental){
-    $(tabId+" "+parental+" .chosen-select").each(function(){
+    parental = parental ? " "+parental : ''
+    $(tabId+parental+" .chosen-select").each(function(){
         var type = $(this).attr('name')
         var value = $(this).data('value')
         var text = $(this).data('text')
@@ -662,7 +668,7 @@ function init_chosen(url,reqType,parental){
             var ajax_json = {url:url,data:{reqType:reqType,type:type},value:value,text:text}
             var pname = $(this).data('pname')
             if(pname!=undefined){
-                ajax_json["pelement"] = $(tabId+" .chosen-select[name='"+pname+"']")
+                ajax_json["pelement"] = $(tabId+" .chosen-select[name='"+pname+"']").eq($(tabId+" .chosen-select[name='"+type+"']").index(this))
             }
             var noupdate = $(this).data('noupdate')
             if(noupdate!=undefined){
@@ -676,7 +682,7 @@ function init_chosen(url,reqType,parental){
         }
         var cname = $(this).data('cname')
         if(cname!=undefined){
-            option["child"] = $(tabId+" .chosen-select[name='"+cname+"']")
+            option["child"] = $(tabId+parental+" .chosen-select[name='"+cname+"']")
         }
         var disSearch = $(this).data('dis-search')
         if(disSearch!=undefined){
@@ -694,6 +700,9 @@ function float(num,place) {
     }
     result = Math.round(num * 100) / 100;
     var s_x = result.toString();
+    if(place==0){
+        return Number(s_x.split(".")[0])
+    }
     var pos_decimal = s_x.indexOf('.');
     if (pos_decimal < 0) {
       pos_decimal = s_x.length;

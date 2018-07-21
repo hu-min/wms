@@ -82,6 +82,9 @@
         </div>
     </div>
     <script>
+        $(function(){
+            $(tabId+" .search-list").trigger("click");
+        })
         /*设置编辑信息*/
         function expenClas_setInfo(info){
             $(tabId+" .modal-info[name='basicId']").val(info['basicId']);

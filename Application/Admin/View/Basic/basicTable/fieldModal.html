@@ -8,8 +8,25 @@
         <div class="box-body">
             <div class="form-group">
                 <label >场地名称：</label>
-                <input  class="modal-info" title="basicId" name="basicId" type="hidden">
+                <input  class="modal-info" title="id" name="id" type="hidden">
                 <input class="form-control modal-info"  name="name" title="场地名称" placeholder="场地名称" type="text">
+            </div>
+            <div class="form-group">
+                <div class="form-group">
+                    <label for="info-title">项目省份：</label>
+                    <select class="form-control modal-info chosen-project chosen-select" title="项目省份" name="province" data-cname="city">
+                        <option value="">省份</option>
+                        <volist name="provinceArr" id="item">
+                            <option value="{$item['pid']}">{$item['province']}</option>
+                        </volist>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="info-title">项目城市：</label>
+                    <select class="form-control modal-info chosen-project chosen-select" data-req="getCityList" data-value="cid"  data-text="city" data-noupdate="true" data-pname="province" title="城市" name="city">
+                        <option value="">城市</option>
+                    </select>
+                </div>
             </div>
             <div class="form-group">
                 <label >场地别名：</label>

@@ -322,6 +322,7 @@
             getUserData("followUp")
             getUserData("business")
             getUserData("leader")
+            $(tabId+" .search-list").trigger("click");
             $(tabId+' .project-time').daterangepicker({
                 "startDate":moment().year()+"-01-01",
                 "endDate":moment().year()+"-"+(moment().month()+1)+"-"+moment().dates(),

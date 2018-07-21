@@ -182,6 +182,8 @@
             // })
         }
         $(function(){
+            $(tabId+" .search-list").trigger("click");
+        
             $(tabId).on("change",".chosen-project[name='project_id']",function(){
                 var project_id = $(this).val()
                 if(project_id==0){

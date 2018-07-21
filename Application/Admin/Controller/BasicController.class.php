@@ -12,6 +12,7 @@ class BasicController extends BaseController{
         parent::_initialize();
         // $this->basicCom=getComponent('Basic');
         $this->assign('dbName',"Basic");//删除数据的时候需要
+        $this->fieldCom=$this->fieldCom=getComponent('Field');
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
     }
@@ -137,6 +138,8 @@ class BasicController extends BaseController{
     function fieldControl(){
         $reqType=I('reqType');
         $this->assign("controlName","basic_field");
+        $this->assign("dbName","Field");
+        $this->assign("provinceArr",$this->basicCom->get_provinces());
         if($reqType){
             $this->$reqType();
         }else{
@@ -154,8 +157,9 @@ class BasicController extends BaseController{
             $title = "编辑场地";
             $btnTitle = "保存数据";
             $redisName="fieldList";
-            $resultData=$this->basicCom->redis_one($redisName,"basicId",$id);
+            $resultData=$this->fieldCom->redis_one($redisName);
         }
+        $resultData["citys"] = $this->basicCom->get_citys($resultData["province"]);
         $modalPara=[
             "data"=>$resultData,
             "title"=>$title,
@@ -172,13 +176,16 @@ class BasicController extends BaseController{
     function basic_fieldList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
-        $where=["class"=>"field"];
-
-        if($data['name']){
-            $where['name']=['LIKE','%'.$data['name'].'%'];
+        $where=[];
+        foreach (['name','alias'] as $key) {
+            if(isset($data[$key])){
+                $where[$key]=['LIKE','%'.$data[$key].'%'];
+            }
         }
-        if($data['alias']){
-            $where['alias']=['LIKE','%'.$data['alias'].'%'];
+        foreach (['province','city'] as $key) {
+            if(isset($data[$key])){
+                $where[$key]=$data[$key];
+            }
         }
         if(isset($data['status'])){
             $where['status']=$data['status'];
@@ -189,9 +196,13 @@ class BasicController extends BaseController{
             'where'=>$where,
             'page'=>$p,
             'pageSize'=>$this->pageSize,
-            'orderStr'=>"basicId DESC",
+            'orderStr'=>"id DESC",
+            'joins'=>[
+                "LEFT JOIN (SELECT pid ,province province_name FROM v_province ) p ON p.pid = province",
+                "LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct ON ct.ctid = city AND ct.cpid = province",
+            ]
         ];
-        $basicResult=$this->basicCom->getBasicList($parameter);
+        $basicResult=$this->fieldCom->getList($parameter);
         $this->tablePage($basicResult,'Basic/basicTable/fieldList',"fieldList");
         // if($basicResult){
         //     $basicRed="fieldList";
@@ -208,23 +219,15 @@ class BasicController extends BaseController{
         $reqType=I("reqType");
         $datas=I("data");
         if($reqType=="basic_fieldAdd"){
-            $datas['class']="field";
-            unset($datas['basicId']);
+            unset($datas['id']);
             return $datas;
         }else if($reqType=="basic_fieldEdit"){
-            $where=["basicId"=>$datas['basicId']];
+            $where=["id"=>$datas['id']];
             $data=[];
-            if(isset($datas['name'])){
-                $data['name']=$datas['name'];
-            }
-            if(isset($datas['alias'])){
-                $data['alias']=$datas['alias'];
-            }
-            if(isset($datas['remark'])){
-                $data['remark']=$datas['remark'];
-            }
-            if(isset($datas['status'])){
-                $data['status']=$datas['status'];
+            foreach (['name','alias','remark','status','province','city'] as $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
             }
             return ["where"=>$where,"data"=>$data];
         }
@@ -233,7 +236,7 @@ class BasicController extends BaseController{
     function basic_fieldAdd(){
         $fieldInfo=$this->manageFieldInfo();
         if($fieldInfo){
-            $insertResult=$this->basicCom->insertBasic($fieldInfo);
+            $insertResult=$this->fieldCom->insert($fieldInfo);
             if($insertResult && $insertResult->errCode==0){
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
@@ -242,7 +245,7 @@ class BasicController extends BaseController{
     } 
     function basic_fieldEdit(){
         $fieldInfo=$this->manageFieldInfo();
-        $updateResult=$this->basicCom->updateBasic($fieldInfo);
+        $updateResult=$this->fieldCom->update($fieldInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
     //场地管理结束
@@ -1050,4 +1053,8 @@ class BasicController extends BaseController{
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
     //固定支出分类结束
+
+    function getCityList(){
+        $this->ajaxReturn(["data"=>A("Project")->_getOption("city")]);
+    }
 }
