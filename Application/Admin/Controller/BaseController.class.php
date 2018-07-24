@@ -24,7 +24,6 @@ class BaseController extends \Common\Controller\BaseController{
      * 对admin的每一个控制器和方法做权限检查
      */
     public function _initialize() {
-        
         parent::_initialize();
         $this->userCom=getComponent('User');
         $this->LogCom=getComponent('Log');
@@ -44,7 +43,7 @@ class BaseController extends \Common\Controller\BaseController{
         // print_r($this->nodeAuth);
         // $this->setLogin();
         $nowConAct=MODULE_NAME."/".CONTROLLER_NAME.'/'.ACTION_NAME;
-        if(in_array($nowConAct,$this->exemption)){
+        if(in_array($nowConAct,$this->exemption) || (ACTION_NAME == 'upload_filesAdd' && $this->isLogin())){
             if(!$this->isLogin() && !in_array(ACTION_NAME,['checkLogin','Login']) ){
                 $this->redirect('Index/Login');
             }elseif($this->isLogin() && ACTION_NAME=='Login'){
@@ -411,5 +410,25 @@ class BaseController extends \Common\Controller\BaseController{
 	   $data['status']=$status;	
 	}
         return $data;
+    }
+    function upload_filesAdd(){
+
+        $url=ROOT_PATH.'Uploads/'.CONTROLLER_NAME.'/'.ACTION_NAME.'/'.date('Ymd',time())."/";
+        if(!file_exists($url)){
+            mkdir($url, 0755,true);
+        }
+        $viewName = $_FILES['file']['name'];
+        $name = $viewName;
+        if(PHP_OS=="WINNT"){
+            $name = iconv("UTF-8","gb2312",$viewName);
+        }
+        $file=$url.$name;
+        
+        $copyState =  copy($_FILES['file']['tmp_name'],$file);
+        if($copyState){
+            $this->ajaxReturn(['errCode'=>0,'fileName'=>$viewName,"url"=>$url,"url2"=>'Uploads/'.CONTROLLER_NAME.'/'.ACTION_NAME.'/'.date('Ymd',time())."/".$viewName]);
+        }else{
+            $this->ajaxReturn(['errCode'=>100,'error'=>'文件上传错误！']);
+        }
     }
 }

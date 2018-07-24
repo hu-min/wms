@@ -165,7 +165,7 @@ function utf8_substr($str,$length,$middle=false){
  * @Date: 2018-06-09 23:01:13 
  * @Desc: list列表中的按钮状态 
  */
-function list_btn($defind_vars,$id,$inlink=[]){
+function list_btn($defind_vars,$id,$inlink=[],$onlycat=false){
     $statusLabel = $defind_vars["statusLabel"];
     $statusType = $defind_vars["statusType"];
     $processType = $defind_vars["processType"];
@@ -190,13 +190,13 @@ function list_btn($defind_vars,$id,$inlink=[]){
         }
         
     }
-    if($processAuth['level'] > 1 && ($item['status'] == 0 or  $item['status'] == 2 )){
+    if($processAuth['level'] > 1 && ($item['status'] == 0 or  $item['status'] == 2 ) && !$onlycat){
         echo "  <button type='button' class='btn btn-success submit-status btn-sm' data-status='1' name='approve' >{$processType[1]}</button>";
         if($item['author'] != $userId && isset($processType[3])){
             echo "  <button type='button' class='btn btn-warning submit-status btn-sm' data-status='3' name='refuse' >{$processType[3]}</button>";
         }
     }
-    if($nodeAuth >= 4){
+    if($nodeAuth >= 4  && !$onlycat){
         echo "  <button type='button' class='btn btn-danger btn-sm status-info' data-status='4' data-reqtype='Del'  >{$processType[4]}</button>";
     }
     echo "</td>";

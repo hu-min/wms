@@ -1,5 +1,8 @@
 var datas={};
 var filesData={};
+var uploadData = {}
+var tempFiles = {};
+
 /** 
  * @Author: vition 
  * @Date: 2018-01-23 00:41:37 
@@ -443,8 +446,8 @@ $(function(){
         // var width = $(".chosen-container").parent(".form-group").width()-$(".chosen-container").parent(".form-group").find("label").width()
         // console.log($(".form-group").width());
         width = $(".form-group .form-control").width()
-        console.log($(".chosen-container").css("display"))
-        console.log("chosenwidth"+$(".chosen-container").width())
+        // console.log($(".chosen-container").css("display"))
+        // console.log("chosenwidth"+$(".chosen-container").width())
         // width = width > 142 ? width : 142
         $(".chosen-container").width("100%")
     })
@@ -714,3 +717,135 @@ function float(num,place) {
     }
     return parseFloat(s_x);
   }
+function upload(option){
+    var url = option.url
+    if(!url == undefined){
+        throw '没有请求网址';
+    }
+    var el = option.el !=undefined ? option.el : ".upload-file"
+    $(tabId+" "+el).unbind("click")
+    $(document).on("click",tabId+" "+el,function(){
+        var source = $(this)
+        if($(tabId+"-upload-modal").html() == undefined){
+            var html='<div class="modal fade in" id="'+tabId.replace("#","")+'-upload-modal" style="display: block; padding-right: 17px;"><div class="modal-dialog" style="top: 10%;"><div class="modal-content"><div class="modal-header"><button type="button" class="close modal-close" data-dismiss="modal" aria-label="关闭"><span aria-hidden="true"> × </span></button><h4 class="modal-title">文件上传</h4></div><div class="modal-body"><div class="input-group"><input readonly="readonly" class="form-control upload-item" type="text"><div class="input-file none"><input class="upload-item-file" name="upload-file-name" multiple="multiple" type="file"></div><span class="input-group-btn"><button type="button" class="btn btn-info btn-flat load-files-btn"><i class="fa  fa-file"></i> 选择文件 </button></span></div></div><div class="modal-footer"><button type="button" class="btn btn-default pull-left modal-close" data-dismiss="modal">关闭</button><button type="button" class="btn btn-primary upload-file-btn"><i class="fa fa-upload" ></i> 全部上传</button></div></div></div></div>'
+            $(document).find("body").append(html);
+            
+            $(document).on("click",tabId+"-upload-modal .modal-close",function(){
+                $(this).parents(tabId+"-upload-modal").toggleClass("modal fade in")
+                $(this).parents(tabId+"-upload-modal").prev(".modal-backdrop").toggleClass("none")
+            })
+            $(document).on("click",tabId+"-upload-modal .load-files-btn",function(){
+                // console.log(tabId+"-upload-modal .load-files-btn")
+                // $("#vtabs57-upload-modal .load-files-btn").parent().prev().find("input")
+                // console.log($(this).next().find("input"))
+                // $(this).nextAll().find(".load-files-btn").removeClass("disabled")
+                $(this).parent().prev().find("input").trigger("click")
+                var ulHtml ='<ul class="products-list product-list-in-box"></ul>'
+                if($(tabId+"-upload-modal .modal-body .products-list").html() == undefined){
+                    $(tabId+"-upload-modal .modal-body").append(ulHtml);
+                    
+                    $(tabId+"-upload-modal").on("click",".modal-body .products-list .product-info .delete-file-btn",function(){
+                        var name = $(this).parents('li').find("a").attr("name")
+                        var reg =RegExp(name+"\[\,\]*")
+                        $(tabId+"-upload-modal .upload-item").val($(tabId+"-upload-modal .upload-item").val().replace(reg,''))
+                        delete tempFiles[$(this).parents('li').attr("name")]
+                        $(this).parents('li').remove();
+                    })
+                    $(tabId+"-upload-modal").on("click",".modal-body .products-list .product-info .insert-file-btn",function(){
+                        source.val($(this).attr("name"))
+                    })
+                    $(tabId+"-upload-modal").on("click",".modal-footer .upload-file-btn",function(){
+                        for (const fileName in tempFiles) {
+                            uploadData = new FormData();
+                            uploadData.append("file",tempFiles[fileName])
+                            $.ajax({
+                                url:url,
+                                type:"post",
+                                data:uploadData,
+                                processData:false,
+                                contentType:false,
+                                xhr:function(){
+                                    var xhr = $.ajaxSettings.xhr();
+                                    if(xhr.upload){
+                                        xhr.upload.addEventListener("progress",function(evt){
+                                            var loaded = evt.loaded;
+                                            var tot = evt.total;
+                                            var per = Math.floor(100*loaded/tot);
+                                            $(tabId+"-upload-modal .modal-body .products-list li[name='"+fileName+"']").find(".progress .progress-bar").css("width",per+"%")
+                                            console.log(per);
+                                        },false);
+                                        return xhr;
+                                    }
+                                }
+                            }).done(function(result){
+                                if(result.errCode==0){
+                                    $(tabId+"-upload-modal .modal-body .products-list li[name='"+fileName+"']").find(".progress").removeClass("active")
+                                    $(tabId+"-upload-modal .modal-body .products-list li[name='"+fileName+"'] .insert-file-btn").attr("name",result.url2)
+                                    $(tabId+"-upload-modal .modal-body .products-list li[name='"+fileName+"'] .insert-file-btn").removeClass("none")
+                                }
+                            })
+                        }
+                        
+                        // console.log("上传")
+                        // console.log(uploadData)
+                        // $.ajax({
+                        //     url:url,
+                        //     type:"post",
+                        //     data:uploadData,
+                        //     processData:false,
+                        //     contentType:false,
+                        //     xhr:function(){
+                        //         var xhr = $.ajaxSettings.xhr();
+                        //         if(xhr.upload){
+                        //             xhr.upload.addEventListener("progress",function(evt){
+                        //                 var loaded = evt.loaded;
+                        //                 var tot = evt.total;
+                        //                 var per = Math.floor(100*loaded/tot);
+                        //                 console.log(per);
+                        //             },false);
+                        //             return xhr;
+                        //         }
+                        //     }
+                        // })
+                    })
+                }
+                $(document).on("change",tabId+"-upload-modal .upload-item-file",function(){
+                    $(tabId+"-upload-modal .modal-body .products-list").html("")
+                    $(tabId+"-upload-modal .upload-item-file").each(function(){
+                        var uploadItem = ""
+                        for (let index = 0; index < this.files.length; index++){
+                            var element = this.files[index];
+                            if(Math.floor(element.size/1024/1024)<=10){
+                                
+                                var src = "/Public/admintmpl/dist/img/default-50x50.gif" 
+                                var liHtml = '<li class="item" name="'+"file"+index+'"><div class="product-img"><img src="'+window.URL.createObjectURL(element)+'" alt="Product Image"></div><div class="product-info"><a href="javascript:void(0)" name="'+element.name+'" lass="product-title">'+element.name+'<span class="btn btn-warning btn-flat pull-right insert-file-btn none"><i class="fa fa-link" ></i> 插入 </span><span class="btn btn-danger btn-flat pull-right delete-file-btn"><i class="fa fa-close"></i> 删除 </span></a><span class="product-description">文件大小：'+float(element.size/1024/1024)+'M 文件类型：'+element.type+'</span><div class="progress progress-sm active"><div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">0% Complete</span></div></div></div></li>';
+                                $(tabId+"-upload-modal .modal-body .products-list").append(liHtml);
+                                if(uploadItem!=""){
+                                    uploadItem+=","+element.name
+                                }else{
+                                    uploadItem+=element.name
+                                }
+                                tempFiles["file"+index] = element
+                                $(tabId+"-upload-modal .upload-item").val(uploadItem)
+                            }
+                        }
+                    })
+                })
+            })
+        }else{
+            $(tabId+"-upload-modal").toggleClass("modal fade in")
+            $(tabId+"-upload-modal").prev(".modal-backdrop").toggleClass("none")
+        }
+    })
+}
+function updata_file(){
+    
+}
+function in_array(val,array){
+    for (let index = 0; index < array.length; index++) {
+        if (val == array[index]){
+            return true;
+        }
+    }
+    return false;
+}

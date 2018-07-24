@@ -96,3 +96,6 @@
 .pad-right-0{
 	padding-right:0;
 }
+.products-list .product-info .progress{
+	margin-top: 5px;
+}

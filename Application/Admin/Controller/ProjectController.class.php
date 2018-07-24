@@ -353,6 +353,10 @@ class ProjectController extends BaseController{
                 $where[$key]=$data[$key];
             }
         }
+        if(isset($data["project_time"])){
+            $dateArr = explode(" - ",$data["project_time"]);
+            $where["project_time"]  = array('between',array(strtotime($dateArr[0]." 00:00:00"),strtotime($dateArr[1]." 23:59:59")));
+        }
         // print_r($where);
         if($nodeAuth<7){
             $where['_string'] = " ((create_user = {$userId})  OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) AND status =1) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}) OR (processLevel = ".($this->processAuth["level"]-1)." AND processLevel <>0) OR FIND_IN_SET({$userId},examine) OR (author = {$userId})";
@@ -369,7 +373,7 @@ class ProjectController extends BaseController{
             'fields'=>"*",
             'page'=>$p,
             'pageSize'=>$this->pageSize,
-            'orderStr'=>"addTime DESC",
+            'orderStr'=>"project_time DESC",
             "joins"=>[
                 "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = brand",
                 "LEFT JOIN (SELECT companyId company_id,company customer_com_name FROM v_customer_company ) c ON c.company_id = customer_com",
@@ -450,7 +454,7 @@ class ProjectController extends BaseController{
             $data=[];
 
             $data['updateUser']=session('userId');
-            foreach (['project_id','amount','bid_date','bid_time','bidding','brand','city','code','create_time','create_user','customer_com','customer_cont','customer_other','days','earlier_user','execute_sub','execute','field','is_bid','business','leader','name','project_time','project_id','projectType','province','scene_user','session_all','type','session_cur','stage'] as  $key) {
+            foreach (['project_id','amount','bid_date','contract','bid_time','bidding','brand','city','code','create_time','create_user','customer_com','customer_cont','customer_other','days','earlier_user','execute_sub','execute','field','is_bid','business','leader','name','project_time','project_id','projectType','province','scene_user','session_all','type','session_cur','stage'] as  $key) {
                 if(isset($datas[$key])){
                     $data[$key]=$datas[$key];
                 }

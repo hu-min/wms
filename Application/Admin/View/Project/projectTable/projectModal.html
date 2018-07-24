@@ -37,7 +37,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label >品牌：</label>
-                                            <select class="form-control modal-info chosen-project chosen-select" title="品牌" data-value="basicId"  data-text="name" name="brand">
+                                            <select class="form-control modal-info chosen-project required="required" chosen-select" title="品牌" data-value="basicId"  data-text="name" name="brand">
                                                 <option value="">品牌</option>
                                                 <volist name="brandArr" id="item">
                                                     <option value="{$item['basicId']}">{$item['name']}</option>
@@ -114,13 +114,24 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">合同金额：</label>
-                                            <input class="form-control modal-info datetime" name="amount" title="合同金额" placeholder="合同金额" type="text">
+                                            <input class="form-control modal-info datetime" required="required" name="amount" title="合同金额" placeholder="合同金额" type="text">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">客户其他人员：</label>
                                             <input class="form-control modal-info datetime" name="customer_other" title="当前场次" placeholder="当前场次" type="text">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="info-title">上传合同：</label>
+                                            <div class="input-group">
+                                                <input class="form-control upload-file" name="contract" type="text">
+                                                <span class="input-group-addon"><i class="fa fa-eye"></i></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

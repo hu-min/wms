@@ -157,7 +157,7 @@ class BasicController extends BaseController{
             $title = "编辑场地";
             $btnTitle = "保存数据";
             $redisName="fieldList";
-            $resultData=$this->fieldCom->redis_one($redisName);
+            $resultData=$this->fieldCom->redis_one($redisName,"id",$id);
         }
         $resultData["citys"] = $this->basicCom->get_citys($resultData["province"]);
         $modalPara=[
