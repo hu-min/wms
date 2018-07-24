@@ -126,7 +126,7 @@
     <script>
         $(function(){
             init_chosen("{$url}","getOptionList",".search-body");
-            upload({url:"{:U('Project/upload_filesAdd')}"})
+            // upload({url:"{:U('Project/upload_filesAdd')}"})
             $(tabId+" .search-list").trigger("click");
             $(tabId).on("change",".modal-info[name='project_id']",function(){
                 var project_id = $(this).val()
@@ -169,6 +169,7 @@
         })
         function project_initInfo(){
             init_chosen("{$url}","getOptionList",".global-modal");
+            upload({url:"{:U('Project/upload_filesAdd')}"})
             init_date();
         }
 
@@ -186,7 +187,7 @@
                 projectChosen.find("option[value='"+projectId+"']").prop("selected",true);
                 projectChosen.trigger("chosen:updated");
             }
-            ["projectId","session_all","session_cur","amount","code","project_time","days","name","customer_other","create_time","bid_date","bid_time"].forEach(element => {
+            ["projectId","session_all","session_cur","contract","amount","code","project_time","days","name","customer_other","create_time","bid_date","bid_time"].forEach(element => {
                 if(info[element]!=null){
                     $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
                 }

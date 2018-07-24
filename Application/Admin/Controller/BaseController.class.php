@@ -413,7 +413,7 @@ class BaseController extends \Common\Controller\BaseController{
     }
     function upload_filesAdd(){
 
-        $url=ROOT_PATH.'Uploads/'.CONTROLLER_NAME.'/'.ACTION_NAME.'/'.date('Ymd',time())."/";
+        $url=ROOT_PATH.'Uploads/'.CONTROLLER_NAME.'/'.date('Ymd',time())."/";
         if(!file_exists($url)){
             mkdir($url, 0755,true);
         }
@@ -426,7 +426,7 @@ class BaseController extends \Common\Controller\BaseController{
         
         $copyState =  copy($_FILES['file']['tmp_name'],$file);
         if($copyState){
-            $this->ajaxReturn(['errCode'=>0,'fileName'=>$viewName,"url"=>$url,"url2"=>'Uploads/'.CONTROLLER_NAME.'/'.ACTION_NAME.'/'.date('Ymd',time())."/".$viewName]);
+            $this->ajaxReturn(['errCode'=>0,'fileName'=>$viewName,"url"=>$url,"url2"=>'Uploads/'.CONTROLLER_NAME.'/'.date('Ymd',time())."/".$viewName]);
         }else{
             $this->ajaxReturn(['errCode'=>100,'error'=>'文件上传错误！']);
         }

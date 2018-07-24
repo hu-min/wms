@@ -723,18 +723,18 @@ function upload(option){
         throw '没有请求网址';
     }
     var el = option.el !=undefined ? option.el : ".upload-file"
-    $(tabId+" "+el).unbind("click")
-    $(document).on("click",tabId+" "+el,function(){
-        var source = $(this)
+    var e = $._data($(tabId+" "+el), "events");
+    $(document).off("click",tabId+" "+el).on("click",tabId+" "+el,function(){
+
         if($(tabId+"-upload-modal").html() == undefined){
             var html='<div class="modal fade in" id="'+tabId.replace("#","")+'-upload-modal" style="display: block; padding-right: 17px;"><div class="modal-dialog" style="top: 10%;"><div class="modal-content"><div class="modal-header"><button type="button" class="close modal-close" data-dismiss="modal" aria-label="关闭"><span aria-hidden="true"> × </span></button><h4 class="modal-title">文件上传</h4></div><div class="modal-body"><div class="input-group"><input readonly="readonly" class="form-control upload-item" type="text"><div class="input-file none"><input class="upload-item-file" name="upload-file-name" multiple="multiple" type="file"></div><span class="input-group-btn"><button type="button" class="btn btn-info btn-flat load-files-btn"><i class="fa  fa-file"></i> 选择文件 </button></span></div></div><div class="modal-footer"><button type="button" class="btn btn-default pull-left modal-close" data-dismiss="modal">关闭</button><button type="button" class="btn btn-primary upload-file-btn"><i class="fa fa-upload" ></i> 全部上传</button></div></div></div></div>'
             $(document).find("body").append(html);
             
-            $(document).on("click",tabId+"-upload-modal .modal-close",function(){
+            $(document).off("click",tabId+"-upload-modal .modal-close").on("click",tabId+"-upload-modal .modal-close",function(){
                 $(this).parents(tabId+"-upload-modal").toggleClass("modal fade in")
                 $(this).parents(tabId+"-upload-modal").prev(".modal-backdrop").toggleClass("none")
             })
-            $(document).on("click",tabId+"-upload-modal .load-files-btn",function(){
+            $(document).off("click",tabId+"-upload-modal .load-files-btn").on("click",tabId+"-upload-modal .load-files-btn",function(){
                 // console.log(tabId+"-upload-modal .load-files-btn")
                 // $("#vtabs57-upload-modal .load-files-btn").parent().prev().find("input")
                 // console.log($(this).next().find("input"))
@@ -744,17 +744,17 @@ function upload(option){
                 if($(tabId+"-upload-modal .modal-body .products-list").html() == undefined){
                     $(tabId+"-upload-modal .modal-body").append(ulHtml);
                     
-                    $(tabId+"-upload-modal").on("click",".modal-body .products-list .product-info .delete-file-btn",function(){
+                    $(tabId+"-upload-modal").off("click",".modal-body .products-list .product-info .delete-file-btn").on("click",".modal-body .products-list .product-info .delete-file-btn",function(){
                         var name = $(this).parents('li').find("a").attr("name")
                         var reg =RegExp(name+"\[\,\]*")
                         $(tabId+"-upload-modal .upload-item").val($(tabId+"-upload-modal .upload-item").val().replace(reg,''))
                         delete tempFiles[$(this).parents('li').attr("name")]
                         $(this).parents('li').remove();
                     })
-                    $(tabId+"-upload-modal").on("click",".modal-body .products-list .product-info .insert-file-btn",function(){
-                        source.val($(this).attr("name"))
+                    $(tabId+"-upload-modal").off("click",".modal-body .products-list .product-info .insert-file-btn").on("click",".modal-body .products-list .product-info .insert-file-btn",function(){
+                        $(document).find(tabId+" "+el).val($(this).attr("name"))
                     })
-                    $(tabId+"-upload-modal").on("click",".modal-footer .upload-file-btn",function(){
+                    $(tabId+"-upload-modal").off("click",".modal-footer .upload-file-btn").on("click",".modal-footer .upload-file-btn",function(){
                         for (const fileName in tempFiles) {
                             uploadData = new FormData();
                             uploadData.append("file",tempFiles[fileName])
@@ -772,7 +772,6 @@ function upload(option){
                                             var tot = evt.total;
                                             var per = Math.floor(100*loaded/tot);
                                             $(tabId+"-upload-modal .modal-body .products-list li[name='"+fileName+"']").find(".progress .progress-bar").css("width",per+"%")
-                                            console.log(per);
                                         },false);
                                         return xhr;
                                     }
@@ -809,7 +808,7 @@ function upload(option){
                         // })
                     })
                 }
-                $(document).on("change",tabId+"-upload-modal .upload-item-file",function(){
+                $(document).off("change",tabId+"-upload-modal .upload-item-file").on("change",tabId+"-upload-modal .upload-item-file",function(){
                     $(tabId+"-upload-modal .modal-body .products-list").html("")
                     $(tabId+"-upload-modal .upload-item-file").each(function(){
                         var uploadItem = ""
