@@ -1,0 +1,65 @@
+<div class="modal-header">
+    <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{$title}</h4>
+</div>
+<div class="modal-body">
+    <form role="form">
+        <div class="box-body">
+            <input class="modal-info" value="0" name="id" type="hidden">
+            <input class="modal-info" value="0" name="project_id" type="hidden">
+            <div class="row">
+                <div class="col-md-12"> <h5 class="box-title">点击右边"+"添加要清算的项目<i class="fa fa-fw fa-plus-square text-aqua add-subcompany" title="新增供应商" data-target=".bankstock-tab" style="cursor: pointer;"></i></h5></div>
+            </div>
+            <div class="row">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>请选择项目</th>
+                            <th>项目编号</th>
+                            <th>员工姓名</th>
+                            <th>借支数量</th>
+                            <th>借支总额</th>
+                            <th>报销单数量</th>
+                            <th>报销总额</th>
+                            <th>已提交发票金额</th>
+                            <th>清算金额</th>
+                        </tr>
+                    </thead>
+                    <tbody class="{$controlName}-table">
+                        {$tables}
+                    </tbody>
+                </table>
+            </div>
+            <div class="row">
+                <div class="col-md-10">
+                    
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="info-title">清算总额：</label>
+                        <input class="form-control project-info" readonly="readonly" name="supplier_type" title="清算总额"  value="" placeholder="清算总额" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <label>注意：提交后表示已同意签署以上所有项目报销，并默认同意财务将状态更改为已清算。</label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
+                    <input class="modal-info" value="0" name="status" type="hidden">
+                    {:modal_btn(get_defined_vars())}
+                </div>
+            </div>
+        </div>
+    </form>            
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+    {:save_btn(get_defined_vars())}
+</div>

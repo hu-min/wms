@@ -723,7 +723,6 @@ function upload(option){
         throw '没有请求网址';
     }
     var el = option.el !=undefined ? option.el : ".upload-file"
-    var e = $._data($(tabId+" "+el), "events");
     $(document).off("click",tabId+" "+el).on("click",tabId+" "+el,function(){
 
         if($(tabId+"-upload-modal").html() == undefined){
@@ -735,10 +734,6 @@ function upload(option){
                 $(this).parents(tabId+"-upload-modal").prev(".modal-backdrop").toggleClass("none")
             })
             $(document).off("click",tabId+"-upload-modal .load-files-btn").on("click",tabId+"-upload-modal .load-files-btn",function(){
-                // console.log(tabId+"-upload-modal .load-files-btn")
-                // $("#vtabs57-upload-modal .load-files-btn").parent().prev().find("input")
-                // console.log($(this).next().find("input"))
-                // $(this).nextAll().find(".load-files-btn").removeClass("disabled")
                 $(this).parent().prev().find("input").trigger("click")
                 var ulHtml ='<ul class="products-list product-list-in-box"></ul>'
                 if($(tabId+"-upload-modal .modal-body .products-list").html() == undefined){
@@ -784,28 +779,6 @@ function upload(option){
                                 }
                             })
                         }
-                        
-                        // console.log("上传")
-                        // console.log(uploadData)
-                        // $.ajax({
-                        //     url:url,
-                        //     type:"post",
-                        //     data:uploadData,
-                        //     processData:false,
-                        //     contentType:false,
-                        //     xhr:function(){
-                        //         var xhr = $.ajaxSettings.xhr();
-                        //         if(xhr.upload){
-                        //             xhr.upload.addEventListener("progress",function(evt){
-                        //                 var loaded = evt.loaded;
-                        //                 var tot = evt.total;
-                        //                 var per = Math.floor(100*loaded/tot);
-                        //                 console.log(per);
-                        //             },false);
-                        //             return xhr;
-                        //         }
-                        //     }
-                        // })
                     })
                 }
                 $(document).off("change",tabId+"-upload-modal .upload-item-file").on("change",tabId+"-upload-modal .upload-item-file",function(){
@@ -837,8 +810,11 @@ function upload(option){
         }
     })
 }
-function updata_file(){
-    
+function read_file(){
+    var el = option.el !=undefined ? option.el : ".read_file"
+    $(document).off("click",tabId+" "+el).on("click",tabId+" "+el,function(){
+
+    })
 }
 function in_array(val,array){
     for (let index = 0; index < array.length; index++) {

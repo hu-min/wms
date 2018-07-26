@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-header">
+                        <i class="fa fa-plus-square"></i>
+                        <h4 class="box-title">清算查阅</h4>
+                        
+                    </div>
+                    <div class="box-body search-body company-search-box">
+                        <div class="col-md-12">
+                            <div class="form-inline">
+                                
+                                <div class="form-group">
+                                    <label class="control-label">项目编号：</label>
+                                    <input class="form-control search-info input-sm" name="code" placeholder="项目编号" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">员工姓名：</label>
+                                    <input class="form-control search-info input-sm" name="code" placeholder="员工姓名" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label >清算状态：</label>
+                                    <select class="form-control search-info input-sm" title="清算状态" name="status">
+                                        <option value="">全部</option>
+                                        <option value="1">已清算</option>
+                                        <option value="0">未清算</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                </div>
+                                
+                            </div>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" style="font-size:0.95em;overflow-x: auto;">
+                <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;">
+                </div>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>项目编号</th>
+                            <th>项目名称</th>
+                            <th>员工姓名</th>
+                            <th>借支数量</th>
+                            <th>借支总额</th>
+                            <th>报销数量</th>
+                            <th>报销总额</th>
+                            <th>催促清算</th>
+                            <th>清算状态</th>
+                        </tr>
+                    </thead>
+                    <tbody class="{$controlName}-table">
+                        {$tables}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="dataTables_wrapper">
+            <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+                {$pages}
+            </div>
+        </div>
+    </section>
+    <div class="modal fade global-modal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+    <script>
+      
+    </script>
+</body>
+</html>

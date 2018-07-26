@@ -714,5 +714,101 @@ class FinanceController extends BaseController{
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
     //采购系统结束
+
+    function staffClearControl(){//Finance/staffClearControl
+        $reqType=I('reqType');
+        $this->assign('dbName',"Clear");//删除数据的时候需要
+        $this->assign("controlName","staffClear");
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    function staffClear_modalOne(){
+        $title = "提交清算";
+        $btnTitle = "提交清算";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        if($gettype=="Edit"){
+            $title = "编辑清算";
+            $btnTitle = "保存数据";
+            $redisName="staffClearList";
+            $resultData=$this->clearCom->redis_one($redisName,"id",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"staffClearModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-07-26 23:28:36 
+     * @Desc: 清算查阅 
+     */    
+    function readClearControl(){//Finance/staffClearControl
+        $reqType=I('reqType');
+        $this->assign('dbName',"Clear");//删除数据的时候需要
+        $this->assign("controlName","readClear");
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    function readClear_modalOne(){
+        $title = "提交清算";
+        $btnTitle = "提交清算";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        if($gettype=="Edit"){
+            $title = "编辑清算";
+            $btnTitle = "保存数据";
+            $redisName="readClearList";
+            $resultData=$this->clearCom->redis_one($redisName,"id",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"readClearModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    function financeClearControl(){//Finance/financeClearControl
+        $reqType=I('reqType');
+        $this->assign('dbName',"Clear");//删除数据的时候需要
+        $this->assign("controlName","financeClear");
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    function financeClear_modalOne(){
+        $title = "清算审核";
+        $btnTitle = "清算审核";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        if($gettype=="Edit"){
+            $title = "清算审核";
+            $btnTitle = "清算审核";
+            $redisName="financeClearList";
+            $resultData=$this->clearCom->redis_one($redisName,"id",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "templet"=>"financeClearModal",
+        ];
+        $this->modalOne($modalPara);
+    }
     
 }
