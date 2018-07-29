@@ -15,6 +15,7 @@ class ProjectController extends BaseController{
         $this->customerCom=getComponent('Customer');
         $this->supplierCom=getComponent('Supplier');
         $this->purchaCom=getComponent('Purcha');
+        $this->fieldCom=getComponent('Field');
         $this->processArr=["0"=>"沟通","1"=>"完结","2"=>"裁决","3"=>"提案","4"=>"签约","5"=>"LOST","6"=>"筹备","7"=>"执行","8"=>"完成"];
         $this->dateArr=["0"=>"立项日期","1"=>"提案日期","2"=>"项目日期","3"=>"结束日期"];
         Vendor("levelTree.levelTree");
@@ -118,7 +119,7 @@ class ProjectController extends BaseController{
                     "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = brand",
                     "LEFT JOIN (SELECT companyId company_id,company customer_com_name FROM v_customer_company ) c ON c.company_id = customer_com",
                     "LEFT JOIN (SELECT contactId contact_id,contact customer_cont_name FROM v_customer_contact ) c2 ON c2.contact_id = customer_cont",
-                    "LEFT JOIN (SELECT basicId field_id,name field_name FROM v_basic WHERE class = 'field' ) f ON f.field_id = field",
+                    "LEFT JOIN (SELECT id field_id,name field_name,city f_city FROM v_field ) f ON f.field_id = field AND f.f_city=city",
                     "LEFT JOIN (SELECT userId user_id,userName create_user_name FROM v_user) cu ON cu.user_id = create_user",
                     "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = business",
                     "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = leader",
@@ -160,7 +161,7 @@ class ProjectController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"projectModal",
+            "template"=>"projectModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -188,7 +189,7 @@ class ProjectController extends BaseController{
                     return $result["list"];
                 }
                 break;
-            case 'brand': case 'field': case 'execute_sub':  case 'projectType': case 'stage': case 'finance_id':
+            case 'brand': case 'execute_sub':  case 'projectType': case 'stage': case 'finance_id':
                 if($type=="execute_sub"){
                     $type = "execute";
                 }elseif($type == 'finance_id'){
@@ -321,6 +322,28 @@ class ProjectController extends BaseController{
                     }
                     return $costs;
                 }
+                break;
+            case 'field':
+                $where['status'] = 1;
+                $pid = I("pid");
+                if(isset($pid) && $pid >0){
+                    $where["city"]=$pid;
+                }
+                if ($key!=""){
+                    $map["name"]=["LIKE","%{$key}%"];
+                    $map["remark"]=["LIKE","%{$key}%"];
+                    $map['_logic'] = 'or';
+                    $where['_complex'] = $map;
+                }
+                $parameter=[
+                    'where'=>$where,
+                    'fields'=>'id,name',
+                    'orderStr'=>"id DESC",
+                ];
+                $result = $this->fieldCom->getList($parameter);
+                if($result){
+                    return $result["list"];
+                }                               
                 break;
             default:
                 # code...
@@ -782,7 +805,7 @@ class ProjectController extends BaseController{
                     "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = brand",
                     "LEFT JOIN (SELECT companyId company_id,company customer_com_name FROM v_customer_company ) c ON c.company_id = customer_com",
                     "LEFT JOIN (SELECT contactId contact_id,contact customer_cont_name FROM v_customer_contact ) c2 ON c2.contact_id = customer_cont",
-                    "LEFT JOIN (SELECT basicId field_id,name field_name FROM v_basic WHERE class = 'field' ) f ON f.field_id = field",
+                    "LEFT JOIN (SELECT id field_id,name field_name,city f_city FROM v_field ) f ON f.field_id = field AND f.f_city=city",
                     "LEFT JOIN (SELECT userId user_id,userName create_user_name FROM v_user) cu ON cu.user_id = create_user",
                     "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = business",
                     "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = leader",
@@ -821,7 +844,7 @@ class ProjectController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"businessModal",
+            "template"=>"businessModal",
         ];
         $this->modalOne($modalPara);
     }

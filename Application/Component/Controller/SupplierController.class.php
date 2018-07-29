@@ -32,7 +32,7 @@ class SupplierController extends BaseController{
         $this->selfDB=$this->companyDB;
         return $this->update($parameter);
     }
-    function getSupplierList($parameter=[],$one=false){
+    function getSuprContList($parameter=[],$one=false){
         $this->selfDB=$this->contactDB;
         $redisName="sup_contactList";
         if($one){

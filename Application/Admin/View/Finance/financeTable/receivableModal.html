@@ -12,9 +12,9 @@
             <div class="row">
                 <div class="col-md-4 create-rece">
                     <div class="form-group">
-                        <label >立项或添加项目场次：</label>
-                        <select class="form-control chosen-project chosen-select" title="立项或添加场次" data-value="projectId"  data-text="name" name="project_id">
-                            <option value="">立项</option>
+                        <label >选择项目收款：</label>
+                        <select class="form-control chosen-project chosen-select" title="选择项目收款" data-value="projectId"  data-text="name" name="project_id">
+                            <option value="">其他</option>
                             <volist name="projectArr" id="item">
                                 <option value="{$item['projectId']}">{$item['name']}</option>
                             </volist>
@@ -97,7 +97,7 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="info-title">付款金额：</label>
-                        <input class="form-control modal-info" name="pay_amount" title="付款金额" required="required" value="" placeholder="付款金额" type="text">
+                        <input class="form-control modal-info" name="pay_amount" title="付款金额"  value="" placeholder="付款金额" type="text">
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -116,7 +116,7 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="info-title">预付款金额：</label>
-                        <input class="form-control modal-info" name="advance" title="预付款金额" required="required" value="" placeholder="预付款金额" type="text">
+                        <input class="form-control modal-info" name="advance" title="预付款金额"  value="" placeholder="预付款金额" type="text">
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -133,7 +133,7 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="info-title">未付款金额：</label>
-                        <input class="form-control modal-info" name="surplus" title="未付款金额" required="required" value="" placeholder="付款金额" type="text">
+                        <input class="form-control modal-info" name="surplus" title="未付款金额" value="" placeholder="付款金额" type="text">
                     </div>
                 </div>
             </div>

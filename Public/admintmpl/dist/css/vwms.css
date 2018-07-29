@@ -7,18 +7,21 @@
 	text-align: center;
 	z-index: 9999999;
 	background: rgba(255,255,255,0.7);
+	top: 0px;
+	left: 0px;
 }
 #loadwaiting .overlay{
 	position: relative;
 	height: 100%;
+	
 }
 #loadwaiting .overlay .fa-refresh{
 	font-size: 3em;
 	position: absolute;
 	top: 50%;
 	transform: translateY(-50%);
-	margin-left: -180px;
-	margin-top: -72px;
+	/* margin-left: -180px; */
+	/* margin-top: -72px; */
 }
 .tab-clo{
 	position: absolute;
@@ -98,4 +101,14 @@
 }
 .products-list .product-info .progress{
 	margin-top: 5px;
+}
+.supr-remove{
+	position: absolute;
+	left: 22px;
+	margin-top: 12px;
+	color: #555;
+	font-size: 30px;
+};
+.supr-remove:hover{
+	color: red!important;
 }

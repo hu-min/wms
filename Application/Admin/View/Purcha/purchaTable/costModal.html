@@ -7,13 +7,13 @@
 <div class="modal-body">
     <form role="form">
         <div class="box-body">
-            <input class="modal-info" value="0" name="id" type="hidden">
-            <input class="modal-info" value="0" name="project_id" type="hidden">
+            <!-- <input class="modal-info" value="0" name="id" type="hidden"> -->
+            <!-- <input class="modal-info" value="0" name="project_id" type="hidden"> -->
             <div class="row">
-                <div class="col-md-4 create-rece">
+                <div class="col-md-3 create-rece">
                     <div class="form-group">
                         <label >选择项目：</label>
-                        <select class="form-control chosen-project chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
+                        <select class="form-control modal-info chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
                             <option value="0">其他</option>
                             <volist name="projectArr" id="item">
                                 <option value="{$item['projectId']}">{$item['name']}</option>
@@ -21,24 +21,44 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="info-title">项目编号：</label>
-                        <input class="form-control project-info" readonly="readonly" name="project_name" title="项目编号"  value="" placeholder="项目编号" type="text">
+                        <input class="form-control project-info" required="required" readonly="readonly" name="code" title="项目编号"  value="" placeholder="项目编号" type="text">
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="info-title">项目主担：</label>
-                        <input class="form-control project-info" readonly="readonly" name="project_name" title="项目主担"  value="" placeholder="项目主担" type="text">
+                        <input class="form-control project-info" required="required" readonly="readonly" name="leader_name" title="项目主担"  value="" placeholder="项目主担" type="text">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="info-title">营业主担：</label>
+                        <input class="form-control project-info" required="required" readonly="readonly" name="business_name" title="营业主担"  value="" placeholder="营业主担" type="text">
                     </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-12"> <h5 class="box-title">点击右边"+"添加供应商<i class="fa fa-fw fa-plus-square text-aqua add-subcompany" title="新增供应商" data-target=".bankstock-tab" style="cursor: pointer;"></i></h5></div>
+                <div class="col-md-12"> <h5 class="box-title">点击右边"+"添加供应商<i class="fa fa-fw fa-plus-square text-aqua add-suprcompany" title="新增供应商" data-target=".bankstock-tab" style="cursor: pointer;"></i></h5></div>
             </div>
             <div class="row">
-                <table class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover supr-list">
+                    <colgroup>
+                        <col style>
+                        <col style="min-width: 142px;">
+                        <col style="min-width: 142px;">
+                        <col style>
+                        <col style>
+                        <col style="min-width: 142px;">
+                        <col style>
+                        <col style>
+                        <col style>
+                        <col style>
+                        <col style>
+                        <col style>
+                    </colgroup>
                     <thead>
                         <tr>
                             <th>序号</th>
@@ -55,8 +75,77 @@
                             <th>备注</th>
                         </tr>
                     </thead>
-                    <tbody class="{$controlName}-table">
-                        {$tables}
+                    <tbody>
+                        <tr>
+                            <td><button type="button" class="close supr-remove"><span>×</span></button>1</td>
+                            <td>
+                                <select class="form-control modal-info chosen-select" title="供应商类型" data-value="basicId" required="required"  data-text="name" name="type" data-cname="supplier_com" data-req="getSuprtype">
+                                    <option value="">选择供应商类型</option>
+                                    <volist name="supplierArr" id="item">
+                                        <option value="{$item['basicId']}">{$item['name']}</option>
+                                    </volist>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="form-control modal-info chosen-select" title="供应商名称" data-value="companyId" data-pname="type" data-text="company" name="supplier_com" required="required" data-req="getSuprComList" data-extra="province_name,city_name" data-cname="supplier_cont">
+                                    <option value="">选择供应商名称</option>
+                                    <!-- <volist name="companyArr" id="item">
+                                        <option value="{$item['companyId']}">{$item['company']}</option>
+                                    </volist> -->
+                                </select>
+                            </td>
+                            <td>
+                                <select class="form-control modal-info chosen-select" title="供应商联系人" data-value="contactId" data-req="getSuprContList" data-pname="supplier_com" data-text="contact" required="required" name="supplier_cont">
+                                    <option value="">选择供应商联系人</option>
+                                    <volist name="suprcontArr" id="item">
+                                        <option value="{$item['contactId']}">{$item['contact']}</option>
+                                    </volist>
+                                </select>
+                            </td>
+                            <td ><input class="form-control modal-info" name="region" readonly="readonly" type="text"></td>
+                            <td>
+                                <select class="form-control modal-info chosen-select" title="承接模块" data-value="basicId" required="required" data-req="getModuleList" data-pname="supplier_com" data-text="name" name="module">
+                                    <option value="">选择承接模块</option>
+                                    <volist name="moduleArr" id="item">
+                                        <option value="{$item['basicId']}">{$item['name']}</option>
+                                    </volist>
+                                </select>
+                            </td>
+                            <td>
+                                <input class="form-control modal-info" required="required"  name="contract_amount" title="合同金额"  value="" placeholder="合同金额" type="text">
+                            </td>
+                            <td>
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input class="form-control pull-right date-input modal-info" name="sign_date" type="text">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input class="form-control pull-right date-input modal-info" name="advance_date" type="text">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="input-group">
+                                    <input class="form-control modal-info upload-file" name="offer_file" type="text">
+                                    <span class="input-group-addon"><i class="fa fa-eye"></i></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="input-group">
+                                    <input class="form-control modal-info upload-file" name="contract_file" type="text">
+                                    <span class="input-group-addon"><i class="fa fa-eye"></i></span>
+                                </div>
+                            </td>
+                            <td>
+                                <input class="form-control modal-info"  name="remark" title="备注"  value="" placeholder="备注" type="text">
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

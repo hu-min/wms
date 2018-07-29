@@ -67,7 +67,7 @@ class UserController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"userModal",
+            "template"=>"userModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -562,7 +562,7 @@ class UserController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"processModal",
+            "template"=>"processModal",
         ];
         $this->modalOne($modalPara);
     }

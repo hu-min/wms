@@ -344,7 +344,7 @@ class BaseController extends \Common\Controller\BaseController{
         $assign["data"] = $parameter["data"] ? $parameter["data"] : [];
         $tpFolder = $parameter["tpFolder"] ? $parameter["tpFolder"] : CONTROLLER_NAME;
         $folder = $parameter["folder"] ? $parameter["folder"] : strtolower(CONTROLLER_NAME).'Table';
-        $templet = $parameter["templet"] ? $parameter["templet"] : strtolower($control).'Modal';
+        $templet = $parameter["template"] ? $parameter["template"] : strtolower($control).'Modal';
         $templets = $parameter["templets"] ? $parameter["templets"] : $tpFolder.'/'.$folder.'/'.$templet;
         $errCode = 0;
         $error = "数据获取成功";

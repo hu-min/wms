@@ -21,7 +21,7 @@ class SupplierController extends BaseController{
      * @Date: 2018-05-27 15:13:52 
      * @Desc: 内部获取供应商类型列表
      */    
-    protected function getSupType($key=""){
+    function getSupType($key=""){
         $where=["class"=>"supType"];
         if ($key!=""){
             $where["name"]=["LIKE","%{$key}%"];
@@ -41,17 +41,24 @@ class SupplierController extends BaseController{
      * @Date: 2018-05-27 15:14:05 
      * @Desc: 内部获取供应商列表 
      */    
-    function getSupplier($key=""){
+    function getSupplier($key="",$type=0){
         $where=["status"=>"1"];
         if ($key!=""){
             $where["company"]=["LIKE","%{$key}%"];
         }
+        if($type>0){
+            $where["type"]=$type;
+        }
         $parameter=[
             'where'=>$where,
-            'fields'=>'companyId,company',
+            'fields'=>'companyId,company,provinceId,cityId,province_name,city_name',
             'page'=>1,
             'pageSize'=>20,
             'orderStr'=>"companyId DESC",
+            "joins"=>[
+                "LEFT JOIN (SELECT pid ,province province_name FROM v_province) p ON p.pid=provinceId",
+                "LEFT JOIN (SELECT cid,city city_name,pid FROM v_city) c ON c.cid=cityId",
+            ],
         ];
         $supplierResult = $this->supplierCom->getCompanyList($parameter);
         return $supplierResult['list'] ? $supplierResult['list'] : [];
@@ -90,7 +97,7 @@ class SupplierController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"supTypeModal",
+            "template"=>"supTypeModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -252,7 +259,7 @@ class SupplierController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"companyModal",
+            "template"=>"companyModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -346,11 +353,11 @@ class SupplierController extends BaseController{
             if(isset($datas['alias'])){
                 $data['alias']=$datas['alias'];
             }
-            if(isset($datas['province'])){
-                $data['province']=$datas['province'];
+            if(isset($datas['provinceId'])){
+                $data['provinceId']=$datas['provinceId'];
             }
-            if(isset($datas['city'])){
-                $data['city']=$datas['city'];
+            if(isset($datas['cityId'])){
+                $data['cityId']=$datas['cityId'];
             }
             if(isset($datas['address'])){
                 $data['address']=$datas['address'];
@@ -365,7 +372,7 @@ class SupplierController extends BaseController{
                 $parameter=[
                     'where'=>["companyId"=>$datas['companyId']],
                 ];
-                $result=$this->customerCom->getCompanyList($parameter,true);
+                $result=$this->supplierCom->getCompanyList($parameter,true);
                 $data = $this->status_update($result,$datas["status"],$data);
             }
             $data['upateTime']=time();
@@ -428,7 +435,7 @@ class SupplierController extends BaseController{
      * @Date: 2018-05-10 00:02:10 
      * @Desc: 修改供应商信息 
      */    
-    function supcompanyEdit(){
+    function sup_companyEdit(){
         $companyInfo=$this->manageCompanyInfo();
         $updateResult=$this->supplierCom->updateCompany($companyInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
@@ -469,7 +476,7 @@ class SupplierController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"contactModal",
+            "template"=>"contactModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -497,13 +504,13 @@ class SupplierController extends BaseController{
             "joins"=>"LEFT JOIN (SELECT companyId cid,company FROM v_supplier_company WHERE status=1) c ON c.cid=companyId",
         ];
         
-        $listResult=$this->supplierCom->getSupplierList($parameter);
+        $listResult=$this->supplierCom->getSuprContList($parameter);
         $this->tablePage($listResult,'Supplier/supplierTable/contactList',"sup_contactList");
     }
     /** 
      * @Author: vition 
      * @Date: 2018-05-09 23:43:33 
-     * @Desc: 添加和修改供应商联系人管理 
+     * @Desc: 添加和修改供应商采购管理 
      */    
     function manageContactInfo(){
         $reqType=I("reqType");
@@ -604,5 +611,39 @@ class SupplierController extends BaseController{
         $type=I("type");
         $project = A("Project");
         $this->ajaxReturn(["data"=>$project->_getOption($type,$key)]);
+    }
+
+    function getSuprCont($key="",$companyId=0){
+        $where=["status"=>"1"];
+        if ($key!=""){
+            $where["contact"]=["LIKE","%{$key}%"];
+        }
+        if($companyId>0){
+            $where["companyId"]=$companyId;
+        }
+        $parameter=[
+            'where'=>$where,
+            'fields'=>'contactId,contact',
+            'page'=>1,
+            'pageSize'=>20,
+            'orderStr'=>"contactId DESC",
+        ];
+        $supplierResult = $this->supplierCom->getSuprContList($parameter);
+        return $supplierResult['list'] ? $supplierResult['list'] : [];
+    }
+    function getModule(){
+        $where=["class"=>"module"];
+        if ($key!=""){
+            $where["name"]=["LIKE","%{$key}%"];
+        }
+        $parameter=[
+            'where'=>$where,
+            'fields'=>'basicId,name',
+            'page'=>1,
+            'pageSize'=>20,
+            'orderStr'=>"basicId DESC",
+        ];
+        $basicResult=$this->basicCom->getBasicList($parameter);
+        return $basicResult['list'] ? $basicResult['list'] : [];
     }
 }

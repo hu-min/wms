@@ -12,7 +12,7 @@ class BasicController extends BaseController{
         parent::_initialize();
         // $this->basicCom=getComponent('Basic');
         $this->assign('dbName',"Basic");//删除数据的时候需要
-        $this->fieldCom=$this->fieldCom=getComponent('Field');
+        $this->fieldCom=getComponent('Field');
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
     }
@@ -48,7 +48,7 @@ class BasicController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"brandModal",
+            "template"=>"brandModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -164,7 +164,7 @@ class BasicController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"fieldModal",
+            "template"=>"fieldModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -277,7 +277,7 @@ class BasicController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"stageModal",
+            "template"=>"stageModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -391,7 +391,7 @@ class BasicController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"projectTypeModal",
+            "template"=>"projectTypeModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -537,7 +537,7 @@ class BasicController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"executeModal",
+            "template"=>"executeModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -684,7 +684,7 @@ class BasicController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"feeTypeModal",
+            "template"=>"feeTypeModal",
         ];
         $option='<option value="0">根Root</option>';
         foreach ($this->getFeeTypeTree() as $key => $value) {
@@ -874,7 +874,7 @@ class BasicController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"moduleModal",
+            "template"=>"moduleModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -977,7 +977,7 @@ class BasicController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"expenClasModal",
+            "template"=>"expenClasModal",
         ];
         $this->modalOne($modalPara);
     }

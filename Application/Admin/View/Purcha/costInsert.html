@@ -8,6 +8,9 @@
     <eq name="load" value="true">
         <include file="Index/Heads" /> 
     </eq>
+    <style>
+        
+    </style>
     <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
     
 </head>
@@ -64,10 +67,9 @@
                             <th>项目名称</th>
                             <th>项目编号</th>
                             <th>项目主担</th>
+                            <th>营业主担</th>
                             <th>供应商数量</th>
-                            <th>【占位】</th>
-                            <th>【占位】</th>
-                            <th>备注</th>
+                            <th>合同总额</th>
                             <th>状态</th>
                             <th>操作</th>
                         </tr>
@@ -85,14 +87,128 @@
         </div>
     </section>
     <div class="modal fade global-modal ">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-full">
             <div class="modal-content"></div>
         </div>
     </div>
     <script>
+        function cost_insert_initInfo(gettype){
+            if(gettype=="Add"){
+                init_chosen("{$url}","getProjectOne",".global-modal");
+                init_date();
+            }
+            // init_chosen("{$url}","getProjectOne",".global-modal");
+            // init_date();
+            upload({url:"{:U('Project/upload_filesAdd')}"})
+        }
+        function cost_insert_setInfo(info){
+            if(info["list"] == undefined){
+                ["code","leader_name","business_name"].forEach(element => {
+                    $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
+                });
+            }else{
+                $(tabId+" .global-modal .supr-list tbody").html("");
+                ["project_id","code","leader_name","business_name"].forEach(element => {
+                    $(tabId+" .global-modal .project-info[name='"+element+"']").val(info.list[0][element]);
+                });
+                ["project_id"].forEach(element => {
+                    $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info.list[0][element]);
+                    init_chosen("{$url}","getProjectOne",".global-modal");
+                });
+                info.list.forEach(function(supritem,rows){
+                    $(tabId+" .global-modal .supr-list tbody").append(info.template);
+                    var $current = $(tabId+" .global-modal .supr-list tbody tr").eq(rows);
+                    $current.find(".serial").text(Number(rows+1));
+
+                    ["id","type","supplier_com","supplier_cont","module","contract_amount","sign_date","advance_date","offer_file","contract_file","remark","region"].forEach(element => {
+
+                        
+                        if(!$current.find(".modal-info[name='"+element+"']").hasClass("chosen-select")){
+                            if(element=="region"){
+                                $current.find(".modal-info[name='"+element+"']").val(supritem["province_name"]+"-"+supritem["city_name"]);
+                            }else{
+                                $current.find(".modal-info[name='"+element+"']").val(supritem[element]);
+                            }
+                            
+                        }else{
+                            if($current.find(".modal-info[name='"+element+"']").find("option[value='"+supritem[element]+"']").length==0){
+                                $current.find(".modal-info[name='"+element+"']").append("<option value='"+supritem[element]+"'>"+supritem[element+"_name"]+"</option>")
+                            }
+                            $current.find(".modal-info[name='"+element+"']").find("option[value='"+supritem[element]+"']").prop("selected",true);
+                        }
+
+                        // $(tabId+" .global-modal .modal-info[name='"+element+"']").val(supritem[element]);
+                    });
+
+                    init_chosen("{$url}","getProjectOne",$current);
+                    init_date(false,$current);
+                });
+            }
+
+        }
+        function cost_insert_getInfo(){
+            var project_id = $(tabId+" .modal-info[name='project_id']").val()
+            var status = $(tabId+" .modal-info[name='status']").val()
+            datas["data"] = []
+            $(tabId+" .global-modal .supr-list tbody tr").each(function(){
+                var tempSupr = {project_id:project_id,status:status}
+                $(this).find(".modal-info").each(function(){
+                    var name = $(this).attr("name")
+                    var val = $(this).val()
+                    var required=$(this).attr("required");
+                    var title=$(this).attr("title");
+                    if(required=="required" && val==""){
+                        notice(110,title,"输入异常");
+                        throw title
+                    }else{
+                        tempSupr[name]=val;
+                    }
+
+                })
+                datas["data"].push(tempSupr);
+            })
+        }
         $(function(){
             $(tabId+" .search-list").trigger("click");
+            $(tabId).offon("change"," .modal-info[name='project_id']",function(){
+                var project_id = $(this).val()
+                if(Number(project_id)>0){
+                    datas["reqType"]='getProjectOne';
+                    datas["onlydata"]='true';
+                    datas["gettype"]='Edit';
+                    datas["id"]=project_id;
+                    get("{$url}",datas,function(result){
+                        if(result.data){
+                            result.data['project_id'] = result.data['projectId'];
+                            cost_insert_setInfo(result.data)
+                        }
+                    })
+                }
+            });
+            $(tabId).offon("change"," .modal-info[name='supplier_com']",function(){
+                var province_name = $(this).find("option:selected").data("province_name");
+                var city_name = $(this).find("option:selected").data("city_name");
+                $(this).parents("tr").find(".modal-info[name='region']").val(province_name+"-"+city_name);
+            });
+            $(tabId).offon("click",".add-suprcompany",function(){
+                // var newTr = $(tabId+" .global-modal .supr-list tr").eq(1).clone()
+                datas["reqType"]='getSuprLiOne';
+                datas["rows"]=$(tabId+" .global-modal .supr-list tr").length;
+                var rows = datas["rows"];
+                get("{$url}",datas,function(result){
+                    $(tabId+" .global-modal .supr-list").append(result.html);
+                    init_chosen("{$url}","getProjectOne",$(tabId+" .global-modal .supr-list tr").eq(rows));
+                    init_date(false,$(tabId+" .global-modal .supr-list tr").eq(rows));
+                })
+            })
+            $(tabId).offon("click",".supr-remove",function(){
+                $(this).parents("tr").remove();
+            })
+            // $(tabId).off("change"," .modal-info[name='project_id']").on("change"," .modal-info[name='project_id']",function(){
+            //     console.log(this)
+            // })
         })
+        
     </script>
 </body>
 </html>

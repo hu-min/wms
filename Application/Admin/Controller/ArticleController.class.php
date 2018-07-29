@@ -59,7 +59,7 @@ class ArticleController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"articleModal",
+            "template"=>"articleModal",
         ];
         $option='<option value="0">根Root</option>';
         foreach ($this->getArtClsTree() as $key => $value) {
@@ -103,7 +103,7 @@ class ArticleController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"artclassModal",
+            "template"=>"artclassModal",
         ];
         $option='<option value="0">根Root</option>';
         foreach ($this->getArtClsTree() as $key => $value) {

@@ -2,7 +2,16 @@ var datas={};
 var filesData={};
 var uploadData = {}
 var tempFiles = {};
-
+$.fn.extend({offon:function(){
+    var event =  arguments[0]
+    var select =  typeof(arguments[1]) == 'string' ? arguments[1] : false
+    var callBack = typeof(arguments[1]) == 'function' ? arguments[1] : typeof(arguments[2]) == 'function' ? arguments[2] : function(){}
+    if(select){
+        return $(this).off(event,select).on(event,select,callBack)
+    }else{
+        return $(this).off(event).on(event,callBack)
+    }
+}})
 /** 
  * @Author: vition 
  * @Date: 2018-01-23 00:41:37 
@@ -20,8 +29,6 @@ function get(url,indata,callBack){
         async:asyncs,
     }).done(function(result) {callBack(result);})
       .always(function() { setLoad();datas={};})
-    
-    
 }
 /** 
  * javascript comment 
@@ -200,7 +207,8 @@ $(document).on("click",".v-showmodal",function(){
                 }
             }
             if(fun_is_exits(con+"_initInfo")){
-                eval(con+"_initInfo()");//
+                // console.log(gettype)
+                eval(con+"_initInfo(gettype)");//
             }
         }
     })
@@ -271,6 +279,7 @@ $(document).on("click",'.save-info',function(){
         $('body').addClass('modal-open')
     }
     datas.reqType=con+gettype;
+    
     if(fun_is_exits(con+"_getInfo")){
     	eval(con+"_getInfo()");//对不同的id设置不同的发送数据
     }else{
@@ -451,6 +460,13 @@ $(function(){
         // width = width > 142 ? width : 142
         $(".chosen-container").width("100%")
     })
+    $(document).on("show.bs.modal", ".modal", function(){
+        $(this).draggable();
+        $(this).css("background","none");
+        // $(this).css("overflow-x", "scroll");   
+        // $(this).css("overflow-y", "scroll");   
+        // 防止出现滚动条，出现的话，你会把滚动条一起拖着走的
+    });
 })
 /** 
  * javascript comment 
@@ -631,10 +647,20 @@ $("#v-notice-window .v-close").on("click",function(){
  */
 function init_date(){
     var opt = arguments[0]
-    $(tabId+" .date-input").each(function(){
+    var parental = arguments[1]
+
+    if(typeof(parental)=="object"){
+        var $this = parental
+    }else{
+        parental = parental ? " "+parental : '' 
+        var $this = $(tabId+parental);
+    }
+
+    $this.find(".date-input").each(function(){
         var option =opt ? opt : {theme: '#3C8DBC'}
         var name = $(this).attr("name")
-        var thisId = tabId.replace("#","")+"-"+name
+        var indexNum = $(tabId+" .date-input[name='"+name+"']").length;
+        var thisId = tabId.replace("#","")+"-"+name+indexNum
         $(this).attr("id",thisId);
         var type = $(this).data("type")
         if(type){
@@ -656,8 +682,14 @@ function init_date(){
  * @Desc: 整合chosen 
  */
 function init_chosen(url,reqType,parental){
-    parental = parental ? " "+parental : ''
-    $(tabId+parental+" .chosen-select").each(function(){
+    // parental = parental ? " "+parental : ''  
+    if(typeof(parental)=="object"){
+        var $this = parental
+    }else{
+        parental = parental ? " "+parental : '' 
+        var $this = $(tabId+parental);
+    }
+    $this.find(".chosen-select").each(function(){
         var type = $(this).attr('name')
         var value = $(this).data('value')
         var text = $(this).data('text')
@@ -671,7 +703,8 @@ function init_chosen(url,reqType,parental){
             var ajax_json = {url:url,data:{reqType:reqType,type:type},value:value,text:text}
             var pname = $(this).data('pname')
             if(pname!=undefined){
-                ajax_json["pelement"] = $(tabId+" .chosen-select[name='"+pname+"']").eq($(tabId+" .chosen-select[name='"+type+"']").index(this))
+                ajax_json["pelement"] = $this.find(".chosen-select[name='"+pname+"']").eq($this.find(".chosen-select[name='"+type+"']").index(this))
+                
             }
             var noupdate = $(this).data('noupdate')
             if(noupdate!=undefined){
@@ -685,13 +718,13 @@ function init_chosen(url,reqType,parental){
         }
         var cname = $(this).data('cname')
         if(cname!=undefined){
-            option["child"] = $(tabId+parental+" .chosen-select[name='"+cname+"']")
+            option["child"] = $this.find(".chosen-select[name='"+cname+"']")
         }
         var disSearch = $(this).data('dis-search')
         if(disSearch!=undefined){
             option["disable_search"] = true
         }
-        
+        // console.log(option)
         $(this).chosen(option)
     })
 }
@@ -717,39 +750,40 @@ function float(num,place) {
     }
     return parseFloat(s_x);
   }
+var $fileInput = ""//当前文件input
 function upload(option){
     var url = option.url
     if(!url == undefined){
         throw '没有请求网址';
     }
     var el = option.el !=undefined ? option.el : ".upload-file"
-    $(document).off("click",tabId+" "+el).on("click",tabId+" "+el,function(){
-
+    $(document).offon("click",tabId+" "+el,function(){
+        $fileInput = $(this)
         if($(tabId+"-upload-modal").html() == undefined){
             var html='<div class="modal fade in" id="'+tabId.replace("#","")+'-upload-modal" style="display: block; padding-right: 17px;"><div class="modal-dialog" style="top: 10%;"><div class="modal-content"><div class="modal-header"><button type="button" class="close modal-close" data-dismiss="modal" aria-label="关闭"><span aria-hidden="true"> × </span></button><h4 class="modal-title">文件上传</h4></div><div class="modal-body"><div class="input-group"><input readonly="readonly" class="form-control upload-item" type="text"><div class="input-file none"><input class="upload-item-file" name="upload-file-name" multiple="multiple" type="file"></div><span class="input-group-btn"><button type="button" class="btn btn-info btn-flat load-files-btn"><i class="fa  fa-file"></i> 选择文件 </button></span></div></div><div class="modal-footer"><button type="button" class="btn btn-default pull-left modal-close" data-dismiss="modal">关闭</button><button type="button" class="btn btn-primary upload-file-btn"><i class="fa fa-upload" ></i> 全部上传</button></div></div></div></div>'
             $(document).find("body").append(html);
             
-            $(document).off("click",tabId+"-upload-modal .modal-close").on("click",tabId+"-upload-modal .modal-close",function(){
+            $(document).offon("click",tabId+"-upload-modal .modal-close",function(){
                 $(this).parents(tabId+"-upload-modal").toggleClass("modal fade in")
                 $(this).parents(tabId+"-upload-modal").prev(".modal-backdrop").toggleClass("none")
             })
-            $(document).off("click",tabId+"-upload-modal .load-files-btn").on("click",tabId+"-upload-modal .load-files-btn",function(){
+            $(document).offon("click",tabId+"-upload-modal .load-files-btn",function(){
                 $(this).parent().prev().find("input").trigger("click")
                 var ulHtml ='<ul class="products-list product-list-in-box"></ul>'
                 if($(tabId+"-upload-modal .modal-body .products-list").html() == undefined){
                     $(tabId+"-upload-modal .modal-body").append(ulHtml);
                     
-                    $(tabId+"-upload-modal").off("click",".modal-body .products-list .product-info .delete-file-btn").on("click",".modal-body .products-list .product-info .delete-file-btn",function(){
+                    $(tabId+"-upload-modal").offon("click",".modal-body .products-list .product-info .delete-file-btn",function(){
                         var name = $(this).parents('li').find("a").attr("name")
                         var reg =RegExp(name+"\[\,\]*")
                         $(tabId+"-upload-modal .upload-item").val($(tabId+"-upload-modal .upload-item").val().replace(reg,''))
                         delete tempFiles[$(this).parents('li').attr("name")]
                         $(this).parents('li').remove();
                     })
-                    $(tabId+"-upload-modal").off("click",".modal-body .products-list .product-info .insert-file-btn").on("click",".modal-body .products-list .product-info .insert-file-btn",function(){
-                        $(document).find(tabId+" "+el).val($(this).attr("name"))
+                    $(tabId+"-upload-modal").offon("click",".modal-body .products-list .product-info .insert-file-btn",function(){
+                        $fileInput.val($(this).attr("name"))
                     })
-                    $(tabId+"-upload-modal").off("click",".modal-footer .upload-file-btn").on("click",".modal-footer .upload-file-btn",function(){
+                    $(tabId+"-upload-modal").offon("click",".modal-footer .upload-file-btn",function(){
                         for (const fileName in tempFiles) {
                             uploadData = new FormData();
                             uploadData.append("file",tempFiles[fileName])
@@ -781,7 +815,7 @@ function upload(option){
                         }
                     })
                 }
-                $(document).off("change",tabId+"-upload-modal .upload-item-file").on("change",tabId+"-upload-modal .upload-item-file",function(){
+                $(document).offon("change",tabId+"-upload-modal .upload-item-file",function(){
                     $(tabId+"-upload-modal .modal-body .products-list").html("")
                     $(tabId+"-upload-modal .upload-item-file").each(function(){
                         var uploadItem = ""
@@ -812,7 +846,7 @@ function upload(option){
 }
 function read_file(){
     var el = option.el !=undefined ? option.el : ".read_file"
-    $(document).off("click",tabId+" "+el).on("click",tabId+" "+el,function(){
+    $(document).offon("click",tabId+" "+el,function(){
 
     })
 }

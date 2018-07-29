@@ -62,7 +62,7 @@ class CostController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"debitModal",
+            "template"=>"debitModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -98,7 +98,7 @@ class CostController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"financedebitModal",
+            "template"=>"financedebitModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -130,7 +130,7 @@ class CostController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"expenseModal",
+            "template"=>"expenseModal",
         ];
         $this->modalOne($modalPara);
     }

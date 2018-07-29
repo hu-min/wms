@@ -71,7 +71,7 @@ class CustomerController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"companyModal",
+            "template"=>"companyModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -256,7 +256,7 @@ class CustomerController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"contactModal",
+            "template"=>"contactModal",
         ];
         $this->modalOne($modalPara);
     }

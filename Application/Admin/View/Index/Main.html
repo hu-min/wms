@@ -15,8 +15,7 @@
   <link rel="stylesheet" href="__ADMINT__/bower_components/Ionicons/css/ionicons.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="__ADMINT__/dist/css/AdminLTE.min.css">
-  <!-- AdminLTE Skins. Choose a skin from the css/skins
-       folder instead of downloading all of them to reduce the load. -->
+
   <link rel="stylesheet" href="__ADMINT__/dist/css/skins/_all-skins.min.css">
 
   <link rel="stylesheet" href="__ADMINT__/bower_components/chosen/css/chosen.min.css">
@@ -564,6 +563,9 @@
 
 <script src="__ADMINT__/bower_components/laydate/laydate.js"></script>
 
+<script src="__ADMINT__/bower_components/jquery-ui/jquery-ui.js"></script>
+
+
 <!-- AdminLTE for demo purposes -->
 
 <script>
@@ -573,7 +575,7 @@
     $(document).ready(function () {
         $('.sidebar-menu').tree()
         //菜单点击事件
-        $(document).on('click','.nodeOn',function(e){
+        $(document).offon('click','.nodeOn',function(e){
             var urlParam=""
             urlParam=getUrlAction()
             e.preventDefault();
@@ -601,18 +603,18 @@
             }
         })
         //标签删除显示和隐藏
-        $(".content").on("mouseover",".tabs-head li",function(){
+        $(".content").offon("mouseover",".tabs-head li",function(){
             $(this).children('.tab-clo').removeClass('none');
         })
-        $(".content").on("mouseout",".tabs-head li",function(){
+        $(".content").offon("mouseout",".tabs-head li",function(){
             $(this).children('.tab-clo').addClass('none');
         })
-        $('#main-navs').on("click",".tab-clo",function(){
+        $('#main-navs').offon("click",".tab-clo",function(){
             var id=$(this).next("a").attr("href");
             var el=$(this).parents("li");
             delTab(el,id);
         })
-        $('#main-navs').on("click","a",function(){
+        $('#main-navs').offon("click","a",function(){
             var nodeid=$(this).attr("href");
             breadHtml=breadData[nodeid];
             $('.breadcrumb').html(breadHtml)
@@ -699,7 +701,7 @@
         delete breadData[id];
     }
     //切换tab    
-    $("#main-navs").on('shown.bs.tab','.main-tabs a[data-toggle="tab"]', function (e) {
+    $("#main-navs").offon('shown.bs.tab','.main-tabs a[data-toggle="tab"]', function (e) {
         tabId=$(e.target).attr("href")
         var nowId=tabId.replace("#vtabs","");
         if(nowId>0){

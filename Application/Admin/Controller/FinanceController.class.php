@@ -154,7 +154,7 @@ class FinanceController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"fix_expenseModal",
+            "template"=>"fix_expenseModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -295,7 +295,7 @@ class FinanceController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"receivableModal",
+            "template"=>"receivableModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -430,7 +430,7 @@ class FinanceController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"wouldpayModal",
+            "template"=>"wouldpayModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -594,7 +594,7 @@ class FinanceController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"purchaModal",
+            "template"=>"purchaModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -741,7 +741,7 @@ class FinanceController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"staffClearModal",
+            "template"=>"staffClearModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -776,7 +776,7 @@ class FinanceController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"readClearModal",
+            "template"=>"readClearModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -806,7 +806,7 @@ class FinanceController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "templet"=>"financeClearModal",
+            "template"=>"financeClearModal",
         ];
         $this->modalOne($modalPara);
     }

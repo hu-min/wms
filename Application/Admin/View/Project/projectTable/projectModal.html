@@ -163,7 +163,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">项目城市：</label>
-                                            <select class="form-control modal-info chosen-project chosen-select" data-value="cid"  data-text="city" data-noupdate="true" data-pname="province" title="城市" name="city">
+                                            <select class="form-control modal-info chosen-project chosen-select" data-value="cid"  data-text="city" data-noupdate="true" data-pname="province" title="城市" name="city" data-cname="field">
                                                 <option value="">城市</option>
                                             </select>
                                         </div>
@@ -171,10 +171,10 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">项目场地：</label>
-                                            <select class="form-control modal-info chosen-project chosen-select" title="项目场地" name="field" data-value="basicId"  data-text="name">
+                                            <select class="form-control modal-info chosen-project chosen-select" title="项目场地" name="field" data-value="id" data-pname="city" data-text="name">
                                                 <option value="">场地</option>
                                                 <volist name="fieldArr" id="item">
-                                                    <option value="{$item['basicId']}">{$item['name']}</option>
+                                                    <option value="{$item['id']}">{$item['name']}</option>
                                                 </volist>
                                             </select>
                                         </div>

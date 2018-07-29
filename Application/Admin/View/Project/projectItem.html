@@ -28,15 +28,6 @@
                         <div class="col-md-12">
                             <div class="form-inline">
                                 <div class="form-group">
-                                    <label >品牌：</label>
-                                    <select class="form-control search-info chosen-select " title="品牌" data-value="basicId"  data-text="name" name="brand">
-                                        <option value="">所有品牌</option>
-                                        <volist name="brandArr" id="item">
-                                            <option value="{$item['basicId']}">{$item['name']}</option>
-                                        </volist>
-                                    </select>
-                                </div>
-                                <div class="form-group">
                                     <label for="info-title">项目编号：</label>
                                     <input class="form-control search-info input-sm" name="code" title="项目编号" required="required" value="" placeholder="项目编号" type="text">
                                 </div>
@@ -86,7 +77,6 @@
                 <table id="" class="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th>品牌</th>
                             <th>项目编号</th>
                             <th>项目日期</th>
                             <th>项目名称</th>
