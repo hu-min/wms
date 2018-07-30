@@ -631,7 +631,7 @@ class SupplierController extends BaseController{
         $supplierResult = $this->supplierCom->getSuprContList($parameter);
         return $supplierResult['list'] ? $supplierResult['list'] : [];
     }
-    function getModule(){
+    function getModule($key){
         $where=["class"=>"module"];
         if ($key!=""){
             $where["name"]=["LIKE","%{$key}%"];
