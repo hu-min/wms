@@ -245,6 +245,32 @@ class PurchaController extends BaseController{
             $this->returnHtml();
         }
     }
+
+    function purcha_applyList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $where=[];
+        $parameter=[
+            'where'=>$where,
+            'fields'=>"*",
+            'page'=>$p,
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>"id DESC",
+            'groupBy' => 'project_id',
+            "joins"=>[
+                "LEFT JOIN (SELECT projectId, name,code,business,leader FROM v_project) p ON p.projectId = project_id",
+                "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = p.business",
+                "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
+                "LEFT JOIN (SELECT companyId cid,company supplier_com_name,type,provinceId,cityId FROM v_supplier_company WHERE status=1) c ON c.cid=supplier_com",
+                "LEFT JOIN (SELECT contactId cid,contact supplier_cont_name FROM v_supplier_contact WHERE status=1) ct ON ct.cid=supplier_cont",
+                "LEFT JOIN (SELECT basicId,name type_name FROM v_basic WHERE class='supType') st ON st.basicId=c.type",
+            ],
+        ];
+        
+        $listResult=$this->purchaCom->getList($parameter);
+        $this->tablePage($listResult,'Purcha/purchaTable/purapplyList',"purapplyList");
+    }
+
     function purcha_apply_modalOne(){
         $title = "采购成本审批";
         $btnTitle = "添加数据";
@@ -255,9 +281,8 @@ class PurchaController extends BaseController{
         if($gettype=="Edit"){
             $title = "采购成本审批";
             $btnTitle = "保存数据";
-            $redisName="purcha_applyList";
-            // $resultData=$this->fixExpenCom->redis_one($redisName,"id",$id);
-            $resultData=[];
+            $redisName="purapplyList";
+            $resultData=$this->purchaCom->redis_one($redisName,"id",$id);
         }
         $modalPara=[
             "data"=>$resultData,

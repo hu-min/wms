@@ -461,7 +461,10 @@ $(function(){
         $(".chosen-container").width("100%")
     })
     $(document).on("show.bs.modal", ".modal", function(){
-        $(this).draggable();
+        $(this).draggable({
+            cursor: "move",
+			handle: '.modal-header'
+        });
         $(this).css("background","none");
         // $(this).css("overflow-x", "scroll");   
         // $(this).css("overflow-y", "scroll");   

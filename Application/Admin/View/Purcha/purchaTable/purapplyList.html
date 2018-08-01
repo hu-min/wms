@@ -1,0 +1,24 @@
+<volist name="list" id="item">
+    <tr>
+        <td>{$item['name']}</td>
+        <td>{$item['code']}</td>
+        <td>{$item['leader_name']}</td>
+        <td>{$item['business_name']}</td>
+        <td>{$item['supplier_com_name']}</td>
+        <td>{$item['type_name']}</td>
+        <td>{$item['supplier_cont_name']}</td>
+        <td>{$item['contract_amount']}</td>
+        <td>
+            <if condition="$item['sign_date'] gt 0">
+                {$item['sign_date']|date="Y-m-d",###}
+            </if>
+        </td>
+        <td>
+            <if condition="$item['advance_date'] gt 0">
+                {$item['advance_date']|date="Y-m-d",###}
+            </if>
+        </td>
+        <td>{$item['remark']}</td>
+        {:list_btn(get_defined_vars(),"id")}
+    </tr>
+</volist>

@@ -65,7 +65,7 @@ class CustomerController extends BaseController{
             $title = "编辑客户公司";
             $btnTitle = "保存数据";
             $redisName="sup_companyList";
-            $resultData=$this->customerCom->redis_one($redisName,"companyId",$id,"companyDB");
+            $resultData=$this->customerCom->redis_one($redisName,"companyId",$id,"ccompanyDB");
         }
         $modalPara=[
             "data"=>$resultData,
@@ -250,7 +250,7 @@ class CustomerController extends BaseController{
             $title = "编辑客户联系人";
             $btnTitle = "保存数据";
             $redisName="cust_contactList";
-            $resultData=$this->customerCom->redis_one($redisName,"contactId",$id,"contactDB");
+            $resultData=$this->customerCom->redis_one($redisName,"contactId",$id,"ccontactDB");
         }
         $modalPara=[
             "data"=>$resultData,

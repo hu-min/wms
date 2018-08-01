@@ -73,6 +73,7 @@
                             <th>项目名称</th>
                             <th>项目编号</th>
                             <th>项目主担</th>
+                            <th>营业主担</th>
                             <th>供应商名称</th>
                             <th>供应商类型</th>
                             <th>供应商联系人</th>
@@ -96,12 +97,17 @@
             </div>
         </div>
     </section>
-    <div class="modal fade global-modal ">
+    <div class="modal fade global-modal" aria-hidden="true" data-backdrop="static"  >
         <div class="modal-dialog modal-lg">
             <div class="modal-content"></div>
         </div>
     </div>
     <script>
+        function purcha_apply_setInfo(info){
+            ["brand_name","code","project_date","project_name","end_date","leader_name"].forEach(element => {
+                $(tabId+" .project-info[name='"+element+"']").val(info[element]);
+            });
+        }
         $(function(){
             $(tabId+" .search-list").trigger("click");
         })
