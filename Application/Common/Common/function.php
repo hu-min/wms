@@ -264,3 +264,8 @@ function add_btn($defind_vars,$title="新增"){
     }
 }
 //各类权限按钮全局函数结束
+
+function domain(){
+    $http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://'; 
+    return $http_type.$_SERVER['HTTP_HOST']."/";
+}

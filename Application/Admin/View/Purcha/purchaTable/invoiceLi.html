@@ -1,0 +1,37 @@
+<tr>
+    <td>
+        <button type="button" class="close supr-remove"><span>×</span></button><span class="serial">{$rows}</span>
+        <input type="hidden" class="modal-info" name="id" value="0">
+    </td>
+    <td>
+        <div class="input-group">
+            <input class="form-control modal-info upload-file" name="contract_file" title="上传/查看发票"  type="text">
+            <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
+        </div>
+    </td>
+    <td>
+        <input class="form-control modal-info"  name="pay_money" title="支付金额"  value="" placeholder="支付金额" type="text">
+    </td>
+    <td>
+        <div class="input-group date">
+            <div class="input-group-addon">
+                <i class="fa fa-calendar"></i>
+            </div>
+            <input class="form-control pull-right date-input modal-info" name="pay_date" type="text">
+        </div>
+    </td>
+    <td>
+        <select class="form-control modal-info" required="required" title="发票类型" name="pay_type" >
+            <option value="">发票类型</option>
+            <volist name="invoiceType" id="item">
+                <option value="{$key}">{$item}</option>
+            </volist>
+        </select>
+    </td>
+    <td>
+        <input class="form-control modal-info"  name="pay_ratio" title="支付比例"  value="" placeholder="支付比例" type="text">
+    </td>
+    <td>
+        <input class="form-control modal-info"  name="pay_ratio" title="备注"  value="" placeholder="备注" type="text">
+    </td>
+</tr>

@@ -144,7 +144,10 @@
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label for="info-title">合同上传/查看：</label>
-                                                    <input class="form-control project-info" readonly="readonly" name="contract_file" title="合同上传/查看"  value="" placeholder="合同上传/查看" type="text">
+                                                    <div class="input-group">
+                                                        <input class="form-control modal-info upload-file" name="contract_file" title="合同上传/查看"  type="text">
+                                                        <span class="input-group-addon"><i class="fa fa-eye"></i></span>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
@@ -164,7 +167,7 @@
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label for="info-title">签约公司：</label>
-                                                    <input class="form-control project-info" readonly="readonly" name="company" title="签约公司"  value="" placeholder="签约公司" type="text">
+                                                    <input class="form-control project-info"  name="company" title="签约公司"  value="" placeholder="签约公司" type="text">
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
@@ -188,11 +191,11 @@
                                 <div id="{$vtabId}-collapseFourth" class="panel-collapse collapse">
                                     <div class="box-body">
                                         <div class="row">
-                                            <div class="col-md-12"> <h5 class="box-title">点击右边"+"添加支付信息<i class="fa fa-fw fa-plus-square text-aqua add-subcompany" title="新增供应商" data-target=".bankstock-tab" style="cursor: pointer;"></i></h5></div>
+                                            <div class="col-md-12"> <h5 class="box-title"><i class="fa fa-plus-square text-aqua add-purpay" title="添加支付安排" data-target=".bankstock-tab" style="cursor: pointer;"> 添加支付安排</i></h5></div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <table class="table table-bordered table-hover">
+                                                <table class="table table-bordered table-hover suprpay-list">
                                                     <div>合同付款次数 </div>
                                                     <thead>
                                                         <tr>
@@ -201,32 +204,12 @@
                                                             <th>支付比例</th>
                                                             <th>支付日期</th>
                                                             <th>付款方式</th>
-                                                            <th>财务计划付款日期</th>
-                                                            <th>实际付款金额</th>
-                                                            <th>实际付款比例</th>
-                                                            <th>实际付款日期</th>
-                                                            <th>付款状态</th>
-                                                            <th>备注</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody class="{$controlName}-table">
-                                                        {$tables}
+                                                    <tbody >
+                                                        
                                                     </tbody>
                                                 </table>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <div class="form-group">
-                                                    <label for="info-title">已付款 统计：</label>
-                                                    <input class="form-control project-info" readonly="readonly" name="project_name" title="已付款 统计"  value="" placeholder="已付款 统计" type="text">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <div class="form-group">
-                                                    <label for="info-title">未付款 统计：</label>
-                                                    <input class="form-control project-info" readonly="readonly" name="project_name" title="未付款 统计"  value="" placeholder="未付款 统计" type="text">
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -243,19 +226,15 @@
                                 <div id="{$vtabId}-collapseFifth" class="panel-collapse collapse">
                                     <div class="box-body">
                                         <div class="row">
-                                            <div class="col-md-12"> <h5 class="box-title">点击右边"+"添加支付信息<i class="fa fa-fw fa-plus-square text-aqua add-subcompany" title="新增供应商" data-target=".bankstock-tab" style="cursor: pointer;"></i></h5></div>
+                                            <div class="col-md-12"> <h5 class="box-title"><i class="fa fa-plus-square text-aqua add-suprfinapay" title="添加支付计划" data-target=".bankstock-tab" style="cursor: pointer;"> 添加支付计划</i></h5></div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <table class="table table-bordered table-hover">
+                                                <table class="table table-bordered table-hover suprfina-list">
                                                     <div>合同付款次数 </div>
                                                     <thead>
                                                         <tr>
                                                             <th>序号</th>
-                                                            <th>支付金额</th>
-                                                            <th>支付比例</th>
-                                                            <th>支付日期</th>
-                                                            <th>付款方式</th>
                                                             <th>财务计划付款日期</th>
                                                             <th>实际付款金额</th>
                                                             <th>实际付款比例</th>
@@ -264,8 +243,8 @@
                                                             <th>备注</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody class="{$controlName}-table">
-                                                        {$tables}
+                                                    <tbody >
+                                                        
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -298,23 +277,24 @@
                                 <div id="{$vtabId}-collapseSixth" class="panel-collapse collapse">
                                     <div class="box-body">
                                         <div class="row">
-                                            <div class="col-md-12"> <h5 class="box-title">点击右边"+"添加发票信息<i class="fa fa-fw fa-plus-square text-aqua add-subcompany" title="添加发票信息" data-target=".bankstock-tab" style="cursor: pointer;"></i></h5></div>
+                                            <div class="col-md-12"> <h5 class="box-title"><i class="fa fa-plus-square text-aqua add-invoice" title="添加发票信息" data-target=".bankstock-tab" style="cursor: pointer;"> 添加发票信息</i></h5></div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <table class="table table-bordered table-hover">
+                                                <table class="table table-bordered table-hover invoice-list">
                                                     <thead>
                                                         <tr>
                                                             <th>序号</th>
                                                             <th>上传查看发票</th>
+                                                            <th>发票金额</th>
                                                             <th>发票开具日期</th>
                                                             <th>发票类别</th>
                                                             <th>发票税率</th>
                                                             <th>备注</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody class="{$controlName}-table">
-                                                        {$tables}
+                                                    <tbody>
+                                                        
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -323,7 +303,7 @@
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label for="info-title">需要提交发票总额：</label>
-                                                    <input class="form-control project-info" readonly="readonly" name="project_name" title="需要提交发票总额"  value="" placeholder="需要提交发票总额" type="text">
+                                                    <input class="form-control project-info"  name="project_name" title="需要提交发票总额"  value="" placeholder="需要提交发票总额" type="text">
                                                 </div>
                                             </div>
                                             <div class="col-md-4">

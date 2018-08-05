@@ -40,10 +40,10 @@ class BaseController extends \Common\Controller\BaseController{
         $pageNum=$parameter['pageSize']?$parameter['pageSize']:0;
         $groupBy=$parameter['groupBy']?$parameter['groupBy']:null;
         $joins=$parameter['joins']?$parameter['joins']:"";
-
-        $classList=$this->selfDB->getList($where , $fields, $orderStr, $page, $pageNum, $groupBy,$joins);
-        $this->log($this->selfDB->_sql());
         $count=$this->selfDB->countList($where,$joins);
+        $classList=$this->selfDB->getList($where , $fields, $orderStr, $page, $pageNum, $groupBy,$joins);
+        // $this->log($this->selfDB->_sql());
+        
         if($classList){
             return ['list'=>$classList,'count'=>$count];
         }

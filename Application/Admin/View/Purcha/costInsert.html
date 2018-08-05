@@ -191,7 +191,6 @@
                 $(this).parents("tr").find(".modal-info[name='region']").val(province_name+"-"+city_name);
             });
             $(tabId).offon("click",".add-suprcompany",function(){
-                // var newTr = $(tabId+" .global-modal .supr-list tr").eq(1).clone()
                 datas["reqType"]='getSuprLiOne';
                 datas["rows"]=$(tabId+" .global-modal .supr-list tr").length;
                 var rows = datas["rows"];

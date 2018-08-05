@@ -17,7 +17,7 @@ class PurchaController extends BaseController{
         $this->purchaCom=getComponent('Purcha');
         $this->payGradeType = ["1"=>"A级[高]","2"=>"B级[次]","3"=>"C级[中]","4"=>"D级[低]"];
         $this->invoiceType = ["0"=>"无","1"=>"收据","2"=>"增值税普通","3"=>"增值税专用"];
-        $this->payType = ['1'=>'公对公','2'=>'现金付款','2'=>'支票付款'];
+        $this->payType = ['1'=>'公对公','2'=>'现金付款','3'=>'支票付款'];
         $this->project=A("Project");
         $this->supplier=A("Supplier");
     }
@@ -239,6 +239,8 @@ class PurchaController extends BaseController{
         $reqType=I('reqType');
         $this->assign("controlName","purcha_apply");
         $this->assign('dbName',"");//删除数据的时候需要
+        $this->assign('payType',$this->payType);//
+        $this->assign('invoiceType',$this->invoiceType);//
         if($reqType){
             $this->$reqType();
         }else{
@@ -256,18 +258,22 @@ class PurchaController extends BaseController{
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"id DESC",
-            'groupBy' => 'project_id',
             "joins"=>[
-                "LEFT JOIN (SELECT projectId, name,code,business,leader FROM v_project) p ON p.projectId = project_id",
+                "LEFT JOIN (SELECT projectId, name project_name,code,business,leader,brand ,project_time project_date,days FROM v_project) p ON p.projectId = project_id",
                 "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = p.business",
                 "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
                 "LEFT JOIN (SELECT companyId cid,company supplier_com_name,type,provinceId,cityId FROM v_supplier_company WHERE status=1) c ON c.cid=supplier_com",
-                "LEFT JOIN (SELECT contactId cid,contact supplier_cont_name FROM v_supplier_contact WHERE status=1) ct ON ct.cid=supplier_cont",
+                "LEFT JOIN (SELECT contactId cid,contact supplier_cont_name,phone supplier_cont_phone,email supplier_cont_email FROM v_supplier_contact WHERE status=1) ct ON ct.cid=supplier_cont",
                 "LEFT JOIN (SELECT basicId,name type_name FROM v_basic WHERE class='supType') st ON st.basicId=c.type",
+                "LEFT JOIN (SELECT basicId,name module_name FROM v_basic WHERE class='module') bm ON bm.basicId=module",
+                "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = p.brand",
+                "LEFT JOIN (SELECT pid ,province province_name FROM v_province) pr ON pr.pid=c.provinceId",
+                "LEFT JOIN (SELECT cid,city city_name,pid FROM v_city) ci ON ci.cid=c.cityId",
             ],
         ];
         
         $listResult=$this->purchaCom->getList($parameter);
+        // echo $this->purchaCom->M()->_sql();
         $this->tablePage($listResult,'Purcha/purchaTable/purapplyList',"purapplyList");
     }
 
@@ -284,6 +290,13 @@ class PurchaController extends BaseController{
             $redisName="purapplyList";
             $resultData=$this->purchaCom->redis_one($redisName,"id",$id);
         }
+        // $resultData["project_date"] = date("Y-m-d",$resultData["project_time"]);
+        foreach (["project_date","sign_date"] as  $date) {
+            if(isset($resultData[$date])){
+                $resultData[$date] = date("Y-m-d",$resultData[$date]);
+            }
+        }
+        $resultData["end_date"] = date("Y-m-d",strtotime($resultData["project_date"]." +".$resultData["days"]."day"));
         $modalPara=[
             "data"=>$resultData,
             "title"=>$title,
@@ -291,5 +304,31 @@ class PurchaController extends BaseController{
             "template"=>"purchaModal",
         ];
         $this->modalOne($modalPara);
+    }
+    function getSuprpayLiOne(){
+        $rows = I("rows");
+        $this->assign('projectArr',$this->project->_getOption("project_id"));
+        $this->assign('supplierArr',$this->supplier->getSupType());
+        $this->assign('companyArr',$this->supplier->getSupplier());
+        $this->assign('moduleArr',$this->supplier->getModule());
+        $this->assign('rows',$rows);
+        $html=$this->fetch('Purcha/purchaTable/suprpayLi');
+        $this->ajaxReturn(['html'=>$html]);
+    }
+    function suprFinapayLiOne(){
+        $rows = I("rows");
+        $this->assign('projectArr',$this->project->_getOption("project_id"));
+        $this->assign('supplierArr',$this->supplier->getSupType());
+        $this->assign('companyArr',$this->supplier->getSupplier());
+        $this->assign('moduleArr',$this->supplier->getModule());
+        $this->assign('rows',$rows);
+        $html=$this->fetch('Purcha/purchaTable/suprfinapayLi');
+        $this->ajaxReturn(['html'=>$html]);
+    }
+    function suprInvoiceLiOne(){
+        $rows = I("rows");
+        $this->assign('rows',$rows);
+        $html=$this->fetch('Purcha/purchaTable/invoiceLi');  
+        $this->ajaxReturn(['html'=>$html]);
     }
 }

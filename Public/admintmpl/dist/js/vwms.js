@@ -470,6 +470,10 @@ $(function(){
         // $(this).css("overflow-y", "scroll");   
         // 防止出现滚动条，出现的话，你会把滚动条一起拖着走的
     });
+    $(document).offon("click",tabId+" .show-media",function(){
+        var file = $(this).prev(".upload-file").val();
+        media(file)
+    })
 })
 /** 
  * javascript comment 
@@ -860,4 +864,52 @@ function in_array(val,array){
         }
     }
     return false;
+}
+function media(mediafile,title){
+    if(!mediafile){
+        return false;
+    }
+    var re = /^http/
+    mediafile = re.test(mediafile) ? mediafile : domain()+"/"+mediafile
+
+    var fileArr = mediafile.split(".")
+    var suffix = fileArr[fileArr.length-1].toLowerCase();
+    var mediaHtml = "";
+    var height = $(window).height()*0.7;
+    if(in_array(suffix,["jpg","jpeg","png","gif","bmp"])){
+        //支持的图片格式处理
+        mediaHtml = '<div style="text-align: center;height:'+height+'px"><img style="height: 100%;" src="'+mediafile+'" /></div>';
+    }else if(suffix=="pdf"){
+        //pdf处理
+        mediaHtml = '<iframe style="width:100%;height:'+height+'px" src="'+domain()+"/Admin/Tools/viewPdf?src="+mediafile+'" frameborder="0"></iframe>';
+    }else if(in_array(suffix,["doc","docx","xls","xlsx","ppt","pptx"])){
+        // word excel ppt 调用Office Online 处理
+        mediaHtml = '<iframe style="width:100%;height:'+height+'px" src="http://view.officeapps.live.com/op/view.aspx?src='+mediafile+'" frameborder="0"></iframe>';
+    }else{
+        var msg = "暂时不支持处理"+suffix+"的文件";
+        notice(110,"文件类型出错",msg);
+        throw msg
+    }
+    title = title ? title : '文件查看'
+    // return false;
+    if($("#vmedia-box").html()==undefined){
+        
+        var html = '<div id="vmedia-box" class="modal fade" aria-hidden="true" data-backdrop="static" ><div class="modal-dialog modal-lg modal-full"><div class="modal-content"><div class="modal-header"><button type="button" class="close modal-close" data-dismiss="modal" aria-label="关闭"><span aria-hidden="true"> × </span></button><h4 class="modal-title">'+title+'</h4></div><div class="modal-body">       </div><div class="modal-footer"><button type="button" class="btn btn-default pull-left modal-close" data-dismiss="modal">关闭</button></div></div></div></div>';
+        $(document).find("body").append(html);
+        $("#vmedia-box").toggle()
+        $("#vmedia-box").toggleClass("in")
+        $("#vmedia-box").offon("click",".modal-close",function(){
+            $("#vmedia-box").toggle();
+            $("#vmedia-box").toggleClass("in")
+        })
+        // $("#vmedia-box").prev(".modal-backdrop").toggleClass("none")
+    }else{
+        $("#vmedia-box").toggle()
+        $("#vmedia-box").toggleClass("in")
+    }
+    $("#vmedia-box .modal-body").html(mediaHtml)
+    // console.log("media")
+}
+function domain(){
+    return window.location.protocol+"//"+window.location.host
 }

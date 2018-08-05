@@ -1,0 +1,28 @@
+<tr>
+    <td>
+        <button type="button" class="close supr-remove"><span>×</span></button><span class="serial">{$rows}</span>
+        <input type="hidden" class="modal-info" name="id" value="0">
+    </td>
+    <td>
+        <input class="form-control modal-info"  name="pay_money" title="支付金额"  value="" placeholder="支付金额" type="text">
+    </td>
+    <td>
+        <input class="form-control modal-info"  name="pay_ratio" title="支付比例"  value="" placeholder="支付比例" type="text">
+    </td>
+    <td>
+        <div class="input-group date">
+            <div class="input-group-addon">
+                <i class="fa fa-calendar"></i>
+            </div>
+            <input class="form-control pull-right date-input modal-info" name="pay_date" type="text">
+        </div>
+    </td>
+    <td>
+        <select class="form-control modal-info" required="required" title="供应商类型" name="pay_type" >
+            <option value="">选择供应商类型</option>
+            <volist name="payType" id="item">
+                <option value="{$key}">{$item}</option>
+            </volist>
+        </select>
+    </td>
+</tr>

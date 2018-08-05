@@ -53,8 +53,12 @@ class BaseController extends \Common\Controller\BaseController{
             $conAct=CONTROLLER_NAME.'/'.ACTION_NAME;
             $auth=$this->authVerify($conAct);
             if(!$auth){
-                $this->prompt(1,'警告!','您不具备访问此页面的权限，如果您认为值得拥有，请联系管理员！');
-                exit;
+                if($this->isLogin() && CONTROLLER_NAME == "Tools"){
+
+                }else{
+                    $this->prompt(1,'警告!','您不具备访问此页面的权限，如果您认为值得拥有，请联系管理员！');
+                    exit;
+                }
             }
             $vtabId	= I("vtabId");
             if($vtabId){
@@ -364,7 +368,7 @@ class BaseController extends \Common\Controller\BaseController{
         $returnData=['errCode'=>0];
         if($data){
             if($redisName){
-                $this->Redis->set($redisName,json_encode($data['list']),3600);
+                $this->Redis->set($redisName,json_encode($data['list']),7200);
             }
             $page = new \Think\VPage($data['count'], $pageSize ? $pageSize : $this->pageSize);
             $pageShow = $page->show();
