@@ -19,8 +19,6 @@
                     <div class="box-header">
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">项目采购成本审批</h4>
-                        &nbsp;&nbsp;&nbsp;&nbsp;
-                        {:add_btn(get_defined_vars(),"项目采购成本审批【仅排版时查看使用】")}
                         
                     </div>
                     <div class="box-body search-body company-search-box">
@@ -118,6 +116,72 @@
                 }else{
                     $(tabId+" .project-info[name='"+element+"']").val(info[element]);
                 }
+            });
+            ["id","contract_file"].forEach(element => {
+                // console.log(info[element])
+                $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
+            });
+            ["suprpay-list","suprfina-list","invoice-list"].forEach(element => {
+                if(info["tableData"][element]["list"]){
+                    var list = info["tableData"][element]["list"];
+                    var template = info["tableData"][element]["template"];
+                    
+                    var allMoney = 0;
+                    list.forEach(function(listData,rows){
+                        $(tabId+" .global-modal ."+element+" tbody").append(template);
+                        var $current = $(tabId+" .global-modal ."+element+" tbody tr").eq(rows);
+                        $current.find(".serial").text(Number(rows+1));
+                        for (var key in listData) {
+                            if(key == "pay_money" || key == "invoice_money"){
+                                allMoney += float(listData[key],2);
+                            }
+                            $current.find(".modal-info[name='"+key+"']").val(listData[key]);
+                        }
+                        init_date(false,$current);
+                    });
+                    if(element == "suprfina-list"){
+                        $(tabId+" .project-info[name='paid']").val(allMoney);
+                        $(tabId+" .project-info[name='surplus']").val(float(info["contract_amount"])-float(allMoney));
+                    }else if(element == "invoice-list"){
+                        $(tabId+" .project-info[name='all_invoice']").val(info["contract_amount"]);
+                        $(tabId+" .project-info[name='invoiced']").val(allMoney);
+                        $(tabId+" .project-info[name='invoice_supr']").val(float(info["contract_amount"])-float(allMoney));
+                    }
+                }
+            });
+        }
+        function purcha_apply_getInfo(){
+            var purcha_id = $(tabId+" .purcha-id[name='id']").val()
+            var status = $(tabId+" .modal-info[name='status']").val()
+            var contract_file = $(tabId+" .modal-info[name='contract_file']").val()
+            datas["contract_file"] = contract_file
+            datas["purcha_id"] = purcha_id
+            datas["data"] = {};
+            ["suprpay-list","suprfina-list","invoice-list"].forEach(element => {
+                datas["data"][element] = [];
+                $(tabId+" .global-modal ."+element+" tbody tr").each(function(){
+                if(element=="invoice-list"){
+                    var tempSupr = {relation_type:"1",relation_id:purcha_id};
+                }else{
+                    var tempSupr = {purcha_id:purcha_id};
+                    tempSupr["insert_type"] = element=="suprpay-list" ? 1 : 2; 
+                }
+                
+                $(this).find(".modal-info").each(function(){
+                    var name = $(this).attr("name");
+                    var val = $(this).val();
+                    var required=$(this).attr("required");
+                    var title=$(this).attr("title");
+                    if(required=="required" && val==""){
+                        notice(110,title,"输入异常");
+                        throw title;
+                    }else{
+                        tempSupr[name]=val;
+                    }
+
+                })
+                datas["data"][element].push(tempSupr);
+            })
             });
         }
         $(function(){

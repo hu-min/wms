@@ -15,6 +15,8 @@ class PurchaController extends BaseController{
         $this->receivableCom=getComponent('Receivable');
         $this->wouldpayCom=getComponent('Wouldpay');
         $this->purchaCom=getComponent('Purcha');
+        $this->payCom=getComponent('Pay');
+        $this->InvoiceCom=getComponent('Invoice');
         $this->payGradeType = ["1"=>"A级[高]","2"=>"B级[次]","3"=>"C级[中]","4"=>"D级[低]"];
         $this->invoiceType = ["0"=>"无","1"=>"收据","2"=>"增值税普通","3"=>"增值税专用"];
         $this->payType = ['1'=>'公对公','2'=>'现金付款','3'=>'支票付款'];
@@ -296,6 +298,11 @@ class PurchaController extends BaseController{
                 $resultData[$date] = date("Y-m-d",$resultData[$date]);
             }
         }
+        $resultData["tableData"] = [];
+        $resultData["tableData"]["suprpay-list"] = ["list"=>$this->payCom->getList(["where"=>["purcha_id"=>$id,"insert_type"=>1],"fields"=>"*,FROM_UNIXTIME(pay_date,'%Y-%m-%d') pay_date"])["list"],"template"=>$this->fetch('Purcha/purchaTable/suprpayLi')];
+        $resultData["tableData"]["suprfina-list"] = ["list"=>$this->payCom->getList(["where"=>["purcha_id"=>$id,"insert_type"=>2],"fields"=>"*,FROM_UNIXTIME(pay_date,'%Y-%m-%d') pay_date"])["list"],"template"=>$this->fetch('Purcha/purchaTable/suprfinapayLi')];
+        $resultData["tableData"]["invoice-list"] = ["list"=>$this->InvoiceCom->getList(["where"=>["relation_id"=>$id,"relation_type"=>1],"fields"=>"*,FROM_UNIXTIME(invoice_date,'%Y-%m-%d') invoice_date"])["list"],"template"=>$this->fetch('Purcha/purchaTable/invoiceLi')];
+
         $resultData["end_date"] = date("Y-m-d",strtotime($resultData["project_date"]." +".$resultData["days"]."day"));
         $modalPara=[
             "data"=>$resultData,
@@ -304,6 +311,57 @@ class PurchaController extends BaseController{
             "template"=>"purchaModal",
         ];
         $this->modalOne($modalPara);
+    }
+    function purcha_applyEdit(){
+        $data=I("data");
+        $contract_file=I("contract_file");
+        $purcha_id=I("purcha_id");
+        $isUpdate = false;
+        foreach (["contract_file"] as $key) {
+            if(isset($$key) && $$key!=""){
+                $dataInfo = [
+                    "id" => $purcha_id,
+                    "contract_file" => $contract_file,
+                ];
+                if($dataInfo){
+                    $isUpdate =true;
+                    $updateResult=$this->purchaCom->update($dataInfo);
+                }
+            }
+        }
+        foreach (["suprpay-list","suprfina-list","invoice-list"] as $itemInfoList) {
+            foreach ($data[$itemInfoList] as $key => $itemInfo) {
+                // print_r($itemInfo);
+                if(in_array($itemInfoList,["suprpay-list","suprfina-list"])){
+                    $itemInfo["pay_date"] = strtotime($itemInfo["pay_date"]);
+                    $listCom = $this->payCom;
+                    
+                }else{
+                    $itemInfo["invoice_date"] = strtotime($itemInfo["invoice_date"]);
+                    $listCom = $this->InvoiceCom;
+                }
+                if($itemInfo["id"]>0){
+                    if($itemInfo){
+                        $updateResult=$listCom->update($itemInfo);
+                        if($updateResult->errCode==0){
+                            $isUpdate =true;
+                        }
+                    }
+                }else{
+                    unset($itemInfo["id"]);
+                    if($itemInfo){
+                        $updateResult=$listCom->insert($itemInfo);
+                        if($updateResult->errCode==0){
+                            $isUpdate =true;
+                        }
+                    }
+                }
+            }
+        }
+        if($isUpdate){
+            $this->ajaxReturn(['errCode'=>0,'error'=>"修改成功"]);
+        }
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
     function getSuprpayLiOne(){
         $rows = I("rows");

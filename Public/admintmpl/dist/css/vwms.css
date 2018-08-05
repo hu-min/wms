@@ -112,3 +112,10 @@
 .supr-remove:hover{
 	color: red!important;
 }
+.show-media{
+	cursor:pointer;
+}
+.show-media:hover{
+	background: #428BCA;
+	color:#fff;
+}

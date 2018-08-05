@@ -10172,7 +10172,7 @@ function getViewerConfiguration() {
     },
     printContainer: document.getElementById('printContainer'),
     openFileInputName: 'fileInput',
-    // debuggerScriptPath: './debugger.js',
+    debuggerScriptPath: PDF_LIB_DIR+'/web/debugger.js',
     defaultUrl: DEFAULT_URL
   };
 }

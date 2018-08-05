@@ -472,6 +472,11 @@ $(function(){
     });
     $(document).offon("click",tabId+" .show-media",function(){
         var file = $(this).prev(".upload-file").val();
+        if(!file){
+            var msg = "当前没有文件"
+            notice(110,msg,"文件异常");
+            throw msg
+        }
         media(file)
     })
 })
@@ -887,7 +892,7 @@ function media(mediafile,title){
         mediaHtml = '<iframe style="width:100%;height:'+height+'px" src="http://view.officeapps.live.com/op/view.aspx?src='+mediafile+'" frameborder="0"></iframe>';
     }else{
         var msg = "暂时不支持处理"+suffix+"的文件";
-        notice(110,"文件类型出错",msg);
+        notice(110,msg,"文件类型出错");
         throw msg
     }
     title = title ? title : '文件查看'
@@ -902,13 +907,11 @@ function media(mediafile,title){
             $("#vmedia-box").toggle();
             $("#vmedia-box").toggleClass("in")
         })
-        // $("#vmedia-box").prev(".modal-backdrop").toggleClass("none")
     }else{
         $("#vmedia-box").toggle()
         $("#vmedia-box").toggleClass("in")
     }
     $("#vmedia-box .modal-body").html(mediaHtml)
-    // console.log("media")
 }
 function domain(){
     return window.location.protocol+"//"+window.location.host

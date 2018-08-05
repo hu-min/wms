@@ -27,5 +27,9 @@ save-info 保存和修改数据触发的按钮
 8，优化选择框允许局部选择器
 9，成本录入
 
-
-"project_id","supplier_com","supplier_cont","sign_date","contract_amount","contract_file","offer_file","advance_date","remark",
+2018-08-06
+1，新增支付表和发票表
+2，取消浮窗遮罩点击关闭和浮窗移动只限制head
+3，新增开发查看文件media组件，支持jpg,png,gif,pdf,office
+4，成本录入
+5，项目采购成本审核
