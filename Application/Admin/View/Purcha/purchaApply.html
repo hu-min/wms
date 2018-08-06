@@ -186,47 +186,21 @@
         }
         $(function(){
             $(tabId+" .search-list").trigger("click");
-
-            $(tabId).offon("click",".add-purpay",function(){
-                datas["reqType"]='getSuprpayLiOne';
-                datas["rows"]=$(tabId+" .global-modal .suprpay-list tr").length;
-                var rows = datas["rows"];
-                get("{$url}",datas,function(result){
-                    $(tabId+" .global-modal .suprpay-list").append(result.html);
-                    init_chosen("{$url}","getProjectOne",$(tabId+" .global-modal .suprpay-list tr").eq(rows));
-                    init_date(false,$(tabId+" .global-modal .suprpay-list tr").eq(rows));
+            [["add-purpay","getSuprpayLiOne","suprpay-list"],["add-suprfinapay","suprFinapayLiOne","suprfina-list"],["add-invoice","suprInvoiceLiOne","invoice-list"]].forEach(element => {
+                $(tabId).offon("click","."+element[0],function(){
+                    datas["reqType"]=element[1];
+                    datas["rows"]=$(tabId+" .global-modal ."+element[2]+" tr").length;
+                    var rows = datas["rows"];
+                    get("{$url}",datas,function(result){
+                        $(tabId+" .global-modal ."+element[2]+"").append(result.html);
+                        init_chosen("{$url}","getProjectOne",$(tabId+" .global-modal ."+element[2]+" tr").eq(rows));
+                        init_date(false,$(tabId+" .global-modal ."+element[2]+" tr").eq(rows));
+                    })
                 })
-            })
-            $(tabId).offon("click",".global-modal .suprpay-list .supr-remove",function(){
-                $(this).parents("tr").remove();
-            })
-
-            $(tabId).offon("click",".add-suprfinapay",function(){
-                datas["reqType"]='suprFinapayLiOne';
-                datas["rows"]=$(tabId+" .global-modal .suprfina-list tr").length;
-                var rows = datas["rows"];
-                get("{$url}",datas,function(result){
-                    $(tabId+" .global-modal .suprfina-list").append(result.html);
-                    init_chosen("{$url}","getProjectOne",$(tabId+" .global-modal .suprfina-list tr").eq(rows));
-                    init_date(false,$(tabId+" .global-modal .suprfina-list tr").eq(rows));
+                $(tabId).offon("click",".global-modal ."+element[2]+" .supr-remove",function(){
+                    $(this).parents("tr").remove();
                 })
-            })
-            $(tabId).offon("click",".global-modal .invoice-list .supr-remove",function(){
-                $(this).parents("tr").remove();
-            })
-            $(tabId).offon("click",".add-invoice",function(){
-                datas["reqType"]='suprInvoiceLiOne';
-                datas["rows"]=$(tabId+" .global-modal .invoice-list tr").length;
-                var rows = datas["rows"];
-                get("{$url}",datas,function(result){
-                    $(tabId+" .global-modal .invoice-list").append(result.html);
-                    init_chosen("{$url}","getProjectOne",$(tabId+" .global-modal .invoice-list tr").eq(rows));
-                    init_date(false,$(tabId+" .global-modal .invoice-list tr").eq(rows));
-                })
-            })
-            $(tabId).offon("click",".global-modal .invoice-list .supr-remove",function(){
-                $(this).parents("tr").remove();
-            })
+            });
         })
     </script>
 </body>

@@ -2,44 +2,45 @@
     <tr>
         <td>{$item['brand_name']}</td>
         <td>{$item['code']}</td>
-        <td>{$item['project_time']|date="Y-m-d",###}</td>
+        <td>{$item['project_date']}</td>
         <td title="{$item['project_name']}">{$item['project_name']}</td>
         <td>{$item['end_date']}</td>
         <td>{$item['leader_name']}</td>
         <td>{$item['finance_name']}</td>
         <td>{$item['supplier_com_name']}</td>
         <td>{$item['type_name']}</td>
-        <td>暂无</td>
+        <td><input type="hidden" class="upload-file" value="{$item['contract_file']}"> <span class="show-media-btn show-media"><i class="fa fa-eye"></i></span></td>
         <td>{$item['supplier_cont_name']}</td>
-        <td>{$payType[$item['pay_type']]}</td>
-        <td>{$item['pay_amount']}</td>
-        <td>
+        <!-- <td>{$payType[$item['pay_type']]}</td> -->
+        <!-- <td>{$item['pay_amount']}</td> -->
+        <!-- <td>
             <if condition="$item['pay_date'] gt 0">
                 {$item['pay_date']|date="Y-m-d",###}
             </if>
-        </td>
+        </td> -->
         <td>{$item['contract_amount']}</td>
         <td>
-            <if condition="$item['late_pay_date'] gt 0">
-                {$item['late_pay_date']|date="Y-m-d",###}
+            <if condition="$item['last_pay_date'] gt 0">
+                {$item['last_pay_date']}
             </if>
         </td>
-        <td>{$item['advance']}</td>
-        <td>{$item['advance_ratio']}</td>
-        <td>
+        <!-- <td>{$item['advance']}</td> -->
+        <!-- <td>{$item['advance_ratio']}</td> -->
+        <!-- <td>
             <if condition="$item['advance_date'] gt 0">
                 {$item['advance_date']|date="Y-m-d",###}
             </if>
-        </td>
-        <td>{$item['surplus']}</td>
+        </td> -->
+        <td>{$item['paid']}</td>
+        <td>{$item['contract_amount']-$item['paid']}</td>
         <td>
             <if condition="$item['next_date'] gt 0">
                 {$item['next_date']|date="Y-m-d",###}
             </if>
         </td>
-        <td>{$item['surplus_ratio']}</td>
+        <td>{:round(($item['contract_amount']-$item['paid'])/$item['contract_amount'],2)}</td>
         <td>{$payGradeType[$item['pay_grade']]}</td>
-        <td>{$invoiceType[$item['invoice_type']]}</td>
+        <!-- <td>{$invoiceType[$item['invoice_type']]}</td> -->
         {:list_btn(get_defined_vars(),"id")}
     </tr>
 </volist>

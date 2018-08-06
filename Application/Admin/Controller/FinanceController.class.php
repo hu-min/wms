@@ -476,29 +476,58 @@ class FinanceController extends BaseController{
     function wouldpayList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
-        $where=[];
+        $where=["status"=>1];
 
+        // $parameter=[
+        //     'fields'=>"*",
+        //     'where'=>$where,
+        //     'page'=>$p,
+        //     'pageSize'=>$this->pageSize,
+        //     'orderStr'=>"add_time DESC",
+        //     "joins"=>[
+        //         "LEFT JOIN (SELECT id puId ,project_id,supplier_com,supplier_cont,sign_date,contract_amount,late_pay_date FROM v_purcha) pu ON pu.puId = cost_id",
+        //         "LEFT JOIN (SELECT projectId,session_all,code,name project_name,project_time,brand,customer_com,leader,type,amount,DATE_ADD(FROM_UNIXTIME(project_time,'%Y-%m-%d'),INTERVAL days day) end_date FROM v_project ) p ON p.projectId = pu.project_id ",
+        //         "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = p.brand",
+        //         "LEFT JOIN (SELECT companyId company_id,company supplier_com_name,type FROM v_supplier_company ) c ON c.company_id = pu.supplier_com",
+        //         "LEFT JOIN (SELECT basicId,name type_name FROM v_basic WHERE class='supType') sb ON sb.basicId=c.type",
+        //         "LEFT JOIN (SELECT contactId contact_id,contact supplier_cont_name FROM v_supplier_contact ) sc ON sc.contact_id = pu.supplier_cont",
+        //         "LEFT JOIN (SELECT basicId bankstock_id,name finance_name FROM v_basic WHERE class = 'bankstock' ) bf ON bf.bankstock_id = finance_id",
+        //         "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
+        //         "LEFT JOIN (SELECT basicId type_id,name supplier_type_name FROM v_basic WHERE class = 'supType' ) t ON t.type_id = c.type",
+        //     ],
+        // ];
+        
+        // $listResult=$this->wouldpayCom->getList($parameter);
+        // print_r( $listResult);
         $parameter=[
-            'fields'=>"*",
             'where'=>$where,
+            'fields'=>"*",
             'page'=>$p,
             'pageSize'=>$this->pageSize,
-            'orderStr'=>"add_time DESC",
+            'orderStr'=>"id DESC",
             "joins"=>[
-                "LEFT JOIN (SELECT id puId ,project_id,supplier_com,supplier_cont,sign_date,contract_amount,late_pay_date FROM v_purcha) pu ON pu.puId = cost_id",
-                "LEFT JOIN (SELECT projectId,session_all,code,name project_name,project_time,brand,customer_com,leader,type,amount,DATE_ADD(FROM_UNIXTIME(project_time,'%Y-%m-%d'),INTERVAL days day) end_date FROM v_project ) p ON p.projectId = pu.project_id ",
-                "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = p.brand",
-                "LEFT JOIN (SELECT companyId company_id,company supplier_com_name,type FROM v_supplier_company ) c ON c.company_id = pu.supplier_com",
-                "LEFT JOIN (SELECT basicId,name type_name FROM v_basic WHERE class='supType') sb ON sb.basicId=c.type",
-                "LEFT JOIN (SELECT contactId contact_id,contact supplier_cont_name FROM v_supplier_contact ) sc ON sc.contact_id = pu.supplier_cont",
-                "LEFT JOIN (SELECT basicId bankstock_id,name finance_name FROM v_basic WHERE class = 'bankstock' ) bf ON bf.bankstock_id = finance_id",
+                "LEFT JOIN (SELECT projectId, name project_name,code,business,leader,brand ,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,days FROM v_project) p ON p.projectId = project_id",
+                "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = p.business",
                 "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
-                "LEFT JOIN (SELECT basicId type_id,name supplier_type_name FROM v_basic WHERE class = 'supType' ) t ON t.type_id = c.type",
+                "LEFT JOIN (SELECT companyId cid,company supplier_com_name,type,provinceId,cityId FROM v_supplier_company WHERE status=1) c ON c.cid=supplier_com",
+                "LEFT JOIN (SELECT contactId cid,contact supplier_cont_name,phone supplier_cont_phone,email supplier_cont_email FROM v_supplier_contact WHERE status=1) ct ON ct.cid=supplier_cont",
+                "LEFT JOIN (SELECT basicId,name type_name FROM v_basic WHERE class='supType') st ON st.basicId=c.type",
+                "LEFT JOIN (SELECT basicId,name module_name FROM v_basic WHERE class='module') bm ON bm.basicId=module",
+                "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = p.brand",
+                "LEFT JOIN (SELECT pid ,province province_name FROM v_province) pr ON pr.pid=c.provinceId",
+                "LEFT JOIN (SELECT cid,city city_name,pid FROM v_city) ci ON ci.cid=c.cityId",
+                "LEFT JOIN (SELECT purcha_id lpid ,FROM_UNIXTIME(SUBSTRING_INDEX(GROUP_CONCAT(pay_date ORDER BY pay_date DESC),',',1),'%Y-%m-%d') last_pay_date FROM v_pay  WHERE insert_type =2 GROUP BY purcha_id) lp ON lp.lpid=id",
+                "LEFT JOIN (SELECT purcha_id ppid, SUM(pay_money) paid FROM v_pay WHERE insert_type =2 GROUP BY purcha_id) pd ON pd.ppid=id",
+                
             ],
         ];
         
-        $listResult=$this->wouldpayCom->getList($parameter);
-        // print_r( $listResult);
+        $listResult=$this->purchaCom->getList($parameter);
+        // print_r($listResult);
+        foreach ($listResult["list"] as $key => $value) {
+            $listResult["list"][$key]["end_date"] = date("Y-m-d",strtotime($value["project_date"]." +".$value["days"]."day"));
+        }
+        // print_r($listResult);
         $this->tablePage($listResult,'Finance/financeTable/wouldpayList',"wouldpayList");
     }
     function wouldpayAdd(){
