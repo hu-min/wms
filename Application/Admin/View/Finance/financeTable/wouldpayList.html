@@ -34,11 +34,11 @@
         <td>{$item['paid']}</td>
         <td>{$item['contract_amount']-$item['paid']}</td>
         <td>
-            <if condition="$item['next_date'] gt 0">
-                {$item['next_date']|date="Y-m-d",###}
+            <if condition="$item['next_pay_date'] gt 0">
+                {$item['next_pay_date']}
             </if>
         </td>
-        <td>{:round(($item['contract_amount']-$item['paid'])/$item['contract_amount'],2)}</td>
+        <td>{:round(($item['contract_amount']-$item['paid'])/$item['contract_amount'],2)}%</td>
         <td>{$payGradeType[$item['pay_grade']]}</td>
         <!-- <td>{$invoiceType[$item['invoice_type']]}</td> -->
         {:list_btn(get_defined_vars(),"id")}

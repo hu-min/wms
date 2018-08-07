@@ -315,19 +315,18 @@ class PurchaController extends BaseController{
     function purcha_applyEdit(){
         $data=I("data");
         $contract_file=I("contract_file");
+        $pay_grade=I("pay_grade");
         $purcha_id=I("purcha_id");
         $isUpdate = false;
-        foreach (["contract_file"] as $key) {
+        $dataInfo=["id" => $purcha_id];
+        foreach (["contract_file","pay_grade"] as $key) {
             if(isset($$key) && $$key!=""){
-                $dataInfo = [
-                    "id" => $purcha_id,
-                    "contract_file" => $contract_file,
-                ];
-                if($dataInfo){
-                    $isUpdate =true;
-                    $updateResult=$this->purchaCom->update($dataInfo);
-                }
+                $dataInfo[$key] = $$key;
             }
+        }
+        if(count($dataInfo)>1){
+            $isUpdate =true;
+            $updateResult=$this->purchaCom->update($dataInfo);
         }
         foreach (["suprpay-list","suprfina-list","invoice-list"] as $itemInfoList) {
             foreach ($data[$itemInfoList] as $key => $itemInfo) {

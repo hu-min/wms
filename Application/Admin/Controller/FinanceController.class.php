@@ -517,6 +517,7 @@ class FinanceController extends BaseController{
                 "LEFT JOIN (SELECT pid ,province province_name FROM v_province) pr ON pr.pid=c.provinceId",
                 "LEFT JOIN (SELECT cid,city city_name,pid FROM v_city) ci ON ci.cid=c.cityId",
                 "LEFT JOIN (SELECT purcha_id lpid ,FROM_UNIXTIME(SUBSTRING_INDEX(GROUP_CONCAT(pay_date ORDER BY pay_date DESC),',',1),'%Y-%m-%d') last_pay_date FROM v_pay  WHERE insert_type =2 GROUP BY purcha_id) lp ON lp.lpid=id",
+                "LEFT JOIN (SELECT purcha_id npid ,FROM_UNIXTIME(SUBSTRING_INDEX(GROUP_CONCAT(pay_date ORDER BY pay_date DESC),',',1),'%Y-%m-%d') next_pay_date FROM v_pay  WHERE insert_type =2 AND pay_date > ".strtotime(date("Y-m-d ")."23:59:59")." GROUP BY purcha_id) np ON np.npid=id",
                 "LEFT JOIN (SELECT purcha_id ppid, SUM(pay_money) paid FROM v_pay WHERE insert_type =2 GROUP BY purcha_id) pd ON pd.ppid=id",
                 
             ],

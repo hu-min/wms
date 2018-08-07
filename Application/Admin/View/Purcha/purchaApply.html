@@ -154,8 +154,10 @@
             var purcha_id = $(tabId+" .purcha-id[name='id']").val()
             var status = $(tabId+" .modal-info[name='status']").val()
             var contract_file = $(tabId+" .modal-info[name='contract_file']").val()
+            var pay_grade = $(tabId+" .modal-info[name='pay_grade']").val()
             datas["contract_file"] = contract_file
             datas["purcha_id"] = purcha_id
+            datas["pay_grade"] = pay_grade
             datas["data"] = {};
             ["suprpay-list","suprfina-list","invoice-list"].forEach(element => {
                 datas["data"][element] = [];

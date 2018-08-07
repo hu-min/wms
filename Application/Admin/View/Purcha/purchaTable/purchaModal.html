@@ -108,8 +108,13 @@
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="form-group">
-                                                    <label for="info-title">付款优先级排序：</label>
-                                                    <input class="form-control project-info" readonly="readonly" name="pay_grade_name" title="付款优先级排序"  value="" placeholder="付款优先级排序" type="text">
+                                                    <label for="info-title">支付优先级：</label>
+                                                    <select class="form-control modal-info" title="立项或添加场次" name="pay_grade">
+                                                        <option value="">支付优先级</option>
+                                                        <volist name="payGradeType" id="item">
+                                                            <option value="{$key}">{$item}</option>
+                                                        </volist>
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
