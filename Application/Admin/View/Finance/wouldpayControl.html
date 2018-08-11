@@ -131,66 +131,85 @@
             init_date();
         }
         function wouldpay_setInfo(info){
-            
-            ["brand_name","project_time","code","project_name","leader_name","end_date","paid_amount","contract_amount","late_pay_date"].forEach(element => {
-                $(tabId+" .project-info[name='"+element+"']").val(info[element]);
-            });
-            ["cost_id","id","pay_grade",'invoice_type',"contract_date","pay_amount","pay_date","surplus","surplus_date","surplus_ratio","next_date","supplier_type",'detail'].forEach(element => {
+            ["brand_name","code","project_date","project_name","end_date","leader_name","supplier_com_name","type_name","supplier_cont_name","supplier_cont_phone","supplier_cont_email","module_name","province_name","contract_amount","sign_date","remark","contract_file"].forEach(element => {
                 
-                if(info[element]!="0"){
-                    $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
-                }
-            });
-            ["advance_ratio","advance","advance_date","pay_amount","pay_ratio","pay_date","finance_id","pay_type"].forEach(element=>{
-                $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
-                if(info[element] !=undefined && (info[element] > 0 || info[element] !="")  && "{$nodeAuth}"<7){
-                    $(tabId+" .modal-info[name='"+element+"']").prop("disabled",true)
+                if(element=="province_name"){
+                    $(tabId+" .project-info[name='supplier_com_region']").val(info["province_name"]+"-"+info["city_name"]);
                 }else{
-                    $(tabId+" .modal-info[name='"+element+"']").prop("disabled",false)
+                    $(tabId+" .project-info[name='"+element+"']").val(info[element]);
                 }
             });
-            ["supplier_type","supplier_com","supplier_cont"].forEach(element => {
-                $(tabId+" .project-info[name='"+element+"']").val(info[element+"_name"]);
+            ["id","contract_file","pay_grade"].forEach(element => {
+                $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
             });
-            // ['supplier_com','supplier_cont'].forEach(element => {
-            //     var select= $(tabId+" .modal-info[name='"+element+"']")
-            //     if(info[element]>0){
-            //         if(select.find("option[value='"+info[element]+"']").length==0){
-            //             if(element=="supplier_com"){
-            //                 var optoin = '<option value="">供应商名称</option>'
-            //             }else if(element=="supplier_cont"){
-            //                 var optoin = '<option value="">供应商联系人</option>'
-            //             }
-            //             select.html(optoin);
-            //             select.append("<option value='"+info[element]+"'>"+info[element+"_name"]+"</option>")
-                        
-            //         }
-            //         select.find("option[value='"+info[element]+"']").prop("selected",true);
-            //         if(select.hasClass("chosen-select")){
-            //             select.trigger("chosen:updated");
-            //         }
-            //     }
-            // })
-            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
-            var gettype= $(tabId+" .save-info").data("gettype");
-            if(gettype=="Add"){
-                $(tabId+" .create-rece").show();
-            }else{
-                $(tabId+" .create-rece").hide();
-            }
+            ["suprfina-list"].forEach(element => {
+                if(info["tableData"][element]["list"]){
+                    var list = info["tableData"][element]["list"];
+                    var template = info["tableData"][element]["template"];
+                    
+                    var allMoney = 0;
+                    list.forEach(function(listData,rows){
+                        $(tabId+" .global-modal ."+element+" tbody").append(template);
+                        var $current = $(tabId+" .global-modal ."+element+" tbody tr").eq(rows);
+                        $current.find(".serial").text(Number(rows+1));
+                        for (var key in listData) {
+                            if(key == "fact_pay_money"){
+                                allMoney += float(listData[key],2);
+                            }
+                            if(in_array(key,["pay_date","pay_money","pay_ratio"])){
+                                $current.find(".modal-info[name='"+key+"']").prop("disabled",true)
+                            }
+                            if(in_array(key,["fact_pay_date","fact_pay_money"]) && listData["fact_pay_money"] > 0){
+                                $current.find(".modal-info[name='"+key+"']").prop("disabled",true)
+                                $current.find(".modal-info[name='fact_pay_ratio']").prop("disabled",true)
+                                $current.find(".modal-info[name='remark']").prop("disabled",true)
+                            }
+                            $current.find(".modal-info[name='"+key+"']").val(listData[key]);
+                        }
+                        init_date(false,$current);
+                    });
+                    $(tabId+" .project-info[name='paid']").val(allMoney);
+                    $(tabId+" .project-info[name='surplus']").val(float(info["contract_amount"])-float(allMoney));
+                }
+            });
+
             
             if((info['processLevel'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7 && "{$gettype}" == "Edit"){
                 $(tabId+" .modal-info").prop("disabled",true)
             }
-            
-            // var projectChosen= $(tabId+" .chosen-select[name='project_id']")
-            // ["brand_name","project_time","code","name","customer_com_name","business_name","type","session_all","amount"].forEach(element => {
-
-            //     // if(info[element]!=null){
-            //     //     $(tabId+" .project-info[name='"+element+"']").val(info[element]);
-            //     // }
-                
-            // })
+        }
+        function wouldpay_getInfo(){
+            // var purcha_id = $(tabId+" .purcha-id[name='id']").val()
+            // var status = $(tabId+" .modal-info[name='status']").val()
+            // var contract_file = $(tabId+" .modal-info[name='contract_file']").val()
+            // var pay_grade = $(tabId+" .modal-info[name='pay_grade']").val()
+            // datas["contract_file"] = contract_file
+            // datas["purcha_id"] = purcha_id
+            // datas["pay_grade"] = pay_grade
+            datas["data"] = [];
+            $(tabId+" .global-modal .suprfina-list tbody tr").each(function(){
+                // if(element=="invoice-list"){
+                //     var tempSupr = {relation_type:"1",relation_id:purcha_id};
+                // }else{
+                //     var tempSupr = {purcha_id:purcha_id};
+                //     tempSupr["insert_type"] = element=="suprpay-list" ? 1 : 2; 
+                // }
+                var tempSupr = {}
+                $(this).find(".modal-info").each(function(){
+                    var name = $(this).attr("name");
+                    var val = $(this).val();
+                    var required=$(this).attr("required");
+                    var title=$(this).attr("title");
+                    if(required=="required" && val==""){
+                        notice(110,title,"输入异常");
+                        throw title;
+                    }else{
+                        tempSupr[name]=val;
+                    }
+                })
+                datas["data"].push(tempSupr);
+            })
+            console.log(datas);
         }
         $(function(){
      

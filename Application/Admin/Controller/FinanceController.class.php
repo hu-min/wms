@@ -15,9 +15,11 @@ class FinanceController extends BaseController{
         $this->receivableCom=getComponent('Receivable');
         $this->wouldpayCom=getComponent('Wouldpay');
         $this->purchaCom=getComponent('Purcha');
+        $this->payCom=getComponent('Pay');
         $this->payGradeType = ["1"=>"A级[高]","2"=>"B级[次]","3"=>"C级[中]","4"=>"D级[低]"];
         $this->invoiceType = ["0"=>"无","1"=>"收据","2"=>"增值税普通","3"=>"增值税专用"];
-        $this->payType = ['1'=>'公对公','2'=>'现金付款','2'=>'支票付款'];
+        $this->payType = ['1'=>'公对公','2'=>'现金付款','3'=>'支票付款'];
+        $this->payStatus = ['0'=>'未支付','1'=>'已支付','2'=>'支付无效'];
     }
     function stockControl(){
         $reqType=I('reqType');
@@ -394,6 +396,7 @@ class FinanceController extends BaseController{
         $this->assign("payGradeType",$this->payGradeType);
         $this->assign("invoiceType",$this->invoiceType);
         $this->assign("payType",$this->payType);
+        $this->assign("payStatus",$this->payStatus);
         $supplier = A("Supplier");
         // print_r($supplier->getSupplier());
         $this->assign("supComArr",A("Project")->_getOption("supplier_com"));
@@ -426,11 +429,21 @@ class FinanceController extends BaseController{
                 }
             }
         }
+        $resultData["tableData"] = [];
+        $payList = $this->payCom->getList(["where"=>["purcha_id"=>$id,"insert_type"=>2],"fields"=>"*,FROM_UNIXTIME(pay_date,'%Y-%m-%d') pay_date"])["list"];
+        foreach ($payList as $key => $value) {
+            $payList[$key]["pay_status"] = $this->payStatus[$value["pay_status"]];
+            # code...
+        }
+        $resultData["tableData"]["suprfina-list"] = ["list"=>$payList,"template"=>$this->fetch('Purcha/purchaTable/suprfinapayLi')];
+
+        $resultData["end_date"] = date("Y-m-d",strtotime($resultData["project_date"]." +".$resultData["days"]."day"));
         $modalPara=[
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "template"=>"wouldpayModal",
+            // "template"=>"wouldpayModal",
+            "template"=>"purchaModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -548,8 +561,32 @@ class FinanceController extends BaseController{
      * @Desc: 修改 
      */    
     function wouldpayEdit(){
-        $info=$this->manageWouldpayInfo();
-        $updateResult=$this->wouldpayCom->updateWouldpay($info);
+        // $info=$this->manageWouldpayInfo();
+        // $updateResult=$this->wouldpayCom->updateWouldpay($info);
+        // $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+        $isUpdate = false;
+        $data=I("data");
+
+        foreach ($data as $key => $itemInfo) {
+            // print_r($itemInfo);
+            $listCom = $this->payCom;
+            if($itemInfo["id"]>0 && $itemInfo["fact_pay_money"]>0){
+                $itemInfo["pay_date"] = strtotime($itemInfo["pay_date"]);
+                $itemInfo["fact_pay_date"] = strtotime($itemInfo["fact_pay_date"]);
+                $itemInfo["pay_status"] = 1;
+                    $updateResult=$listCom->update($itemInfo);
+                    if($updateResult->errCode==0){
+                        $isUpdate =true;
+                    }
+                
+            }else{
+                $updateResult->error ="没有更改项";
+            }
+        }
+        
+        if($isUpdate){
+            $this->ajaxReturn(['errCode'=>0,'error'=>"修改成功"]);
+        }
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
     function getOptionList(){

@@ -5,9 +5,6 @@
     </td>
     <td>
         <div class="input-group date">
-            <div class="input-group-addon">
-                <i class="fa fa-calendar"></i>
-            </div>
             <input class="form-control pull-right date-input modal-info" name="pay_date" type="text">
         </div>
     </td>
@@ -18,10 +15,18 @@
         <input class="form-control modal-info"  name="pay_ratio" title="支付比例"  value="" placeholder="支付比例" type="text">
     </td>
     <td>
-        <input class="form-control modal-info"  readonly="readonly" name="pay_date" title="实际付款日期"  value="" placeholder="实际付款日期" type="text">
+        <div class="input-group date">
+            <input class="form-control pull-right date-input modal-info" name="fact_pay_date" type="text">
+        </div>
     </td>
     <td>
-        付款状态
+        <input class="form-control modal-info"  name="fact_pay_money" title="实际支付金额"  value="" placeholder="实际支付金额" type="text">
+    </td>
+    <td>
+        <input class="form-control modal-info"  name="fact_pay_ratio" title="实际支付比例"  value="" placeholder="实际支付比例" type="text">
+    </td>
+    <td>
+        <input class="form-control modal-info" readonly="readonly" disabled="disabled" name="pay_status" title="支付状态"  value="" placeholder="支付状态" type="text">
     </td>
     <td>
         <input class="form-control modal-info"  name="remark" title="备注"  value="" placeholder="备注" type="text">

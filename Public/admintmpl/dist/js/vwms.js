@@ -667,7 +667,6 @@ function init_date(){
         parental = parental ? " "+parental : '' 
         var $this = $(tabId+parental);
     }
-
     $this.find(".date-input").each(function(){
         var option =opt ? opt : {theme: '#3C8DBC'}
         var name = $(this).attr("name")
@@ -679,10 +678,7 @@ function init_date(){
             option["type"] = type
         }
         option["elem"] = option["elem"] ? option["elem"] : "#"+thisId
-        // console.log(option)
-        // console.log($("#"+thisId))
         if(thisId){
-            // console.log(thisId)
             laydate.render(option);
         }
     })
