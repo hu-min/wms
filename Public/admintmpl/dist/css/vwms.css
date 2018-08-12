@@ -127,3 +127,8 @@
 	background-color: #eee;
 	border: 1px solid #ccc;
 }
+.required:before{
+	content: "*";
+	color: red;
+	font-weight: bold;
+}

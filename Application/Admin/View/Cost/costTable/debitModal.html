@@ -13,7 +13,7 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label >选择项目：</label>
-                        <select class="form-control chosen-project chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
+                        <select class="form-control project-info modal-info chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
                             <option value="0">选择项目</option>
                             <volist name="projectArr" id="item">
                                 <option value="{$item['projectId']}">{$item['name']}</option>
@@ -24,7 +24,7 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="info-title">项目编号：</label>
-                        <input class="form-control project-info" readonly="readonly" name="project_name" title="项目编号"  value="" placeholder="项目编号" type="text">
+                        <input class="form-control project-info" readonly="readonly" name="code" title="项目编号"  value="" placeholder="项目编号" type="text">
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -36,7 +36,7 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="info-title">项目日期：</label>
-                        <input class="form-control project-info" readonly="readonly" name="project_name" title="项目日期"  value="" placeholder="项目日期" type="text">
+                        <input class="form-control project-info" readonly="readonly" name="project_date" title="项目日期"  value="" placeholder="项目日期" type="text">
                     </div>
                 </div>
             </div>
@@ -44,29 +44,26 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="info-title">营业主担：</label>
-                        <input class="form-control project-info" readonly="readonly" name="project_name" title="营业主担"  value="" placeholder="营业主担" type="text">
+                        <input class="form-control project-info" readonly="readonly" name="business_name" title="营业主担"  value="" placeholder="营业主担" type="text">
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="info-title">项目主担：</label>
-                        <input class="form-control project-info" readonly="readonly" name="project_name" title="项目主担"  value="" placeholder="项目主担" type="text">
+                        <input class="form-control project-info" readonly="readonly" name="leader_name" title="项目主担"  value="" placeholder="项目主担" type="text">
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="info-title">借支金额：</label>
-                        <input class="form-control project-info" name="project_name" title="借支金额"  value="" placeholder="借支金额" type="text">
+                        <input class="form-control modal-info" required="required" name="debit_money" title="借支金额"  value="" placeholder="借支金额" type="text">
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
                         <label >费用类别：</label>
-                        <select class="form-control chosen-project chosen-select" title="费用类别" data-value="projectId"  data-text="name" name="project_id">
-                            <option value="0">其他</option>
-                            <volist name="projectArr" id="item">
-                                <option value="{$item['projectId']}">{$item['name']}</option>
-                            </volist>
+                        <select class="form-control modal-info chosen-select" required="required" title="费用类别"  name="free_type">
+                            {$pidoption}
                         </select>
                     </div>
                 </div>
@@ -75,17 +72,17 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="info-title">要求放款日期：</label>
-                        <input class="form-control project-info" readonly="readonly" name="project_name" title="要求放款日期"  value="" placeholder="要求放款日期" type="text">
+                        <input class="form-control modal-info date-input" readonly="readonly" name="require_date" title="要求放款日期"  value="" placeholder="要求放款日期" type="text">
                     </div>
                 </div>
                 
                 <div class="col-md-3">
                     <div class="form-group">
                         <label >收款账户类型：</label>
-                        <select class="form-control chosen-project chosen-select" title="收款账户类型" data-value="projectId"  data-text="name" name="project_id">
-                            <option value="0">其他</option>
-                            <volist name="projectArr" id="item">
-                                <option value="{$item['projectId']}">{$item['name']}</option>
+                        <select class="form-control modal-info chosen-select" required="required" title="收款账户类型"  name="account_type">
+                            <option value="0">收款账户</option>
+                            <volist name="accountType" id="item">
+                                <option value="{$key}">{$item}</option>
                             </volist>
                         </select>
                     </div>
@@ -93,13 +90,13 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="info-title">收款账户详细：</label>
-                        <input class="form-control project-info" name="project_name" title="收款账户详细"  value="" placeholder="收款账户详细" type="text">
+                        <input class="form-control modal-info" name="account" required="required" title="收款账户详细"  value="" placeholder="收款账户详细" type="text">
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="info-title">借支说明：</label>
-                        <input class="form-control project-info"  name="project_name" title="借支说明"  value="" placeholder="借支说明" type="text">
+                        <input class="form-control modal-info"  name="debit_cause" title="借支说明"  value="" placeholder="借支说明" type="text">
                     </div>
                 </div>
             </div>

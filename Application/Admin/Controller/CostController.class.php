@@ -11,9 +11,11 @@ class CostController extends BaseController{
     public function _initialize() {
         parent::_initialize();
         $this->projectCom=getComponent('Project');
+        $this->project=A('Project');
         $this->configCom=getComponent('Config');
         $this->customerCom=getComponent('Customer');
         $this->costCom=getComponent('Cost');
+        $this->debitCom=getComponent('Debit');
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
     }
@@ -37,12 +39,39 @@ class CostController extends BaseController{
      */    
     function debitControl(){
         $reqType=I('reqType');
+        $accountType = ["1"=>"现金","2"=>"微信支付","3"=>"支付宝","4"=>"银行卡","5"=>"支票","6"=>"其它"];
+        $this->assign('accountType',$accountType);
+        $this->assign('projectArr',$this->project->_getOption("project_id"));
         $this->assign("controlName","debit");
         if($reqType){
             $this->$reqType();
         }else{
             $this->returnHtml();
         }
+    }
+    function debitList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $where=[];
+        // if($data['expenClas']){
+        //     $where['expenClas']=$data['expenClas'];
+        // }
+        $parameter=[
+            'fields'=>"*,FROM_UNIXTIME(debit_date,'%Y-%m-%d') debit_date,FROM_UNIXTIME(require_date,'%Y-%m-%d') require_date,FROM_UNIXTIME(loan_date,'%Y-%m-%d') loan_date",
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>"id DESC",
+            "joins"=>[
+                "LEFT JOIN (SELECT projectId,code,name project_name,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,business,leader FROM v_project ) p ON p.projectId = project_id ",
+                "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = p.business",
+                "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
+                "LEFT JOIN (SELECT basicId,name free_name FROM v_basic WHERE class='feeType') f ON f.basicId=free_type",
+            ]
+        ];
+        
+        $listResult=$this->debitCom->getList($parameter);
+        $this->tablePage($listResult,'Cost/costTable/debitList',"debitList");
     }
     function debit_modalOne(){
         $title = "新增借支";
@@ -55,8 +84,8 @@ class CostController extends BaseController{
             $title = "编辑借支";
             $btnTitle = "保存数据";
             $redisName="debitList";
-            // $resultData=$this->fixExpenCom->redis_one($redisName,"id",$id);
-            $resultData=[];
+            $resultData=$this->debitCom->redis_one($redisName,"id",$id);
+            // $resultData=[];
         }
         $modalPara=[
             "data"=>$resultData,
@@ -64,7 +93,75 @@ class CostController extends BaseController{
             "btnTitle"=>$btnTitle,
             "template"=>"debitModal",
         ];
+        $option='<option value="0">费用类别</option>';
+        foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
+            // print_r($value);
+            $option.=A("Basic")->getfeeType($value,0);
+        }
+        $this->assign("pidoption",$option);
         $this->modalOne($modalPara);
+    }
+    function manageDebitInfo(){
+        $reqType=I("reqType");
+        $datas=I("data");
+        if($datas["debit_date"] == 0){
+            unset($datas["debit_date"] );
+        }
+        foreach (['require_date'] as  $date) {
+            if(isset($datas[$date])){
+                $datas[$date]=strtotime($datas[$date]);
+            }
+        }
+        if($reqType=="debitAdd"){
+            $datas['add_time']=time();
+            $datas['debit_date']=time();
+            $datas['user_id']=session('userId');
+            $datas['author']=session('userId');
+            $datas['processLevel']=$this->processAuth["level"];
+            unset($datas['id']);
+            return $datas;
+        }else if($reqType=="debitEdit"){
+            $where=["id"=>$datas['id']];
+            $data=[];
+            
+            foreach (["project_id","user_id","debit_money","debit_date","debit_cause","account","account_type","free_type","require_date","remark","voucher_file","loan_date"] as  $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
+            }
+            if(isset($datas['status'])){
+                $parameter=[
+                    'where'=>["id"=>$datas['id']],
+                ];
+                $result=$this->debitCom->getOne($parameter);
+                $data = $this->status_update($result,$datas["status"],$data);
+            }
+            $data['upate_time']=time();
+            
+            return ["where"=>$where,"data"=>$data];
+        }
+        return "";
+    }
+    function debitAdd(){
+        $info=$this->manageDebitInfo();
+        if($info){
+            // print_r($info);
+            $insertResult=$this->debitCom->insert($info);
+            if($insertResult && $insertResult->errCode==0){
+                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+            }
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    }
+    function debitEdit(){
+        $info=$this->manageDebitInfo();
+        $updateResult=$this->debitCom->update($info);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+    function getProjectOne(){
+        // print_r($option);
+        
+        $this->ajaxReturn(["data"=>A("Purcha")->getProjectOne()["list"]]);
     }
     /** 
      * @Author: vition 

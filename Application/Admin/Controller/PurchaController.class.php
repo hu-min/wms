@@ -42,17 +42,20 @@ class PurchaController extends BaseController{
             $this->returnHtml();
         }
     }
-    function getProjectOne(){
+    function getProjectOne($return=false){
         $id = I("id");
         $parameter=[
             "where"=>["projectId"=>$id],
-            "fields" => "projectId,code,leader,leader_name,business,business_name",
+            "fields" => "projectId,name project_name,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,code,leader,leader_name,business,business_name",
             "joins"=>[
                 "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = leader",
                 "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = business",
             ]
         ];
         $resultData = $this->project->projectCom->getOne($parameter)["list"];
+        if($return){
+            return $resultData;
+        }
         $this->ajaxReturn(["data"=>$resultData]);
     }
     function getSuprtype(){

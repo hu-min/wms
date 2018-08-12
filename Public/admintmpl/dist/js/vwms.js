@@ -201,7 +201,12 @@ $(document).on("click",".v-showmodal",function(){
              
             $(tabId+" .global-modal .modal-content").html(result.html);
             $(tabId+" "+vtarget).modal('toggle')
+            $(tabId+" .global-modal .modal-content").find("[required='required']").each(function(){
+                $(this).before('<span class="required"></span>')
+            })
             if(gettype=="Edit"){
+                
+                // $("[required='required']").before('<span class="required"></span>');
                 if(fun_is_exits(con+"_setInfo")){
                     eval(con+"_setInfo(result.data)");//对不同的模块设置不同的响应数据
                 }
@@ -289,7 +294,7 @@ $(document).on("click",'.save-info',function(){
             var val =$(this).val();
             var required=$(this).attr("required");
             var title=$(this).attr("title");
-            if(required=="required" && val==""){
+            if(required=="required" && (val=="" || val == "0")){
                 notice(110,title,"输入异常");
                 throw title
             }else{

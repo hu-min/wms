@@ -71,7 +71,6 @@
                 <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th>序号</th>
                             <th>项目编号</th>
                             <th>项目名称</th>
                             <th>项目日期</th>
@@ -109,8 +108,44 @@
         </div>
     </div>
     <script>
+        function debit_initInfo(){
+            init_chosen("{$url}","getOptionList",".global-modal");
+            init_date();
+        }
+        function debit_setInfo(info){
+            ["project_id","code","project_name","project_date","business_name","leader_name"].forEach(element=>{
+                if(element == "project_id"){
+                    var projectChosen= $(tabId+" .chosen-select[name='project_id']");
+                    var projectId = info["projectId"];
+                    if(projectChosen.find("option[value='"+info["projectId"]+"']").length==0){
+                        projectChosen.append("<option value='"+info["project_pid"]+"'>"+info["project_name"]+"</option>")
+                    }
+                }
+                $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
+            });
+            ["id","debit_money","free_type","require_date","account_type","account","debit_cause"].forEach(element=>{
+                if(info[element]!="" || info[element]!="0"){
+                    $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
+                }
+            })
+        }
         $(function(){
             $(tabId+" .search-list").trigger("click");
+            $(tabId).offon("change"," .project-info[name='project_id']",function(){
+                var project_id = $(this).val()
+                if(Number(project_id)>0){
+                    datas["reqType"]='getProjectOne';
+                    datas["onlydata"]='true';
+                    datas["gettype"]='Edit';
+                    datas["id"]=project_id;
+                    get("{$url}",datas,function(result){
+                        if(result.data){
+                            result.data['project_id'] = result.data['projectId'];
+                            debit_setInfo(result.data)
+                        }
+                    })
+                }
+            });
         })
     </script>
 </body>
