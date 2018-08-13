@@ -111,6 +111,7 @@
         function debit_initInfo(){
             init_chosen("{$url}","getOptionList",".global-modal");
             init_date();
+            upload({url:"{:U('Project/upload_filesAdd')}"})
         }
         function debit_setInfo(info){
             ["project_id","code","project_name","project_date","business_name","leader_name"].forEach(element=>{

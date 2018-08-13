@@ -1,0 +1,25 @@
+<volist name="list" id="item">
+    <tr>
+        <td>{$item['code']}</td>
+        <td>{$item['project_name']}</td>
+        <td>{$item['project_date']}</td>
+        <td>{$item['business_name']}</td>
+        <td>{$item['leader_name']}</td>
+        <td>{$item['debit_date']}</td>
+        <td>{$item['require_date']}</td>
+        <td>{$item['free_name']}</td>
+        <td>{$item['debit_cause']}</td>
+        <td>{$item['debit_money']}</td>
+        <td>{$accountType[$item['account_type']]}</td>
+        <td>{$item['loan_date']}</td>
+        <td>审批记录</td>
+        <td>
+            <div class="input-group">
+                <input class="upload-file form-control input-sm" value="{$item['voucher_file']}" type="text" readonly="readonly">
+                <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
+            </div>
+        </td>
+        <td>{$item['remark']}</td>
+        {:list_btn(get_defined_vars(),"id")}
+    </tr>
+</volist>

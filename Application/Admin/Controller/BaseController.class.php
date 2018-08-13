@@ -24,6 +24,7 @@ class BaseController extends \Common\Controller\BaseController{
      * 对admin的每一个控制器和方法做权限检查
      */
     public function _initialize() {
+        // echo 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'];exit;
         parent::_initialize();
         $this->userCom=getComponent('User');
         $this->LogCom=getComponent('Log');

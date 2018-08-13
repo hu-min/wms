@@ -74,7 +74,6 @@
                 <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th>序号</th>
                             <th>项目编号</th>
                             <th>项目名称</th>
                             <th>项目日期</th>
@@ -112,7 +111,13 @@
         </div>
     </div>
     <script>
+        function finance_debit_initInfo(){
+            init_chosen("{$url}","getOptionList",".global-modal");
+            init_date();
+            
+        }
         $(function(){
+            upload({url:"{:U('Project/upload_filesAdd')}"})
             $(tabId+" .search-list").trigger("click");
         })
     </script>

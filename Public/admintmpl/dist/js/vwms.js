@@ -2,6 +2,7 @@ var datas={};
 var filesData={};
 var uploadData = {}
 var tempFiles = {};
+var tabId="";//定义当前tab指定的id
 $.fn.extend({offon:function(){
     var event =  arguments[0]
     var select =  typeof(arguments[1]) == 'string' ? arguments[1] : false
@@ -474,7 +475,7 @@ $(function(){
         // $(this).css("overflow-x", "scroll");   
         // $(this).css("overflow-y", "scroll");   
         // 防止出现滚动条，出现的话，你会把滚动条一起拖着走的
-    });
+    });   
     $(document).offon("click",tabId+" .show-media",function(){
         var file = $(this).prev(".upload-file").val();
         if(!file){
@@ -484,6 +485,7 @@ $(function(){
         }
         media(file)
     })
+    
 })
 /** 
  * javascript comment 

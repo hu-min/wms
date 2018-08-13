@@ -53,6 +53,9 @@ class CostController extends BaseController{
         $data=I("data");
         $p=I("p")?I("p"):1;
         $where=[];
+        if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+            $where['user_id'] = session('userId');
+        }
         // if($data['expenClas']){
         //     $where['expenClas']=$data['expenClas'];
         // }
@@ -64,12 +67,11 @@ class CostController extends BaseController{
             'orderStr'=>"id DESC",
             "joins"=>[
                 "LEFT JOIN (SELECT projectId,code,name project_name,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,business,leader FROM v_project ) p ON p.projectId = project_id ",
-                "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = p.business",
-                "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
+                "LEFT JOIN (SELECT userId,userName business_name FROM v_user) bu ON bu.userId = p.business",
+                "LEFT JOIN (SELECT userId,userName leader_name FROM v_user) lu ON lu.userId = p.leader",
                 "LEFT JOIN (SELECT basicId,name free_name FROM v_basic WHERE class='feeType') f ON f.basicId=free_type",
             ]
         ];
-        
         $listResult=$this->debitCom->getList($parameter);
         $this->tablePage($listResult,'Cost/costTable/debitList',"debitList");
     }
@@ -176,6 +178,26 @@ class CostController extends BaseController{
         }else{
             $this->returnHtml();
         }
+    }
+    function finance_debitList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $where=[];
+        $parameter=[
+            'fields'=>"*,FROM_UNIXTIME(debit_date,'%Y-%m-%d') debit_date,FROM_UNIXTIME(require_date,'%Y-%m-%d') require_date,FROM_UNIXTIME(loan_date,'%Y-%m-%d') loan_date",
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>"id DESC",
+            "joins"=>[
+                "LEFT JOIN (SELECT projectId,code,name project_name,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,business,leader FROM v_project ) p ON p.projectId = project_id ",
+                "LEFT JOIN (SELECT userId,userName business_name FROM v_user) bu ON bu.userId = p.business",
+                "LEFT JOIN (SELECT userId,userName leader_name FROM v_user) lu ON lu.userId = p.leader",
+                "LEFT JOIN (SELECT basicId,name free_name FROM v_basic WHERE class='feeType') f ON f.basicId=free_type",
+            ]
+        ];
+        $listResult=$this->debitCom->getList($parameter);
+        $this->tablePage($listResult,'Cost/costTable/financedebitList',"debitList");
     }
     function finance_debit_modalOne(){
         $title = "借支控制";
