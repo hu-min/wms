@@ -79,7 +79,7 @@
                 <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th>序号</th>
+                            <!-- <th>序号</th> -->
                             <th>项目编号</th>
                             <th>项目名称</th>
                             <th>项目日期</th>
@@ -88,11 +88,10 @@
                             <th>报销提交日期</th>
                             <th>报销总项</th>
                             <th>报销金额</th>
-                            <th>收款账户类别</th>
-                            <th>预计放款日期</th>
-                            <th>发票或凭证</th>
-                            <th>审批记录</th>
-                            <th>备注</th>
+                            <!-- <th>收款账户类别</th> -->
+                            <!-- <th>发票或凭证</th> -->
+                            <!-- <th>审批记录</th> -->
+                            <!-- <th>备注</th> -->
                             <th>状态</th>
                             <th>操作</th>
                         </tr>
@@ -110,13 +109,133 @@
         </div>
     </section>
     <div class="modal fade global-modal" aria-hidden="true" data-backdrop="static" >
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg  modal-full">
             <div class="modal-content"></div>
         </div>
     </div>
     <script>
+        function expense_initInfo(){
+            init_chosen("{$url}","getOptionList",".global-modal");
+            init_date();
+            upload({url:"{:U('Cost/upload_filesAdd')}"})
+        }
+        function expense_setInfo(info){
+            ["project_id","code","project_name","project_date","business_name","leader_name","all_money"].forEach(element=>{
+                if(element == "project_id"){
+                    var projectChosen= $(tabId+" .chosen-select[name='project_id']");
+                    var projectId = info["projectId"];
+                    if(projectChosen.find("option[value='"+info["projectId"]+"']").length==0){
+                        projectChosen.append("<option value='"+info["project_pid"]+"'>"+info["project_name"]+"</option>")
+                    }
+                }
+                $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
+            });
+            ["id","debit_money","free_type","require_date","account_type","account","debit_cause"].forEach(element=>{
+                if(info[element]!="" || info[element]!="0"){
+                    $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
+                }
+            });
+            ["expense-list"].forEach(element => {
+                if(info["tableData"][element]["list"]){
+                    var list = info["tableData"][element]["list"];
+                    var template = info["tableData"][element]["template"];
+                    var statusType = JSON.parse('{$statusTypeJ}')
+                    var allMoney = 0;
+                    list.forEach(function(listData,rows){
+                        $(tabId+" .global-modal ."+element+" tbody").append(template);
+                        var $current = $(tabId+" .global-modal ."+element+" tbody tr").eq(rows);
+                        $current.find(".serial").text(Number(rows+1));
+                        for (var key in listData) {
+                            // if(key == "pay_money" || key == "invoice_money"){
+                            //     allMoney += float(listData[key],2);
+                            // }
+                            
+                            // console.log(statusType)
+                            if(key == "status"){
+                                $current.find("td[name='"+key+"']").text(statusType[listData[key]]);
+                            }else{
+                                $current.find(".modal-info[name='"+key+"']").val(listData[key]);
+                            }
+                            
+                        }
+                        init_date(false,$current);
+                    });
+                    // if(element == "suprfina-list"){
+                    //     $(tabId+" .project-info[name='paid']").val(allMoney);
+                    //     $(tabId+" .project-info[name='surplus']").val(float(info["contract_amount"])-float(allMoney));
+                    // }else if(element == "invoice-list"){
+                    //     $(tabId+" .project-info[name='all_invoice']").val(info["contract_amount"]);
+                    //     $(tabId+" .project-info[name='invoiced']").val(allMoney);
+                    //     $(tabId+" .project-info[name='invoice_supr']").val(float(info["contract_amount"])-float(allMoney));
+                    // }
+                }
+            });
+        }
+        function expense_getInfo(){
+            var expense_id = $(tabId+" .expense-id[name='id']").val()
+            var status = $(tabId+" .modal-info[name='status']").val()
+            var project_id = $(tabId+" .modal-info[name='project_id']").val()
+            datas["expense_id"] = expense_id
+            datas["project_id"] = project_id
+
+            datas["data"] = {};
+            ["expense-list"].forEach(element => {
+                datas["data"][element] = [];
+                $(tabId+" .global-modal ."+element+" tbody tr").each(function(){
+                    tempSupr = {}
+                    
+                    $(this).find(".modal-info").each(function(){
+                        var name = $(this).attr("name");
+                        var val = $(this).val();
+                        var required=$(this).attr("required");
+                        var title=$(this).attr("title");
+                        if(required=="required" && val==""){
+                            notice(110,title,"输入异常");
+                            throw title;
+                        }else{
+                            tempSupr[name]=val;
+                        }
+                    })
+                    datas["data"][element].push(tempSupr);
+                })
+            });
+        }
         $(function(){
             $(tabId+" .search-list").trigger("click");
+            $(tabId).offon("change"," .project-info[name='project_id']",function(){
+                var project_id = $(this).val()
+                if(Number(project_id)>0){
+                    datas["reqType"]='getProjectOne';
+                    datas["onlydata"]='true';
+                    datas["gettype"]='Edit';
+                    datas["id"]=project_id;
+                    get("{$url}",datas,function(result){
+                        if(result.data){
+                            result.data['project_id'] = result.data['projectId'];
+                            expense_setInfo(result.data)
+                        }
+                    })
+                }else{
+                    ["project_id","code","project_name","project_date","business_name","leader_name"].forEach(element=>{
+                        $(tabId+" .global-modal .project-info[name='"+element+"']").val("");
+                    });
+                }
+            });
+            [["add-expense","getExpenseLiOne","expense-list"]].forEach(element => {
+                $(tabId).offon("click","."+element[0],function(){
+                    datas["reqType"]=element[1];
+                    datas["rows"]=$(tabId+" .global-modal ."+element[2]+" tr").length;
+                    var rows = datas["rows"];
+                    get("{$url}",datas,function(result){
+                        $(tabId+" .global-modal ."+element[2]+"").append(result.html);
+                        init_chosen("{$url}","getProjectOne",$(tabId+" .global-modal ."+element[2]+" tr").eq(rows));
+                        init_date(false,$(tabId+" .global-modal ."+element[2]+" tr").eq(rows));
+                    })
+                })
+                $(tabId).offon("click",".global-modal ."+element[2]+" .supr-remove",function(){
+                    $(this).parents("tr").remove();
+                })
+            });
         })
     </script>
 </body>

@@ -15,7 +15,11 @@
         <td>审批记录</td>
         <td>
             <div class="input-group">
-                <input class="upload-file form-control input-sm" value="{$item['voucher_file']}" type="text" readonly="readonly">
+                <if condition="$item['status'] eq 0 && $item['voucher_file'] eq ''">
+                    <input class="upload-file form-control input-sm" value="{$item['voucher_file']}" type="text" readonly="readonly">
+                <else/>
+                    <input class="form-control input-sm" value="{$item['voucher_file']}" type="text" readonly="readonly">
+                </if>
                 <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
             </div>
         </td>

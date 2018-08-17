@@ -8,6 +8,8 @@ namespace Admin\Controller;
  */
 class CostController extends BaseController{
     protected $pageSize=15;
+    protected $accountType = ["1"=>"现金","2"=>"微信支付","3"=>"支付宝","4"=>"银行卡","5"=>"支票","6"=>"其它"];
+    protected $expVouchType = ["无","收据","签收单+身份证","发票","其他"];
     public function _initialize() {
         parent::_initialize();
         $this->projectCom=getComponent('Project');
@@ -16,6 +18,8 @@ class CostController extends BaseController{
         $this->customerCom=getComponent('Customer');
         $this->costCom=getComponent('Cost');
         $this->debitCom=getComponent('Debit');
+        $this->expenseCom=getComponent('Expense');
+        $this->expenseSubCom=getComponent('ExpenseSub');
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
     }
@@ -39,8 +43,7 @@ class CostController extends BaseController{
      */    
     function debitControl(){
         $reqType=I('reqType');
-        $accountType = ["1"=>"现金","2"=>"微信支付","3"=>"支付宝","4"=>"银行卡","5"=>"支票","6"=>"其它"];
-        $this->assign('accountType',$accountType);
+        $this->assign('accountType',$this->accountType);
         $this->assign('projectArr',$this->project->_getOption("project_id"));
         $this->assign("controlName","debit");
         if($reqType){
@@ -222,9 +225,14 @@ class CostController extends BaseController{
         $this->modalOne($modalPara);
     }
 
+    //个人报销开始
     function expenseControl(){
         $reqType=I('reqType');
         $this->assign("controlName","expense");
+        $this->assign('accountType',$this->accountType);
+        $this->assign('projectArr',$this->project->_getOption("project_id"));
+        $this->assign('expTypeArr',$this->project->_getOption("expense_type"));
+        $this->assign('expVouchType',$this->expVouchType);
         if($reqType){
             $this->$reqType();
         }else{
@@ -241,9 +249,12 @@ class CostController extends BaseController{
         if($gettype=="Edit"){
             $title = "编辑报销";
             $btnTitle = "保存数据";
-            $redisName="finance_debitList";
-            // $resultData=$this->fixExpenCom->redis_one($redisName,"id",$id);
-            $resultData=[];
+            $redisName="expenseList";
+            $resultData=$this->expenseCom->redis_one($redisName,"id",$id);
+        }
+        if($resultData){
+            $resultData["tableData"] = [];
+            $resultData["tableData"]["expense-list"] = ["list"=>$this->expenseSubCom->getList(["where"=>["parent_id"=>$id],"fields"=>"*,FROM_UNIXTIME(happen_date,'%Y-%m-%d') happen_date"])["list"],"template"=>$this->fetch('Cost/costTable/expenseLi')];
         }
         $modalPara=[
             "data"=>$resultData,
@@ -253,6 +264,113 @@ class CostController extends BaseController{
         ];
         $this->modalOne($modalPara);
     }
+    function expenseList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $where=[];
+        $parameter=[
+            'where'=>$where,
+            'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_date,c.state status ",
+            'page'=>$p,
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>"id DESC",
+            "joins"=>[
+                "LEFT JOIN (SELECT projectId,code,name project_name,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,business,leader FROM v_project ) p ON p.projectId = project_id ",
+                "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = p.business",
+                "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
+                "LEFT JOIN (SELECT parent_id,count(*) all_item,FLOOR(SUM(`status`)/count(*)) state, SUM(money) all_money FROM v_expense_sub GROUP BY parent_id ) c ON parent_id = id",
+            ],
+        ];
+        
+        $listResult=$this->expenseCom->getList($parameter);
+        $this->tablePage($listResult,'Cost/costTable/expenseList',"expenseList");
+    }
+    function expenseManage($datas,$reqType=false){
+        $reqType = $reqType ? $reqType : I("reqType");
+        foreach (["happen_date"] as $date) {
+            $datas[$date] = strtotime($datas[$date]);
+        }
+        if($reqType=="expenseAdd"){
+            $datas['add_time']=time();
+            unset($datas['id']);
+            return $datas;
+        }else if($reqType=="expenseEdit"){
+            $where=["id"=>$datas['id']];
+            $data=[];
+            $data['updateTime']=time();
+            foreach (["account","account_type","cost_desc","expen_vouch_type","expense_type","happen_date","money","remark","vouch_file"] as $key) {
+                if(isset($datas[$key])){
+                    $data[$key] = $datas[$key];
+                } 
+            }
+            if(isset($datas['status'])){
+                $parameter=[
+                    'where'=>["id"=>$datas['id']],
+                ];
+                $result=$this->purchaCom->getList($parameter,true);
+                $data = $this->status_update($result,$datas["status"],$data);
+            }
+            return ["where"=>$where,"data"=>$data];
+        }
+        return "";
+    }
+    function expenseAdd(){
+        $datas=I("data");
+        $project_id=I("project_id");
+        $expInfo = [
+            "project_id"=>$project_id,
+            "user_id"=>session("userId"),
+            "add_time"=>time(),
+        ];
+        $isInsert = false;
+        $insertRes = $this->expenseCom->insert($expInfo);
+        if($insertRes->errCode==0){
+            foreach ($datas["expense-list"] as $subExpInfo) {
+                $dataInfo = $this->expenseManage($subExpInfo);
+                $dataInfo["parent_id"] = $insertRes->data;
+                if($dataInfo){
+                    $insertResult=$this->expenseSubCom->insert($dataInfo);
+                    $isInsert = true;
+                }
+            }
+            if($isInsert){
+                $this->ajaxReturn(['errCode'=>0,'error'=>"添加成功"]);
+            }
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    }
+    function expenseEdit(){
+        $datas=I("data");
+        $project_id=I("project_id");
+        $expense_id=I("expense_id");
+        $this->expenseCom->update(["where"=>["id"=>$project_id],"data"=>["update"=>time()]]);
+        $isUpdate =false;
+        if($insertRes->errCode==0){
+            foreach ($datas["expense-list"] as $subExpInfo) {
+                if($subExpInfo["id"]>0){
+                    $dataInfo = $this->expenseManage($subExpInfo);
+                    if($dataInfo){
+                        $insertResult=$this->expenseSubCom->update($dataInfo);
+                        $isUpdate = true;
+                    }
+                }else{
+                    $dataInfo = $this->expenseManage($subExpInfo);
+                    $dataInfo["parent_id"] = $expense_id;
+                    if($dataInfo){
+                        $insertResult=$this->expenseSubCom->insert($dataInfo);
+                        $isUpdate = true;
+                    }
+                }
+                
+            }
+            if($isUpdate){
+                $this->ajaxReturn(['errCode'=>0,'error'=>"修改成功"]);
+            }
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    }
+    //个人报销结束
+    //财务报销管理开始
     function fin_expenseControl(){
         $reqType=I('reqType');
         $this->assign("controlName","fin_expense");
@@ -262,4 +380,12 @@ class CostController extends BaseController{
             $this->returnHtml();
         }
     }
+    function getExpenseLiOne(){
+        $rows = I("rows");
+
+        $this->assign('rows',$rows);
+        $html=$this->fetch('Cost/costTable/expenseLi');
+        $this->ajaxReturn(['html'=>$html]);
+    }
+    //财务报销管理结束
 }

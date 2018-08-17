@@ -1,0 +1,13 @@
+<volist name="list" id="item">
+    <tr>
+        <td>{$item['code']|default="非项目"}</td>
+        <td>{$item['project_name']|default="非项目"}</td>
+        <td>{$item['project_date']|default="非项目"}</td>
+        <td>{$item['business_name']|default="非项目"}</td>
+        <td>{$item['leader_name']|default="非项目"}</td>
+        <td>{$item['add_date']}</td>
+        <td>{$item['all_item']}</td>
+        <td>{$item['all_money']}</td>
+        {:list_btn(get_defined_vars(),"id")}
+    </tr>
+</volist>

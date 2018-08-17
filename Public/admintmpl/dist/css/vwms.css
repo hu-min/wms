@@ -103,16 +103,14 @@
 	margin-top: 5px;
 }
 .supr-remove{
-	position: absolute;
-	left: 22px;
-	margin-top: 12px;
-	color: #555;
 	font-size: 30px;
+	width: 100%;
+	margin-top: -13px;
 };
 .supr-remove:hover{
 	color: red!important;
 }
-.show-media{
+.show-media,.clear-media{
 	cursor:pointer;
 }
 .show-media:hover{
@@ -127,8 +125,15 @@
 	background-color: #eee;
 	border: 1px solid #ccc;
 }
+.clear-media:hover{
+	background: #FF3300;
+	color:#fff;
+}
 .required:before{
 	content: "*";
 	color: red;
 	font-weight: bold;
+}
+.table > tbody > tr > td{
+	vertical-align: middle!important;
 }

@@ -1,0 +1,66 @@
+<volist name="list" id="item">
+
+</volist>
+<tr>
+    <td>
+        <span class="serial">{$rows}</span>
+        <button type="button" class="close supr-remove"><span>×</span></button>
+        <input type="hidden" class="modal-info" name="id" value="0">
+    </td> 
+    <td>
+        <div class="input-group">
+            <div class="input-group-addon">
+                <i class="fa fa-calendar"></i>
+            </div>
+            <input class="form-control pull-right date-input input-sm modal-info" name="happen_date" type="text">
+        </div>
+    </td>
+    <td>
+        <select class="form-control modal-info chosen-select" required="required" title="报销类别" data-value="basicId" data-req="getModuleList" data-pname="supplier_com" data-text="name" name="expense_type">
+            <option value="">选择报销类别</option>
+            <volist name="expTypeArr" id="item">
+                <option value="{$item['basicId']}">{$item['name']}</option>
+            </volist>
+        </select>
+    </td>
+    <td>
+        <input class="form-control modal-info input-sm"  name="cost_desc" title="费用说明"  value="" placeholder="费用说明" type="text">
+    </td>
+    <td>
+        <select class="form-control modal-info chosen-select"  title="报销凭证类型"  name="expen_vouch_type">
+            <volist name="expVouchType" id="item">
+                <option value="{$key}">{$item}</option>
+            </volist>
+        </select>
+    </td>
+    <td>
+        <input class="form-control modal-info input-sm"  name="money" title="发生金额"  value="" placeholder="发生金额" type="text">
+    </td>
+    <td>
+        <select class="form-control modal-info chosen-select" required="required" title="收款账户类型"  name="account_type">
+            <option value="0">收款账户</option>
+            <volist name="accountType" id="item">
+                <option value="{$key}">{$item}</option>
+            </volist>
+        </select>
+    </td>
+    <td>
+        <input class="form-control modal-info input-sm" name="account" required="required" title="收款账户详细"  value="" placeholder="收款账户详细" type="text">
+    </td>
+    <td>
+        <input class="form-control modal-info input-sm" name="remark" title="备注"  value="" placeholder="备注" type="text">
+    </td>
+    <td>
+        <div class="input-group">
+            <input class="form-control modal-info upload-file input-sm" readonly="readonly" name="vouch_file" type="text">
+            <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
+            <span class="input-group-addon clear-media"><i class="fa fa-recycle"></i></span>
+        </div>
+    </td>
+    <td name="status">
+        
+    </td>
+    <td>
+        <button type="button" class="btn btn-block bg-purple btn-sm">审批记录</button>
+    </td>
+</tr>

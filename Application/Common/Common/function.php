@@ -159,6 +159,14 @@ function utf8_substr($str,$length,$middle=false){
     return mb_substr($str,0,$length,"utf8").$suf;
 }
 
+function status_label($defind_vars){
+    $statusLabel = $defind_vars["statusLabel"];
+    
+    $statusType = $defind_vars["statusType"];
+    $item = $defind_vars["item"];
+    print_r($item);
+    echo "<span class='label bg-{$statusLabel[$item['status']]}'>{$statusType[$item['status']]}</span>";
+}
 //各类权限按钮全局函数开始
 /** 
  * @Author: vition 

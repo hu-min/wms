@@ -28,6 +28,7 @@ class BaseController extends \Common\Controller\BaseController{
         parent::_initialize();
         $this->userCom=getComponent('User');
         $this->LogCom=getComponent('Log');
+        $this->ApprLogCom=getComponent('ApproveLog');
         $this->nodeCom=getComponent('Node');
         $this->authority=C('authority');
         $this->nodeAuth=session('nodeAuth');
@@ -70,6 +71,7 @@ class BaseController extends \Common\Controller\BaseController{
             $this->assign('userId',session("userId"));
             $this->assign('processAuth',$this->processAuth);
             $this->assign('statusType',$this->statusType);
+            $this->assign('statusTypeJ',json_encode($this->statusType));
             $this->assign('statusLabel',$this->statusLabel);
             $this->assign('processType',$this->processType);
             

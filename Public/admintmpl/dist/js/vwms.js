@@ -202,9 +202,9 @@ $(document).on("click",".v-showmodal",function(){
              
             $(tabId+" .global-modal .modal-content").html(result.html);
             $(tabId+" "+vtarget).modal('toggle')
-            $(tabId+" .global-modal .modal-content").find("[required='required']").each(function(){
-                $(this).before('<span class="required"></span>')
-            })
+            // $(tabId+" .global-modal .modal-content").find("[required='required']").each(function(){
+            //     $(this).before('<span class="required"></span>')
+            // })
             if(gettype=="Edit"){
                 
                 // $("[required='required']").before('<span class="required"></span>');
@@ -484,6 +484,9 @@ $(function(){
             throw msg
         }
         media(file)
+    })
+    $(document).offon("click",tabId+" .clear-media",function(){
+        $(this).parent().children(".upload-file").val("")
     })
     
 })
@@ -768,19 +771,23 @@ function float(num,place) {
 var $fileInput = ""//当前文件input
 function upload(option){
     var url = option.url
+    var urlArr = {}
     if(!url == undefined){
         throw '没有请求网址';
     }
     var el = option.el !=undefined ? option.el : ".upload-file"
+    urlArr[tabId+el] = url
+    // console.log(urlArr);
     $(document).offon("click",tabId+" "+el,function(){
         $fileInput = $(this)
         if($(tabId+"-upload-modal").html() == undefined){
             var html='<div class="modal fade in" id="'+tabId.replace("#","")+'-upload-modal" style="display: block; padding-right: 17px;"><div class="modal-dialog" style="top: 10%;"><div class="modal-content"><div class="modal-header"><button type="button" class="close modal-close" data-dismiss="modal" aria-label="关闭"><span aria-hidden="true"> × </span></button><h4 class="modal-title">文件上传</h4></div><div class="modal-body"><div class="input-group"><input readonly="readonly" class="form-control upload-item" type="text"><div class="input-file none"><input class="upload-item-file" name="upload-file-name" multiple="multiple" type="file"></div><span class="input-group-btn"><button type="button" class="btn btn-info btn-flat load-files-btn"><i class="fa  fa-file"></i> 选择文件 </button></span></div></div><div class="modal-footer"><button type="button" class="btn btn-default pull-left modal-close" data-dismiss="modal">关闭</button><button type="button" class="btn btn-primary upload-file-btn"><i class="fa fa-upload" ></i> 全部上传</button></div></div></div></div>'
             $(document).find("body").append(html);
             
-            $(document).offon("click",tabId+"-upload-modal .modal-close",function(){
+            $(document).on("click",tabId+"-upload-modal .modal-close",function(){
                 $(this).parents(tabId+"-upload-modal").toggleClass("modal fade in")
                 $(this).parents(tabId+"-upload-modal").prev(".modal-backdrop").toggleClass("none")
+                $(this).parents(tabId+"-upload-modal").css("display","none")
             })
             $(document).offon("click",tabId+"-upload-modal .load-files-btn",function(){
                 $(this).parent().prev().find("input").trigger("click")
@@ -803,7 +810,7 @@ function upload(option){
                             uploadData = new FormData();
                             uploadData.append("file",tempFiles[fileName])
                             $.ajax({
-                                url:url,
+                                url:urlArr[tabId+el],
                                 type:"post",
                                 data:uploadData,
                                 processData:false,
@@ -856,6 +863,7 @@ function upload(option){
         }else{
             $(tabId+"-upload-modal").toggleClass("modal fade in")
             $(tabId+"-upload-modal").prev(".modal-backdrop").toggleClass("none")
+            $(tabId+"-upload-modal").css("display","block")
         }
     })
 }

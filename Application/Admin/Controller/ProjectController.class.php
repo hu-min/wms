@@ -189,7 +189,7 @@ class ProjectController extends BaseController{
                     return $result["list"];
                 }
                 break;
-            case 'brand': case 'execute_sub':  case 'projectType': case 'stage': case 'finance_id':
+            case 'brand': case 'execute_sub':  case 'projectType': case 'stage': case 'finance_id': case 'expense_type':
                 if($type=="execute_sub"){
                     $type = "execute";
                 }elseif($type == 'finance_id'){

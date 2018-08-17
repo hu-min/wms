@@ -1057,4 +1057,112 @@ class BasicController extends BaseController{
     function getCityList(){
         $this->ajaxReturn(["data"=>A("Project")->_getOption("city")]);
     }
+    //报销类别开始
+    /** 
+     * @Author: vition 
+     * @Date: 2018-08-16 09:59:15 
+     * @Desc: 报销类别管理 
+     */    
+    function expense_typeControl(){
+        $reqType=I('reqType');
+        $this->assign("controlName","basic_expense_type");
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    function basic_expense_type_modalOne(){
+        $title = "新建报销类别";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑报销类别";
+            $btnTitle = "保存数据";
+            $redisName="expense_typeList";
+            $resultData=$this->basicCom->redis_one($redisName,"basicId",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "template"=>"expense_typeModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-08-16 10:21:43 
+     * @Desc: 报销类别列表 
+     */    
+    function basic_expense_typeList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $where=["class"=>"expense_type"];
+
+        if($data['name']){
+            $where['name']=['LIKE','%'.$data['name'].'%'];
+        }
+        if($data['alias']){
+            $where['alias']=['LIKE','%'.$data['alias'].'%'];
+        }
+        if(isset($data['status'])){
+            $where['status']=$data['status'];
+        }else{
+            $where['status']=["lt",3];
+        }
+        $parameter=[
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>"basicId DESC",
+        ];
+        $basicResult=$this->basicCom->getBasicList($parameter);
+        $this->tablePage($basicResult,'Basic/basicTable/expense_typeList',"expense_typeList");
+    }
+    function manageExpenseTypeInfo(){
+        $reqType=I("reqType");
+        $datas=I("data");
+        if($reqType=="basic_expense_typeAdd"){
+            $datas['class']="expense_type";
+            unset($datas['basicId']);
+            return $datas;
+        }else if($reqType=="basic_expense_typeEdit"){
+            $where=["basicId"=>$datas['basicId']];
+            $data=[];
+            if(isset($datas['name'])){
+                $data['name']=$datas['name'];
+            }
+            if(isset($datas['alias'])){
+                $data['alias']=$datas['alias'];
+            }
+            if(isset($datas['remark'])){
+                $data['remark']=$datas['remark'];
+            }
+            if(isset($datas['status'])){
+                $data['status']=$datas['status'];
+            }
+            return ["where"=>$where,"data"=>$data];
+        }
+        return "";
+    }
+    function basic_expense_typeAdd(){
+        $Info=$this->manageExpenseTypeInfo();
+        if($Info){
+            $insertResult=$this->basicCom->insertBasic($Info);
+            if($insertResult && $insertResult->errCode==0){
+                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+            }
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    } 
+    function basic_expense_typeEdit(){
+        $Info=$this->manageExpenseTypeInfo();
+        $updateResult=$this->basicCom->updateBasic($Info);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+    //报销类别结束
 }

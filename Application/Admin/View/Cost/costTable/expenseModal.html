@@ -7,14 +7,12 @@
     <div class="modal-body">
         <form role="form">
             <div class="box-body">
-                <input class="modal-info" value="0" name="id" type="hidden">
-                <input class="modal-info" value="0" name="project_id" type="hidden">
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">
                             <label >选择项目：</label>
-                            <select class="form-control chosen-project chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
-                                <option value="0">选择项目</option>
+                            <select class="form-control project-info modal-info chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
+                                <option value="0">非项目报销</option>
                                 <volist name="projectArr" id="item">
                                     <option value="{$item['projectId']}">{$item['name']}</option>
                                 </volist>
@@ -24,7 +22,7 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="info-title">项目编号：</label>
-                            <input class="form-control project-info" readonly="readonly" name="project_name" title="项目编号"  value="" placeholder="项目编号" type="text">
+                            <input class="form-control project-info" readonly="readonly" name="code" title="项目编号"  value="" placeholder="项目编号" type="text">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -36,7 +34,7 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="info-title">项目日期：</label>
-                            <input class="form-control project-info" readonly="readonly" name="project_name" title="项目日期"  value="" placeholder="项目日期" type="text">
+                            <input class="form-control project-info" readonly="readonly" name="project_date" title="项目日期"  value="" placeholder="项目日期" type="text">
                         </div>
                     </div>
                 </div>
@@ -44,47 +42,47 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="info-title">营业主担：</label>
-                            <input class="form-control project-info" readonly="readonly" name="project_name" title="营业主担"  value="" placeholder="营业主担" type="text">
+                            <input class="form-control project-info" readonly="readonly" name="business_name" title="营业主担"  value="" placeholder="营业主担" type="text">
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="info-title">项目主担：</label>
-                            <input class="form-control project-info" readonly="readonly" name="project_name" title="项目主担"  value="" placeholder="项目主担" type="text">
+                            <input class="form-control project-info" readonly="readonly" name="leader_name" title="项目主担"  value="" placeholder="项目主担" type="text">
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="info-title">报销金额合计：</label>
-                            <input class="form-control project-info" name="project_name" title="报销金额合计"  value="" placeholder="报销金额合计" type="text">
+                            <input class="form-control project-info" readonly="readonly" name="all_money" title="报销金额合计"  value="0" placeholder="报销金额合计" type="text">
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <!-- <div class="col-md-3">
                         <div class="form-group">
-                            <label >收款账户类别：</label>
-                            <select class="form-control chosen-project chosen-select" title="收款账户类别" data-value="projectId"  data-text="name" name="project_id">
-                                <option value="0">收款账户类别</option>
-                                <volist name="projectArr" id="item">
-                                    <option value="{$item['projectId']}">{$item['name']}</option>
+                            <label >收款账户类型：</label>
+                            <select class="form-control modal-info chosen-select" required="required" title="收款账户类型"  name="account_type">
+                                <option value="0">收款账户</option>
+                                <volist name="accountType" id="item">
+                                    <option value="{$key}">{$item}</option>
                                 </volist>
                             </select>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="row">
-                    <div class="col-md-3">
+                    <!-- <div class="col-md-3">
                         <div class="form-group">
                             <label for="info-title">收款账户详细：</label>
-                            <input class="form-control project-info" name="project_name" title="收款账户详细"  value="" placeholder="收款账户详细" type="text">
+                            <input class="form-control modal-info" name="account" required="required" title="收款账户详细"  value="" placeholder="收款账户详细" type="text">
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="row">
-                    <div class="col-md-12"> <h5 class="box-title">点击右边"+"添加报销信息<i class="fa fa-fw fa-plus-square text-aqua add-subcompany" title="新增供应商" data-target=".bankstock-tab" style="cursor: pointer;"></i></h5></div>
+                    <div class="col-md-12"> <h5 class="box-title"><i class="fa fa-plus-square text-aqua add-expense" title="添加报销信息" data-target=".bankstock-tab" style="cursor: pointer;"> 添加报销信息</i></h5></div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <table class="table table-bordered table-hover">
+                        <table class="table table-bordered table-hover expense-list">
                             <thead>
                                 <tr>
                                     <th>序号</th>
@@ -94,10 +92,11 @@
                                     <th>报销凭证类型</th>
                                     <th>发生金额</th>
                                     <th>收款账户类别</th>
-                                    <th>报销状态</th>
-                                    <th>财务备注</th>
+                                    <th>收款账户</th>
+                                    <th>备注</th>
                                     <th>发票或凭证</th>
-                                    <th>操作</th>
+                                    <th>报销状态</th>
+                                    <th>审批记录</th>
                                 </tr>
                             </thead>
                             <tbody class="{$controlName}-table">
@@ -120,5 +119,6 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+        <input class="modal-info expense-id" value="0" name="id" type="hidden">
         {:save_btn(get_defined_vars())}
     </div>
