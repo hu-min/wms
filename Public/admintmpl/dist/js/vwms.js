@@ -18,7 +18,7 @@ $.fn.extend({offon:function(){
  * @Date: 2018-01-23 00:41:37 
  * @Desc: get方式获取数据 
  */    
-function get(url,indata,callBack){
+var get = function(url,indata,callBack){
     setLoad()
     asyncs=arguments[3]!=undefined?arguments[3]:true;
     indata["vtabId"]=tabId
@@ -464,7 +464,8 @@ $(function(){
         // console.log($(".chosen-container").css("display"))
         // console.log("chosenwidth"+$(".chosen-container").width())
         // width = width > 142 ? width : 142
-        $(".chosen-container").width("100%")
+        // console.log($(".chosen-container").parents(".form-inline"))
+        // $(".chosen-container").width("100%")
     })
     $(document).on("show.bs.modal", ".modal", function(){
         $(this).draggable({
@@ -488,7 +489,71 @@ $(function(){
     $(document).offon("click",tabId+" .clear-media",function(){
         $(this).parent().children(".upload-file").val("")
     })
-    
+    $(document).offon("click",".approve-group .approve-log,.approve-group .approve-con",function(){
+        var table = $(this).parents(".approve-group").data("table")
+        var id = $(this).parents(".approve-group").data("id")
+        var url = $(this).data("url")
+        
+        var indata = {table:table,id:id}
+        var apl_id = "approve-log-modal";
+        if($("#approve-log-modal").html() == undefined){
+            var html='<div class="modal fade in" id="'+apl_id+'" style="display: block; padding-right: 17px;"><div class="modal-dialog" style="top: 10%;"><div class="modal-content"><div class="modal-header"><button type="button" class="close modal-close" data-dismiss="modal" aria-label="关闭"><span aria-hidden="true"> × </span></button><h4 class="modal-title"></h4></div><div class="modal-body"></div><div class="modal-footer"><button type="button" class="btn btn-default pull-left modal-close" data-dismiss="modal">关闭</button></div></div></div></div>'
+            $(document).find("body").append(html);
+            $(document).on("click","#"+apl_id+" .modal-close",function(){
+                $(this).parents("#"+apl_id).toggleClass("modal fade in")
+                $(this).parents("#"+apl_id).prev(".modal-backdrop").toggleClass("none")
+                $(this).parents("#"+apl_id).css("display","none")
+            })
+            if($(this).hasClass("approve-con")){
+                $(document).on("click","#"+apl_id+" .modal-body .approve-btn",function(){
+                    var approve_remark = $("#"+apl_id+" .approve-remark").val()
+                    if(($(this).hasClass("bg-orange")  || $(this).hasClass("btn-danger")) && approve_remark == ""){
+                        notice(110,$(this).text()+"必须写明理由","操作异常");
+                        return false
+                    }
+                    indata["statu"] = $(this).data("statu")
+                    post(url,indata,function(result){})
+                })
+            }
+        }else{
+            $("#"+apl_id).toggleClass("modal fade in")
+            $("#"+apl_id).prev(".modal-backdrop").toggleClass("none")
+            $("#"+apl_id).css("display","block")
+        }
+        if($(this).hasClass("approve-log")){
+            var title = "审批记录"
+            var body = '<table class="table table-bordered"><thead><tr><th>审批人</th><th>职务</th><th>审批状态</th><th>审批时间</th></tr></thead><tbody></tbody></table><div><div class="progress progress-striped active"><div class="progress-bar progress-bar-primary" style="width: 0%"></div></div></div>'
+        }else{
+            var title = "审批操作"
+            var body ='<div class="form-group"><label>审批内容</label><textarea class="form-control approve-remark" rows="3" placeholder="如果驳回请写明理由"></textarea></div><div style="text-align: right;"> <button type="button" class="btn bg-olive approve-btn btn-sm" data-statu="1">通过</button> <button type="button" class="btn bg-orange approve-btn btn-sm" data-statu="2">驳回</button> <button type="button" class="btn btn-danger approve-btn btn-sm" data-statu="3">拒绝</button></div>';
+        }
+        $("#"+apl_id+" .modal-title").text(title);
+        $("#"+apl_id+" .modal-body").html(body);
+        if($(this).hasClass("approve-log")){
+            get(url,indata,function(result){
+                var current = 0;
+                if(result.errCode == 0){
+                    var trHtml = '';
+                    result.data.forEach(element => {
+                        trHtml+='<tr><td>'+element.user_name+'</td><td>'+element.role_name+'</td><td>'+element.state+'</td><td>'+element.add_time+'</td></tr>'
+                        if(Number(element.status) == 1){
+                            current++
+                        }
+                    });
+                    
+                    var progress = float(current/result.allProcess)*100
+                    if(progress>=100){
+                        $("#"+apl_id+" .modal-body .progress").removeClass("active");
+                    }
+                    $("#"+apl_id+" .modal-body tbody").html(trHtml);
+                    $("#"+apl_id+" .modal-body .progress .progress-bar").css("width",progress+"%");
+                    $("#"+apl_id+" .modal-body .progress .progress-bar").text("当前进度："+current+"/"+result.allProcess);
+                }
+            })
+        }else{
+
+        }
+    })
 })
 /** 
  * javascript comment 
@@ -744,6 +809,17 @@ function init_chosen(url,reqType,parental){
         }
         // console.log(option)
         $(this).chosen(option)
+        if($(this).parents(".form-inline").length>0 && $(window).width() > 750){
+            
+            if($(this).parent(".form-group").parent("div[class^='col-md']").length>0){
+                $(this).parent(".form-group").css("width","100%")
+                var all = $(this).parent(".form-group").width()
+                var babel = $(this).prev(".control-label").width()
+                $(this).next(".chosen-container").css("width",(Number(all)-Number(babel)-3)+"px")
+            }else{
+                $(this).next(".chosen-container").css("width","auto");
+            }           
+        }
     })
 }
 function float(num,place) {

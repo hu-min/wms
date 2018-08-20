@@ -268,6 +268,9 @@ class CostController extends BaseController{
         $data=I("data");
         $p=I("p")?I("p"):1;
         $where=[];
+        if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+            $where['user_id'] = session('userId');
+        }
         $parameter=[
             'where'=>$where,
             'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_date,c.state status ",
@@ -374,11 +377,66 @@ class CostController extends BaseController{
     function fin_expenseControl(){
         $reqType=I('reqType');
         $this->assign("controlName","fin_expense");
+        $this->assign('projectArr',$this->project->_getOption("project_id"));
+        $this->assign('userArr',$this->project->_getOption("create_user"));
+        $this->assign('accountType',$this->accountType);
+        $this->assign('expTypeArr',$this->project->_getOption("expense_type"));
+        $this->assign('expVouchType',$this->expVouchType);
         if($reqType){
             $this->$reqType();
         }else{
             $this->returnHtml();
         }
+    }
+    function fin_expenseList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $where=[];
+        $parameter=[
+            'where'=>$where,
+            'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_date ,c.state status",
+            'page'=>$p,
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>"id DESC",
+            "joins"=>[
+                // "LEFT JOIN (SELECT id pId , project_id,user_id FROM v_expense) e ON e.pId = parent_id",
+                "LEFT JOIN (SELECT projectId,code,name project_name,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,business,leader FROM v_project ) p ON p.projectId = project_id ",
+                "LEFT JOIN (SELECT userId ,userName user_name FROM v_user) u ON u.userId = user_id",
+                "LEFT JOIN (SELECT userId ,userName business_name FROM v_user) bu ON bu.userId = p.business",
+                "LEFT JOIN (SELECT userId ,userName leader_name FROM v_user) lu ON lu.userId = p.leader",
+                "LEFT JOIN (SELECT parent_id,count(*) all_item,FLOOR(SUM(`status`)/count(*)) state, SUM(money) all_money FROM v_expense_sub GROUP BY parent_id ) c ON parent_id = id",
+            ],
+        ];
+        
+        $listResult=$this->expenseCom->getList($parameter);
+        
+        $this->assign("tableName",$this->expenseCom->tableName());
+        $this->tablePage($listResult,'Cost/costTable/fin_expenseList',"fin_expenseList");
+    }
+    function fin_expense_modalOne(){
+        $title = "报销管理";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑报销";
+            $btnTitle = "保存数据";
+            $redisName="fin_expenseList";
+            $resultData=$this->expenseCom->redis_one($redisName,"id",$id);
+        }
+        if($resultData){
+            $resultData["tableData"] = [];
+            $resultData["tableData"]["expense-list"] = ["list"=>$this->expenseSubCom->getList(["where"=>["parent_id"=>$id],"fields"=>"*,FROM_UNIXTIME(happen_date,'%Y-%m-%d') happen_date"])["list"],"template"=>$this->fetch('Cost/costTable/expenseLi')];
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "template"=>"fin_expenseModal",
+        ];
+        $this->modalOne($modalPara);
     }
     function getExpenseLiOne(){
         $rows = I("rows");

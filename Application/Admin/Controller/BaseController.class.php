@@ -17,7 +17,7 @@ class BaseController extends \Common\Controller\BaseController{
     protected $exemption;
     protected $pageSize=15;
     protected $statusType=[0=>"待审核",1=>"启用",2=>"审核中",3=>"无效",4=>"删除"];
-    protected $processType=[0=>"未启用",1=>"批准",3=>"拒绝",4=>"删除"];
+    protected $processType=[0=>"未审批",1=>"批准",2=>"驳回",3=>"拒绝",4=>"删除"];
 
     protected $statusLabel=[0=>"blue",1=>"green",2=>"yellow",3=>"black",4=>"red"];
     /**

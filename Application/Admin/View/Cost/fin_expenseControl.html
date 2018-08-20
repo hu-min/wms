@@ -21,27 +21,33 @@
                         <h4 class="box-title">报销管理</h4>
                         
                     </div>
-                    <div class="box-body search-body company-search-box">
+                    <div class="box-body search-body search-box">
                         <div class="col-md-12">
                             <div class="form-inline">
-                                <div class="form-group">
-                                    <label >项目名称：</label>
-                                    <select class="form-control search-info input-sm" data-city="search-info" title="项目名称" name="provinceId">
-                                        <option value="">项目名称</option>
-                                        <volist name="province" id="item">
-                                            <option value="{$item.pid}">{$item.province}</option>
-                                        </volist>
-                                    </select>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="control-label">选择项目：</label>
+                                        <select class="form-control search-info  chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
+                                            <option value="">项目与非项目</option>
+                                            <option value="0">非项目报销</option>
+                                            <volist name="projectArr" id="item">
+                                                <option value="{$item['projectId']}">{$item['name']}</option>
+                                            </volist>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label >员工：</label>
-                                    <select class="form-control search-info input-sm" data-city="search-info" title="员工" name="provinceId">
-                                        <option value="">员工</option>
-                                        <volist name="province" id="item">
-                                            <option value="{$item.pid}">{$item.province}</option>
-                                        </volist>
-                                    </select>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="control-label">选择员工：</label>
+                                        <select class="form-control search-info  chosen-select" title="选择员工" data-value="projectId"  data-text="name" name="project_id">
+                                            <option value="0">选择员工</option>
+                                            <volist name="userArr" id="item">
+                                                <option value="{$item['userId']}">【{$item['roleName']}】{$item['userName']}</option>
+                                            </volist>
+                                        </select>
+                                    </div>
                                 </div>
+                                
                                 <div class="form-group">
                                     <label class="control-label">项目编号：</label>
                                     <input class="form-control search-info input-sm" name="company" placeholder="项目编号" type="text">
@@ -83,20 +89,19 @@
                 <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th>序号</th>
+                            <!-- <th>序号</th> -->
+                            <th>员工姓名</th>
                             <th>项目编号</th>
                             <th>项目名称</th>
                             <th>项目日期</th>
                             <th>营业主担</th>
                             <th>项目主担</th>
-                            <th>员工姓名</th>
-                            <th>借支日期</th>
+                            <th>报销日期</th>
+                            <th>报销项</th>
                             <th>费用金额</th>
-                            <th>收款账户类别</th>
-                            <th>报销状态</th>
                             <th>财务备注</th>
+                            <th>报销状态</th>
                             <th>审批记录</th>
-                            <th>报销明细</th>
                             <th>操作</th>
                         </tr>
                     </thead>
@@ -113,12 +118,58 @@
         </div>
     </section>
     <div class="modal fade global-modal" aria-hidden="true" data-backdrop="static" >
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-full">
             <div class="modal-content"></div>
         </div>
     </div>
     <script>
+        function fin_expense_initInfo(){
+            
+            init_chosen("{$url}","getOptionList",".global-modal");
+            init_date();
+            upload({url:"{:U('Cost/upload_filesAdd')}"})
+        }
+        function fin_expense_setInfo(info){
+            ["project_id","code","project_name","project_date","business_name","leader_name","all_money"].forEach(element=>{
+                if(element == "project_id"){
+                    var projectChosen= $(tabId+" .chosen-select[name='project_id']");
+                    var projectId = info["projectId"];
+                    if(projectChosen.find("option[value='"+info["projectId"]+"']").length==0){
+                        projectChosen.append("<option value='"+info["project_pid"]+"'>"+info["project_name"]+"</option>")
+                    }
+                }
+                $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
+            });
+            ["id","debit_money","free_type","require_date","account_type","account","debit_cause"].forEach(element=>{
+                if(info[element]!="" || info[element]!="0"){
+                    $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
+                }
+            });
+            ["expense-list"].forEach(element => {
+                if(info["tableData"] !=undefined && info["tableData"][element]["list"]){
+                    var list = info["tableData"][element]["list"];
+                    var template = info["tableData"][element]["template"];
+                    var statusType = JSON.parse('{$statusTypeJ}')
+                    var allMoney = 0;
+                    list.forEach(function(listData,rows){
+                        $(tabId+" .global-modal ."+element+" tbody").append(template);
+                        var $current = $(tabId+" .global-modal ."+element+" tbody tr").eq(rows);
+                        $current.find(".serial").text(Number(rows+1));
+                        for (var key in listData) {
+                            if(key == "status"){
+                                $current.find("td[name='"+key+"']").text(statusType[listData[key]]);
+                            }else{
+                                $current.find(".modal-info[name='"+key+"']").val(listData[key]);
+                            }
+                            
+                        }
+                        init_date(false,$current);
+                    });
+                }
+            });
+        }
         $(function(){
+            init_chosen("{$url}","getOptionList",".search-box");
             $(tabId+" .search-list").trigger("click");
         })
     </script>

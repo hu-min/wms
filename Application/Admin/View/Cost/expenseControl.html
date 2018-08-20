@@ -136,7 +136,7 @@
                 }
             });
             ["expense-list"].forEach(element => {
-                if(info["tableData"][element]["list"]){
+                if(info["tableData"] !=undefined && ["tableData"][element]["list"]){
                     var list = info["tableData"][element]["list"];
                     var template = info["tableData"][element]["template"];
                     var statusType = JSON.parse('{$statusTypeJ}')

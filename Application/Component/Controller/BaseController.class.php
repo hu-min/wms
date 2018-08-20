@@ -138,6 +138,9 @@ class BaseController extends \Common\Controller\BaseController{
     function M(){
         return $this->selfDB;
     }
+    function tableName(){
+        return $this->selfDB->getTableName();
+    }
     /** 
      * @Author: vition 
      * @Date: 2018-06-02 00:34:18 
