@@ -401,10 +401,15 @@ class CostController extends BaseController{
         $nodeId = getTabId(I("vtabId"));
         $process = $this->nodeCom->getProcess($nodeId);
         // print_r($process);exit;
-        $map['process_level']  = [["eq",($process["place"]-1)],["gt",$process["place"]],"OR"];
-        $map['title']  = array('like','%thinkphp%');
-        $map['_logic'] = 'or';
-        $where=["process_level"=>[["eq",($process["place"]-1)],["egt",($process["place"])],"OR"],"status"=>1,'_logic'=>'OR'];
+        // $map['process_level']  = [["eq",($process["place"]-1)],["gt",$process["place"]],"OR"];
+        // $map['title']  = array('like','%thinkphp%');
+        // $map['_logic'] = 'or';
+        if($process["place"]>0){
+            $where=["process_level"=>[["eq",($process["place"]-1)],["egt",($process["place"])],"OR"],"status"=>1,'_logic'=>'OR'];
+        }else{
+            $where=["status"=>1];
+        }
+        
         $parameter=[
             'where'=>$where,
             'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_date",

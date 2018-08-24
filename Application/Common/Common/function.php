@@ -176,7 +176,6 @@ function status_label($defind_vars){
 function list_btn($defind_vars,$id,$inlink=[],$onlycat=false){
     $statusLabel = $defind_vars["statusLabel"];
     $statusType = $defind_vars["statusType"];
-    $statusType = $defind_vars["statusType"];
     $item = $defind_vars["item"];
     $tableName = $defind_vars["tableName"];
     $controlName = $defind_vars["controlName"];
