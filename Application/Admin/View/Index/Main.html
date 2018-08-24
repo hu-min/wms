@@ -158,8 +158,8 @@
                 <img src="{$Think.session.avatar}" class="img-circle" alt="User Image">
 
                 <p>
-                  Alexander Pierce - Web Developer
-                  <small>Member since Nov. 2012</small>
+                  {$Think.session.userInfo.rolePName} >> {$Think.session.userInfo.roleName}
+                  <small>注册时间：{$Think.session.userInfo.regTime|date="Y-m-d H:i:s",###}</small>
                 </p>
               </li>
               <!-- Menu Body -->
@@ -180,7 +180,7 @@
               <!-- Menu Footer-->
               <li class="user-footer">
                 <div class="pull-left">
-                  <a href="#" class="btn btn-default btn-flat">Profile</a>
+                  <a href="#" class="btn btn-default btn-flat">个人资料</a>
                 </div>
                 <div class="pull-right">
                   <a href="{:U($logout)}" class="btn btn-default btn-flat">退出</a>
@@ -210,8 +210,10 @@
         </div>
         <div class="pull-left info">
           <p>{$Think.session.userName}</p>
-          <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+          <a href="#"><i class="fa fa-circle text-success"></i> 在线</a>
         </div>
+        <div class="role-group"><i class="fa fa-users text-orange
+          "></i> <span> {$Think.session.userInfo.rolePName} >> {$Think.session.userInfo.roleName} </span></div>
       </div>
       <!-- search form -->
       <form action="#" method="get" class="sidebar-form">

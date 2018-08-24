@@ -29,6 +29,7 @@ class IndexController extends BaseController{
         $this->display();
     }
     function Main(){
+        // print_r($_SESSION);
         $this->userId=session('userId');
         if(!$this->userId){
             $this->redirect('Index/LogOut');

@@ -140,6 +140,7 @@ class BaseController extends \Common\Controller\BaseController{
         if(empty($userInfo)){
 	    $this->vlog(0);
             //退出设置
+            session("userInfo",NULL);
             session('userId',NULL);
             session('userName',NULL);
             session('isLogin',NULL);
@@ -153,6 +154,7 @@ class BaseController extends \Common\Controller\BaseController{
             $this->redirect('Index/Login');
         }else{
             //登录设置
+            session("userInfo",$userInfo);
             session('userId',$userInfo['userId']);
             session('isLogin',1);
             session('loginName',$userInfo['loginName']);

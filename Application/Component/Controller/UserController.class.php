@@ -15,7 +15,7 @@ class UserController extends BaseController{
      * @Desc: 检查用户 
      */    
     function checkUser($parameter=[]){
-        $this->log($parameter);
+        // $this->log($parameter);
         $res=$this->initRes();
         if(!$parameter['loginName'] || !$parameter['password']){
             $res->errCode=110;
@@ -25,12 +25,16 @@ class UserController extends BaseController{
         $parameter['password']=sha1(sha1($parameter['password']));
         $parArray=[
             'where'=>$parameter,
-            'fields'=>'password',
-            'noField'=>true,
+            'fields'=>'*',
+            'joins'=>[
+                'LEFT JOIN (SELECT roleId role_id ,rolePid,roleName FROM v_role) r ON r.role_id = roleId',
+                'LEFT JOIN (SELECT roleId role_pid ,roleName rolePName FROM v_role) rp ON rp.role_pid = r.rolePid',
+            ],
         ];
         $userResult=$this->selfDB->getOne($parArray);
         $this->log($this->selfDB->_sql());
         if($userResult){
+            unset($userResult["password"]);
             if($userResult['status']!=1){
                 $res->errCode=10002;
                 $res->error=getError(10002);
@@ -42,8 +46,8 @@ class UserController extends BaseController{
                 $res->error=getError(10004);
                 return $res;
             }
-            $roleResult = $this->roleDB->getOne(["where"=>["roleId"=>$userResult['roleId']],"fields"=>"rolePid"]);
-            $userResult['rolePid'] = $roleResult["rolePid"];
+            // $roleResult = $this->roleDB->getOne(["where"=>["roleId"=>$userResult['roleId']],"fields"=>"rolePid"]);
+            // $userResult['rolePid'] = $roleResult["rolePid"];
             $this->getUserNode($userResult['userId']);
             $res->errCode=0;
             $res->error=getError(0);

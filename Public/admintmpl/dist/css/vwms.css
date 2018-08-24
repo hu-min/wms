@@ -137,3 +137,10 @@
 .table > tbody > tr > td{
 	vertical-align: middle!important;
 }
+.user-panel .role-group{
+	text-align: center;
+	color: #b8c7ce;
+	line-height: 30px;
+	overflow: hidden;
+	clear: both;
+}
