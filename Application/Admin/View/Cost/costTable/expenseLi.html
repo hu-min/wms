@@ -12,7 +12,7 @@
             <div class="input-group-addon">
                 <i class="fa fa-calendar"></i>
             </div>
-            <input class="form-control pull-right date-input input-sm modal-info" name="happen_date" type="text">
+            <input class="form-control pull-right date-input input-sm modal-info" readonly="readonly" name="happen_date" type="text">
         </div>
     </td>
     <td>
@@ -45,7 +45,7 @@
         </select>
     </td>
     <td>
-        <input class="form-control modal-info input-sm" name="account" required="required" title="收款账户详细"  value="" placeholder="收款账户详细" type="text">
+        <input class="form-control modal-info input-sm" name="account"  title="收款账户详细"  value="" placeholder="收款账户详细" type="text">
     </td>
     <td>
         <input class="form-control modal-info input-sm" name="remark" title="备注"  value="" placeholder="备注" type="text">
@@ -57,10 +57,11 @@
             <span class="input-group-addon clear-media"><i class="fa fa-recycle"></i></span>
         </div>
     </td>
+    <input class="modal-info" value="0" type="hidden" name="status"/>
     <td name="status">
         
     </td>
     <td>
-        <button type="button" class="btn btn-block bg-purple btn-sm">审批记录</button>
+        {:approve_btn($tableName)}
     </td>
 </tr>

@@ -130,6 +130,10 @@
             upload({url:"{:U('Cost/upload_filesAdd')}"})
         }
         function fin_expense_setInfo(info){
+            $(tabId+" .global-modal .table-id[name='table-id']").val(info["id"]);
+            if(info.process.place>0){
+                $(tabId+" .global-modal .place-id[name='place-id']").val(info.process.place);
+            }
             ["project_id","code","project_name","project_date","business_name","leader_name","all_money"].forEach(element=>{
                 if(element == "project_id"){
                     var projectChosen= $(tabId+" .chosen-select[name='project_id']");
@@ -139,11 +143,13 @@
                     }
                 }
                 $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
+                
             });
             ["id","debit_money","free_type","require_date","account_type","account","debit_cause"].forEach(element=>{
                 if(info[element]!="" || info[element]!="0"){
                     $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
                 }
+
             });
             ["expense-list"].forEach(element => {
                 if(info["tableData"] !=undefined && info["tableData"][element]["list"]){
@@ -151,17 +157,31 @@
                     var template = info["tableData"][element]["template"];
                     var statusType = JSON.parse('{$statusTypeJ}')
                     var allMoney = 0;
+                    
                     list.forEach(function(listData,rows){
                         $(tabId+" .global-modal ."+element+" tbody").append(template);
                         var $current = $(tabId+" .global-modal ."+element+" tbody tr").eq(rows);
                         $current.find(".serial").text(Number(rows+1));
+                        //处理权限问题，
+                        if(info.process.place<1 || listData["a_status"] >= 1){
+                            $current.find(".approve-group .approve-con").addClass("disabled")
+                            $current.find(".approve-group .approve-con").prop("disabled",true)
+                        }
+                        $current.find(".clear-media").remove();
+                        
                         for (var key in listData) {
                             if(key == "status"){
-                                $current.find("td[name='"+key+"']").text(statusType[listData[key]]);
+                                var status = listData[key]
+                                if(Number(listData["last_status"])>1){
+                                    status= listData["last_status"]
+                                }
+                                $current.find("td[name='"+key+"']").text(statusType[status]);
+                            }else if(key == "id"){
+                                $current.find(".approve-group").data("id",listData[key])
                             }else{
                                 $current.find(".modal-info[name='"+key+"']").val(listData[key]);
                             }
-                            
+                            $current.find(".modal-info[name='"+key+"']").prop("disabled",true);
                         }
                         init_date(false,$current);
                     });

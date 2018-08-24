@@ -229,6 +229,7 @@ class CostController extends BaseController{
     function expenseControl(){
         $reqType=I('reqType');
         $this->assign("controlName","expense");
+        $this->assign("tableName",$this->expenseSubCom->tableName());
         $this->assign('accountType',$this->accountType);
         $this->assign('projectArr',$this->project->_getOption("project_id"));
         $this->assign('expTypeArr',$this->project->_getOption("expense_type"));
@@ -267,21 +268,23 @@ class CostController extends BaseController{
     function expenseList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
+        $this->assign("tableName",$this->expenseCom->tableName());
         $where=[];
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+            // print_r(session('userId'));
             $where['user_id'] = session('userId');
         }
         $parameter=[
             'where'=>$where,
-            'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_date,c.state status ",
+            'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_date ",
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"id DESC",
             "joins"=>[
                 "LEFT JOIN (SELECT projectId,code,name project_name,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,business,leader FROM v_project ) p ON p.projectId = project_id ",
-                "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = p.business",
-                "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
-                "LEFT JOIN (SELECT parent_id,count(*) all_item,FLOOR(SUM(`status`)/count(*)) state, SUM(money) all_money FROM v_expense_sub GROUP BY parent_id ) c ON parent_id = id",
+                "LEFT JOIN (SELECT userId buser_id,userName business_name FROM v_user) bu ON bu.buser_id = p.business",
+                "LEFT JOIN (SELECT userId luser_id,userName leader_name FROM v_user) lu ON lu.luser_id = p.leader",
+                "LEFT JOIN (SELECT parent_id,count(*) all_item,SUM(money) all_money FROM v_expense_sub GROUP BY parent_id ) c ON parent_id = id",
             ],
         ];
         
@@ -301,18 +304,18 @@ class CostController extends BaseController{
             $where=["id"=>$datas['id']];
             $data=[];
             $data['updateTime']=time();
-            foreach (["account","account_type","cost_desc","expen_vouch_type","expense_type","happen_date","money","remark","vouch_file"] as $key) {
+            foreach (["id","account","account_type","cost_desc","expen_vouch_type","expense_type","happen_date","money","remark","vouch_file","status"] as $key) {
                 if(isset($datas[$key])){
                     $data[$key] = $datas[$key];
                 } 
             }
-            if(isset($datas['status'])){
-                $parameter=[
-                    'where'=>["id"=>$datas['id']],
-                ];
-                $result=$this->purchaCom->getList($parameter,true);
-                $data = $this->status_update($result,$datas["status"],$data);
-            }
+            // if(isset($datas['status'])){
+                // $parameter=[
+                //     'where'=>["id"=>$datas['id']],
+                // ];
+                // $result=$this->purchaCom->getList($parameter,true);
+                // $data = $this->status_update($result,$datas["status"],$data);
+            // }
             return ["where"=>$where,"data"=>$data];
         }
         return "";
@@ -332,7 +335,8 @@ class CostController extends BaseController{
                 $dataInfo = $this->expenseManage($subExpInfo);
                 $dataInfo["parent_id"] = $insertRes->data;
                 if($dataInfo){
-                    $insertResult=$this->expenseSubCom->insert($dataInfo);
+                    $insertResult=$this->expenseSubCom->insert($dataInfo); 
+                    $this->ApprLogCom->createApp($this->expenseSubCom->tableName(),$insertResult->data,session("userId"),"");
                     $isInsert = true;
                 }
             }
@@ -354,17 +358,18 @@ class CostController extends BaseController{
                     $dataInfo = $this->expenseManage($subExpInfo);
                     if($dataInfo){
                         $insertResult=$this->expenseSubCom->update($dataInfo);
+                        $this->ApprLogCom->updateStatus($this->expenseSubCom->tableName(),$subExpInfo["id"],$expense_id);
                         $isUpdate = true;
+                        //这里需要判断状态是否改过来了
                     }
                 }else{
-                    $dataInfo = $this->expenseManage($subExpInfo);
+                    $dataInfo = $this->expenseManage($subExpInfo,"expenseAdd");
                     $dataInfo["parent_id"] = $expense_id;
                     if($dataInfo){
                         $insertResult=$this->expenseSubCom->insert($dataInfo);
                         $isUpdate = true;
                     }
                 }
-                
             }
             if($isUpdate){
                 $this->ajaxReturn(['errCode'=>0,'error'=>"修改成功"]);
@@ -377,6 +382,7 @@ class CostController extends BaseController{
     function fin_expenseControl(){
         $reqType=I('reqType');
         $this->assign("controlName","fin_expense");
+        $this->assign("tableName",$this->expenseSubCom->tableName());
         $this->assign('projectArr',$this->project->_getOption("project_id"));
         $this->assign('userArr',$this->project->_getOption("create_user"));
         $this->assign('accountType',$this->accountType);
@@ -391,10 +397,17 @@ class CostController extends BaseController{
     function fin_expenseList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
-        $where=[];
+        $this->assign("tableName",$this->expenseCom->tableName());
+        $nodeId = getTabId(I("vtabId"));
+        $process = $this->nodeCom->getProcess($nodeId);
+        // print_r($process);exit;
+        $map['process_level']  = [["eq",($process["place"]-1)],["gt",$process["place"]],"OR"];
+        $map['title']  = array('like','%thinkphp%');
+        $map['_logic'] = 'or';
+        $where=["process_level"=>[["eq",($process["place"]-1)],["egt",($process["place"])],"OR"],"status"=>1,'_logic'=>'OR'];
         $parameter=[
             'where'=>$where,
-            'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_date ,c.state status",
+            'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_date",
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"id DESC",
@@ -404,13 +417,13 @@ class CostController extends BaseController{
                 "LEFT JOIN (SELECT userId ,userName user_name FROM v_user) u ON u.userId = user_id",
                 "LEFT JOIN (SELECT userId ,userName business_name FROM v_user) bu ON bu.userId = p.business",
                 "LEFT JOIN (SELECT userId ,userName leader_name FROM v_user) lu ON lu.userId = p.leader",
-                "LEFT JOIN (SELECT parent_id,count(*) all_item,FLOOR(SUM(`status`)/count(*)) state, SUM(money) all_money FROM v_expense_sub GROUP BY parent_id ) c ON parent_id = id",
+                "LEFT JOIN (SELECT parent_id,count(*) all_item, SUM(money) all_money FROM v_expense_sub GROUP BY parent_id ) c ON parent_id = id",
             ],
         ];
         
+        //"LEFT JOIN (SELECT GROUP_CONCAT(table_id ORDER BY add_time DESC) aid ,GROUP_CONCAT(status ORDER BY add_time DESC) last_status FROM v_approve_log WHERE table_name = '".$this->expenseSubCom->tableName()."' GROUP BY table_id) al ON al.aid = id",
         $listResult=$this->expenseCom->getList($parameter);
-        
-        $this->assign("tableName",$this->expenseCom->tableName());
+        // print_r($listResult);exit;
         $this->tablePage($listResult,'Cost/costTable/fin_expenseList',"fin_expenseList");
     }
     function fin_expense_modalOne(){
@@ -419,7 +432,9 @@ class CostController extends BaseController{
         $gettype = I("gettype");
         $resultData=[];
         $id = I("id");
-        
+        $nodeId = getTabId(I("vtabId"));
+       
+        // print_r($process);
         if($gettype=="Edit"){
             $title = "编辑报销";
             $btnTitle = "保存数据";
@@ -428,7 +443,17 @@ class CostController extends BaseController{
         }
         if($resultData){
             $resultData["tableData"] = [];
-            $resultData["tableData"]["expense-list"] = ["list"=>$this->expenseSubCom->getList(["where"=>["parent_id"=>$id],"fields"=>"*,FROM_UNIXTIME(happen_date,'%Y-%m-%d') happen_date"])["list"],"template"=>$this->fetch('Cost/costTable/expenseLi')];
+            $resultData["process"] = $this->nodeCom->getProcess($nodeId);
+            $subPar=[
+                "where" => ["parent_id"=>$id],
+                "fields"=> "*,FROM_UNIXTIME(happen_date,'%Y-%m-%d') happen_date",
+                "joins" =>[
+                    "LEFT JOIN (SELECT table_id,status a_status FROM v_approve_log WHERE table_name = '".$this->expenseSubCom->tableName()."' AND user_id = ".session("userId").") ap ON ap.table_id = id",
+                    "LEFT JOIN (SELECT GROUP_CONCAT(table_id ORDER BY add_time DESC) aid ,GROUP_CONCAT(status ORDER BY add_time DESC) last_status FROM v_approve_log WHERE table_name = '".$this->expenseSubCom->tableName()."' GROUP BY table_id) al ON al.aid = id",
+                ],
+            ];
+
+            $resultData["tableData"]["expense-list"] = ["list"=>$this->expenseSubCom->getList($subPar)["list"],"template"=>$this->fetch('Cost/costTable/expenseLi')];
         }
         $modalPara=[
             "data"=>$resultData,

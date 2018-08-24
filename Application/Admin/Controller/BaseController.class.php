@@ -16,13 +16,13 @@ class BaseController extends \Common\Controller\BaseController{
     protected $nodeAuth;
     protected $exemption;
     protected $pageSize=15;
-    protected $statusType=[0=>"待审核",1=>"启用",2=>"审核中",3=>"无效",4=>"删除"];
-    protected $processType=[0=>"未审批",1=>"批准",2=>"驳回",3=>"拒绝",4=>"删除"];
+    // protected $statusType=[0=>"提交申请",1=>"批准",2=>"审核中",3=>"无效",4=>"删除"];
+    protected $statusType=[0=>"提交申请",1=>"批准",2=>"审核中",3=>"驳回",4=>"删除",5=>"拒绝"];
 
-    protected $statusLabel=[0=>"blue",1=>"green",2=>"yellow",3=>"black",4=>"red"];
+    protected $statusLabel=[0=>"blue",1=>"green",2=>"yellow",3=>"orange ",4=>"red",5=>'black'];
     /**
      * 对admin的每一个控制器和方法做权限检查
-     */
+     */ 
     public function _initialize() {
         // echo 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'];exit;
         parent::_initialize();
@@ -47,6 +47,7 @@ class BaseController extends \Common\Controller\BaseController{
         $nowConAct=MODULE_NAME."/".CONTROLLER_NAME.'/'.ACTION_NAME;
         if(in_array($nowConAct,$this->exemption) || (ACTION_NAME == 'upload_filesAdd' && $this->isLogin())){
             if(!$this->isLogin() && !in_array(ACTION_NAME,['checkLogin','Login']) ){
+                session("history",domain(false).__SELF__);
                 $this->redirect('Index/Login');
             }elseif($this->isLogin() && ACTION_NAME=='Login'){
                 $this->redirect('Index/Main');
@@ -73,7 +74,8 @@ class BaseController extends \Common\Controller\BaseController{
             $this->assign('statusType',$this->statusType);
             $this->assign('statusTypeJ',json_encode($this->statusType));
             $this->assign('statusLabel',$this->statusLabel);
-            $this->assign('processType',$this->processType);
+            // $this->assign('processType',$this->processType);
+            // $this->assign('processTypeJ',json_encode($this->processType));
             
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->assign("pageId",$this->createId());
@@ -147,6 +149,7 @@ class BaseController extends \Common\Controller\BaseController{
             session('rolePid',NULL);
             session('usertype',NULL);
             session('nodeAuth',[]);
+            session("history",NULL);
             $this->redirect('Index/Login');
         }else{
             //登录设置
@@ -305,7 +308,7 @@ class BaseController extends \Common\Controller\BaseController{
      */    
     function globalStatusEdit(){
         extract($_REQUEST);
-        $dbObject=D($db);
+        $dbObject=M($db,NULL);
         $msg="删除成功！";
         if($statusType=="del"){
             $conResult=$dbObject->save([$dbObject->getPk()=>$id,"status"=>$status]);

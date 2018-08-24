@@ -2,7 +2,7 @@
     <tr>
         <td>{$item['user_name']|default="非项目"}</td>
         <td>{$item['code']|default="非项目"}</td>
-        <td>{$item[' _name']|default="非项目"}</td>
+        <td>{$item['project_name']|default="非项目"}</td>
         <td>{$item['project_date']|default="非项目"}</td>
         <td>{$item['business_name']|default="非项目"}</td>
         <td>{$item['leader_name']|default="非项目"}</td>
@@ -11,10 +11,7 @@
         <td>{$item['all_money']}</td>
         <td>{$item['remark']}</td>
         <td>
-            <div class="approve-group" data-table="{$tableName}" data-id="{$item['id']}" >
-                <button type="button" data-url="{:U('Tools/getApproveList')}" class="btn btn-sm bg-purple approve-log">记录</button>
-                <button type="button" data-url="{:U('Tools/approveEdit')}" class="btn btn-sm bg-orange approve-con">操作</button>
-            </div>
+            <!-- {:approve_btn($tableName)} -->
         </td>
         {:list_btn(get_defined_vars(),"id")}
     </tr>

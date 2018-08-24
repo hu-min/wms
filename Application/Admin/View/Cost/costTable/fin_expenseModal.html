@@ -11,7 +11,7 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label >选择项目：</label>
-                        <select class="form-control project-info modal-info chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
+                        <select class="form-control project-info modal-info chosen-select" title="选择项目" data-value="projectId"  data-text="name" disabled="disabled" name="project_id">
                             <option value="0">非项目报销</option>
                             <volist name="projectArr" id="item">
                                 <option value="{$item['projectId']}">{$item['name']}</option>
@@ -77,9 +77,9 @@
                     </div>
                 </div> -->
             </div>
-            <div class="row">
-                <div class="col-md-12"> <h5 class="box-title"><i class="fa fa-plus-square text-aqua add-expense" title="添加报销信息" data-target=".bankstock-tab" style="cursor: pointer;"> 添加报销信息</i></h5></div>
-            </div>
+            <!-- <div class="row"> -->
+                <!-- <div class="col-md-12"> <h5 class="box-title"><i class="fa fa-plus-square text-aqua add-expense" title="添加报销信息" data-target=".bankstock-tab" style="cursor: pointer;"> 添加报销信息</i></h5></div> -->
+            <!-- </div> -->
             <div class="row">
                 <div class="col-md-12">
                     <table class="table table-bordered table-hover expense-list">
@@ -110,7 +110,7 @@
             </div>
             <div class="form-group">
                 <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
-                    <input class="modal-info" value="0" name="status" type="hidden">
+                    <!-- <input class="modal-info" value="0" name="status" type="hidden"> -->
                     {:modal_btn(get_defined_vars())}
                 </div>
             </div>
@@ -120,5 +120,7 @@
 <div class="modal-footer">
     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
     <input class="modal-info expense-id" value="0" name="id" type="hidden">
-    {:save_btn(get_defined_vars())}
+    <input class="table-id" value="0" name="table-id" type="hidden">
+    <input class="place-id" value="0" name="place-id" type="hidden">
+    <!-- {:save_btn(get_defined_vars())} -->
 </div>

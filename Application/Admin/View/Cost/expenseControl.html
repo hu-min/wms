@@ -135,41 +135,54 @@
                     $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
                 }
             });
-            ["expense-list"].forEach(element => {
-                if(info["tableData"] !=undefined && ["tableData"][element]["list"]){
-                    var list = info["tableData"][element]["list"];
-                    var template = info["tableData"][element]["template"];
-                    var statusType = JSON.parse('{$statusTypeJ}')
-                    var allMoney = 0;
-                    list.forEach(function(listData,rows){
-                        $(tabId+" .global-modal ."+element+" tbody").append(template);
-                        var $current = $(tabId+" .global-modal ."+element+" tbody tr").eq(rows);
-                        $current.find(".serial").text(Number(rows+1));
-                        for (var key in listData) {
-                            // if(key == "pay_money" || key == "invoice_money"){
-                            //     allMoney += float(listData[key],2);
-                            // }
-                            
-                            // console.log(statusType)
-                            if(key == "status"){
-                                $current.find("td[name='"+key+"']").text(statusType[listData[key]]);
-                            }else{
-                                $current.find(".modal-info[name='"+key+"']").val(listData[key]);
-                            }
-                            
+            set_table_data(["expense-list"],info["tableData"],JSON.parse('{$statusTypeJ}'),function($current,listData,statusType){
+                $current.find(".approve-group .approve-con").remove()
+                for (var key in listData) {
+                    if(key == "status"){
+                        var status = listData[key]
+                        if(Number(listData["last_status"])>1){
+                            status= listData["last_status"]
                         }
-                        init_date(false,$current);
-                    });
-                    // if(element == "suprfina-list"){
-                    //     $(tabId+" .project-info[name='paid']").val(allMoney);
-                    //     $(tabId+" .project-info[name='surplus']").val(float(info["contract_amount"])-float(allMoney));
-                    // }else if(element == "invoice-list"){
-                    //     $(tabId+" .project-info[name='all_invoice']").val(info["contract_amount"]);
-                    //     $(tabId+" .project-info[name='invoiced']").val(allMoney);
-                    //     $(tabId+" .project-info[name='invoice_supr']").val(float(info["contract_amount"])-float(allMoney));
-                    // }
+                        $current.find("td[name='"+key+"']").text(statusType[status]);
+                        $current.find(".modal-info[name='"+key+"']").val(listData[key]);
+                    }else{
+                        if(key == "id"){
+                            $current.find(".approve-group").data("id",listData[key])
+                        }
+                        $current.find(".modal-info[name='"+key+"']").val(listData[key]);
+                        if(!in_array(listData["status"],[0,3])){
+                            $current.find(".modal-info[name='"+key+"']").prop("disabled",true);
+                            $current.find(".clear-media").remove();
+                        }
+                    }
                 }
+                init_date(false,$current);
             });
+            // ["expense-list"].forEach(element => {
+            //     if(info["tableData"] !=undefined && info["tableData"][element]["list"]){
+            //         var list = info["tableData"][element]["list"];
+            //         var template = info["tableData"][element]["template"];
+            //         var statusType = JSON.parse('{$statusTypeJ}');
+            //         var allMoney = 0;
+            //         list.forEach(function(listData,rows){
+            //             $(tabId+" .global-modal ."+element+" tbody").append(template);
+            //             var $current = $(tabId+" .global-modal ."+element+" tbody tr").eq(rows);
+            //             $current.find(".serial").text(Number(rows+1));
+            //             for (var key in listData) {
+            //                 if(key == "status"){
+            //                     $current.find("td[name='"+key+"']").text(statusType[listData[key]]);
+            //                 }else{
+            //                     $current.find(".modal-info[name='"+key+"']").val(listData[key]);
+            //                     if(listData["status"] == 1){
+            //                         $current.find(".modal-info[name='"+key+"']").prop("disabled",true);
+            //                     }
+                                
+            //                 }
+            //             }
+            //             init_date(false,$current);
+            //         });
+            //     }
+            // });
         }
         function expense_getInfo(){
             var expense_id = $(tabId+" .expense-id[name='id']").val()
@@ -179,12 +192,14 @@
             datas["project_id"] = project_id
 
             datas["data"] = {};
+            var gettype = $(tabId+" .global-modal .modal-footer .save-info").data("gettype");
             ["expense-list"].forEach(element => {
                 datas["data"][element] = [];
                 $(tabId+" .global-modal ."+element+" tbody tr").each(function(){
                     tempSupr = {}
                     
                     $(this).find(".modal-info").each(function(){
+                        
                         var name = $(this).attr("name");
                         var val = $(this).val();
                         var required=$(this).attr("required");
@@ -196,7 +211,10 @@
                             tempSupr[name]=val;
                         }
                     })
-                    datas["data"][element].push(tempSupr);
+                    if(gettype=="Add" || (gettype=="Edit" && in_array(tempSupr["status"],[0,3])) ){
+                        tempSupr["status"] = tempSupr["status"] == 3 ? 0 : tempSupr["status"];
+                        datas["data"][element].push(tempSupr);
+                    }
                 })
             });
         }
@@ -228,6 +246,7 @@
                     var rows = datas["rows"];
                     get("{$url}",datas,function(result){
                         $(tabId+" .global-modal ."+element[2]+"").append(result.html);
+                        $(tabId+" .global-modal ."+element[2]+" tr").eq(rows).find(".approve-group").remove()
                         init_chosen("{$url}","getProjectOne",$(tabId+" .global-modal ."+element[2]+" tr").eq(rows));
                         init_date(false,$(tabId+" .global-modal ."+element[2]+" tr").eq(rows));
                     })
@@ -236,6 +255,14 @@
                     $(this).parents("tr").remove();
                 })
             });
+
+            $(tabId+" .global-modal").on("input",".modal-info[name='money']",function(){
+                var all_money = 0;
+                $(tabId+" .global-modal").find(".modal-info[name='money']").each(function(){
+                    all_money += float($(this).val());
+                })
+                $(tabId+" .global-modal").find(".project-info[name='all_money']").val(all_money);
+            })
         })
     </script>
 </body>

@@ -104,11 +104,15 @@
             data:datas,
             success:function(result){
                 if(result.errCode==0){
-                  window.location.href="{:U('Index/Index')}";
+					if(result.data.history){
+						window.location.href=result.data.history;
+					}else{
+						window.location.href="{:U('Index/Index')}";
+					}
                 }else if(result.error){
-                  alert(result.error)
+                	alert(result.error)
                 }else{
-                  alert("账户异常请联系管理员")
+                	alert("账户异常请联系管理员")
                 }
             }
         })

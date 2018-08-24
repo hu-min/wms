@@ -56,6 +56,11 @@ class IndexController extends BaseController{
         if($userResult->errCode==0){
             $this->setLogin($userResult->data);
         }
+        if(session("history")){
+            $history = session("history");
+            session("history",NULL);
+            $userResult->data["history"] = $history;
+        }
         $this->ajaxReturn($userResult);
     }
     /** 
