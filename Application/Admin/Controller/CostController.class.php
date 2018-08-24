@@ -404,11 +404,14 @@ class CostController extends BaseController{
         // $map['process_level']  = [["eq",($process["place"]-1)],["gt",$process["place"]],"OR"];
         // $map['title']  = array('like','%thinkphp%');
         // $map['_logic'] = 'or';
-        if($process["place"]>0){
-            $where=["process_level"=>[["eq",($process["place"]-1)],["egt",($process["place"])],"OR"],"status"=>1,'_logic'=>'OR'];
-        }else{
-            $where=["status"=>1];
+        if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+            if($process["place"]>0){
+                $where=["process_level"=>[["eq",($process["place"]-1)],["egt",($process["place"])],"OR"],"status"=>1,'_logic'=>'OR'];
+            }else{
+                $where=["status"=>1];
+            }
         }
+        
         
         $parameter=[
             'where'=>$where,

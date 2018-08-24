@@ -130,7 +130,7 @@ class UserController extends BaseController{
      */    
     function userEdit(){
         $userInfo=$this->manageUserInfo();
-        if($userInfo["roleId"]==2 && session("roleId")!=2){
+        if($userInfo["userId"]==1 && session("userId")!=1){
             $this->ajaxReturn(['errCode'=>10003,'error'=>getError(10003)]);
         }
         $updateResult=$this->userCom->updateUser($userInfo);
