@@ -91,6 +91,7 @@
                             <th>纯利</th>
                             <th>纯利率</th>
                             <th>项目阶段</th>
+                            <th>审批记录</th>
                             <th>状态</th>
                             <th>操作</th>
                         </tr>
@@ -177,10 +178,13 @@
                 projectChosen.find("option[value='"+projectId+"']").prop("selected",true);
                 projectChosen.trigger("chosen:updated");
             }
-            ["projectId","session_all","session_cur","contract","amount","code","project_time","days","name","customer_other","create_time","bid_date","bid_time"].forEach(element => {
+            ["projectId","session_all","session_cur","contract","amount","code","project_time","days","name","customer_other","create_time","bid_date","bid_time","status"].forEach(element => {
                 if(info[element]!=null){
                     $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
                 }
+                // if(info["status"]>0){
+                //     $(tabId+" .modal-info[name='"+element+"']").prop("disabled",true);
+                // }
             });
             ["brand","customer_com","customer_cont","province","city","field","create_user","is_bid","bidding","business","leader","execute","execute_sub","type","stage"].forEach(element => {
                 var select= $(tabId+" .modal-info[name='"+element+"']")
@@ -201,6 +205,9 @@
                         select.trigger("chosen:updated");
                     }
                 }
+                // if(info["status"]>0){
+                //     select.prop("disabled",true);
+                // }
             });
             ["earlier_user","scene_user"].forEach(element => {
                 if(info[element]!=null){
@@ -217,14 +224,25 @@
                     if(select.hasClass("chosen-select")){
                         select.trigger("chosen:updated");
                     }
+                    // if(info["status"]>0){
+                    //     select.prop("disabled",true);
+                    // }
                 }
             });
-            // console.log(info['processLevel'])
+            // console.log(info['process_level'])
             // console.log(info['status'])
             // console.log("{$nodeAuth}")
             // console.log("{$gettype}")
-            if((info['processLevel'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7 && "{$gettype}" == "Edit"){
+            // console.log(info['author'])
+            // console.log("{$Think.session.userId}")
+            if(( info['status'] > 0 || info['author'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3){
                 $(tabId+" .modal-info").prop("disabled",true)
+            }
+            //设置审批按钮状态
+            $(tabId+" .global-modal").find(".approve-group").data("id",info['projectId'])
+            if(info['process_level'] >= "{$place}"){
+                $(tabId+" .global-modal").find(".approve-group .approve-con").addClass("disabled")
+                $(tabId+" .global-modal").find(".approve-group .approve-con").prop("disabled",true)
             }
         }
         function get_project_code(id){

@@ -12,7 +12,7 @@ class CustomerController extends BaseController{
     function getCompanyList($parameter=[],$one=false){
         $this->selfDB=$this->ccompanyDB;
         $redisName="cust_companyList";
-        $parameter["fields"]="`companyId`,`company`,`alias`,`provinceId`,`cityId`,`province`,`city`,`address`,`remarks`,`addTime`,`updateTime`,`status`,`author`,`examine`,processLevel";
+        $parameter["fields"]="`companyId`,`company`,`alias`,`provinceId`,`cityId`,`province`,`city`,`address`,`remarks`,`addTime`,`updateTime`,`status`,`author`,`examine`,process_level";
         $joins=["LEFT JOIN v_province p ON p.pid=provinceId","LEFT JOIN v_city c ON c.pid=p.pid AND c.cid=cityId"];
         if(isset($parameter["joins"])){
             if(is_array($parameter["joins"])){
@@ -47,7 +47,7 @@ class CustomerController extends BaseController{
     }
     function getCustomerList($parameter=[],$one=false){
         $this->selfDB=$this->ccontactDB;
-        $parameter["fields"]="`contactId`,`companyId`,`contact`,`phone`,`email`,`address`,`remarks`,`addTime`,`updateTime`,`status`,company,`author`,`examine`,processLevel";
+        $parameter["fields"]="`contactId`,`companyId`,`contact`,`phone`,`email`,`address`,`remarks`,`addTime`,`updateTime`,`status`,company,`author`,`examine`,process_level";
         $redisName="cust_contactList";
         $joins=["LEFT JOIN (SELECT companyId cid,company FROM v_customer_company WHERE status=1) c ON c.cid=companyId"];
         if(isset($parameter["joins"])){

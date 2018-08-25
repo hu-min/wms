@@ -238,11 +238,18 @@ function modal_btn($defind_vars){
         echo "  <button type='button' class='btn btn-danger btn-sm status-info' data-status='4' data-reqtype='Del'  >{$statusType[4]}</button>";
     }
 }
-function approve_btn($tableName){
-    echo '<div class="approve-group" data-table="'.$tableName.'" data-id="" >
-        <button type="button" data-url="'.U('Tools/getApproveList').'" class="btn btn-sm bg-purple approve-log">记录</button>
-        <button type="button" data-url="'.U('Tools/approveEdit').'" class="btn btn-sm bg-orange approve-con">操作</button>
-    </div>';
+function approve_btn($tableName,$id=0,$place=false,$level=0,$status=0){
+    echo '<div class="approve-group" data-table="'.$tableName.'" data-id="'.$id.'" >
+        <button type="button" data-url="'.U('Tools/getApproveList').'" class="btn btn-sm bg-purple approve-log">记录</button>';
+    // echo $place,",",$level;
+    if($place===false || $place > 1){
+        $disabled = "";
+        if(($place !== false && $level >= $place) || $status == 3){
+            $disabled = "disabled";
+        }
+        echo '<button type="button" '.$disabled.' data-url="'.U('Tools/approveEdit').'" class="btn btn-sm bg-orange approve-con '.$disabled.'">操作</button>';
+    }
+    echo '</div>';
 }
 /** 
  * @Author: vition 
@@ -260,10 +267,10 @@ function save_btn($defind_vars){
     $url = $defind_vars["url"];
     $noModal = $defind_vars["noModal"] ? "" : "data-modal='true'";
     if((($item["author"] == $userId || $item["user_id"] == $userId) && in_array($item['status'],[0,3])) || ($gettype == "Add" && $processAuth['level'] > 0)){
-        echo "<button type='button' class='btn btn-primary save-info' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>{$btnTitle}</button>";
+        echo "<button type='button' class='btn btn-sm btn-primary save-info' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>{$btnTitle}</button>";
     }
     
-    // if((($item["author"] == $userId && $item['status'] == 0) || ($gettype == "Add" && $processAuth['level'] > 0) || (($processAuth['level'] -1) == $item["processLevel"] && $item["processLevel"] > 0))  || $nodeAuth>= 7){
+    // if((($item["author"] == $userId && $item['status'] == 0) || ($gettype == "Add" && $processAuth['level'] > 0) || (($processAuth['level'] -1) == $item["process_level"] && $item["process_level"] > 0))  || $nodeAuth>= 7){
     //     echo "<button type='button' class='btn btn-primary save-info' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>{$btnTitle}</button>";
     // }
 }

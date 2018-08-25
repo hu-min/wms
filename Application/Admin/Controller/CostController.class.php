@@ -42,10 +42,16 @@ class CostController extends BaseController{
      * @Desc: 借支控制 
      */    
     function debitControl(){
+
         $reqType=I('reqType');
         $this->assign('accountType',$this->accountType);
         $this->assign('projectArr',$this->project->_getOption("project_id"));
         $this->assign("controlName","debit");
+        $this->assign("tableName",$this->debitCom->tableName()); 
+        $nodeId = getTabId(I("vtabId"));
+        $process = $this->nodeCom->getProcess($nodeId);
+        $this->assign("place",$process["place"]);
+
         if($reqType){
             $this->$reqType();
         }else{
@@ -122,24 +128,20 @@ class CostController extends BaseController{
             $datas['debit_date']=time();
             $datas['user_id']=session('userId');
             $datas['author']=session('userId');
-            $datas['processLevel']=$this->processAuth["level"];
+            $datas['process_level']=$this->processAuth["level"];
             unset($datas['id']);
             return $datas;
         }else if($reqType=="debitEdit"){
             $where=["id"=>$datas['id']];
             $data=[];
             
-            foreach (["project_id","user_id","debit_money","debit_date","debit_cause","account","account_type","free_type","require_date","remark","voucher_file","loan_date"] as  $key) {
+            foreach (["project_id","user_id","debit_money","debit_date","debit_cause","account","account_type","free_type","require_date","remark","voucher_file","loan_date",'status'] as  $key) {
                 if(isset($datas[$key])){
                     $data[$key]=$datas[$key];
                 }
             }
             if(isset($datas['status'])){
-                $parameter=[
-                    'where'=>["id"=>$datas['id']],
-                ];
-                $result=$this->debitCom->getOne($parameter);
-                $data = $this->status_update($result,$datas["status"],$data);
+                $data['status'] = $datas['status'] == 3 ? 0 : $datas['status'];
             }
             $data['upate_time']=time();
             
@@ -152,15 +154,19 @@ class CostController extends BaseController{
         if($info){
             // print_r($info);
             $insertResult=$this->debitCom->insert($info);
-            if($insertResult && $insertResult->errCode==0){
+            if(isset($insertResult->errCode) && $insertResult->errCode==0){
+                $this->ApprLogCom->createApp($this->debitCom->tableName(),$insertResult->data,session("userId"),"");
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
         }
         $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
     }
     function debitEdit(){
-        $info=$this->manageDebitInfo();
-        $updateResult=$this->debitCom->update($info);
+        $updateInfo=$this->manageDebitInfo();
+        $updateResult=$this->debitCom->update($updateInfo);
+        if(isset($updateResult->errCode) && $updateResult->errCode == 0){
+            $this->ApprLogCom->updateStatus($this->debitCom->tableName(),$updateInfo["where"]["id"]); 
+        }
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
     function getProjectOne(){
@@ -175,7 +181,15 @@ class CostController extends BaseController{
      */    
     function finance_debitControl(){
         $reqType=I('reqType');
+        $this->assign('accountType',$this->accountType);
+        $this->assign('projectArr',$this->project->_getOption("project_id"));
+
         $this->assign("controlName","finance_debit");
+        $this->assign("tableName",$this->debitCom->tableName()); 
+        $nodeId = getTabId(I("vtabId"));
+        $process = $this->nodeCom->getProcess($nodeId);
+        $this->assign("place",$process["place"]);
+
         if($reqType){
             $this->$reqType();
         }else{
@@ -185,7 +199,17 @@ class CostController extends BaseController{
     function finance_debitList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
+        $nodeId = getTabId(I("vtabId"));
+        $process = $this->nodeCom->getProcess($nodeId);
+        $this->assign("place",$process["place"]);
         $where=[];
+        if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+            if($process["place"]>0){
+                $where=["process_level"=>[["eq",($process["place"]-1)],["egt",($process["place"])],"OR"],"status"=>1,'_logic'=>'OR'];
+            }else{
+                $where=["status"=>1];
+            }
+        }
         $parameter=[
             'fields'=>"*,FROM_UNIXTIME(debit_date,'%Y-%m-%d') debit_date,FROM_UNIXTIME(require_date,'%Y-%m-%d') require_date,FROM_UNIXTIME(loan_date,'%Y-%m-%d') loan_date",
             'where'=>$where,
@@ -200,7 +224,7 @@ class CostController extends BaseController{
             ]
         ];
         $listResult=$this->debitCom->getList($parameter);
-        $this->tablePage($listResult,'Cost/costTable/financedebitList',"debitList");
+        $this->tablePage($listResult,'Cost/costTable/financedebitList',"finance_debitList");
     }
     function finance_debit_modalOne(){
         $title = "借支控制";
@@ -213,8 +237,9 @@ class CostController extends BaseController{
             $title = "编辑借支";
             $btnTitle = "保存数据";
             $redisName="finance_debitList";
+            $resultData=$this->debitCom->redis_one($redisName,"id",$id);
             // $resultData=$this->fixExpenCom->redis_one($redisName,"id",$id);
-            $resultData=[];
+            // $resultData=[];
         }
         $modalPara=[
             "data"=>$resultData,

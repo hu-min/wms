@@ -150,7 +150,7 @@
 
             set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
             
-            if((info['processLevel'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7){
+            if((info['process_level'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7){
                 $(tabId+" .modal-info").prop("disabled",true)
             }
             if(info['author'] == "{$Think.session.userId}"){

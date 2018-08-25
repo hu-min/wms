@@ -162,7 +162,7 @@
                         $(tabId+" .global-modal ."+element+" tbody").append(template);
                         var $current = $(tabId+" .global-modal ."+element+" tbody tr").eq(rows);
                         $current.find(".serial").text(Number(rows+1));
-                        //处理权限问题，
+                        //处理权限问题，这个比较特殊，
                         if(info.process.place<1 || listData["a_status"] >= 1){
                             $current.find(".approve-group .approve-con").addClass("disabled")
                             $current.find(".approve-group .approve-con").prop("disabled",true)

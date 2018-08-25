@@ -144,3 +144,13 @@
 	overflow: hidden;
 	clear: both;
 }
+.approve-group{
+	display: inline-block;
+}
+td > .approve-group > .approve-con {
+	margin-left:5px;
+}
+.sidebar-menu .node-action{
+	background: #3c8dbc;
+	color: #fff!important;
+}

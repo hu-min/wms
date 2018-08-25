@@ -141,7 +141,7 @@
                 $(tabId+" .create-rece").hide();
             }
 
-            if((info['processLevel'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7 && "{$gettype}" == "Edit"){
+            if((info['process_level'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7 && "{$gettype}" == "Edit"){
                 $(tabId+" .modal-info").prop("disabled",true)
             }
             // var projectChosen= $(tabId+" .chosen-select[name='project_id']")

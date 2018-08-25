@@ -60,6 +60,7 @@ class ToolsController extends BaseController{
     function approveEdit(){
         
         extract($_REQUEST);
+        $this->log($_REQUEST);
         // [table] => v_expense_sub
         // [id] => 8
         // [tableId] => 5
@@ -68,19 +69,24 @@ class ToolsController extends BaseController{
         // [status] => 1
         // [vtabId] => #vtabs33
         
-        
+        // table:v_project
+        // id:13
+        // remark:尝试着驳回
+        // status:3
+        // vtabId:#vtabs57
         $db = M($table,NULL);
+        $tableId = $tableId ? $tableId : $id;
         $this->approveCom=getComponent('ApproveLog');
         // $allItem = $db ->where(["parent_id"=>$tableId])->count();
         // print_r($allItem);exit;
         $db ->startTrans();
-
+        $userId = session('userId');
         //1,先执行插入审批记录
         $parameter=[
             "table_name" => $table,
             "table_id" => $id,
             "add_time" => time(),
-            "user_id" => session('userId'),
+            "user_id" => $userId,
             "status" => $status, //审批流程里的状态是实际状态
             "remark" => $remark,
         ];
@@ -93,6 +99,7 @@ class ToolsController extends BaseController{
             $process = $this->nodeCom->getProcess($nodeId);
             $state = $status;//v_expense_sub 项状态，
             //3，当前审批者的位置如果小于总流程数量，且审批值是1
+            $place = $process["place"];
             if($place < $process["allProcess"] && $status==1){
                 $state = 2;//v_expense_sub 项状态，
             }
@@ -102,12 +109,20 @@ class ToolsController extends BaseController{
                 $db ->commit();
                 $this->approveCom->M() ->commit();
                 //5，统计 $table 数量
-                $allItem = $db ->where(["parent_id"=>$tableId])->count();
+                
                 //6，统计审批状态为1的审批记录
-                $approveRes = $this->approveCom->M()->query("SELECT count(*) all_approve FROM v_approve_log WHERE table_name = '{$table}' AND  FIND_IN_SET(table_id,(SELECT GROUP_CONCAT(id) FROM {$table} WHERE parent_id = {$tableId})) and status = 1");
+                if($table=="v_expense_sub"){
+                    $allItem = $db ->where(["parent_id"=>$tableId])->count();
+                    $approveSql = "SELECT count(*) all_approve FROM v_approve_log WHERE user_id = {$userId} AND table_name = '{$table}' AND  FIND_IN_SET(table_id,(SELECT GROUP_CONCAT(id) FROM {$table} WHERE parent_id = {$tableId})) AND status = 1";
+                }else{
+                    // $allItem = $db ->where([$db->getPk()=>$tableId])->count();
+                    $allItem = 1;
+                    $approveSql = "SELECT count(*) all_approve FROM v_approve_log WHERE user_id = {$userId} AND table_name = '{$table}' AND  table_id = {$tableId} AND status = 1";
+                }
+                $this->log($approveSql);
+                $approveRes = $this->approveCom->M()->query($approveSql);
                 $allApprove = 0;
-                $this->log(json_encode( $allItem));
-                $this->log(json_encode( $approveRes));
+ 
                 if($approveRes[0]["all_approve"]){
                     $allApprove = $approveRes[0]["all_approve"];
                 }

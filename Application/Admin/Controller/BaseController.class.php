@@ -325,7 +325,7 @@ class BaseController extends \Common\Controller\BaseController{
                 $dbObject->getPk()=>$id,
             ];
             $findResult=$dbObject->where($updateData)->find();
-            $updateData['processLevel'] = $this->processAuth["level"];
+            $updateData['process_level'] = $this->processAuth["level"];
             $updateData = $this->status_update($findResult,$status,$updateData);
             
             $updateData["updateTime"]=time();
@@ -412,10 +412,10 @@ class BaseController extends \Common\Controller\BaseController{
         
         if($status==1 && $this->processAuth["level"] == $this->processAuth["allLevel"]){
             $data['status']=$status;
-            $data['processLevel'] = 0;
+            $data['process_level'] = 0;
         }else if($status==1){
             $data['status']=2;
-            $data['processLevel'] = $this->processAuth["level"];
+            $data['process_level'] = $this->processAuth["level"];
         }else if($status==3){
             $data['status']=$status;
         }else{

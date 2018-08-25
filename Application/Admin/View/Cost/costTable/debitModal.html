@@ -90,7 +90,7 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="info-title">收款账户详细：</label>
-                        <input class="form-control modal-info" name="account" required="required" title="收款账户详细"  value="" placeholder="收款账户详细" type="text">
+                        <input class="form-control modal-info" name="account" title="收款账户详细"  value="" placeholder="收款账户详细" type="text">
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -111,5 +111,6 @@
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+    <input class="modal-info" name="status" value="0" type="hidden">
     {:save_btn(get_defined_vars())}
 </div>

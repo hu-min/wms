@@ -80,6 +80,7 @@ class ProjectController extends BaseController{
         $this->assign('processArr',$this->processArr);
         $this->assign('btnTitle','确认立项');
         $project=$this->configCom->get_val("project");
+        $this->assign("tableName",$this->projectCom->tableName());
         // $this->assign("gettype","Add");
         //一堆立项初始化数据开始了
         $this->assign('projectArr',$this->_getOption("project_id"));
@@ -363,8 +364,11 @@ class ProjectController extends BaseController{
 
         $userId = session("userId");
         $nodeAuth = $this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME];
+        $nodeId = getTabId(I("vtabId"));
+        $process = $this->nodeCom->getProcess($nodeId);
+        $this->assign("place",$process["place"]);
         $where=[];
-        // $where['_string']=" (processLevel = ".($this->processAuth["level"]-1)." OR processLevel = 0 OR author = ".session("userId")." OR FIND_IN_SET(".session("userId").",examine)) OR (create_user = '{$userId}') OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}') ";
+        // $where['_string']=" (process_level = ".($this->processAuth["level"]-1)." OR process_level = 0 OR author = ".session("userId")." OR FIND_IN_SET(".session("userId").",examine)) OR (create_user = '{$userId}') OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}') ";
 
         foreach (['name','code','customer_com_name','customer_cont_name','business_name','leader_name'] as $key) {
             if(isset($data[$key])){
@@ -382,8 +386,15 @@ class ProjectController extends BaseController{
         }
         // print_r($where);
         if($nodeAuth<7){
-            $where['_string'] = " ((create_user = {$userId})  OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) AND status =1) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}) OR (processLevel = ".($this->processAuth["level"]-1)." AND processLevel <>0) OR FIND_IN_SET({$userId},examine) OR (author = {$userId})";
-        }//OR processLevel = 0 OR author = {$userId} OR FIND_IN_SET({$userId},examine)
+            $where['_string'] = " ((create_user = {$userId})  OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) AND status =1) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}) OR ((process_level = ".($this->processAuth["level"]-1)." OR process_level >= ".$this->processAuth["level"].") AND process_level <>0) OR FIND_IN_SET({$userId},examine) OR (author = {$userId})";
+            // $where['user_id'] = session('userId');
+            // if($process["place"]>0){
+            //     $where=["process_level"=>[["eq",($process["place"]-1)],["egt",($process["place"])],"OR"],"status"=>1,'_logic'=>'OR'];
+            // }else{
+            //     $where=["status"=>1];
+            // }
+            // $where['_string'] = " ((create_user = {$userId})  OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) AND status =1) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}) OR (process_level = ".($this->processAuth["level"]-1)." AND process_level <>0) OR FIND_IN_SET({$userId},examine) OR (author = {$userId})";
+        }//OR process_level = 0 OR author = {$userId} OR FIND_IN_SET({$userId},examine)
 
         if(isset($data['status'])){
             $where['status']=$data['status'];
@@ -469,7 +480,7 @@ class ProjectController extends BaseController{
             $datas['addTime']=time();
             $datas['time']=strtotime($datas['time']);
             $datas['author']=session('userId');
-            $datas['processLevel']=$this->processAuth["level"];
+            $datas['process_level']=$this->processAuth["level"];
             unset($datas['projectId']);
             return $datas;
         }else if($reqType=="projectEdit"){
@@ -477,17 +488,18 @@ class ProjectController extends BaseController{
             $data=[];
 
             $data['updateUser']=session('userId');
-            foreach (['project_id','amount','bid_date','contract','bid_time','bidding','brand','city','code','create_time','create_user','customer_com','customer_cont','customer_other','days','earlier_user','execute_sub','execute','field','is_bid','business','leader','name','project_time','project_id','projectType','province','scene_user','session_all','type','session_cur','stage'] as  $key) {
+            foreach (['project_id','amount','bid_date','contract','bid_time','bidding','brand','city','code','create_time','create_user','customer_com','customer_cont','customer_other','days','earlier_user','execute_sub','execute','field','is_bid','business','leader','name','project_time','project_id','projectType','province','scene_user','session_all','type','session_cur','stage','status'] as  $key) {
                 if(isset($datas[$key])){
                     $data[$key]=$datas[$key];
                 }
             }
             if(isset($datas['status'])){
-                $parameter=[
-                    'where'=>["projectId"=>$datas['projectId']],
-                ];
-                $result=$this->projectCom->getOne($parameter);
-                $data = $this->status_update($result,$datas["status"],$data);
+                $data['status'] = $datas['status'] == 3 ? 0 : $datas['status'];
+                // $parameter=[
+                //     'where'=>["projectId"=>$datas['projectId']],
+                // ];
+                // $result=$this->projectCom->getOne($parameter);
+                // $data = $this->status_update($result,$datas["status"],$data);
             }
             $data['upateTime']=time();
             
@@ -505,6 +517,7 @@ class ProjectController extends BaseController{
         if($projectInfo){
             $insertResult=$this->projectCom->insertProject($projectInfo);
             if($insertResult && $insertResult->errCode==0){
+                $this->ApprLogCom->createApp($this->projectCom->tableName(),$insertResult->data,session("userId"),"");
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
         }
@@ -518,6 +531,9 @@ class ProjectController extends BaseController{
     function projectEdit(){
         $projectInfo=$this->manageProjectInfo();
         $updateResult=$this->projectCom->updateProject($projectInfo);
+        if(isset($updateResult->errCode) && $updateResult->errCode == 0){
+            $this->ApprLogCom->updateStatus($this->projectCom->tableName(),$projectInfo["where"]["projectId"]);
+        }
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
     /** 

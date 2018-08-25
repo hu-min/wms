@@ -168,7 +168,7 @@ class FinanceController extends BaseController{
             $where['expenClas']=$data['expenClas'];
         }
         $parameter=[
-            'fields'=>"`id`,`expenClas`,expenClass,`finanAccount`,finanAccs,`toObject`,`content`,`startDate`,`endDate`,`fee`,`payment`,noPayment,payTime,remark,addTime,status,processLevel,author,examine",
+            'fields'=>"`id`,`expenClas`,expenClass,`finanAccount`,finanAccs,`toObject`,`content`,`startDate`,`endDate`,`fee`,`payment`,noPayment,payTime,remark,addTime,status,process_level,author,examine",
             'where'=>$where,
             'page'=>$p,
             'pageSize'=>$this->pageSize,
@@ -319,7 +319,7 @@ class FinanceController extends BaseController{
             $datas['add_time']=time();
             $datas['time']=strtotime($datas['time']);
             $datas['author']=session('userId');
-            $datas['processLevel']=$this->processAuth["level"];
+            $datas['process_level']=$this->processAuth["level"];
             unset($datas['id']);
             return $datas;
         }else if($reqType=="receivableEdit"){
@@ -460,7 +460,7 @@ class FinanceController extends BaseController{
         if($reqType=="wouldpayAdd"){
             $datas['add_time']=time();
             $datas['author']=session('userId');
-            $datas['processLevel']=$this->processAuth["level"];
+            $datas['process_level']=$this->processAuth["level"];
             unset($datas['id']);
             return $datas;
         }else if($reqType=="wouldpayEdit"){
@@ -678,7 +678,7 @@ class FinanceController extends BaseController{
         if($reqType=="purchaAdd"){
             $datas['add_time']=time();
             $datas['author']=session('userId');
-            $datas['processLevel']=$this->processAuth["level"];
+            $datas['process_level']=$this->processAuth["level"];
             unset($datas['id']);
             return $datas;
         }else if($reqType=="purchaEdit"){

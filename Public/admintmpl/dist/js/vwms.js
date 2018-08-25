@@ -251,7 +251,7 @@ function set_status_btn(this_btn,info,userId,nodeAuth){
     })
     $(this_btn).parent(".status-group").children("input[name='status']").val($(this_btn).attr("name"));
     if(info){
-        if(((info['status'] == 1 || info['processLevel'] == 2) || info['author'] != userId )  && nodeAuth<7){
+        if(((info['status'] == 1 || info['process_level'] == 2) || info['author'] != userId )  && nodeAuth<7){
             $(tabId+" .modal-info").prop("disabled",true)
         }
     }
@@ -455,6 +455,7 @@ $(function(){
                 $(document).find(".nodeOn").each(function(){
                     if($(this).attr("href")==match[0]){
                         var result=$(this).parents(".treeview-menu").css("display","block");
+                        var result=$(this).parents(".treeview-menu").prev(".nodeOn").parent(".treeview").addClass("menu-open");
                         var nodeOn=$(this);
                         setTimeout(function(){nodeOn.click();},0);
                         return false
@@ -553,7 +554,7 @@ $(function(){
                     $("#"+apl_id+" .modal-body tbody").html(trHtml);
                     $("#"+apl_id+" .modal-body .progress .progress-bar").css("width",progress+"%");
                     if(current>0){
-                        $("#"+apl_id+" .modal-body .progress .progress-bar").text("当前进度："+current+"/"+allProcess+final);
+                        $("#"+apl_id+" .modal-body .progress .progress-bar").text("当前进度："+current+" / "+allProcess+final);
                     }
                     
                 }
@@ -574,7 +575,12 @@ $(function(){
                         $("#"+apl_id+" .modal-close").click();
                         if($('body').hasClass('modal-open')){
                             $(tabId+" .global-modal .modal-content .close").click();
-                            $(tabId+" .search-box .search-list").click();
+                            
+                            // $(tabId+" .search-box .search-list").click();
+                        }
+                        $(tabId+" .search-body").find(".search-list").click();
+                        console.log($(tabId+" .search-body").find(".search-list"))
+                        if($('body').hasClass('modal-open')){
                             setTimeout(() => {
                                 $(tabId).find(".status-con .v-showmodal").each(function(){
                                     if($(this).parent(".status-con").data("id") == tableId){
@@ -583,7 +589,6 @@ $(function(){
                                     }
                                 })
                             },500)
-                            // $(tabId+" .search-box .search-list").click();
                         }
                         
                     }else{
@@ -628,8 +633,11 @@ function chUrlAction(nodelId){
         if(parseInt(nodelId)==parseInt($(this).data("nodeid"))){
             var tController=$(this).attr("href")
             var tMatch=tController.match(/\/Admin\/([\S\/]*)\./)
+            
             urlParam=getUrlAction()
             if(tMatch!=null && tMatch[1]!=urlParam){
+                $(".sidebar-menu").find(".nodeOn").removeClass("node-action");
+                $(".sidebar-menu").find("a[href='"+tMatch[0]+"html']").addClass("node-action");
                 setUrlAction(tMatch[1],tMatch[1])
             }
             return false;

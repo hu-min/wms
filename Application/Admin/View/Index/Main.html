@@ -216,7 +216,7 @@
           "></i> <span> {$Think.session.userInfo.rolePName} >> {$Think.session.userInfo.roleName} </span></div>
       </div>
       <!-- search form -->
-      <form action="#" method="get" class="sidebar-form">
+      <!-- <form action="#" method="get" class="sidebar-form">
         <div class="input-group">
           <input type="text" name="q" class="form-control" placeholder="Search...">
           <span class="input-group-btn">
@@ -224,7 +224,7 @@
                 </button>
               </span>
         </div>
-      </form>
+      </form> -->
       <!-- /.search form -->
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu" data-widget="tree">
@@ -578,6 +578,7 @@
         $('.sidebar-menu').tree()
         //菜单点击事件
         $(document).offon('click','.nodeOn',function(e){
+            
             var urlParam=""
             urlParam=getUrlAction()
             e.preventDefault();
@@ -588,6 +589,8 @@
             var nodeid=$(this).data("nodeid");
             breadcrumb(el,title,level);
             if(nodeid>0){
+                $(".sidebar-menu").find(".nodeOn").removeClass("node-action");
+                $(this).addClass("node-action");
                 var controller=$(this).attr("href");
                 var SUFFIX="{:C('TMPL_TEMPLATE_SUFFIX')}";
                 if(controller!='/Admin/Index/Main'+SUFFIX){
@@ -706,6 +709,8 @@
     $("#main-navs").offon('shown.bs.tab','.main-tabs a[data-toggle="tab"]', function (e) {
         tabId=$(e.target).attr("href")
         var nowId=tabId.replace("#vtabs","");
+        // $(".sidebar-menu").find(".nodeOn").removeClass("node-action");
+        // $(this).addClass("node-action");
         if(nowId>0){
             chUrlAction(nowId)
         }

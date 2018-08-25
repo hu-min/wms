@@ -20,6 +20,9 @@
             </if>
         </td>
         <td>{$item['remark']}</td>
+        <td>
+            {:approve_btn($tableName,$item['id'],0,0)}
+        </td>
         {:list_btn(get_defined_vars(),"id")}
     </tr>
 </volist>
