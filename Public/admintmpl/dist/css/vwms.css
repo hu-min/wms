@@ -154,3 +154,10 @@ td > .approve-group > .approve-con {
 	background: #3c8dbc;
 	color: #fff!important;
 }
+.sidebar-menu .node-action:hover{
+	background: #3c8dbc!important;
+	color: #fff !important;
+}
+/* .content .content{
+	padding:0px;
+} */

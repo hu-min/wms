@@ -73,3 +73,6 @@ $this->assign("tableName",$this->对应的组件->tableName());
 5，部分驳回重新提交需要在manager中修改 $datas['status'] = $datas['status'] == 3 ? 0 : $datas['status'];
 6,modal 中需要有<input class="modal-info" name="status" value="0" type="hidden">
 7，统一 process_level 格式
+
+获取最新的审批
+需要在节点添加查询的表名

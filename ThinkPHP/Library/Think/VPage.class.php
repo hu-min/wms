@@ -17,7 +17,8 @@ class VPage{
     public $totalRows; // 总行数
     public $totalPages; // 分页总页面数
     public $rollPage   = 11;// 分页栏每页显示的页数
-	public $lastSuffix = true; // 最后一页是否显示总页数
+    public $lastSuffix = true; // 最后一页是否显示总页数
+    public $bigSize = true;
 
     private $p       = 'p'; //分页参数名
     private $url     = ''; //当前链接URL
@@ -143,6 +144,11 @@ class VPage{
             array('%NOW_PAGE%', '%UP_PAGE%', '%DOWN_PAGE%', '%FIRST%', '%LINK_PAGE%', '%END%', '%TOTAL_ROW%', '%TOTAL_PAGE%'),
             array($this->nowPage, $up_page, $down_page, $the_first, $link_page, $the_end, $this->totalRows, $this->totalPages),
             $this->config['theme']);
-        return "{$header_str}<div class='col-sm-7'><div class='dataTables_paginate paging_simple_numbers' id='example2_paginate'><ul class='pagination'>{$page_str}</ul></div></div>";
+            //id='example2_paginate'
+        $ulClass = "pagination";
+        if(!$bigSize){
+            $ulClass = "pagination pagination-sm no-margin pull-right";
+        }
+        return "{$header_str}<div class='col-sm-7'><div class='dataTables_paginate paging_simple_numbers'><ul class='{$ulClass}'>{$page_str}</ul></div></div>";
     }
 }

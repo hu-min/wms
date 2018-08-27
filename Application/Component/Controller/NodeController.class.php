@@ -30,4 +30,16 @@ class NodeController extends BaseController{
         }
         return $processInfo;
     }
+
+    function nodeProcess(){
+        $parameter=[
+            "where"=>["status"=>1,"processIds"=>['neq',""],"db_table"=>['neq',""]],
+            "fields"=>'nodeId,db_table,controller,nodeTitle,processIds',
+        ];
+        $nodeRes = $this->getList($parameter);
+        if(isset($nodeRes["list"]) && !empty($nodeRes["list"])){
+            return $nodeRes["list"];
+        }
+        return [];
+    }
 }

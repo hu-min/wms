@@ -229,6 +229,7 @@
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header">主菜单导航</li>
+        <li><a class="nodeOn" data-level="1" data-nodeid="10000" href="/Admin/Index/home.html"><span class="glyphicon glyphicon-home"></span><span>后台首页</span></a></li>
         {$nodeHtml}
         <!-- <volist name="nodeList" id="node">
             <if condition="is_array($node['node']) neq true">
@@ -643,7 +644,7 @@
                 breadHtml="<li><span>"+nodeTitle+"</span></li>"+breadHtml;
             }
         }
-        breadHtml="<li><i class='fa fa-dashboard'></i><span> 后台首页 </span></li>"+breadHtml+"<li class='active'><span>"+title+"</span></li>"
+        breadHtml="<li><i class='fa fa-dashboard'></i><span> 个人首页 </span></li>"+breadHtml+"<li class='active'><span>"+title+"</span></li>"
         
         if(nodeid>0){
             breadData["#vtabs"+nodeid]=breadHtml;

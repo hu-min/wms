@@ -448,22 +448,22 @@ $(function(){
     paramMatch=getUrlAction()
     // if(search!="" && search.search(/\?action\=\S/)>=0){
         // var paramMatch=search.match(/\=([\S\/]*)/);
-        if(paramMatch){
-            var splitArr=paramMatch.split("/");
-            var match= window.document.body.innerHTML.match(new RegExp("\/Admin\/"+splitArr[0]+"\/"+splitArr[1]+"[\.a-zA-Z]*","gim"))
-            if(match[0]){
-                $(document).find(".nodeOn").each(function(){
-                    if($(this).attr("href")==match[0]){
-                        var result=$(this).parents(".treeview-menu").css("display","block");
-                        var result=$(this).parents(".treeview-menu").prev(".nodeOn").parent(".treeview").addClass("menu-open");
-                        var nodeOn=$(this);
-                        setTimeout(function(){nodeOn.click();},0);
-                        return false
-                    }
-                })
-            }
+        if(!paramMatch){
+            paramMatch = "Index/home"
         }
-        
+        var splitArr=paramMatch.split("/");
+        var match= window.document.body.innerHTML.match(new RegExp("\/Admin\/"+splitArr[0]+"\/"+splitArr[1]+"[\.a-zA-Z]*","gim"))
+        if(match[0]){
+            $(document).find(".nodeOn").each(function(){
+                if($(this).attr("href")==match[0]){
+                    var result=$(this).parents(".treeview-menu").css("display","block");
+                    var result=$(this).parents(".treeview-menu").prev(".nodeOn").parent(".treeview").addClass("menu-open");
+                    var nodeOn=$(this);
+                    setTimeout(function(){nodeOn.click();},0);
+                    return false
+                }
+            })
+        }
     // }
     
     $(window).resize(function(){

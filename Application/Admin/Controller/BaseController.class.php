@@ -56,7 +56,8 @@ class BaseController extends \Common\Controller\BaseController{
             $conAct=CONTROLLER_NAME.'/'.ACTION_NAME;
             $auth=$this->authVerify($conAct);
             if(!$auth){
-                if($this->isLogin() && CONTROLLER_NAME == "Tools"){
+                // echo $conAct;
+                if($this->isLogin() && (CONTROLLER_NAME == "Tools" || $conAct == "Index/home")){
 
                 }else{
                     $this->prompt(1,'警告!','您不具备访问此页面的权限，如果您认为值得拥有，请联系管理员！');
@@ -372,13 +373,16 @@ class BaseController extends \Common\Controller\BaseController{
      * @Date: 2018-06-03 14:28:59 
      * @Desc: 返回表格和分页数据 
      */    
-    function tablePage($data,$templet,$redisName="",$pageSize=false,$countStr=""){
+    function tablePage($data,$templet,$redisName="",$pageSize=false,$countStr="",$config=[]){
         $returnData=['errCode'=>0];
         if($data){
             if($redisName){
                 $this->Redis->set($redisName,json_encode($data['list']),7200);
             }
             $page = new \Think\VPage($data['count'], $pageSize ? $pageSize : $this->pageSize);
+            if(isset($config["bigSize"])){
+                $page->bigSize = $config["bigSize"];
+            }
             $pageShow = $page->show();
             $this->assign('list',$data['list']);
             $returnData["table"]=$this->fetch($templet);

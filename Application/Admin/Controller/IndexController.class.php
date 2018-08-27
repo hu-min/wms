@@ -81,6 +81,55 @@ class IndexController extends BaseController{
             }
         }
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-08-27 08:56:02 
+     * @Desc:  个人首页
+     */    
+    function home(){
+        $reqType=I('reqType');
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+        // $this->display();
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-08-27 08:56:16 
+     * @Desc: 获取最新的审核 
+     */    
+    function getAppList(){
+        $page=I("p")?I("p"):1;
+        $pageNum = 5;
+        $processCom = getComponent("Process");
+        $processAppList = $processCom->getProcess();
+        $db = M();
+        $sqlArr = [];
+        foreach ($processAppList as $table => $info) {
+            $user_id = "user_id";
+            $add_time = "add_time";
+            $project_id = "project_id";
+            if(in_array($table,["v_project"])){
+                $user_id = "author `user_id`";
+                $add_time = "addTime `add_time`";
+                $project_id = "`projectId` project_id";
+            }
+            $s = "SELECT {$project_id} ,'{$info["title"]}' `moudle_name`,{$user_id},`process_level`,".$info["all"]." `all`,`status`,{$add_time},'{$info["controller"]}' controller FROM {$table} WHERE `status` IN (0,2) AND process_level = ".$info["level"];
+            array_push($sqlArr,$s);
+        }
+        $sql = implode(" UNION all ",$sqlArr);
+        $sqls = "SELECT project_id,project_name,`moudle_name`,`user_id`,`user_name`,`process_level`,`all`,`status`,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time,controller FROM ({$sql}) p LEFT JOIN (SELECT userId,userName `user_name` FROM v_user WHERE status =1) u ON userId = `user_id` LEFT JOIN (SELECT projectId pId,name project_name FROM v_project) pr ON pr.pId = project_id ORDER BY add_time DESC LIMIT ".($page - 1) * $pageNum.",".$pageNum; 
+        // echo $sqls;exit;
+        $cqls = "SELECT count(*) `count` FROM ({$sql}) p LEFT JOIN (SELECT userId,userName `user_name` FROM v_user WHERE status =1) u ON userId = `user_id` ";
+        $result = $db ->query($sqls);
+        $countRes = $db ->query($cqls);
+        // echo "SELECT `moudle_name`,`name`,`user_id`,`user_name`,`process_level`,`all`,`status`,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time FROM ({$sql}) p LEFT JOIN (SELECT userId,userName `user_name` FROM v_user WHERE status =1) u ON userId = `user_id` ORDER BY add_time DESC";
+        $listResult = ["list"=>$result,"count"=>$countRes[0]["count"]];
+        $this->tablePage($listResult,'Index/table/appList',"homeAppList",5,["bigSize"=>false]);
+        // $this->ajaxReturn($result);
+    }
 }
 
 /** 
