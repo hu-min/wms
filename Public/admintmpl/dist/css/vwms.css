@@ -147,8 +147,8 @@
 .approve-group{
 	display: inline-block;
 }
-td > .approve-group > .approve-con {
-	margin-left:5px;
+td > .approve-group > button{
+	margin:2px 0px;
 }
 .sidebar-menu .node-action{
 	background: #3c8dbc;
@@ -161,3 +161,6 @@ td > .approve-group > .approve-con {
 /* .content .content{
 	padding:0px;
 } */
+#approve-log-modal{
+	box-shadow: 0px 0px 10px 4px #3c8dbc;
+}

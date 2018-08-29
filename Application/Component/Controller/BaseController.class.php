@@ -40,8 +40,9 @@ class BaseController extends \Common\Controller\BaseController{
         $pageNum=$parameter['pageSize']?$parameter['pageSize']:0;
         $groupBy=$parameter['groupBy']?$parameter['groupBy']:null;
         $joins=$parameter['joins']?$parameter['joins']:"";
-        $count=$this->selfDB->countList($where,$joins);
-        $classList=$this->selfDB->getList($where , $fields, $orderStr, $page, $pageNum, $groupBy,$joins);
+        $having=$parameter['having']?$parameter['having']:"";
+        $count=$this->selfDB->countList($where,$joins,$groupBy,$having);
+        $classList=$this->selfDB->getList($where , $fields, $orderStr, $page, $pageNum, $groupBy,$joins,$having);
         // $this->log($this->selfDB->_sql());
         
         if($classList){
@@ -61,7 +62,8 @@ class BaseController extends \Common\Controller\BaseController{
             $fields=$parameter['fields']?$parameter['fields']:"*";
             $orderStr=$parameter['orderStr']?$parameter['orderStr']:null;
             $joins=$parameter['joins']?$parameter['joins']:null;
-            $classList=$this->selfDB->getOne(['where'=>$where,'fields'=>$fields,"joins"=>$joins]);
+            $having=$parameter['having']?$parameter['having']:null;
+            $classList=$this->selfDB->getOne(['where'=>$where,'fields'=>$fields,"joins"=>$joins,"having"=>$having]);
         }else{
             $classList=$this->selfDB->getOne($parameter);
         }

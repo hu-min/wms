@@ -644,10 +644,13 @@ class UserController extends BaseController{
     function manageProcessInfo(){
         $reqType=I("reqType");
         $datas=I("data");
+        $datas["Depict"][0]["role"] = array_values(array_filter($datas["Depict"][0]["role"],function($var){if($var!="") return $var;}));
         $datas["processDepict"]=json_encode($datas["Depict"],JSON_UNESCAPED_UNICODE);
         unset($datas["Depict"]);
-
+        
+        $datas["Option"][0]["role"] = array_values(array_filter($datas["Option"][0]["role"],function($var){if($var!="") return $var;}));
         $datas["processOption"]=json_encode($datas["Option"],JSON_UNESCAPED_UNICODE);
+
         unset($datas["Option"]);
         if($reqType=="user_processAdd"){
 	    $datas["addTime"]=time();
@@ -780,4 +783,15 @@ class UserController extends BaseController{
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
 	
     }
+    // function checkProcessList(){
+    //     $processIds =I("processIds");
+    //     foreach ($processIds as  $processId) {
+    //         $processInfo=$this->processCom->getOne(["where"=>["processId"=>$processId],"fields"=>"processId,processOption"])["list"];
+
+    //         if($processInfo){
+    //             $processOption = json_decode($processInfo["processOption"],true);
+    //             print_r($processOption);
+    //         }
+    //     }
+    // }
 }   

@@ -1,5 +1,6 @@
 <volist name="list" id="item">
     <tr>
+        <td>{$item['user_name']}</td>
         <td style="max-width: 100px;overflow: hidden;text-overflow: ellipsis;" title="{$item['code']}">{$item['code']}</td>
         <td>{$item['project_name']}</td>
         <td>{$item['project_date']}</td>
@@ -12,20 +13,15 @@
         <td>{$item['debit_money']}</td>
         <td>{$accountType[$item['account_type']]}</td>
         <td>{$item['loan_date']}</td>
-        <td>审批记录</td>
         <td>
-            <div class="input-group" style="max-width: 100px;">
-                <if condition="$item['status'] eq 0 && $item['voucher_file'] eq ''">
-                    <input class="form-control upload-file input-sm" value="{$item['voucher_file']}" type="text" readonly="readonly">
-                <else/>
-                    <input class="form-control upload-file input-sm" value="{$item['voucher_file']}" type="text" readonly="readonly">
-                </if>
-                <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
-            </div>
+            <if condition="$item['voucher_file'] neq ''">
+                <input class="upload-file" value="{$item['voucher_file']}" type="hidden">
+                <span class="show-media-btn show-media"><i class="fa fa-eye"></i></span>
+            </if>
         </td>
         <td>{$item['remark']}</td>
         <td>
-            {:approve_btn($tableName,$item['id'],$place,$item['process_level'],$item['status'])}
+            {:approve_btn($tableName,$item['id'],$item['place'],$item['process_level'],$item['status'])}
         </td>
         {:list_btn(get_defined_vars(),"id")}
     </tr>

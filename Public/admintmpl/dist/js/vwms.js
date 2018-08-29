@@ -452,8 +452,9 @@ $(function(){
             paramMatch = "Index/home"
         }
         var splitArr=paramMatch.split("/");
+        
         var match= window.document.body.innerHTML.match(new RegExp("\/Admin\/"+splitArr[0]+"\/"+splitArr[1]+"[\.a-zA-Z]*","gim"))
-        if(match[0]){
+        if(match!=null && match[0]){
             $(document).find(".nodeOn").each(function(){
                 if($(this).attr("href")==match[0]){
                     var result=$(this).parents(".treeview-menu").css("display","block");
@@ -499,103 +500,124 @@ $(function(){
     $(document).offon("click",tabId+" .clear-media",function(){
         $(this).parent().children(".upload-file").val("")
     })
-    $(document).on("click",".approve-group .approve-log,.approve-group .approve-con",function(){
-        console.log("触发");
-        var table = $(this).parents(".approve-group").data("table")
-        var id = $(this).parents(".approve-group").data("id")
-        var url = $(this).data("url")
-        var tableId =  $(tabId+" .global-modal .table-id[name='table-id']").val();
-        var indata = {table:table,id:id,tableId:tableId}
-        var place = $(tabId+" .global-modal .place-id[name='place-id']").val();
-        var apl_id = "approve-log-modal";
-        if($("#approve-log-modal").html() == undefined){
-            var html='<div class="modal fade in" id="'+apl_id+'" style="display: block; padding-right: 17px;"><div class="modal-dialog" style="top: 10%;"><div class="modal-content"><div class="modal-header"><button type="button" class="close modal-close" data-dismiss="modal" aria-label="关闭"><span aria-hidden="true"> × </span></button><h4 class="modal-title"></h4></div><div class="modal-body"></div><div class="modal-footer"><button type="button" class="btn btn-default pull-left modal-close" data-dismiss="modal">关闭</button></div></div></div></div>'
-            $(document).find("body").append(html);
-            $(document).on("click","#"+apl_id+" .modal-close",function(){
-                $(this).parents("#"+apl_id).toggleClass("modal fade in")
-                $(this).parents("#"+apl_id).prev(".modal-backdrop").toggleClass("none")
-                $(this).parents("#"+apl_id).css("display","none")
-            })           
-        }else{
-            if(!$("#"+apl_id).hasClass("modal fade in")){
-                $("#"+apl_id).toggleClass("modal fade in")
+    $(document).on("mouseover",".approve-group .approve-log,.approve-group .approve-con",function(){
+        if(!$(this).hasClass("disabled") && ($("#approve-log-modal").css("display")=="none" || $("#approve-log-modal").css("display")==undefined)){
+            var table = $(this).parents(".approve-group").data("table")
+            var id = $(this).parents(".approve-group").data("id")
+            var url = $(this).data("url")
+            var tableId =  $(tabId+" .global-modal .table-id[name='table-id']").val();
+            var indata = {table:table,id:id,tableId:tableId}
+            var place = $(tabId+" .global-modal .place-id[name='place-id']").val();
+            var apl_id = "approve-log-modal";
+            if($("#approve-log-modal").html() == undefined){
+                var html='<div class="modal fade in" id="'+apl_id+'" style="display: block; padding-right: 17px;"><div class="modal-dialog" style="top: 10%;"><div class="modal-content"><div class="modal-header"><button type="button" class="close modal-close" data-dismiss="modal" aria-label="关闭"><span aria-hidden="true"> × </span></button><h4 class="modal-title"></h4></div><div class="modal-body"></div><div class="modal-footer"><button type="button" class="btn btn-default pull-left modal-close" data-dismiss="modal">关闭</button></div></div></div></div>'
+                $(document).find("body").append(html);
+                $(document).on("click","#"+apl_id+" .modal-close",function(){
+                    $(this).parents("#"+apl_id).toggleClass("modal fade in")
+                    $(this).parents("#"+apl_id).prev(".modal-backdrop").toggleClass("none")
+                    $(this).parents("#"+apl_id).css("display","none")
+                })           
+            }else{
+                if(!$("#"+apl_id).hasClass("modal fade in")){
+                    $("#"+apl_id).toggleClass("modal fade in")
+                }
+                $("#"+apl_id).prev(".modal-backdrop").toggleClass("none")
+                $("#"+apl_id).css("display","block")
             }
-            $("#"+apl_id).prev(".modal-backdrop").toggleClass("none")
-            $("#"+apl_id).css("display","block")
-        }
-        if($(this).hasClass("approve-log")){
-            var title = "审批记录"
-            var body = '<table class="table table-bordered"><thead><tr><th>操作人</th><th>职务</th><th>状态</th><th>时间</th><th>备注</th></tr></thead><tbody></tbody></table><div><div class="progress progress-striped active"><div class="progress-bar progress-bar-primary" style="width: 0%"></div></div></div>'
-        }else{
-            var title = "审批操作"
-            var body ='<div class="form-group"><label>审批内容</label><textarea class="form-control approve-remark" rows="3" placeholder="如果驳回或拒绝请写明理由"></textarea></div><div style="text-align: right;"> <button type="button" class="btn bg-olive approve-btn btn-sm" data-status="1">通过</button> <button type="button" class="btn bg-orange approve-btn btn-sm" data-status="3">驳回</button> <button type="button" class="btn btn-danger approve-btn btn-sm" data-status="5">拒绝</button></div>';
-        }
-        $("#"+apl_id+" .modal-title").text(title);
-        $("#"+apl_id+" .modal-body").html(body);
-        if($(this).hasClass("approve-log")){
-            get(url,indata,function(result){
-                var current = 0;
-                var allProcess = result.allProcess > 0 ? (Number(result.allProcess) - 1) : 0;
-                if(result.errCode == 0){
-                    var trHtml = '';
-                    result.data.forEach(element => {
-                        trHtml+='<tr><td>'+element.user_name+'</td><td>'+element.role_name+'</td><td>'+element.state+'</td><td>'+element.add_time+'</td><td>'+element.remark+'</td></tr>'
-                        if(Number(element.status) == 1){
-                            current++
+            if($(this).hasClass("approve-log")){
+                var title = "审批记录"
+                var body = '<p class="text-yellow" style="font-weight: bold;">下一个审批者：<span class="next-examine"></span></p><table class="table table-bordered"><thead><tr><th>操作人</th><th>职务</th><th>状态</th><th>时间</th><th>备注</th></tr></thead><tbody></tbody></table><div><div class="progress progress-striped active"><div class="progress-bar progress-bar-primary" style="width: 0%"></div></div></div>'
+            }else{
+                var title = "审批操作"
+                var body ='<div class="form-group"><label>审批内容</label><textarea class="form-control approve-remark" rows="3" placeholder="如果驳回或拒绝请写明理由"></textarea></div><div style="text-align: right;"> <button type="button" class="btn bg-olive approve-btn btn-sm" data-status="1">通过</button> <button type="button" class="btn bg-orange approve-btn btn-sm" data-status="3">驳回</button> <button type="button" class="btn btn-danger approve-btn btn-sm" data-status="5">拒绝</button></div>';
+            }
+            $("#"+apl_id+" .modal-title").text(title);
+            $("#"+apl_id+" .modal-body").html(body);
+            if($(this).hasClass("approve-log")){
+                get(url,indata,function(result){
+                    var current = 0;
+                    var allProcess = result.allProcess > 0 ? (Number(result.allProcess)) : 0;
+                    if(result.errCode == 0){
+                        var trHtml = '';
+                        result.data.forEach(element => {
+                            trHtml+='<tr><td>'+element.user_name+'</td><td>'+element.role_name+'</td><td>'+element.state+'</td><td>'+element.add_time+'</td><td>'+element.remark+'</td></tr>'
+                            if(Number(element.status) == 1){
+                                current++
+                            }
+                        });
+                        // console.log(result.nextExamine)
+                        $("#"+apl_id+" .modal-body .next-examine").text(result.nextExamine)
+                        var progress = float(current/allProcess)*100;
+                        var final = " 未完成";
+                        if(progress>=100){
+                            progress = 100;
+                            $("#"+apl_id+" .modal-body .progress").removeClass("active");
+                            final = " 已完成";
                         }
-                    });
-                    
-                    var progress = float(current/allProcess)*100;
-                    var final = " 未完成";
-                    if(progress>=100){
-                        $("#"+apl_id+" .modal-body .progress").removeClass("active");
-                        final = " 已完成";
-                    }
-                    $("#"+apl_id+" .modal-body tbody").html(trHtml);
-                    $("#"+apl_id+" .modal-body .progress .progress-bar").css("width",progress+"%");
-                    if(current>0){
-                        $("#"+apl_id+" .modal-body .progress .progress-bar").text("当前进度："+current+" / "+allProcess+final);
-                    }
-                    
-                }
-            })
-        }else{
-            $(document).offon("click","#"+apl_id+" .modal-body .approve-btn",function(){
-                var approve_remark = $("#"+apl_id+" .approve-remark").val()
-                if(($(this).hasClass("bg-orange")  || $(this).hasClass("btn-danger")) && approve_remark == ""){
-                    notice(110,$(this).text()+"必须写明理由","操作异常");
-                    return false
-                }
-                indata["remark"] = approve_remark
-                indata["place"] = place;
-                indata["status"] = $(this).data("status")
-                post(url,indata,function(result){
-                    if(result.errCode==0){
-                        notice(result.errCode,result.error,false,2);
-                        $("#"+apl_id+" .modal-close").click();
-                        if($('body').hasClass('modal-open')){
-                            $(tabId+" .global-modal .modal-content .close").click();
-                            
-                            // $(tabId+" .search-box .search-list").click();
-                        }
-                        $(tabId+" .search-body").find(".search-list").click();
-                        console.log($(tabId+" .search-body").find(".search-list"))
-                        if($('body').hasClass('modal-open')){
-                            setTimeout(() => {
-                                $(tabId).find(".status-con .v-showmodal").each(function(){
-                                    if($(this).parent(".status-con").data("id") == tableId){
-                                        $(this).click();
-                                        return false;
-                                    }
-                                })
-                            },500)
+                        $("#"+apl_id+" .modal-body tbody").html(trHtml);
+                        $("#"+apl_id+" .modal-body .progress .progress-bar").css("width",progress+"%");
+                        if(current>0){
+                            $("#"+apl_id+" .modal-body .progress .progress-bar").text("当前进度："+current+" / "+allProcess+final);
                         }
                         
-                    }else{
-                        notice(result.errCode,result.error);
                     }
+                },false)
+            }else{
+                $(document).offon("click","#"+apl_id+" .modal-body .approve-btn",function(){
+                    var approve_remark = $("#"+apl_id+" .approve-remark").val()
+                    if(($(this).hasClass("bg-orange")  || $(this).hasClass("btn-danger")) && approve_remark == ""){
+                        notice(110,$(this).text()+"必须写明理由","操作异常");
+                        return false
+                    }
+                    if($fileInput!=""){
+                        indata["file"]={key:$fileInput.attr("name"),file:$fileInput.val()}
+                    }
+                    indata["remark"] = approve_remark
+                    indata["place"] = place;
+                    indata["status"] = $(this).data("status")
+                    post(url,indata,function(result){
+                        if(result.errCode==0){
+                            notice(result.errCode,result.error,false,2);
+                            $("#"+apl_id+" .modal-close").click();
+                            if($('body').hasClass('modal-open')){
+                                $(tabId+" .global-modal .modal-content .close").click();
+                                
+                                // $(tabId+" .search-box .search-list").click();
+                            }
+                            $(tabId+" .search-body").find(".search-list").click();
+                            // console.log($(tabId+" .search-body").find(".search-list"))
+                            if($('body').hasClass('modal-open')){
+                                setTimeout(() => {
+                                    $(tabId).find(".status-con .v-showmodal").each(function(){
+                                        if($(this).parent(".status-con").data("id") == tableId){
+                                            $(this).click();
+                                            return false;
+                                        }
+                                    })
+                                },500)
+                            }
+                            
+                        }else{
+                            notice(result.errCode,result.error);
+                        }
+                    })
                 })
-            })
+            }
+            //调整样式    width: 600px;    height: 376px;
+            // $("#"+apl_id).css({width:"600px"});
+            var width = $(window).width()
+            width = width > 600 ? 600 : width; 
+            var height = $("#"+apl_id+" .modal-dialog .modal-content").height()
+            // height = Number(height)+100
+            // console.log(height)
+            $("#"+apl_id).css({width:width+"px",left:"50%",top:"50%",height:height+"px",marginTop:"-"+(height/2)+"px",marginLeft:"-"+(width/2)+"px"});
+            $("#"+apl_id+" .modal-dialog").css({top:"0px",width:width+"px",height:height+"px",margin:"0px"});
+        }
+        
+    })
+    $(document).on("mouseout",".approve-group .approve-log",function(){
+        if($("#approve-log-modal").find(".approve-btn").length==0){
+            $("#approve-log-modal .modal-close").click();
         }
     })
 })
@@ -1080,6 +1102,6 @@ var set_table_data = function(listData,tableData,statusType,attachCall){
 }
 var toAlias = function(url,string){
     get(url,{string:string},function(result){
-        console.log(result)
+        // console.log(result)
     })
 }

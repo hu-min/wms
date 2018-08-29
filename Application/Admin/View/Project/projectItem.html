@@ -162,6 +162,10 @@
             init_chosen("{$url}","getOptionList",".global-modal");
             upload({url:"{:U('Project/upload_filesAdd')}"})
             init_date();
+            var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
+            if(gettype == "Add"){
+                $(tabId+" .global-modal").find(".approve-group").remove();
+            }
         }
 
         function project_setInfo(info){
@@ -238,11 +242,20 @@
             if(( info['status'] > 0 || info['author'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3){
                 $(tabId+" .modal-info").prop("disabled",true)
             }
-            //设置审批按钮状态
+            // //设置审批按钮状态
+            // console.log(info['process_level'])
+            // console.log(info['place'])
+            // console.log(info['status'])
+            
             $(tabId+" .global-modal").find(".approve-group").data("id",info['projectId'])
-            if(info['process_level'] >= "{$place}"){
-                $(tabId+" .global-modal").find(".approve-group .approve-con").addClass("disabled")
-                $(tabId+" .global-modal").find(".approve-group .approve-con").prop("disabled",true)
+            if(info['process_level'] > info['place'] || info['status'] ==3){
+                console.log(info);
+                if(info["author"] == "{$Think.session.userId}"){
+                    $(tabId+" .global-modal").find(".approve-group .approve-con").remove();
+                }else{
+                    $(tabId+" .global-modal").find(".approve-group .approve-con").addClass("disabled");
+                    $(tabId+" .global-modal").find(".approve-group .approve-con").prop("disabled",true);
+                }
             }
         }
         function get_project_code(id){

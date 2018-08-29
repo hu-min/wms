@@ -74,5 +74,44 @@ $this->assign("tableName",$this->对应的组件->tableName());
 6,modal 中需要有<input class="modal-info" name="status" value="0" type="hidden">
 7，统一 process_level 格式
 
+
+manager里需要修改
+
+
 获取最新的审批
 需要在节点添加查询的表名
+
+列表新增字段 
+记录当前数据使用哪一个流程，下一个审批者id
+流程3个字段
+
+当前指定流程id
+当前流程位置
+下一个审核者id
+
+1，添加数据的时候需要获取当前的审批流，如果存在多个则以添加先后为判断，最后的覆盖最先的。
+例子：借支里有两个审批流，A提交给B审核，A提交给C审核，那么默认选中A提交给C审核
+2，保存数据的时候会带上流程id，同时查找下一个审核者的id，如果数据涉及到项目，则第一个审批的人为指定项目的项目担当，接下来才执行正常流程
+
+3,6,4,1
+1 2 3 4
+
+
+FIND_IN_SET(用户id,examine) <= process_level 
+
+
+
+<input class="modal-info" value="0" name="leader" type="hidden">
+
+//添加时必备数据
+$process = $this->nodeCom->getProcess(I("vtabId"));
+$datas['process_id'] = $process["processId"];
+if($datas["project_id"]>0){ 
+    //存在项目，则第一个审批的人是项目主管,examine需要
+    $userRole = $this->userCom->getUserInfo($datas['leader']);
+    $datas['examine'] = $userRole['roleId'].",".$process["examine"];
+    unset($datas['leader']);
+}else{
+    $datas['examine'] = $process["examine"];
+}
+$datas['process_level']=$process["place"];

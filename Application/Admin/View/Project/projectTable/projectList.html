@@ -15,7 +15,7 @@
         <td>{$item['profitRate']|number_format}</td>
         <td>{$item['stage_name']}</td>
         <td>
-            {:approve_btn($tableName,$item['projectId'],$place,$item['process_level'],$item['status'])}
+            {:approve_btn($tableName,$item['projectId'],$item['place'],$item['process_level'],$item['status'])}
         </td>
         {:list_btn(get_defined_vars(),"projectId")}
     </tr>

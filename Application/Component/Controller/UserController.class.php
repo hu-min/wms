@@ -226,4 +226,30 @@ class UserController extends BaseController{
         $this->selfDB->where(['userId'=>$userId])->setInc("loginNum");
         $this->selfDB->modify(['userId'=>$userId],['lastTime'=>time(),'lastIp'=>ipTolong(getIp())]);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-08-28 16:09:42 
+     * @Desc:  userid和roleid互换
+     */    
+    function getUserInfo($userId,$roleId=0){
+        if($roleId>0){
+            $where=["roleId"=>$roleId];
+        }else{
+            $where=["userId"=>$userId];
+        }
+        $parameter=[
+            'where'=>$where,
+            'fields'=>'userId,loginName,userName,avatar,phone,gender,userType,roleId,roleName,rolePid,rolePName',
+            'joins'=>[
+                'LEFT JOIN (SELECT roleId role_id ,rolePid,roleName FROM v_role) r ON r.role_id = roleId',
+                'LEFT JOIN (SELECT roleId role_pid ,roleName rolePName FROM v_role) rp ON rp.role_pid = r.rolePid',
+            ],
+        ];
+        $userRoleRes =  $this->getOne($parameter);
+        if(!empty($userRoleRes["list"])){
+            return $userRoleRes["list"];
+        }else{
+            return [];
+        }
+    }
 }

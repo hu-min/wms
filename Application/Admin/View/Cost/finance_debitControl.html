@@ -74,6 +74,7 @@
                 <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
+                            <th>申请人</th>
                             <th>项目编号</th>
                             <th>项目名称</th>
                             <th>项目日期</th>
@@ -86,7 +87,6 @@
                             <th>借支金额</th>
                             <th>收款账户类别</th>
                             <th>放款日期</th>
-                            <th>审批记录</th>
                             <th>支付凭证</th>
                             <th>备注</th>
                             <th>审批记录</th>
@@ -128,20 +128,27 @@
                 }
                 $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
             });
-            ["id","debit_money","free_type","require_date","account_type","account","debit_cause","status"].forEach(element=>{
+            ["id","debit_money","free_type","require_date","account_type","account","debit_cause","voucher_file","status"].forEach(element=>{
                 if(info[element]!="" || info[element]!="0"){
                     $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
                 }
             })
             
-            if(( info['status'] > 0 || info['author'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3){
+            if(( info['status'] > 0 || info['author'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 ){
                 $(tabId+" .modal-info").prop("disabled",true)
+                
             }
             //控制按钮权限
             $(tabId+" .global-modal").find(".approve-group").data("id",info['id'])
-            if(info['process_level'] >= "{$place}"){
+            // console.log(info['process_level'])
+            // console.log("{$place}")
+            if(info['process_level'] > info['place'] || info['status'] ==3){
                 $(tabId+" .global-modal").find(".approve-group .approve-con").addClass("disabled")
                 $(tabId+" .global-modal").find(".approve-group .approve-con").prop("disabled",true)
+                $(tabId+" .modal-info[name='voucher_file']").parent(".input-group").find(".clear-media").remove();
+            }else{
+                $(tabId+" .modal-info[name='voucher_file']").prop("disabled",false)
+               
             }
         }
         $(function(){

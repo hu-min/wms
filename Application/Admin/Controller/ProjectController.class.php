@@ -105,6 +105,7 @@ class ProjectController extends BaseController{
         $btnTitle = "添加数据";
         $gettype = I("gettype");
         $onlydata = I("onlydata");
+        $roleId = session("roleId");
         $resultData=[];
         $id = I("id");
         if($gettype=="Edit"){
@@ -114,7 +115,7 @@ class ProjectController extends BaseController{
 
             $parameter=[
                 "where" => ["projectId"=>$id],
-                "fields" => "*",
+                "fields" => "*,FIND_IN_SET({$roleId},examine) place",
                 "joins" =>[
                     "LEFT JOIN (SELECT projectId project_pid,name project_name FROM v_project ) p ON p.project_pid = project_id",
                     "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = brand",
@@ -134,7 +135,7 @@ class ProjectController extends BaseController{
 
             $resultData["project_time"] = date("Y-m-d",$resultData["project_time"]);
             $resultData["create_time"] = date("Y-m-d",$resultData["create_time"]);
-            $resultData["bid_date"] = date("Y-m-d",$resultData["bid_date"]);
+            // $resultData["bid_date"] = date("Y-m-d",$resultData["bid_date"]);
             $resultData["bid_time"] = date("H:i:s",$resultData["bid_time"]);
             $resultData["end_date"] = date("Y-m-d",strtotime($resultData["project_time"]." +".$resultData["days"]."day"));
             $resultData["citys"] = $this->basicCom->get_citys($resultData["province"]);
@@ -385,8 +386,13 @@ class ProjectController extends BaseController{
             $where["project_time"]  = array('between',array(strtotime($dateArr[0]." 00:00:00"),strtotime($dateArr[1]." 23:59:59")));
         }
         // print_r($where);
-        if($nodeAuth<7){
-            $where['_string'] = " ((create_user = {$userId})  OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) AND status =1) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}) OR ((process_level = ".($this->processAuth["level"]-1)." OR process_level >= ".$this->processAuth["level"].") AND process_level <>0) OR FIND_IN_SET({$userId},examine) OR (author = {$userId})";
+        $roleId = session('roleId');
+        if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+            $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (create_user = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId})) AND status =1 )";
+
+        }
+        // if($nodeAuth<7){
+        //     $where['_string'] = " ((create_user = {$userId})  OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) AND status =1) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}) OR ((process_level = ".($this->processAuth["level"]-1)." OR process_level >= ".$this->processAuth["level"].") AND process_level <>0) OR FIND_IN_SET({$userId},examine) OR (author = {$userId})";
             // $where['user_id'] = session('userId');
             // if($process["place"]>0){
             //     $where=["process_level"=>[["eq",($process["place"]-1)],["egt",($process["place"])],"OR"],"status"=>1,'_logic'=>'OR'];
@@ -394,7 +400,8 @@ class ProjectController extends BaseController{
             //     $where=["status"=>1];
             // }
             // $where['_string'] = " ((create_user = {$userId})  OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) AND status =1) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}) OR (process_level = ".($this->processAuth["level"]-1)." AND process_level <>0) OR FIND_IN_SET({$userId},examine) OR (author = {$userId})";
-        }//OR process_level = 0 OR author = {$userId} OR FIND_IN_SET({$userId},examine)
+        // }
+        //OR process_level = 0 OR author = {$userId} OR FIND_IN_SET({$userId},examine)
 
         if(isset($data['status'])){
             $where['status']=$data['status'];
@@ -404,7 +411,7 @@ class ProjectController extends BaseController{
         }
         $parameter=[
             'where'=>$where,
-            'fields'=>"*",
+            'fields'=>"*,FIND_IN_SET({$roleId},examine) place",
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"project_time DESC",
@@ -467,9 +474,9 @@ class ProjectController extends BaseController{
         if(isset($datas['scene_user'])){
             $datas['scene_user']=implode(",",$datas['scene_user']);
         }
-        if(isset($datas['bid_date'])){
-            $datas['bid_date']=date("Ymd",strtotime($datas['bid_date']));
-        }
+        // if(isset($datas['bid_date'])){
+        //     $datas['bid_date']=date("Ymd",strtotime($datas['bid_date']));
+        // }
         if(isset($datas['create_time'])){
             $datas['create_time']=strtotime($datas['create_time']);
         }
@@ -481,6 +488,14 @@ class ProjectController extends BaseController{
             $datas['time']=strtotime($datas['time']);
             $datas['author']=session('userId');
             $datas['process_level']=$this->processAuth["level"];
+            //添加时必备数据
+            $process = $this->nodeCom->getProcess(I("vtabId"));
+
+            $datas['process_id'] = $process["processId"];
+            $userRole = $this->userCom->getUserInfo($datas['leader']);
+            $datas['examine'] = $userRole['roleId'].",".$process["examine"];
+            $datas['process_level']=$process["place"];
+
             unset($datas['projectId']);
             return $datas;
         }else if($reqType=="projectEdit"){
@@ -835,7 +850,7 @@ class ProjectController extends BaseController{
 
             $resultData["project_time"] = date("Y-m-d",$resultData["project_time"]);
             $resultData["create_time"] = date("Y-m-d",$resultData["create_time"]);
-            $resultData["bid_date"] = date("Y-m-d",$resultData["bid_date"]);
+            // $resultData["bid_date"] = date("Y-m-d",strtotime($resultData["bid_date"]));
             $resultData["bid_time"] = date("H:i:s",$resultData["bid_time"]);
             $resultData["end_date"] = date("Y-m-d",strtotime($resultData["project_time"]." +".$resultData["days"]."day"));
             $resultData["citys"] = $this->basicCom->get_citys($resultData["province"]);

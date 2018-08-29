@@ -19,6 +19,7 @@ class BaseModel extends Model{
         $noField=$parameter['noField']?$parameter['noField']:false;
         $order=$parameter['order']?$parameter['order']:null;
         $joins=$parameter['joins']?$parameter['joins']:"";
+        $having=$parameter['having']?$parameter['having']:"";
         if(isset($parameter["where"])){
             $this->where ( $where_arra );
         }else{
@@ -32,6 +33,9 @@ class BaseModel extends Model{
         }else{
             $this->join($joins);
         }
+        if(!empty($having)){
+            $this->having($having);
+        }
         if (!is_null ( $fields )) 
             $this->field ( $fields ,$noField);
         if (!empty( $order )) 
@@ -43,7 +47,7 @@ class BaseModel extends Model{
      * @Date: 2018-01-14 21:40:12 
      * @Desc: 获取多条数据 
      */    
-    public function getList($where_arra , $fields = true, $orderStr = null, $page = 0, $pageNum = 0, $groupBy = null,$joins=""){
+    public function getList($where_arra , $fields = true, $orderStr = null, $page = 0, $pageNum = 0, $groupBy = null,$joins="",$having=""){
         $page     = $page >= 1 ? $page : $this->page;
         $pageNum = $pageNum >= 1 ? $pageNum : $this->pageNum;
         $fields   = $fields ? $fields : true;
@@ -59,6 +63,9 @@ class BaseModel extends Model{
         if($orderStr){
             $this->order($orderStr);
         }
+        if(!empty($having)){
+            $this->having($having);
+        }
         if($groupBy){
             $this->group($groupBy);
         }
@@ -71,13 +78,16 @@ class BaseModel extends Model{
      * @Date: 2018-01-14 21:43:21 
      * @Desc: 统计数量 
      */    
-    public function countList($where_arra,$joins,$groupBy = null){
+    public function countList($where_arra,$joins,$groupBy = null,$having=""){
         if(is_array($joins)){
             foreach ($joins as $join) {
                 $this->join( $join);
             }
         }else{
             $this->join($joins);
+        }
+        if(!empty($having)){
+            $this->having($having);
         }
         if($groupBy){
           $subQuery = $this->where($where_arra)->group($groupBy)->buildSql();

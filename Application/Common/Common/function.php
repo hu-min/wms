@@ -240,11 +240,12 @@ function modal_btn($defind_vars){
 }
 function approve_btn($tableName,$id=0,$place=false,$level=0,$status=0){
     echo '<div class="approve-group" data-table="'.$tableName.'" data-id="'.$id.'" >
-        <button type="button" data-url="'.U('Tools/getApproveList').'" class="btn btn-sm bg-purple approve-log">记录</button>';
+        <button type="button" data-url="'.U('Tools/getApproveList').'" class="btn btn-sm bg-purple approve-log">记录</button> ';
     // echo $place,",",$level;
-    if($place===false || $place > 1){
+    if($place===false || $place > 0){
         $disabled = "";
-        if(($place !== false && $level >= $place) || $status == 3){
+        // if(($place !== false && $level >= $place) || $status == 3){
+        if(( $level > $place) || $status == 3){
             $disabled = "disabled";
         }
         echo '<button type="button" '.$disabled.' data-url="'.U('Tools/approveEdit').'" class="btn btn-sm bg-orange approve-con '.$disabled.'">操作</button>';

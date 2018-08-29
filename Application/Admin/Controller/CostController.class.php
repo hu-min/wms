@@ -7,7 +7,7 @@ namespace Admin\Controller;
  * @Desc: 成本管理 
  */
 class CostController extends BaseController{
-    protected $pageSize=15;
+    protected $pageSize=10;
     protected $accountType = ["1"=>"现金","2"=>"微信支付","3"=>"支付宝","4"=>"银行卡","5"=>"支票","6"=>"其它"];
     protected $expVouchType = ["无","收据","签收单+身份证","发票","其他"];
     public function _initialize() {
@@ -128,7 +128,20 @@ class CostController extends BaseController{
             $datas['debit_date']=time();
             $datas['user_id']=session('userId');
             $datas['author']=session('userId');
-            $datas['process_level']=$this->processAuth["level"];
+
+            //添加时必备数据
+            $process = $this->nodeCom->getProcess(I("vtabId"));
+            $datas['process_id'] = $process["processId"];
+            if($datas["project_id"]>0){ 
+                //存在项目，则第一个审批的人是项目主管,examine需要
+                $userRole = $this->userCom->getUserInfo($datas['leader']);
+                $datas['examine'] = $userRole['roleId'].",".$process["examine"];
+                unset($datas['leader']);
+            }else{
+                $datas['examine'] = $process["examine"];
+            }
+            $datas['process_level']=$process["place"];
+            // $datas['process_level']=$this->processAuth["level"];
             unset($datas['id']);
             return $datas;
         }else if($reqType=="debitEdit"){
@@ -152,7 +165,6 @@ class CostController extends BaseController{
     function debitAdd(){
         $info=$this->manageDebitInfo();
         if($info){
-            // print_r($info);
             $insertResult=$this->debitCom->insert($info);
             if(isset($insertResult->errCode) && $insertResult->errCode==0){
                 $this->ApprLogCom->createApp($this->debitCom->tableName(),$insertResult->data,session("userId"),"");
@@ -189,7 +201,6 @@ class CostController extends BaseController{
         $nodeId = getTabId(I("vtabId"));
         $process = $this->nodeCom->getProcess($nodeId);
         $this->assign("place",$process["place"]);
-
         if($reqType){
             $this->$reqType();
         }else{
@@ -203,27 +214,32 @@ class CostController extends BaseController{
         $process = $this->nodeCom->getProcess($nodeId);
         $this->assign("place",$process["place"]);
         $where=[];
+        $roleId = session('roleId');
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+            $where["_string"] = "FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0";
             if($process["place"]>0){
-                $where=["process_level"=>[["eq",($process["place"]-1)],["egt",($process["place"])],"OR"],"status"=>1,'_logic'=>'OR'];
+                // $where=["process_level"=>''];
+                // $where=["process_level"=>[["eq",($process["place"]-1)],["egt",($process["place"])],"OR"],"status"=>1,'_logic'=>'OR'];
             }else{
-                $where=["status"=>1];
+                // $where=["status"=>1];
             }
         }
         $parameter=[
-            'fields'=>"*,FROM_UNIXTIME(debit_date,'%Y-%m-%d') debit_date,FROM_UNIXTIME(require_date,'%Y-%m-%d') require_date,FROM_UNIXTIME(loan_date,'%Y-%m-%d') loan_date",
+            'fields'=>"*,FROM_UNIXTIME(debit_date,'%Y-%m-%d') debit_date,FROM_UNIXTIME(require_date,'%Y-%m-%d') require_date,FROM_UNIXTIME(loan_date,'%Y-%m-%d') loan_date,FIND_IN_SET({$roleId},examine) place",
             'where'=>$where,
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"id DESC",
             "joins"=>[
                 "LEFT JOIN (SELECT projectId,code,name project_name,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,business,leader FROM v_project ) p ON p.projectId = project_id ",
+                "LEFT JOIN (SELECT userId,userName user_name FROM v_user) un ON un.userId = user_id",
                 "LEFT JOIN (SELECT userId,userName business_name FROM v_user) bu ON bu.userId = p.business",
                 "LEFT JOIN (SELECT userId,userName leader_name FROM v_user) lu ON lu.userId = p.leader",
                 "LEFT JOIN (SELECT basicId,name free_name FROM v_basic WHERE class='feeType') f ON f.basicId=free_type",
             ]
         ];
         $listResult=$this->debitCom->getList($parameter);
+    // echo        $this->debitCom->M()->_sql();
         $this->tablePage($listResult,'Cost/costTable/financedebitList',"finance_debitList");
     }
     function finance_debit_modalOne(){
@@ -323,6 +339,9 @@ class CostController extends BaseController{
         }
         if($reqType=="expenseAdd"){
             $datas['add_time']=time();
+            $datas['user_id']=session('userId');
+            
+
             unset($datas['id']);
             return $datas;
         }else if($reqType=="expenseEdit"){
@@ -348,17 +367,34 @@ class CostController extends BaseController{
     function expenseAdd(){
         $datas=I("data");
         $project_id=I("project_id");
+        $leader=I("leader");
+
         $expInfo = [
             "project_id"=>$project_id,
             "user_id"=>session("userId"),
             "add_time"=>time(),
         ];
+        //添加时必备数据
+        $process = $this->nodeCom->getProcess(I("vtabId"));
+        $expInfo['process_id'] = $process["processId"];
+        if($expInfo["project_id"]>0){ 
+            //存在项目，则第一个审批的人是项目主管,examine需要
+            $userRole = $this->userCom->getUserInfo($leader);
+            $expInfo['examine'] = $userRole['roleId'].",".$process["examine"];
+            // unset($expInfo['leader']);
+        }else{
+            $expInfo['examine'] = $process["examine"];
+        }
+        $expInfo['process_level']=$process["place"];
+
         $isInsert = false;
         $insertRes = $this->expenseCom->insert($expInfo);
         if($insertRes->errCode==0){
             foreach ($datas["expense-list"] as $subExpInfo) {
                 $dataInfo = $this->expenseManage($subExpInfo);
                 $dataInfo["parent_id"] = $insertRes->data;
+                $dataInfo["examine"] = $expInfo['examine'];
+                $dataInfo['process_level'] = $expInfo["process_level"];
                 if($dataInfo){
                     $insertResult=$this->expenseSubCom->insert($dataInfo); 
                     $this->ApprLogCom->createApp($this->expenseSubCom->tableName(),$insertResult->data,session("userId"),"");
@@ -425,16 +461,18 @@ class CostController extends BaseController{
         $this->assign("tableName",$this->expenseCom->tableName());
         $nodeId = getTabId(I("vtabId"));
         $process = $this->nodeCom->getProcess($nodeId);
+        $roleId = session('roleId');
         // print_r($process);exit;
         // $map['process_level']  = [["eq",($process["place"]-1)],["gt",$process["place"]],"OR"];
         // $map['title']  = array('like','%thinkphp%');
         // $map['_logic'] = 'or';
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
-            if($process["place"]>0){
-                $where=["process_level"=>[["eq",($process["place"]-1)],["egt",($process["place"])],"OR"],"status"=>1,'_logic'=>'OR'];
-            }else{
-                $where=["status"=>1];
-            }
+            $where["_string"] = "FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0";
+            // if($process["place"]>0){
+            //     $where=["process_level"=>[["eq",($process["place"]-1)],["egt",($process["place"])],"OR"],"status"=>1,'_logic'=>'OR'];
+            // }else{
+            //     $where=["status"=>1];
+            // }
         }
         
         
