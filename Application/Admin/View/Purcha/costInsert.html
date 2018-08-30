@@ -103,19 +103,28 @@
         }
         function cost_insert_setInfo(info){
             if(info["list"] == undefined){
-                ["code","leader_name","business_name"].forEach(element => {
+                ["code","leader_name","business_name","leader"].forEach(element => {
                     $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
                 });
             }else{
                 $(tabId+" .global-modal .supr-list tbody").html("");
-                ["project_id","code","leader_name","business_name"].forEach(element => {
+                ["project_id","code","leader_name","business_name","leader"].forEach(element => {
                     $(tabId+" .global-modal .project-info[name='"+element+"']").val(info.list[0][element]);
                 });
                 ["project_id"].forEach(element => {
                     $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info.list[0][element]);
                     init_chosen("{$url}","getProjectOne",".global-modal");
                 });
+                var status = 0
+                var user_id = 0
+                var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
                 info.list.forEach(function(supritem,rows){
+                    
+                    if( supritem["status"] > status){
+                        status = supritem["status"]
+                    }
+                    
+                    user_id = supritem["user_id"]
                     $(tabId+" .global-modal .supr-list tbody").append(info.template);
                     var $current = $(tabId+" .global-modal .supr-list tbody tr").eq(rows);
                     $current.find(".serial").text(Number(rows+1));
@@ -140,18 +149,34 @@
                         // $(tabId+" .global-modal .modal-info[name='"+element+"']").val(supritem[element]);
                     });
 
+                    
+                    
+                    if(( status > 0 || user_id != "{$Think.session.userId}") && "{$nodeAuth}"<7 && status !=3 && gettype !="Add"){
+                        // $current.find(".modal-info").prop("disabled",true)
+                        $current.find("input").prop("disabled",true)
+                        $current.find(".chosen-select").prop("disabled",true)
+                    }
                     init_chosen("{$url}","getProjectOne",$current);
                     init_date(false,$current);
                 });
             }
-
+            if(( status > 0 || user_id != "{$Think.session.userId}") && "{$nodeAuth}"<7 && status !=3 && gettype !="Add"){
+                $(tabId+" .chosen-select").prop("disabled",true)
+                $(tabId+" .global-modal").find(".add-suprcompany").parent().remove();
+            }
+            // console.log(status)
+            // console.log(user_id)
+            // console.log("{$nodeAuth}")
+            // console.log("{$Think.session.userId}")
+            
         }
         function cost_insert_getInfo(){
             var project_id = $(tabId+" .modal-info[name='project_id']").val()
+            var leader = $(tabId+" .modal-info[name='leader']").val()
             var status = $(tabId+" .modal-info[name='status']").val()
             datas["data"] = []
             $(tabId+" .global-modal .supr-list tbody tr").each(function(){
-                var tempSupr = {project_id:project_id,status:status}
+                var tempSupr = {project_id:project_id,status:status,leader:leader}
                 $(this).find(".modal-info").each(function(){
                     var name = $(this).attr("name")
                     var val = $(this).val()

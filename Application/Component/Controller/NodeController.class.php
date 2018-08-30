@@ -14,6 +14,7 @@ class NodeController extends BaseController{
         $processResult = $this->getList(["fields"=>"processId,processIds,processOption","where"=>["nodeId"=> $nodeId],"joins"=>["LEFT JOIN (SELECT processId,processOption FROM v_process WHERE status = 1) p ON FIND_IN_SET(p.processId,processIds)"] ]);
         $processInfo = ["process"=>[],"allProcess"=>1,"place"=>0,"processId"=>0,"examine"=>''];
         $processList = [];
+        // $this->log($processResult);
         if(is_array($processResult["list"])){
             $processIds = explode(",",$processResult["list"][0]["processIds"]);
             foreach ($processIds as  $processId) {

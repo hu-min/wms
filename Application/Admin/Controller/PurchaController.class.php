@@ -9,6 +9,8 @@ namespace Admin\Controller;
 class PurchaController extends BaseController{
 
     public function _initialize() {
+        $this->project=A("Project");
+        $this->supplier=A("Supplier");
         parent::_initialize();
         $this->basicCom=getComponent('Basic');
         $this->fixExpenCom=getComponent('FixldExpense');
@@ -20,8 +22,7 @@ class PurchaController extends BaseController{
         $this->payGradeType = ["1"=>"A级[高]","2"=>"B级[次]","3"=>"C级[中]","4"=>"D级[低]"];
         $this->invoiceType = ["0"=>"无","1"=>"收据","2"=>"增值税普通","3"=>"增值税专用"];
         $this->payType = ['1'=>'公对公','2'=>'现金付款','3'=>'支票付款'];
-        $this->project=A("Project");
-        $this->supplier=A("Supplier");
+        
     }
     /** 
      * @Author: vition 
@@ -101,6 +102,7 @@ class PurchaController extends BaseController{
         $gettype = I("gettype");
         $resultData=[];
         $id = I("id");
+        $roleId = session("roleId");
         
         if($gettype=="Edit"){
             $title = "编辑成本";
@@ -109,7 +111,7 @@ class PurchaController extends BaseController{
             $where = ["project_id"=>$id];
             $parameter=[
                 'where'=>$where,
-                'fields'=>"*,FROM_UNIXTIME(sign_date,'%Y-%m-%d') sign_date,FROM_UNIXTIME(advance_date,'%Y-%m-%d') advance_date",
+                'fields'=>"*,FROM_UNIXTIME(sign_date,'%Y-%m-%d') sign_date,FROM_UNIXTIME(advance_date,'%Y-%m-%d') advance_date,FIND_IN_SET({$roleId},examine) place",
                 'page'=>$p,
                 'pageSize'=>$this->pageSize,
                 'orderStr'=>"id DESC",
@@ -126,6 +128,7 @@ class PurchaController extends BaseController{
                 ],
             ];
             $resultData=$this->purchaCom->getList($parameter);
+            // print_r($resultData);
             $resultData["template"] = $this->fetch('Purcha/purchaTable/suprLi');
         }
         $modalPara=[
@@ -139,22 +142,28 @@ class PurchaController extends BaseController{
     function cost_insertList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
+        $roleId = session("roleId");
         $where=[];
+        if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+            $where['user_id'] = session('userId');
+        }
         $parameter=[
             'where'=>$where,
-            'fields'=>"project_id,COUNT(supplier_com) supr_num,SUM(contract_amount) amount, name,code,business_name,leader_name",
+            'fields'=>"project_id,state status,user_id,COUNT(supplier_com) supr_num,SUM(contract_amount) amount, name,code,business_name,leader_name,FIND_IN_SET({$roleId},examine) place",
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"id DESC",
             'groupBy' => 'project_id',
             "joins"=>[
                 "LEFT JOIN(SELECT projectId, name,code,business,leader FROM v_project) p ON p.projectId = project_id",
-                "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = p.business",
-                "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
+                "LEFT JOIN (SELECT userId buser_id,userName business_name FROM v_user) bu ON bu.buser_id = p.business",
+                "LEFT JOIN (SELECT userId luser_id,userName leader_name FROM v_user) lu ON lu.luser_id = p.leader",
+                "LEFT JOIN (SELECT project_id project_sid, CASE WHEN FIND_IN_SET(0,GROUP_CONCAT(status))>0 THEN 0 WHEN FIND_IN_SET(1,GROUP_CONCAT(status))>0 THEN 1 WHEN FIND_IN_SET(2,GROUP_CONCAT(status))>0 THEN 2  WHEN FIND_IN_SET(3,GROUP_CONCAT(status))>0 THEN 3  WHEN FIND_IN_SET(4,GROUP_CONCAT(status))>0 THEN 4 ELSE 0 END state FROM v_purcha GROUP BY project_id) s ON s.project_sid=project_id",
             ],
         ];
         
         $listResult=$this->purchaCom->getList($parameter);
+        // echo $this->purchaCom->M()->_sql();
         $this->tablePage($listResult,'Purcha/purchaTable/costInsertList',"sup_companyList");
     }
     function manageCostInsertInfo($datas,$reqType=false){
@@ -164,6 +173,7 @@ class PurchaController extends BaseController{
         }
         if($reqType=="cost_insertAdd"){
             $datas['add_time']=time();
+            $datas['user_id']=session("userId");
             unset($datas['id']);
             return $datas;
         }else if($reqType=="cost_insertEdit"){
@@ -189,12 +199,30 @@ class PurchaController extends BaseController{
     function cost_insertAdd(){
         $datas=I("data");
         $isInsert =false;
+        $process = $this->nodeCom->getProcess(I("vtabId"));
+        $process_id = $process["processId"];
+        if($datas[0]["project_id"]>0){ 
+            //存在项目，则第一个审批的人是项目主管,examine需要
+            $userRole = $this->userCom->getUserInfo($datas[0]["leader"]);
+            $examine = $userRole['roleId'].",".$process["examine"];
+            unset($expInfo['leader']);
+        }else{
+            $examine = $process["examine"];
+        }
+        $process_level=$process["place"];
         foreach ($datas as $suprInfo) {
             $dataInfo = $this->manageCostInsertInfo($suprInfo);
+            $dataInfo["process_id"] = $process_id;
+            $dataInfo["examine"] = $examine;
+            $dataInfo['process_level'] = $process_level;
+            // print_r($dataInfo);
+            unset($dataInfo['leader']);
             if($dataInfo){
                 $insertResult=$this->purchaCom->insert($dataInfo);
+                
                 if($insertResult->errCode==0){
-                    $this->wouldpayCom->insert(["cost_id"=>$insertResult->data]);
+                    $this->ApprLogCom->createApp($this->purchaCom->tableName(),$insertResult->data,session("userId"),"");
+                    // $this->wouldpayCom->insert(["cost_id"=>$insertResult->data]);
                     $isInsert =true;
                 }
             }
@@ -214,6 +242,7 @@ class PurchaController extends BaseController{
                 if($dataInfo){
                     $updateResult=$this->purchaCom->update($dataInfo);
                     if($updateResult->errCode==0){
+                        $this->ApprLogCom->updateStatus($this->purchaCom->tableName(),$dataInfo["where"]["id"]);
                         $isUpdate =true;
                     }
                 }
@@ -246,6 +275,7 @@ class PurchaController extends BaseController{
         $this->assign('dbName',"");//删除数据的时候需要
         $this->assign('payType',$this->payType);//
         $this->assign('invoiceType',$this->invoiceType);//
+        $this->assign("tableName",$this->purchaCom->tableName());
         if($reqType){
             $this->$reqType();
         }else{
@@ -257,9 +287,13 @@ class PurchaController extends BaseController{
         $data=I("data");
         $p=I("p")?I("p"):1;
         $where=[];
+        $roleId = session('roleId');
+        if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+            $where["_string"] = "FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0";
+        }
         $parameter=[
             'where'=>$where,
-            'fields'=>"*",
+            'fields'=>"*,FIND_IN_SET({$roleId},examine) place",
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"id DESC",
@@ -316,20 +350,31 @@ class PurchaController extends BaseController{
         $this->modalOne($modalPara);
     }
     function purcha_applyEdit(){
-        $data=I("data");
-        $contract_file=I("contract_file");
-        $pay_grade=I("pay_grade");
-        $purcha_id=I("purcha_id");
+        // $data=I("data");
+        extract($_POST);
+        // $contract_file=I("contract_file");
+        // $pay_grade=I("pay_grade");
+        // $purcha_id=I("purcha_id");
         $isUpdate = false;
         $dataInfo=["id" => $purcha_id];
-        foreach (["contract_file","pay_grade"] as $key) {
+        foreach (["contract_file","pay_grade","contract_amount","company","sign_date","remark"] as $key) {
             if(isset($$key) && $$key!=""){
-                $dataInfo[$key] = $$key;
+                if($key=="sign_date"){
+                    $dataInfo[$key] = strtotime($$key);
+                }else{
+                    $dataInfo[$key] = $$key;
+                }
             }
+        }
+        if(!isset($data) || !is_array($data)){ 
+            $this->ajaxReturn(['errCode'=>114,'error'=>getError(114)]);
         }
         if(count($dataInfo)>1){
             $isUpdate =true;
             $updateResult=$this->purchaCom->update($dataInfo);
+            if($updateResult->errCode==0){
+                $this->ApprLogCom->updateStatus($this->purchaCom->tableName(),$dataInfo["id"]);
+            }
         }
         foreach (["suprpay-list","suprfina-list","invoice-list"] as $itemInfoList) {
             foreach ($data[$itemInfoList] as $key => $itemInfo) {

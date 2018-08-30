@@ -459,8 +459,8 @@ class CostController extends BaseController{
         $data=I("data");
         $p=I("p")?I("p"):1;
         $this->assign("tableName",$this->expenseCom->tableName());
-        $nodeId = getTabId(I("vtabId"));
-        $process = $this->nodeCom->getProcess($nodeId);
+        // $nodeId = getTabId(I("vtabId"));
+        // $process = $this->nodeCom->getProcess($nodeId);
         $roleId = session('roleId');
         // print_r($process);exit;
         // $map['process_level']  = [["eq",($process["place"]-1)],["gt",$process["place"]],"OR"];

@@ -257,7 +257,7 @@ function approve_btn($tableName,$id=0,$place=false,$level=0,$status=0){
  * @Date: 2018-06-10 00:42:43 
  * @Desc: 新增保存按钮权限 
  */
-function save_btn($defind_vars){
+function save_btn($defind_vars,$always=false,$hide=false){
     $processAuth = $defind_vars["processAuth"];
     $nodeAuth = $defind_vars["nodeAuth"];
     $controlName = $defind_vars["controlName"];
@@ -267,8 +267,10 @@ function save_btn($defind_vars){
     $userId = $defind_vars["userId"];
     $url = $defind_vars["url"];
     $noModal = $defind_vars["noModal"] ? "" : "data-modal='true'";
-    if((($item["author"] == $userId || $item["user_id"] == $userId) && in_array($item['status'],[0,3])) || ($gettype == "Add" && $processAuth['level'] > 0)){
+    if((($item["author"] == $userId || $item["user_id"] == $userId) && in_array($item['status'],[0,3])) || ($gettype == "Add" && $processAuth['level'] > 0) || $always){
         echo "<button type='button' class='btn btn-sm btn-primary save-info' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>{$btnTitle}</button>";
+    }elseif($hide){
+        echo "<button type='button' class='btn btn-sm btn-primary save-info none' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>{$btnTitle}</button>";
     }
     
     // if((($item["author"] == $userId && $item['status'] == 0) || ($gettype == "Add" && $processAuth['level'] > 0) || (($processAuth['level'] -1) == $item["process_level"] && $item["process_level"] > 0))  || $nodeAuth>= 7){

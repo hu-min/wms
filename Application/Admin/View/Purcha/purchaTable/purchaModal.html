@@ -158,13 +158,13 @@
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label for="info-title">合同总额：</label>
-                                                    <input class="form-control project-info" readonly="readonly" name="contract_amount" title="合同总额"  value="" placeholder="合同总额" type="text">
+                                                    <input class="form-control project-info" name="contract_amount" title="合同总额"  value="" placeholder="合同总额" type="text">
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label for="info-title">签约日期：</label>
-                                                    <input class="form-control project-info" readonly="readonly" name="sign_date" title="签约日期"  value="" placeholder="签约日期" type="text">
+                                                    <input class="form-control project-info date-input" readonly="readonly" name="sign_date" title="签约日期"  value="" placeholder="签约日期" type="text">
                                                 </div>
                                             </div>
                                         </div>
@@ -185,7 +185,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="panel box box-success">
+                            <div class="panel box box-success purpay-box">
                                 <div class="box-header with-border">
                                     <h4 class="box-title">
                                         <a data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#{$vtabId}-collapseFourth">
@@ -206,7 +206,7 @@
                                                         <tr>
                                                             <th>序号</th>
                                                             <th>支付金额</th>
-                                                            <th>支付比例</th>
+                                                            <th>支付比例%</th>
                                                             <th>支付日期</th>
                                                             <th>付款方式</th>
                                                             <th>备注</th>
@@ -221,7 +221,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="panel box box-warring">
+                            <div class="panel box box-warning finance-box">
                                 <div class="box-header with-border">
                                     <h4 class="box-title">
                                         <a data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#{$vtabId}-collapseFifth">
@@ -243,10 +243,10 @@
                                                             <th>序号</th>
                                                             <th>计划付款日期</th>
                                                             <th>计划付款金额</th>
-                                                            <th>计划付款比例</th>
+                                                            <th>计划付款比例%</th>
                                                             <th>实际付款日期</th>
                                                             <th>实际付款金额</th>
-                                                            <th>实际付款比例</th>
+                                                            <th>实际付款比例%</th>
                                                             <th>付款状态</th>
                                                             <th>备注</th>
                                                         </tr>
@@ -274,7 +274,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="panel box box-info">
+                            <div class="panel box box-default invoice-box">
                                 <div class="box-header with-border">
                                     <h4 class="box-title">
                                         <a data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#{$vtabId}-collapseSixth">
@@ -311,7 +311,7 @@
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label for="info-title">需要提交发票总额：</label>
-                                                    <input class="form-control project-info"  name="all_invoice" title="需要提交发票总额"  value="" placeholder="需要提交发票总额" type="text">
+                                                    <input class="form-control project-info"  readonly="readonly" name="all_invoice" title="需要提交发票总额"  value="" placeholder="需要提交发票总额" type="text">
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
@@ -345,5 +345,6 @@
     <div class="modal-footer">
         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
         <input class="modal-info purcha-id" value="0" name="id" type="hidden">
-        {:save_btn(get_defined_vars())}
+        {:save_btn(get_defined_vars(),true)}
+        {:approve_btn($tableName)}
     </div>

@@ -79,6 +79,7 @@
                             <th>最迟签署日期</th>
                             <th>预付款日期</th>
                             <th>备注</th>
+                            <th>审批记录</th>
                             <th>状态</th>
                             <th>操作</th>
                         </tr>
@@ -105,7 +106,7 @@
             // init_date();
             // init_chosen("{$url}","getProjectOne",".global-modal");
             // init_chosen("{$url}","getProjectOne",".global-modal");
-            // init_date();
+            init_date();
             upload({url:"{:U('Project/upload_filesAdd')}"})
         }
         function purcha_apply_setInfo(info){
@@ -143,12 +144,33 @@
                         $(tabId+" .project-info[name='paid']").val(allMoney);
                         $(tabId+" .project-info[name='surplus']").val(float(info["contract_amount"])-float(allMoney));
                     }else if(element == "invoice-list"){
-                        $(tabId+" .project-info[name='all_invoice']").val(info["contract_amount"]);
+                        invoive_compute()
                         $(tabId+" .project-info[name='invoiced']").val(allMoney);
                         $(tabId+" .project-info[name='invoice_supr']").val(float(info["contract_amount"])-float(allMoney));
                     }
                 }
             });
+            $(tabId+" .project-info[name='all_invoice']").val(info["contract_amount"]);
+            if(( info['status'] > 0 || info['author'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 ){
+                $(tabId+" .modal-info").prop("disabled",true) 
+                $(tabId+" .global-modal").find(".purpay-box .add-purpay").hide()
+            }
+            if("{$Think.session.userInfo.roleName}".match(/财务/)===null){
+                $(tabId+" .global-modal").find(".finance-box").hide()
+            }else{
+                $(tabId+" .global-modal").find(".invoice-box .add-invoice").hide()
+            }
+            if(info['status']==0){
+                $(tabId+" .global-modal").find(".invoice-box").hide()
+            }
+            //控制按钮权限
+            $(tabId+" .global-modal").find(".approve-group").data("id",info['id'])
+            if(info['process_level'] > info['place'] || in_array(Number(info['status']),[3])){
+                $(tabId+" .global-modal").find(".approve-group .approve-con").addClass("disabled")
+                $(tabId+" .global-modal").find(".approve-group .approve-con").prop("disabled",true)
+            }else{
+               
+            }
         }
         function purcha_apply_getInfo(){
             var purcha_id = $(tabId+" .purcha-id[name='id']").val()
@@ -158,6 +180,10 @@
             datas["contract_file"] = contract_file
             datas["purcha_id"] = purcha_id
             datas["pay_grade"] = pay_grade
+            datas["contract_amount"] = $(tabId+" .project-info[name='contract_amount']").val()
+            datas["company"] = $(tabId+" .project-info[name='company']").val()
+            datas["sign_date"] = $(tabId+" .project-info[name='sign_date']").val()
+            datas["remark"] = $(tabId+" .project-info[name='remark']").val()
             datas["data"] = {};
             ["suprpay-list","suprfina-list","invoice-list"].forEach(element => {
                 datas["data"][element] = [];
@@ -186,6 +212,15 @@
             })
             });
         }
+        var invoive_compute =function(){
+            var invoiveMoney = 0
+            var allInvoive = $(tabId+" .global-modal").find("input[name='all_invoice']").val();
+            $(tabId+" .global-modal").find("table input[name='invoice_money']").each(function(index){
+                invoiveMoney+=float($(this).val());
+            })
+            $(tabId+" .global-modal").find("input[name='invoiced']").val(invoiveMoney);
+            $(tabId+" .global-modal").find("input[name='invoice_supr']").val(float(allInvoive-invoiveMoney));
+        }
         $(function(){
             $(tabId+" .search-list").trigger("click");
             [["add-purpay","getSuprpayLiOne","suprpay-list"],["add-suprfinapay","suprFinapayLiOne","suprfina-list"],["add-invoice","suprInvoiceLiOne","invoice-list"]].forEach(element => {
@@ -203,6 +238,76 @@
                     $(this).parents("tr").remove();
                 })
             });
+            //支付比例计算
+            $(tabId+" .global-modal").on("input","table input[name='pay_money']",function(){
+                var amount = $(tabId+" .global-modal").find("input[name='contract_amount']").val();
+                var money = $(this).val()
+                var currentMoney = 0
+                $(this).parents("table").find("input[name='pay_money']").each(function(index){
+                    currentMoney+=float($(this).val());
+                })
+                currentMoney -= money
+                if(float(amount)<=0){
+                    notice(110,"金额异常","合同金额不能小于等于0");
+                    $(this).val("")
+                    $(this).parents("tr").find("input[name='pay_ratio']").val("");
+                    return;
+                }else if(float(money)+float(currentMoney)>float(amount)){
+                    money = float(amount)-float(currentMoney)
+                    $(this).val(money)
+                }
+                var ratio = float((float(money)/float(amount))*100)
+                $(this).parents("tr").find("input[name='pay_ratio']").val(ratio);
+                $(this).val(float(money))
+            })
+            //支付金额计算
+            $(tabId+" .global-modal").on("input","table input[name='pay_ratio']",function(){
+                var amount = $(tabId+" .global-modal").find("input[name='contract_amount']").val();
+                var ratio = $(this).val()
+                var money = float((ratio/100)*amount)
+                $(this).parents("tr").find("input[name='pay_money']").val(money);
+
+                var currentMoney = 0
+                $(this).parents("table").find("input[name='pay_money']").each(function(index){
+                    currentMoney+=float($(this).val());
+                })
+                currentMoney -= money
+
+                if(float(amount)<=0){
+                    notice(110,"金额异常","合同金额不能小于等于0");
+                    $(this).val("")
+                    $(this).parents("tr").find("input[name='pay_money']").val("");
+                    return;
+                }else if(float(money)+float(currentMoney)>float(amount)){
+                    money = float(amount)-float(currentMoney)
+                    var ratio = float((float(money)/float(amount))*100)
+                    $(this).val(ratio)
+                    $(this).parents("tr").find("input[name='pay_money']").val(money);
+                }
+                $(this).val(float(ratio))
+                // $(this).parents("tr").find("input[name='pay_money']").val("");
+                
+            })
+            //发票比例计算
+            $(tabId+" .global-modal").on("input","table input[name='invoice_money']",function(){
+                var amount = $(tabId+" .global-modal").find("input[name='all_invoice']").val();
+                var money = $(this).val()
+                var currentMoney = 0
+                $(this).parents("table").find("input[name='invoice_money']").each(function(index){
+                    currentMoney+=float($(this).val());
+                })
+                currentMoney -= money
+                if(float(amount)<=0){
+                    notice(110,"金额异常","发票金额不能小于等于0");
+                    $(this).val("")
+                    return;
+                }else if(float(money)+float(currentMoney)>float(amount)){
+                    money = float(amount)-float(currentMoney)
+                    $(this).val(money)
+                }
+                $(this).val(float(money))
+                invoive_compute()
+            })
         })
     </script>
 </body>

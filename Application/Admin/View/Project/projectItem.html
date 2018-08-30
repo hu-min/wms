@@ -249,7 +249,7 @@
             
             $(tabId+" .global-modal").find(".approve-group").data("id",info['projectId'])
             if(info['process_level'] > info['place'] || info['status'] ==3){
-                console.log(info);
+                // console.log(info);
                 if(info["author"] == "{$Think.session.userId}"){
                     $(tabId+" .global-modal").find(".approve-group .approve-con").remove();
                 }else{
