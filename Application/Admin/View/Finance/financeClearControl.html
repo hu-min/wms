@@ -18,7 +18,10 @@
                     <div class="box-header">
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">清算审批</h4>
-                        <label>* 此页面的数据取自员工已提交清算申请的数据表中，需查询未申请的请移步<a class="nodeOn" data-level="2" data-nodeid="60" href="{:U('Finance/readClearControl')}"> <span>【清算查阅】</span></a></label>
+                        <if condition="$readNodeId gt 0">
+                            <label>* 此页面的数据取自员工已提交清算申请的数据表中，需查询未申请的请移步<a class="nodeOn" data-nodeid="{$readNodeId}" href="{:U('Finance/readClearControl')}"> <span>【清算查阅】</span></a></label>
+                        </if>
+                        
                         <!-- {:add_btn(get_defined_vars(),"清算审核，临时显示")} -->
                     </div>
                     <div class="box-body search-body company-search-box">

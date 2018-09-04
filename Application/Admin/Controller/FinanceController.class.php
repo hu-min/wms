@@ -966,7 +966,8 @@ class FinanceController extends BaseController{
         $this->assign('dbName',"Clear");//删除数据的时候需要
         $this->assign("controlName","readClear");
         $this->assign("tableName",$this->clearCom->tableName()); 
-
+        $clearNodeId = $this->nodeCom->getNodeInfo("controller","Finance/financeClearControl","nodeId");
+        $this->assign("clearNodeId",$clearNodeId);
         if($reqType){
             $this->$reqType();
         }else{
@@ -1020,6 +1021,9 @@ class FinanceController extends BaseController{
         $this->assign('dbName',"Clear");//删除数据的时候需要
         $this->assign("controlName","financeClear");
         $this->assign("tableName",$this->clearCom->tableName()); 
+        $readNodeId = $this->nodeCom->getNodeInfo("controller","Finance/readClearControl","nodeId");
+        $this->assign("readNodeId",$readNodeId);
+        // print_r($readNodeId);exit;
         if($reqType){
             $this->$reqType();
         }else{

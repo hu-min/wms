@@ -7,6 +7,11 @@ class NodeController extends BaseController{
         parent::_initialize();
         $this->selfDB = D('Component/Node');
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-09-05 00:00:41 
+     * @Desc: 根据节点或者角色获取对应的流程信息 
+     */    
     function getProcess($nodeId,$roleId=null,$rolePid=null){
         $nodeId = getTabId($nodeId);
         $roleId = $roleId ? $roleId : session('roleId');
@@ -56,7 +61,11 @@ class NodeController extends BaseController{
         }
         return $processInfo;
     }
-
+    /** 
+     * @Author: vition 
+     * @Date: 2018-09-05 00:00:11 
+     * @Desc: 查询节点对应的流程 
+     */    
     function nodeProcess(){
         $parameter=[
             "where"=>["status"=>1,"processIds"=>['neq',""],"db_table"=>['neq',""]],
@@ -67,5 +76,30 @@ class NodeController extends BaseController{
             return $nodeRes["list"];
         }
         return [];
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-09-05 00:00:02 
+     * @Desc: 获取节点信息 
+     */    
+    function getNodeInfo($key,$val,$outkey=false){
+        $nodeInfos = session('nodeInfo');
+        foreach ($nodeInfos as $nodeInfo) {
+            if(strtoupper($nodeInfo[$key])  == strtoupper($val)){
+                if($outkey){
+                    if(is_array($outkey)){
+                        $return =[];
+                        foreach ($outkey as $oKey) {
+                            $return[$oKey] = $nodeInfo[$oKey];
+                        }
+                        return $return;
+                    }else{
+                        return $nodeInfo[$outkey];
+                    }
+                }
+                return $nodeInfo;
+            }
+        }
+        return false;
     }
 }

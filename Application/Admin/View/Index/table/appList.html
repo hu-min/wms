@@ -3,7 +3,7 @@
     <tr>
         <td style="width: 10px">{$key+1}</td>
         <td>{$item.user_name}</td>
-        <td><a class="nodeOn node-action" data-level="2" data-nodeid="57" href="{:U($item['controller'])}"><span>{$item.moudle_name}</span></a></td>
+        <td><a class="nodeOn node-action" data-nodeid="{$item['nodeId']}" href="{:U($item['controller'])}"><span>{$item.moudle_name}</span></a></td>
         <td>{$item.project_name}</td>
         <td>{$item.add_time}</td>
         <td>

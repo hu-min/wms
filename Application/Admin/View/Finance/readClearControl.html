@@ -18,7 +18,9 @@
                     <div class="box-header">
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">清算查阅</h4>
-                        
+                        <if condition="$clearNodeId gt 0">
+                            <label>* 此页面的数据取自员工已提交且审批通过的借支和报销记录，需操作清算审批的请移步<a class="nodeOn" data-nodeid="{$clearNodeId}" href="{:U('Finance/financeClearControl')}"> <span>【清算审批】</span></a></label>
+                        </if>
                     </div>
                     <div class="box-body search-body company-search-box">
                         <div class="col-md-12">

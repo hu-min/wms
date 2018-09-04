@@ -117,12 +117,14 @@ class UserController extends BaseController{
         // $levelTree->setReplace(["roleid"=>"nodeId","roleTitle"=>"nodeTitle","rolePid"=>"nodePid"]);
         $menus=$levelTree->createTree($mNodeResult);
         // $menus=setLevelTree(["nodeList"=>$mNodeResult,"id"=>"nodeId","pid"=>"nodePid","nodes"=>"node"]);
-
+        $nodeInfos = [];
         if($mNodeResult) {
             foreach ($mNodeResult AS $nodeInfo) {
+                
                 $newAllNodes[$nodeInfo['nodeId']] = $nodeInfo;
                 if($nodeInfo['controller']!=""){
                     $authority[$nodeInfo['controller']]=$nodeInfo['authority'];
+                    array_push($nodeInfos,$nodeInfo);
                 }
             }
         }else{
@@ -131,6 +133,7 @@ class UserController extends BaseController{
             return $res;
         }
         session('nodeAuth',$authority);
+        session('nodeInfo',$nodeInfos);
         $this->Redis->set($refreNode,2,3600);
         $this->Redis->set($nodeName,$menus,3600);
         $res->errCode=10001;

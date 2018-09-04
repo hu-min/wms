@@ -75,6 +75,8 @@ class BaseController extends \Common\Controller\BaseController{
             $this->assign('statusType',$this->statusType);
             $this->assign('statusTypeJ',json_encode($this->statusType));
             $this->assign('statusLabel',$this->statusLabel);
+            // $nodeId = getTabId(I("vtabId"));
+            $this->nodeId = getTabId(I("vtabId"));
             // $this->assign('processType',$this->processType);
             // $this->assign('processTypeJ',json_encode($this->processType));
             
@@ -151,6 +153,7 @@ class BaseController extends \Common\Controller\BaseController{
             session('rolePid',NULL);
             session('usertype',NULL);
             session('nodeAuth',[]);
+            session('nodeInfo',[]);
             session("history",NULL);
             $this->redirect('Index/Login');
         }else{
