@@ -1,0 +1,20 @@
+<volist name="list" id="item">
+    <tr>
+        <td>{$key+1}<button type="button" class="close supr-remove"><span>×</span></button></td>
+        <td>{$item.name}</td>
+        <td>{$item.code}</td>
+        <td class="modal-info" name="debit_num" >{$item.debit_num|default=0}</td>
+        <td class="modal-info" name="debit_money" >{$item.debit_money|default=0}</td>
+        <td class="modal-info" name="expense_num" >{$item.expense_num|default=0}</td>
+        <td class="modal-info" name="expense_money" >{$item.expense_money|default=0}</td>
+        <td class="modal-info" name="invoice_money" >{$item.invoice_money|default=0}</td>
+        <td class="modal-info" name="all_money" >{$item["expense_money"]-$item["debit_money"]}</td>
+        <if condition="$gettype eq 'Edit'">
+            <td>{$item["add_time"]}</td>    
+        </if>
+        <input class="modal-info"  type="hidden" value="{$item['project_id']}" name="project_id">
+        <input class="modal-info"  type="hidden" value="{$item['debit_ids']}" name="debit_ids">
+        <input class="modal-info"  type="hidden" value="{$item['expense_ids']}" name="expense_ids">
+        <input class="modal-info"  type="hidden" value="{$item['leader']}" name="leader">
+    </tr>
+</volist>

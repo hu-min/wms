@@ -1,6 +1,3 @@
-<volist name="list" id="item">
-
-</volist>
 <tr>
     <td>
         <span class="serial">{$rows}</span>
@@ -56,6 +53,9 @@
             <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
             <span class="input-group-addon clear-media"><i class="fa fa-recycle"></i></span>
         </div>
+    </td>
+    <td>
+        <input class="form-control modal-info input-sm" name="invoice_money" title="发票金额"  value="0" placeholder="有发票则写明金额" type="text">
     </td>
     <input class="modal-info" value="0" type="hidden" name="status"/>
     <td name="status">

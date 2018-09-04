@@ -131,7 +131,7 @@
                 }
                 $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
             });
-            ["id","debit_money","free_type","require_date","account_type","account","debit_cause","leader"].forEach(element=>{
+            ["id","debit_money","free_type","require_date","account_type","account","invoice_money","debit_cause","leader"].forEach(element=>{
                 if(info[element]!="" || info[element]!="0"){
                     $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
                 }

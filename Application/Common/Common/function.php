@@ -173,7 +173,7 @@ function status_label($defind_vars){
  * @Date: 2018-06-09 23:01:13 
  * @Desc: list列表中的按钮状态 
  */
-function list_btn($defind_vars,$id,$inlink=[],$onlycat=false){
+function list_btn($defind_vars,$id,$inlink=[],$onlycat=false,$onlyState=false){
     $statusLabel = $defind_vars["statusLabel"];
     $statusType = $defind_vars["statusType"];
     $item = $defind_vars["item"];
@@ -184,8 +184,11 @@ function list_btn($defind_vars,$id,$inlink=[],$onlycat=false){
     $nodeAuth = $defind_vars["nodeAuth"];
     $processAuth = $defind_vars["processAuth"];
     echo "<td><span class='label bg-{$statusLabel[$item['status']]}'>{$statusType[$item['status']]}</span></td>";
-    echo "<td class='status-con' data-db='{$tableName}' data-con='{$controlName}' data-id='".$item[$id]."' data-url='{$url}' >";
-    if($nodeAuth >= 1){
+    if(!$onlyState){
+        echo "<td class='status-con' data-db='{$tableName}' data-con='{$controlName}' data-id='".$item[$id]."' data-url='{$url}' >";
+    }
+    
+    if($nodeAuth >= 1 && !$onlyState){
         if(empty($inlink)){
             echo "<button type='button' data-gettype='Edit' data-toggle='modal' data-vtarget='.global-modal' class='btn btn-sm btn-primary v-showmodal'>查看</button>";
         }else{
@@ -203,7 +206,7 @@ function list_btn($defind_vars,$id,$inlink=[],$onlycat=false){
     //         echo "  <button type='button' class='btn btn-warning submit-status btn-sm' data-status='3' name='refuse' >{$statusType[3]}</button>";
     //     }
     // }
-    if($nodeAuth >= 4  && !$onlycat){
+    if($nodeAuth >= 4  && !$onlycat && !$onlyState){
         echo "  <button type='button' class='btn btn-danger btn-sm status-info' data-status='4' data-reqtype='Del'  >{$statusType[4]}</button>";
     }
     echo "</td>";
@@ -213,7 +216,7 @@ function list_btn($defind_vars,$id,$inlink=[],$onlycat=false){
  * @Date: 2018-06-09 23:57:37 
  * @Desc: modal里按钮权限 
  */
-function modal_btn($defind_vars){
+function modal_btn($defind_vars,$status=false){
     $userId = $defind_vars["userId"];
     $nodeAuth = $defind_vars["nodeAuth"];
     $processAuth = $defind_vars["processAuth"];
@@ -223,6 +226,17 @@ function modal_btn($defind_vars){
     
     if($nodeAuth >= 7){
         echo "<button  type='button' name='0' class='btn btn-default btn-sm active status-btn'><i class='fa fa-square text-default'></i> 未启用 </button>";
+    }
+    if($status){
+        if($processAuth['level'] > 1 && !in_array($userId,explode(',',$item['examine'])) || $item['status'] == 1 || $nodeAuth>= 7){
+            echo "<button type='button' name='1' class='btn btn-success btn-sm status-btn'><i class='fa fa-square text-default'> $statusType[1] </i></button>";
+        }
+        if(isset($statusType[3]) && $item['author']!= $userId && $gettype!="Add" && $item['status']!=1){
+            echo "<button type='button' name='3' class='btn btn-warning btn-sm status-btn'><i class='fa fa-square text-default'> {$statusType[3]} </i></button>";
+        }
+        if($processAuth['level'] > 1 && ($item['status'] == 0 ||  $item['status'] == 2 ) && !in_array($userId,explode(',',$item['examine'])) || ($nodeAuth>= 7 && $gettype == "Edit") && isset($statusType[3]) && $gettype != "Add"){
+            echo "<button type='button' name='3' class='btn btn-warning btn-sm status-btn'><i class='fa fa-square text-default'> {$statusType[3]} </i>{$gettype}</button>";
+        }
     }
     // if($processAuth['level'] > 1 && !in_array($userId,explode(',',$item['examine'])) || $item['status'] == 1 || $nodeAuth>= 7){
     //     echo "<button type='button' name='1' class='btn btn-success btn-sm status-btn'><i class='fa fa-square text-default'> $statusType[1] </i></button>";

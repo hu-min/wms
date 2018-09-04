@@ -16,6 +16,7 @@ class FinanceController extends BaseController{
         $this->wouldpayCom=getComponent('Wouldpay');
         $this->purchaCom=getComponent('Purcha');
         $this->payCom=getComponent('Pay');
+        $this->clearCom=getComponent('Liquidate');
         $this->payGradeType = ["1"=>"A级[高]","2"=>"B级[次]","3"=>"C级[中]","4"=>"D级[低]"];
         $this->invoiceType = ["0"=>"无","1"=>"收据","2"=>"增值税普通","3"=>"增值税专用"];
         $this->payType = ['1'=>'公对公','2'=>'现金付款','3'=>'支票付款'];
@@ -784,13 +785,54 @@ class FinanceController extends BaseController{
 
     function staffClearControl(){//Finance/staffClearControl
         $reqType=I('reqType');
-        $this->assign('dbName',"Clear");//删除数据的时候需要
+        // $this->assign('dbName',"Clear");//删除数据的时候需要
         $this->assign("controlName","staffClear");
+        $this->assign("tableName",$this->clearCom->tableName()); 
         if($reqType){
             $this->$reqType();
         }else{
             $this->returnHtml();
         }
+    }
+    function getReckonList($return=false){
+        $sql="SELECT p.project_id project_id,vp.name,vp.code,SUM(debit_money) debit_money,COUNT(debit_money) debit_num,SUM(money) expense_money,COUNT(money) expense_num,SUM(invoice_money) invoice_money,GROUP_CONCAT(did) debit_ids,GROUP_CONCAT(eid) expense_ids,leader FROM (SELECT project_id FROM v_debit WHERE `status`=1 AND user_id=".session("userId")." AND clear_status = 0 UNION SELECT project_id FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id FROM v_expense WHERE `status`=1 AND user_id=".session("userId").") m1 ON m1.exId=parent_id WHERE clear_status = 0) p LEFT JOIN (SELECT project_id,debit_money,id did FROM v_debit WHERE `status`=1 AND user_id=".session("userId")." AND clear_status = 0) d ON d.project_id=p.project_id LEFT JOIN (SELECT project_id,parent_id,money,invoice_money,id eid FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id FROM v_expense WHERE `status`=1 AND user_id=".session("userId").") m ON m.exId=parent_id WHERE clear_status = 0) e ON e.project_id=p.project_id LEFT JOIN (SELECT projectId,name,code,leader FROM v_project) vp ON vp.projectId=p.project_id GROUP BY p.project_id";
+        $db = M();
+        $addResult = $db->query($sql);
+        $this->assign("list",$addResult);
+        $allReckon = 0;
+        if($addResult){
+            foreach ($addResult as $reckon) {
+                $allReckon += ($reckon["expense_money"]-$reckon["debit_money"]);
+            }
+        }
+        $html=$this->fetch('Finance/financeTable/reckonLi');
+        $html = empty($html) ?  '<tr><td colspan="9">暂无数据</td></tr>' : $html;
+        $this->assign("allReckon",$allReckon);
+        if($return){
+            return $html;
+        }else{
+            $this->ajaxReturn(['table'=>$html]);
+        }
+    }
+    function staffClearList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $where=[];
+        if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+            $where['user_id'] = session('userId');
+        }
+        $parameter=[
+            'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time",
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>"id DESC",
+            "joins"=>[
+                "LEFT JOIN (SELECT projectId,code,name FROM v_project ) p ON p.projectId = project_id ",
+            ]
+        ];
+        $listResult=$this->clearCom->getList($parameter);
+        $this->tablePage($listResult,'Finance/financeTable/staffClearList',"staffClearList");
     }
     function staffClear_modalOne(){
         $title = "提交清算";
@@ -799,18 +841,120 @@ class FinanceController extends BaseController{
         $resultData=[];
         $id = I("id");
         if($gettype=="Edit"){
-            $title = "编辑清算";
+            $title = "查看清算数据";
             $btnTitle = "保存数据";
             $redisName="staffClearList";
             $resultData=$this->clearCom->redis_one($redisName,"id",$id);
+            // print_r($resultData);
+            $this->assign("list",[$resultData]);
+            $this->assign("gettype",$gettype);
+            $html = $this->fetch('Finance/financeTable/reckonLi');
+            $this->assign("allReckon",$resultData["all_money"]);
+        }else{
+            $html = $this->getReckonList(true);
         }
+        $this->assign("tables",$html);
         $modalPara=[
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
             "template"=>"staffClearModal",
+            // "assign"=>["table"=>$html],
         ];
         $this->modalOne($modalPara);
+    }
+    function manageSClear($datas,$reqType=false){
+        $reqType = $reqType ? $reqType : I("reqType");
+        if($reqType=="staffClearAdd"){
+            $datas['add_time']=time();
+            $datas['user_id']=session('userId');
+
+            //添加时必备数据
+            $process = $this->nodeCom->getProcess(I("vtabId"));
+            $datas['process_id'] = $process["processId"];
+            if($datas["project_id"]>0){ 
+                //存在项目，则第一个审批的人是项目主管,examine需要
+                $userRole = $this->userCom->getUserInfo($datas['leader']);
+                $datas['examine'] = $userRole['roleId'].",".$process["examine"];
+                unset($datas['leader']);
+            }else{
+                $datas['examine'] = $process["examine"];
+            }
+            $datas['process_level']=$process["place"];
+            unset($datas['id']);
+            return $datas;
+        }else if($reqType=="staffClearEdit"){
+            $where=["id"=>$datas['id']];
+            $data=[];
+            
+            foreach (["debit_num","debit_money","expense_num","expense_money","invoice_money","all_money","project_id","debit_ids","expense_ids"] as  $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
+            }
+            if(isset($datas['status'])){
+                $data['status'] = $datas['status'] == 3 ? 0 : $datas['status'];
+            }
+            $data['upate_time']=time();
+            
+            return ["where"=>$where,"data"=>$data];
+        }
+        return "";
+    }
+    function staffClearAdd(){
+        $datas=I("data");
+        $debitCom=getComponent('Debit');
+        $expenseCom=getComponent('ExpenseSub');
+        $allCount = count($datas);
+        $upPoint = 0;
+        $debitCom->startTrans();
+        $expenseCom->startTrans();
+        $this->clearCom->startTrans();
+        $this->ApprLogCom->startTrans();
+        foreach ($datas as $key => $clearInfo) {
+            $updateStatus = false;
+            $updateStatus = true;
+            $this->log($clearInfo);
+            foreach (["debit","expense"]as $item) {
+                $Ids = explode(",",$clearInfo[$item."_ids"]);
+                if(!empty($clearInfo[$item."_ids"])){
+                    $parameter=[
+                        "where"=>["id"=>["IN",$Ids]],
+                        "data"=>["update_time"=>time(),"clear_status"=>2],
+                    ];
+
+                    $com = $item."Com";
+                    $this->log($parameter);
+                    $updateRes = $$com->update($parameter);
+                    if(isset($updateRes->errCode) && $updateRes->errCode == 0){
+                        $updateStatus = true;
+                    }else{
+                        $updateStatus = false;
+                    }
+                }
+            }
+            $this->log($parameter);
+            if($updateStatus){
+                $updateInfo = $this->manageSClear($clearInfo);
+                $insertRes = $this->clearCom->insert($updateInfo);
+                if(isset($insertRes->errCode) && $insertRes->errCode == 0){
+                    $upPoint++; 
+                    $this->ApprLogCom->createApp($this->clearCom->tableName(),$insertRes->data,session("userId"),"");
+                }
+            }
+        }
+        if($allCount == $upPoint){
+            $debitCom->commit();
+            $expenseCom->commit();
+            $this->clearCom->commit();
+            $this->ApprLogCom->commit();
+            $this->ajaxReturn(['errCode'=>0,'error'=>"添加成功"]);
+        }
+        $debitCom->rollback();
+        $expenseCom->rollback();
+        $this->clearCom->rollback();
+        $this->ApprLogCom->rollback();
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
     }
     /** 
      * @Author: vition 
@@ -821,11 +965,32 @@ class FinanceController extends BaseController{
         $reqType=I('reqType');
         $this->assign('dbName',"Clear");//删除数据的时候需要
         $this->assign("controlName","readClear");
+        $this->assign("tableName",$this->clearCom->tableName()); 
+
         if($reqType){
             $this->$reqType();
         }else{
             $this->returnHtml();
         }
+    }
+    function readClearList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $where=[];
+        $roleId = session('roleId');
+        // if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+        //     $where["_string"] = "FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0";
+        // }
+        $table  = "SELECT p.project_id project_id,vp.name,vp.code,SUM(debit_money) debit_money,COUNT(debit_money) debit_num,SUM(money) expense_money,COUNT(money) expense_num,SUM(invoice_money) invoice_money,GROUP_CONCAT(did) debit_ids,GROUP_CONCAT(eid) expense_ids,leader,clear_status,user_id,user_name FROM (SELECT project_id,user_id,clear_status FROM v_debit WHERE `status`=1 UNION SELECT project_id,user_id,clear_status FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m1 ON m1.exId=parent_id ) p LEFT JOIN (SELECT project_id,debit_money,id did FROM v_debit WHERE `status`=1) d ON d.project_id=p.project_id LEFT JOIN (SELECT project_id,parent_id,money,invoice_money,id eid FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id FROM v_expense WHERE `status`=1) m ON m.exId=parent_id ) e ON e.project_id=p.project_id LEFT JOIN (SELECT projectId,name,code,leader FROM v_project) vp ON vp.projectId=p.project_id LEFT JOIN (SELECT userId ,userName user_name FROM v_user) u ON u.userId = user_id GROUP BY p.project_id ORDER BY project_id DESC";
+        $sql="SELECT * FROM ({$table}) c LIMIT ".(($p-1)*$this->pageSize).",".$this->pageSize;
+        $db = M();
+        $addResult = $db->query($sql);
+        
+        $countResult = $db->query("SELECT count(*) vcount FROM ({$table}) c");
+        // print_r($countResult);
+        $count = isset($countResult[0]["vcount"]) ? $countResult[0]["vcount"] : 0;
+        $listResult=["list" => $addResult,"count" => count($count)];
+        $this->tablePage($listResult,'Finance/financeTable/readClearList',"readClearList");
     }
     function readClear_modalOne(){
         $title = "提交清算";
@@ -851,11 +1016,77 @@ class FinanceController extends BaseController{
         $reqType=I('reqType');
         $this->assign('dbName',"Clear");//删除数据的时候需要
         $this->assign("controlName","financeClear");
+        $this->assign("tableName",$this->clearCom->tableName()); 
         if($reqType){
             $this->$reqType();
         }else{
             $this->returnHtml();
         }
+    }
+    function financeClearList(){
+        
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        // $group = I("group");
+        $countype = $data["countype"];
+        // $projectGroup = I("projectGroup");
+        $project_id = I("projectId");
+        // $userGroup = I("userGroup");
+        $user_id = I("userId");
+        $where=[];
+        $roleId = session('roleId');
+        //test
+        // $group = true;
+        // $userGroup = true;
+        // $user_id = 3;
+        //test
+        if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+            $where["_string"] = "FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0";
+        }
+        foreach (["project_id","user_id"] as $param) {
+            if($$param){
+                $where[$param] = $$param;
+            }
+        }
+        $fields = "*,FIND_IN_SET({$roleId},examine) place,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_time";
+        $groupBy = NULL;
+        $orderStr = "id DESC";
+        $template = "financeClearList";
+        if($countype==2){
+            $fields .= ",SUM(debit_num) debit_num,SUM(debit_money) debit_money,SUM(expense_num) expense_num,SUM(expense_money) expense_money,SUM(invoice_money) invoice_money,SUM(all_money) all_money";
+            $groupBy = "project_id ,user_id,status";
+            $orderStr = "id DESC,project_id DESC";
+            $template = "financeClearPList";
+        }elseif($countype==1){
+            $fields .= ",COUNT(DISTINCT project_id) project_num,SUM(debit_num) debit_num,SUM(debit_money) debit_money,SUM(expense_num) expense_num,SUM(expense_money) expense_money,SUM(invoice_money) invoice_money,SUM(all_money) all_money";
+            $groupBy = "user_id,status";
+            $orderStr = "id DESC,project_id DESC";
+            $template = "financeClearUList";
+        }
+        $parameter=[
+            'fields'=>$fields,
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>$orderStr,
+            "groupBy" =>$groupBy,
+            "joins"=>[
+                "LEFT JOIN (SELECT projectId,code,name,leader FROM v_project ) p ON p.projectId = project_id ",
+                "LEFT JOIN (SELECT userId,userName user_name FROM v_user) un ON un.userId = user_id",
+                // "LEFT JOIN (SELECT userId,userName business_name FROM v_user) bu ON bu.userId = p.business",
+                // "LEFT JOIN (SELECT userId,userName leader_name FROM v_user) lu ON lu.userId = p.leader",
+                // "LEFT JOIN (SELECT basicId,name free_name FROM v_basic WHERE class='feeType') f ON f.basicId=free_type",
+            ]
+        ];
+        $listResult=$this->clearCom->getList($parameter);
+        // $sumField = 
+        // echo $this->clearCom->M()->_sql();exit;
+        $parameter["sum"] = ["debit_num","debit_money","expense_num","expense_money","invoice_money","all_money"];
+        $countResult = $this->clearCom->getOne($parameter);
+        // print_r($countResult);
+        // echo $this->clearCom->M()->_sql();exit;
+        $countStr = "<div><label>借支次数总计：<span class='text-light-blue'>".$countResult["list"]["debit_num"]."</span></label> | <label>借支金额总计：<span class='text-light-blue'>".$countResult["list"]["debit_money"]."</span></label> | <label>报销金额总计：<span class='text-light-blue'>".$countResult["list"]["expense_num"]."</span></label> | <label>报销金额总计：<span class='text-light-blue'>".$countResult["list"]["expense_money"]."</span></label> | <label>清算金额总计：<span class='text-light-blue'>".$countResult["list"]["all_money"]."</span></label></div>";
+        $this->tablePage($listResult,'Finance/financeTable/'.$template,"finance_clearList",false,$countStr);
     }
     function financeClear_modalOne(){
         $title = "清算审核";

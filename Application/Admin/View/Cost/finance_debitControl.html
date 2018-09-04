@@ -136,7 +136,6 @@
             
             if(( info['status'] > 0 || info['author'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 ){
                 $(tabId+" .modal-info").prop("disabled",true)
-                
             }
             //控制按钮权限
             $(tabId+" .global-modal").find(".approve-group").data("id",info['id'])

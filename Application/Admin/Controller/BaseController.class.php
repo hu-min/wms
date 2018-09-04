@@ -352,7 +352,6 @@ class BaseController extends \Common\Controller\BaseController{
         $assign["gettype"] = $parameter["gettype"] ? $parameter["gettype"] : I("gettype");
         $assign["title"] = $parameter["title"] ? $parameter["title"] : ($gettype=="Add" ? "新增":"编辑");
         $assign["btnTitle"] = $parameter["btnTitle"] ? $parameter["btnTitle"] : ($gettype=="Add" ? "新增":"编辑");
-
         $data = $parameter["data"] ? $parameter["data"] : [];
         $assign["data"] = $parameter["data"] ? $parameter["data"] : [];
         $tpFolder = $parameter["tpFolder"] ? $parameter["tpFolder"] : CONTROLLER_NAME;

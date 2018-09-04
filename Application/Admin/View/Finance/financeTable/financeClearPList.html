@@ -1,0 +1,14 @@
+<volist name="list" id="item">
+    <tr>
+        <td>{$item.name}</td>
+        <td title="{$item.code}" style="max-width:150px;">{$item.code}</td>
+        <td>{$item.user_name}</td>
+        <td class="modal-info" name="debit_num" >{$item.debit_num|default=0}</td>
+        <td class="modal-info" name="debit_money" >{$item.debit_money|default=0}</td>
+        <td class="modal-info" name="expense_num" >{$item.expense_num|default=0}</td>
+        <td class="modal-info" name="expense_money" >{$item.expense_money|default=0}</td>
+        <td class="modal-info" name="invoice_money" >{$item["invoice_money"]}</td>
+        <td class="modal-info" name="all_money" >{$item["all_money"]}</td>
+        {:list_btn(get_defined_vars(),"id",[],false,true)}
+    </tr>
+</volist>

@@ -198,9 +198,9 @@ class CostController extends BaseController{
 
         $this->assign("controlName","finance_debit");
         $this->assign("tableName",$this->debitCom->tableName()); 
-        $nodeId = getTabId(I("vtabId"));
-        $process = $this->nodeCom->getProcess($nodeId);
-        $this->assign("place",$process["place"]);
+        // $nodeId = getTabId(I("vtabId"));
+        // $process = $this->nodeCom->getProcess($nodeId);
+        // $this->assign("place",$process["place"]);
         if($reqType){
             $this->$reqType();
         }else{

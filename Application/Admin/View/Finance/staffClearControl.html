@@ -64,12 +64,15 @@
                         <tr>
                             <th>项目编号</th>
                             <th>项目名称</th>
-                            <th>员工姓名</th>
+                            <!-- <th>员工姓名</th> -->
+                            <th>申请时间</th>
                             <th>借支数量</th>
                             <th>借支总额</th>
                             <th>报销数量</th>
                             <th>报销总额</th>
+                            <th>发票金额</th>
                             <th>清算金额</th>
+                            <th>审批记录</th>
                             <th>清算状态</th>
                             <th>操作</th>
                         </tr>
@@ -92,7 +95,54 @@
         </div>
     </div>
     <script>
-      
+        var staffClear_getInfo = function(){
+            datas["data"] =[];
+            $(tabId+" .global-modal .{$controlName}-table tr").each(function(){
+                tempSupr = {}
+                $(this).find(".modal-info").each(function(){
+                    var name = $(this).attr("name");
+                    if(in_array(name,["project_id","debit_ids","expense_ids","leader"])){
+                        var val = $(this).val();
+                    }else{
+                        var val = $(this).text();
+                    }
+                    tempSupr[name]=val;
+                })
+                datas["data"].push(tempSupr);
+            })
+        }
+        var compute_ClearMoney = function(){
+            var allReckon = 0
+            $(tabId+" .global-modal .{$controlName}-table tr").each(function(){
+                var money = $(this).find(".modal-info[name='all_money']").text()
+                if(money!==""){
+                    allReckon+="+"+money
+                }
+            })
+            $(tabId+" .global-modal").find(".allReckon").text(eval(allReckon));
+        }
+        var staffClear_setInfo = function(info){
+            $(tabId+" .global-modal").find(".approve-group").data("id",info['id']);
+            $(tabId+" .global-modal").find(".approve-group .approve-con").remove();
+            var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
+            if(gettype=="Edit"){
+                $(tabId+" .global-modal .modal-footer").find(".save-info").hide();
+            }
+        }
+        $(function(){
+            $(tabId+" .search-list").trigger("click");
+            $(tabId).offon("click",".global-modal .{$controlName}-table .supr-remove",function(){
+                $(this).parents("tr").remove();
+                compute_ClearMoney();
+            })
+            $(tabId).offon("click",".global-modal .refresh",function(){
+                var req = $(this).attr("name")
+                get("{$url}",{reqType:req},function(result){
+                    $(tabId+" .global-modal .{$controlName}-table").html(result.table);
+                    compute_ClearMoney();
+                })
+            })
+        })
     </script>
 </body>
 </html>

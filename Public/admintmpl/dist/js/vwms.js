@@ -29,7 +29,7 @@ var get = function(url,indata,callBack){
         dataType:'json',
         data:indata,
         async:asyncs,
-    }).done(function(result) {callBack(result);})
+    }).done(function(result) {if(result.errCode=="404"){window.location.reload();}callBack(result);})
       .always(function() { setLoad();datas={};})
 }
 /** 
@@ -49,7 +49,7 @@ function post(url,indata,callBack){
         dataType:'json',
         data:indata,
         async:asyncs,
-    }).done(function(result) {callBack(result);})
+    }).done(function(result) {if(result.errCode=="404"){window.location.reload();}callBack(result);})
     .always(function() { setLoad();datas={};})
 }
 //enter-input class的输入框键盘回车事件

@@ -20,6 +20,7 @@ class BaseModel extends Model{
         $order=$parameter['order']?$parameter['order']:null;
         $joins=$parameter['joins']?$parameter['joins']:"";
         $having=$parameter['having']?$parameter['having']:"";
+        $sum=$parameter['sum']?$parameter['sum']:[];
         if(isset($parameter["where"])){
             $this->where ( $where_arra );
         }else{
@@ -36,10 +37,15 @@ class BaseModel extends Model{
         if(!empty($having)){
             $this->having($having);
         }
-        if (!is_null ( $fields )) 
-            $this->field ( $fields ,$noField);
-        if (!empty( $order )) 
+        if (!empty( $order )) {
             $this->order ( $order );
+        }
+        foreach ($sum as $key) {
+            $fields.=",SUM({$key}) {$key}";
+        }
+        if (!is_null ( $fields )) {
+            $this->field ( $fields ,$noField);
+        }    
         return $this->find();
     }
     /** 
@@ -136,5 +142,11 @@ class BaseModel extends Model{
             $this->error = '删除数据出错';
         }
         return $modFlag;   //删除数据个数
+    }
+    function sums($where_arra,$fields,$array=[]){
+        foreach ($array as $key) {
+            $fields.="SUM({$key}) {$key},";
+        }
+        return $this->where($where_arra)->field(rtrim($fields,","))->find();
     }
 }

@@ -1906,5 +1906,4 @@ class Model {
             $this->$name = $value;
         return $this;
     }
-
 }

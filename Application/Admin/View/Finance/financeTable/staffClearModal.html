@@ -10,7 +10,12 @@
             <input class="modal-info" value="0" name="id" type="hidden">
             <input class="modal-info" value="0" name="project_id" type="hidden">
             <div class="row">
-                <div class="col-md-12"> <h5 class="box-title">点击右边"+"添加要清算的项目<i class="fa fa-fw fa-plus-square text-aqua add-subcompany" title="新增供应商" data-target=".bankstock-tab" style="cursor: pointer;"></i></h5></div>
+                <div class="col-md-12"> 
+                    <!-- <h5 class="box-title">点击右边"+"添加要清算的项目<i class="fa fa-fw fa-plus-square text-aqua add-subcompany" title="新增供应商" data-target=".bankstock-tab" style="cursor: pointer;"></i></h5>
+                     -->
+                    点击刷新所有借支和报销 <button type="button" name="getReckonList" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
+                     </button>
+                </div>
             </div>
             <div class="row">
                 <table class="table table-bordered table-hover">
@@ -19,13 +24,15 @@
                             <th>序号</th>
                             <th>请选择项目</th>
                             <th>项目编号</th>
-                            <th>员工姓名</th>
                             <th>借支数量</th>
                             <th>借支总额</th>
                             <th>报销单数量</th>
                             <th>报销总额</th>
                             <th>已提交发票金额</th>
                             <th>清算金额</th>
+                            <if condition="$gettype eq Edit">
+                                <th>提交时间</th>
+                            </if>
                         </tr>
                     </thead>
                     <tbody class="{$controlName}-table">
@@ -34,19 +41,19 @@
                 </table>
             </div>
             <div class="row">
-                <div class="col-md-10">
-                    
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="info-title">清算总额：</label>
-                        <input class="form-control project-info" readonly="readonly" name="supplier_type" title="清算总额"  value="" placeholder="清算总额" type="text">
+                <div class="col-md-12" style="text-align: right;">
+                    <div class="form-inline">
+                        <div class="form-group" style="font-size: 13px">
+                            <label for="info-title">清算总额：¥</label>
+                            <label class="allReckon">{$allReckon|default=0}</label>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <label>注意：提交后表示已同意签署以上所有项目报销，并默认同意财务将状态更改为已清算。</label>
+                    <div><label class="control-label text-red" style="font-size: 13px"><i class="fa fa-warning "></i> 注意：提交后表示已同意签署以上所有项目报销，并默认同意财务将状态更改为已清算。</label></div>
+                    <div><label class="control-label text-orange" style="font-size: 13px"><i class="fa fa-tag" style="width: 13px;height: 13px;"></i> 说明：“清算金额”为正数：公司需付员工;“清算金额”为负数：员工需归还公司</label></div>                   
                 </div>
             </div>
             
@@ -62,4 +69,5 @@
 <div class="modal-footer">
     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
     {:save_btn(get_defined_vars())}
+    {:approve_btn($tableName)}
 </div>

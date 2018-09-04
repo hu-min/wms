@@ -63,7 +63,8 @@ class BaseController extends \Common\Controller\BaseController{
             $orderStr=$parameter['orderStr']?$parameter['orderStr']:null;
             $joins=$parameter['joins']?$parameter['joins']:null;
             $having=$parameter['having']?$parameter['having']:null;
-            $classList=$this->selfDB->getOne(['where'=>$where,'fields'=>$fields,"joins"=>$joins,"having"=>$having]);
+            $sum=$parameter['sum']?$parameter['sum']:null;
+            $classList=$this->selfDB->getOne(['where'=>$where,'fields'=>$fields,"joins"=>$joins,"having"=>$having,"sum"=>$sum]);
         }else{
             $classList=$this->selfDB->getOne($parameter);
         }
@@ -171,5 +172,14 @@ class BaseController extends \Common\Controller\BaseController{
             }
         }
         return $itemData;
+    }
+    function startTrans(){
+        $this->selfDB->startTrans();
+    }
+    function commit(){
+        $this->selfDB->commit();
+    }
+    function rollback(){
+        $this->selfDB->rollback();
     }
 }
