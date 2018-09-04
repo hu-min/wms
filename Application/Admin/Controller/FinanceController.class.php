@@ -978,10 +978,12 @@ class FinanceController extends BaseController{
         $p=I("p")?I("p"):1;
         $where=[];
         $roleId = session('roleId');
+        $clearType = [["title"=>"未清算","color"=>"blue"],["title"=>"已清算","color"=>"green"],["title"=>"清算中","color"=>"orange"]];
         // if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
         //     $where["_string"] = "FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0";
         // }
-        $table  = "SELECT p.project_id project_id,vp.name,vp.code,SUM(debit_money) debit_money,COUNT(debit_money) debit_num,SUM(money) expense_money,COUNT(money) expense_num,SUM(invoice_money) invoice_money,GROUP_CONCAT(did) debit_ids,GROUP_CONCAT(eid) expense_ids,leader,clear_status,user_id,user_name FROM (SELECT project_id,user_id,clear_status FROM v_debit WHERE `status`=1 UNION SELECT project_id,user_id,clear_status FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m1 ON m1.exId=parent_id ) p LEFT JOIN (SELECT project_id,debit_money,id did FROM v_debit WHERE `status`=1) d ON d.project_id=p.project_id LEFT JOIN (SELECT project_id,parent_id,money,invoice_money,id eid FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id FROM v_expense WHERE `status`=1) m ON m.exId=parent_id ) e ON e.project_id=p.project_id LEFT JOIN (SELECT projectId,name,code,leader FROM v_project) vp ON vp.projectId=p.project_id LEFT JOIN (SELECT userId ,userName user_name FROM v_user) u ON u.userId = user_id GROUP BY p.project_id ORDER BY project_id DESC";
+        // $table  = "SELECT p.project_id project_id,vp.name,vp.code,SUM(debit_money) debit_money,COUNT(debit_money) debit_num,SUM(money) expense_money,COUNT(money) expense_num,SUM(invoice_money) invoice_money,GROUP_CONCAT(did) debit_ids,GROUP_CONCAT(eid) expense_ids,leader,clear_status,user_id,user_name FROM (SELECT project_id,user_id,clear_status FROM v_debit WHERE `status`=1 UNION SELECT project_id,user_id,clear_status FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m1 ON m1.exId=parent_id ) p LEFT JOIN (SELECT project_id,debit_money,id did FROM v_debit WHERE `status`=1) d ON d.project_id=p.project_id LEFT JOIN (SELECT project_id,parent_id,money,invoice_money,id eid FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id FROM v_expense WHERE `status`=1) m ON m.exId=parent_id ) e ON e.project_id=p.project_id LEFT JOIN (SELECT projectId,name,code,leader FROM v_project) vp ON vp.projectId=p.project_id LEFT JOIN (SELECT userId ,userName user_name FROM v_user) u ON u.userId = user_id GROUP BY p.project_id ORDER BY project_id DESC";
+        $table = "SELECT p.project_id project_id,SUM(debit_money) debit_money,COUNT(debit_money) debit_num,SUM(money) expense_money,COUNT(money) expense_num,SUM(invoice_money) invoice_money,GROUP_CONCAT(did) debit_ids,GROUP_CONCAT(eid) expense_ids,user_id, clear_status,vp.name,vp.code,user_name  FROM (SELECT project_id,user_id,clear_status FROM v_debit WHERE `status`=1 UNION SELECT project_id,user_id,clear_status FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m1 ON m1.exId=parent_id) p LEFT JOIN (SELECT project_id,debit_money,id did,user_id user_did FROM v_debit WHERE `status`=1) d ON d.project_id=p.project_id AND d.user_did = p.user_id LEFT JOIN (SELECT project_id,parent_id,money,invoice_money,id eid,user_id user_eid  FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m ON m.exId=parent_id ) e ON e.project_id=p.project_id AND e.user_eid=p.user_id LEFT JOIN (SELECT projectId,name,code,leader FROM v_project) vp ON vp.projectId=p.project_id LEFT JOIN (SELECT userId ,userName user_name FROM v_user) u ON u.userId = user_id GROUP BY p.project_id,clear_status";
         $sql="SELECT * FROM ({$table}) c LIMIT ".(($p-1)*$this->pageSize).",".$this->pageSize;
         $db = M();
         $addResult = $db->query($sql);
@@ -990,6 +992,7 @@ class FinanceController extends BaseController{
         // print_r($countResult);
         $count = isset($countResult[0]["vcount"]) ? $countResult[0]["vcount"] : 0;
         $listResult=["list" => $addResult,"count" => count($count)];
+        $this->assign("clearType",$clearType);
         $this->tablePage($listResult,'Finance/financeTable/readClearList',"readClearList");
     }
     function readClear_modalOne(){
@@ -1082,6 +1085,8 @@ class FinanceController extends BaseController{
         // $sumField = 
         // echo $this->clearCom->M()->_sql();exit;
         $parameter["sum"] = ["debit_num","debit_money","expense_num","expense_money","invoice_money","all_money"];
+        $parameter["page"] = 1;
+        $parameter["pageSize"] = 99999999999;
         $countResult = $this->clearCom->getOne($parameter);
         // print_r($countResult);
         // echo $this->clearCom->M()->_sql();exit;

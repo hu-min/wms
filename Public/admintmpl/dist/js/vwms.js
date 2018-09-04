@@ -384,7 +384,7 @@ $(document).on("click",".status-info",function(){
     var db = $(this).parent(".status-con").data("db");
     var con = $(this).parent(".status-con").data("con");
     var status = $(this).data("status");
-    var html = '<div class="v-status-box" style="text-align: center;" data-status="'+status+'"  data-db="'+db+'" data-con="'+con+'" data-url="'+url+'" data-id="'+id+'"><div class="col-sm-3"><button type="button" name="del"  class="btn btn-sm bg-orange submit-status">删除</button></div><div class="col-sm-5"><input type="password" placeholder="输入二级密码" class="form-control input-sm senior-password" /></div><div class="col-sm-3"><button type="button" name="deepDel" class="btn bg-navy btn-sm submit-status">彻底删除</button></div></div>'
+    var html = '<div class="v-status-box" style="text-align: center;" data-status="'+status+'"  data-db="'+db+'" data-con="'+con+'" data-url="'+url+'" data-id="'+id+'"><div class="col-sm-3"><button type="button" name="del"  class="btn btn-xs bg-orange submit-status">删除</button></div><div class="col-sm-5"><input type="password" placeholder="输入二级密码" class="form-control input-sm senior-password" /></div><div class="col-sm-3"><button type="button" name="deepDel" class="btn bg-navy btn-xs submit-status">彻底删除</button></div></div>'
     notice(100,html,"删除提示",0)
 })
 $(document).on("click",".submit-status",function(){

@@ -190,24 +190,24 @@ function list_btn($defind_vars,$id,$inlink=[],$onlycat=false,$onlyState=false){
     
     if($nodeAuth >= 1 && !$onlyState){
         if(empty($inlink)){
-            echo "<button type='button' data-gettype='Edit' data-toggle='modal' data-vtarget='.global-modal' class='btn btn-sm btn-primary v-showmodal'>查看</button>";
+            echo "<button type='button' data-gettype='Edit' data-toggle='modal' data-vtarget='.global-modal' class='btn btn-xs btn-primary v-showmodal'>查看</button>";
         }else{
             if(isset($inlink["title"])){
                 $title = 'data-title="'.$inlink["title"].'"';
             }
 
-            echo '<a class="btn btn-sm btn-primary nodeOn" role="button" data-id="'.$item[$id].'" '.$title.' data-nodeid="'.$inlink["nodeid"].'" href="'.$inlink["href"].'"><span>查看</span></a>';
+            echo '<a class="btn btn-xs btn-primary nodeOn" role="button" data-id="'.$item[$id].'" '.$title.' data-nodeid="'.$inlink["nodeid"].'" href="'.$inlink["href"].'"><span>查看</span></a>';
         }
         
     }
     // if($processAuth['level'] > 1 && ($item['status'] == 0 or  $item['status'] == 2 ) && !$onlycat){
-    //     echo "  <button type='button' class='btn btn-success submit-status btn-sm' data-status='1' name='approve' >{$statusType[1]}</button>";
+    //     echo "  <button type='button' class='btn btn-success submit-status btn-xs' data-status='1' name='approve' >{$statusType[1]}</button>";
     //     if($item['author'] != $userId && isset($statusType[3])){
-    //         echo "  <button type='button' class='btn btn-warning submit-status btn-sm' data-status='3' name='refuse' >{$statusType[3]}</button>";
+    //         echo "  <button type='button' class='btn btn-warning submit-status btn-xs' data-status='3' name='refuse' >{$statusType[3]}</button>";
     //     }
     // }
     if($nodeAuth >= 4  && !$onlycat && !$onlyState){
-        echo "  <button type='button' class='btn btn-danger btn-sm status-info' data-status='4' data-reqtype='Del'  >{$statusType[4]}</button>";
+        echo "  <button type='button' class='btn btn-danger btn-xs status-info' data-status='4' data-reqtype='Del'  >{$statusType[4]}</button>";
     }
     echo "</td>";
 }
@@ -254,7 +254,7 @@ function modal_btn($defind_vars,$status=false){
 }
 function approve_btn($tableName,$id=0,$place=false,$level=0,$status=0){
     echo '<div class="approve-group" data-table="'.$tableName.'" data-id="'.$id.'" >
-        <button type="button" data-url="'.U('Tools/getApproveList').'" class="btn btn-sm bg-purple approve-log">记录</button> ';
+        <button type="button" data-url="'.U('Tools/getApproveList').'" class="btn btn-xs bg-black approve-log">记录</button> ';
     // echo $place,",",$level;
     if($place===false || $place > 0){
         $disabled = "";
@@ -262,7 +262,7 @@ function approve_btn($tableName,$id=0,$place=false,$level=0,$status=0){
         if(( $level > $place) || $status == 3){
             $disabled = "disabled";
         }
-        echo '<button type="button" '.$disabled.' data-url="'.U('Tools/approveEdit').'" class="btn btn-sm bg-orange approve-con '.$disabled.'">操作</button>';
+        echo '<button type="button" '.$disabled.' data-url="'.U('Tools/approveEdit').'" class="btn btn-xs bg-orange approve-con '.$disabled.'">操作</button>';
     }
     echo '</div>';
 }
