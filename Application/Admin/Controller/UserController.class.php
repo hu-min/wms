@@ -783,15 +783,118 @@ class UserController extends BaseController{
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
 	
     }
-    // function checkProcessList(){
-    //     $processIds =I("processIds");
-    //     foreach ($processIds as  $processId) {
-    //         $processInfo=$this->processCom->getOne(["where"=>["processId"=>$processId],"fields"=>"processId,processOption"])["list"];
-
-    //         if($processInfo){
-    //             $processOption = json_decode($processInfo["processOption"],true);
-    //             print_r($processOption);
-    //         }
-    //     }
-    // }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-09-05 10:53:44 
+     * @Desc: 白名单用户，不参与营业数据统计 
+     */    
+    function whiteControl(){
+        $reqType=I('reqType');
+        $this->assign("controlName","white_user");
+        $this->assign('dbName',"White");//删除数据的时候需要
+        $this->assign('userArr',A("Project")->_getOption("create_user"));
+        if($reqType){
+            $this->$reqType();
+        }else{         
+            $this->returnHtml();
+        }
+    }
+    function white_user_modalOne(){
+        $whiteCom=getComponent('White');
+        $title = "添加白名单";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑白名单";
+            $btnTitle = "保存数据";
+            $redisName="white_userList";
+            $resultData=$whiteCom->redis_one($redisName,"id",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "template"=>"whiteModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    function white_userList(){
+        $whiteCom=getComponent('White');
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $where = [];
+        // if($data['name']){
+        //     $where['name']=['LIKE','%'.$data['name'].'%'];
+        // }
+        // if($data['alias']){
+        //     $where['alias']=['LIKE','%'.$data['alias'].'%'];
+        // }
+        // if(isset($data['status'])){
+        //     $where['status']=$data['status'];
+        // }else{
+        //     $where['status']=["lt",3];
+        // }
+        $parameter=[
+            'where'=>$where,
+            'fields'=>'*,FROM_UNIXTIME(add_time,"%Y-%m-%d %H:%i:%s") add_time',
+            'page'=>$p,
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>"add_time DESC",
+            'joins'=>[
+                "LEFT JOIN (SELECT userId,userName user_name,loginName login_name,avatar,roleId role_id FROM v_user) u ON u.userId=user_id",
+                "LEFT JOIN (SELECT roleId,roleName role_name FROM v_role) r ON r.roleId=role_id",
+            ],
+        ];
+        $resultData=$whiteCom->getList($parameter);
+        $this->tablePage($resultData,'User/userTable/whiteList',"white_userList");
+    }
+    function manageWhiteUser(){
+        $reqType=I("reqType");
+        $datas=I("data");
+        if($reqType=="white_userAdd"){
+            unset($datas['id']);
+            $datas['add_time'] = time();
+            $datas['author'] = session("userId");
+            return $datas;
+        }else if($reqType=="white_userEdit"){
+            $where=["id"=>$datas['id']];
+            $data=[];
+            foreach (['remark','status'] as $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
+            }
+            $data['update_time'] = time();
+            return ["where"=>$where,"data"=>$data];
+        }
+        return "";
+    }
+    function white_userAdd(){
+        $this->manageWhiteUser();
+        $insertInfo=$this->manageWhiteUser();
+        $whiteCom=getComponent('White');
+        $hasWhite = $whiteCom->getOne(["where"=>["user_id"=>$insertInfo["user_id"]]]);
+        if($hasWhite){
+            $this->ajaxReturn(['errCode'=>10005,'error'=>getError(10005)]);
+        }
+        if($insertInfo){
+            $insertResult=$whiteCom->insert($insertInfo);
+            if(isset($insertResult->errCode) && $insertResult->errCode==0){
+                $redisName = "whiteIds_redis";
+                $this->Redis->set($redisName,"",1);
+                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+            }
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    }
+    function white_userEdit(){
+        $updateInfo=$this->manageWhiteUser();
+        $whiteCom=getComponent('White');
+        // print_r($updateInfo);
+        $updateResult=$whiteCom->update($updateInfo);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
 }   

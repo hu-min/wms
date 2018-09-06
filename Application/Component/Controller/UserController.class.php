@@ -255,4 +255,15 @@ class UserController extends BaseController{
             return [];
         }
     }
+    function getWhites(){
+        $redisName = "whiteIds_redis";
+        $whiteIds = $this->Redis->get($redisName);
+        if(!$whiteIds){
+            $whiteDb = M();
+            $whiteRes = $whiteDb->query("SELECT GROUP_CONCAT(user_id) white_ids FROM v_white WHERE `status` = 1");
+            $whiteIds = $whiteRes[0]["white_ids"];
+            $this->Redis->set($redisName,$whiteIds,7200);
+        }
+        return$whiteIds;
+    }
 }

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-body search-body">
+                        <div class="col-md-12">
+                            <div class="form-inline">
+                                <label  class="control-label">登录名称：</label>
+                                <div class="form-group">
+                                    <input class="form-control search-info"  name="loginName" placeholder="登录名" type="text">
+                                </div>
+                                <label class="control-label">用户名：</label>
+                                <div class="form-group">
+                                    <input class="form-control search-info"  name="userName" placeholder="用户名" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                </div>
+                                <if condition="$nodeAuth egt 2">
+                                    <div class="form-group">
+                                        <button type="button" data-gettype="Add" data-toggle="modal"  data-vtarget=".global-modal" data-con="{$controlName}" data-url="{$url}" class="btn btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 添加白名单</button>
+                                    </div> 
+                                </if>
+                            </div>
+                            <br>
+                        </div>
+                        <label>* 添加成白名单用户之后用户用户的数据除了白名单用户和财务之后其他人不可见，营业数据不包含白名单用户的数据</label>
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <table id="" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>白名单ID</th>
+                            <th>用户ID</th>
+                            <th>登录名</th>
+                            <th>用户名</th>
+                            <th>角色</th>
+                            <th>头像</th>
+                            <th>备注</th>
+                            <th>添加时间</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="{$controlName}-table">
+                        {$tables}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="dataTables_wrapper">
+            <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+                {$pages}
+            </div>
+        </div>
+    </section>
+    <div class="modal fade global-modal" aria-hidden="true" data-backdrop="static" >
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+    <script>
+        var white_user_initInfo = function(){
+            init_chosen("{$url}","getOptionList",".global-modal");
+        }
+        var white_user_setInfo = function (info){
+            var userChosen= $(tabId+" .chosen-select[name='user_id']")
+            var user_id = info["user_id"]
+            if(userChosen.find("option[value='"+info["user_id"]+"']").length==0){
+                userChosen.append("<option value='"+info["user_id"]+"'>【"+info["role_name"]+"】"+info["user_name"]+"</option>")
+                user_id = info["user_id"]
+            }
+            userChosen.find("option[value='"+user_id+"']").prop("selected",true);
+            userChosen.prop("disabled",true)
+            userChosen.trigger("chosen:updated");
+            
+            ['id','remark'].forEach(element => {
+                $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
+            });
+            set_status_btn($(tabId+" .global-modal .modal-status .status-btn[name='"+info['status']+"']"))
+        }
+        $(function(){
+            // init_chosen("{$url}","getOptionList",".global-modal");
+            $(tabId+" .search-list").trigger("click");
+        })
+    </script>
+</body>
+</html>

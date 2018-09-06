@@ -34,6 +34,7 @@ class IndexController extends BaseController{
         if(!$this->userId){
             $this->redirect('Index/LogOut');
         }
+        $this->assign('no_read',getComponent('Message')->noRead());
         $nodeResult=$this->userCom->getUserNode($this->userId);
         $this->levelTree->setKeys(["nodeName"=>"node"]);
 

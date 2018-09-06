@@ -1,0 +1,19 @@
+<volist name="list" id="item">
+    <tr>
+        <td>{$item['id']}</td>
+        <td>{$item['user_id']}</td>
+        <td>{$item['login_name']}</td>
+        <td>{$item['user_name']}</td>
+        <td>{$item['role_name']}</td>
+        <td data-avatar="{$item['avatar']}" class="users-avatar-td"><if condition="$item['avatar'] neq ''"><img src="__UPLOADS__/{$item['avatar']}"></if></td>
+        <td>{$item['remark']}</td>
+        <td>{$item['add_time']}</td>
+        <td><span class="label bg-{$statusLabel[$item['status']]}">{$statusType[$item['status']]}</span></td>
+        <td class="status-con" data-db="{$dbName}" data-con="{$controlName}" data-id="{$item['id']}" data-url="{$url}" >
+            <button type="button" data-gettype="Edit" data-toggle="modal"  data-url="{$url}" data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-primary btn-sm v-showmodal"><i class="fa fa-fw fa-eye "></i> 查看 </button>            
+            <if condition="$nodeAuth egt 4 ">
+                <button type="button" class="btn btn-danger btn-sm status-info" data-status="4" data-reqtype="Del"  >删除</button>
+            </if>
+        </td>
+    </tr>
+</volist>

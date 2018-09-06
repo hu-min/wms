@@ -29,7 +29,7 @@ var get = function(url,indata,callBack){
         dataType:'json',
         data:indata,
         async:asyncs,
-    }).done(function(result) {if(result.errCode=="404"){window.location.reload();}callBack(result);})
+    }).done(function(result) {if(result.errCode=="405"){window.location.reload();}callBack(result);})
       .always(function() { setLoad();datas={};})
 }
 /** 
@@ -49,7 +49,7 @@ function post(url,indata,callBack){
         dataType:'json',
         data:indata,
         async:asyncs,
-    }).done(function(result) {if(result.errCode=="404"){window.location.reload();}callBack(result);})
+    }).done(function(result) {if(result.errCode=="405"){window.location.reload();}callBack(result);})
     .always(function() { setLoad();datas={};})
 }
 //enter-input class的输入框键盘回车事件
@@ -104,7 +104,11 @@ $(document).on("click",".search-list,.vpage",function(){
  */
 function searchFun(url,datas,table,page,count){
     get(url,datas,function(result){
-        if(result.errCode==0){          
+        if(result.errCode==0){
+            if(result.table==""){
+                var tdNum = $(tabId+" ."+table).parent("table").find("thead tr th").length
+                result.table = '<tr><td colspan="'+tdNum+'">无数据</td></tr>'
+            }
             $(tabId+" ."+table).html(result.table);
             $(tabId+" ."+page).html(result.page);
             $(tabId+" ."+count).html(result.count);

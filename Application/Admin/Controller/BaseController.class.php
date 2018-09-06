@@ -57,7 +57,7 @@ class BaseController extends \Common\Controller\BaseController{
             $auth=$this->authVerify($conAct);
             if(!$auth){
                 // echo $conAct;
-                if($this->isLogin() && (CONTROLLER_NAME == "Tools" || $conAct == "Index/home")){
+                if($this->isLogin() && (in_array(ucfirst(CONTROLLER_NAME),["Tools","Public"]) || $conAct == "Index/home")){
 
                 }else{
                     $this->prompt(1,'警告!','您不具备访问此页面的权限，如果您认为值得拥有，请联系管理员！');
@@ -205,7 +205,11 @@ class BaseController extends \Common\Controller\BaseController{
         $this->assign("content",$content);
         $this->assign("icon",$icon);
         if(IS_AJAX){
-            $this->ajaxReturn(['html'=>$this->fetch("Index/Prompt"),'errCode'=>404,'error'=>getError(404)]);
+            if($this->isLogin()){
+                $this->ajaxReturn(['html'=>$this->fetch("Index/Prompt"),'errCode'=>404,'error'=>getError(404)]);
+            }else{
+                $this->ajaxReturn(['html'=>$this->fetch("Index/Prompt"),'errCode'=>405,'error'=>getError(405)]);
+            }
         }
         $this->assign("load",true);
         $this->display("Index/Prompt");
@@ -385,6 +389,9 @@ class BaseController extends \Common\Controller\BaseController{
             if(isset($config["bigSize"])){
                 $page->bigSize = $config["bigSize"];
             }
+            if(isset($config["returnData"])){
+                $returnData["data"] = $data['list'];
+            }
             $pageShow = $page->show();
             $this->assign('list',$data['list']);
             $returnData["table"]=$this->fetch($templet);
@@ -393,7 +400,7 @@ class BaseController extends \Common\Controller\BaseController{
                 $returnData["count"]=$countStr;
             }
         }else{
-            $returnData["table"]="无数据";
+            $returnData["table"]="";
             $returnData["page"]="";
         }
         $this->ajaxReturn($returnData);

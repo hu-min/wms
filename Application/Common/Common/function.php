@@ -314,7 +314,34 @@ function domain($diagonal=true){
     }
     return $http_type.$_SERVER['HTTP_HOST'];
 }
-
+/** 
+ * @Author: vition 
+ * @Date: 2018-09-06 11:02:38 
+ * @Desc: 格式化tabId 
+ */
 function getTabId($vtabId){
     return str_replace("#vtabs","",$vtabId);
+}
+/** 
+ * @Author: vition 
+ * @Date: 2018-09-06 11:10:12 
+ * @Desc: 格式化时间，距离当前时间 
+ */
+function disTime($timeStamp){
+    $time = time() - $timeStamp;
+    if($time<0){
+        return "穿越到过去了吧";
+    }else{
+        if($time<60){
+            return intval($time)." 秒之前";
+        }elseif($time<3600){
+            return intval($time/60)." 分钟之前";
+        }elseif($time<86400){
+            return intval($time/3600)." 小时之前";
+        }elseif($time<2592000){
+            return intval($time/86400)." 天之前";
+        }else{
+            return date("Y-m-d H:i:s",$timeStamp);  
+        }
+    }
 }
