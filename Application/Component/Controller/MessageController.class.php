@@ -24,6 +24,7 @@ class MessageController extends BaseController{
         $this->startTrans();
         foreach ($relationArray as $to_user) {
             $datas['to_user'] = $to_user;
+            // print_r($datas);
             $insertResult=$this->insert($datas);
             if(isset($insertResult->errCode) && $insertResult->errCode==0){
                 $current++;

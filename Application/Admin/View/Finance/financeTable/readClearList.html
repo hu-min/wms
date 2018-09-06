@@ -10,7 +10,7 @@
         <td class="modal-info" name="invoice_money" ><span class="label bg-{$clearType[$item['clear_status']]['color']}">{$clearType[$item["clear_status"]]["title"]}</span></td>
         <td>
             <if condition="$item['clear_status'] eq 0">
-                <button type="button" class="btn btn-info btn-xs" data-con="readClear"><i class="fa fa-envelope"></i> 催促清算 </button>
+                <button type="button" class="btn btn-info btn-xs read-clear" data-con="readClear" data-id="{$item['project_id']}" data-userid="{$item['user_id']}"><i class="fa fa-envelope"></i> 催促清算 </button>
             </if>
         </td>
     </tr>

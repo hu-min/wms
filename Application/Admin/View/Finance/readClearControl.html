@@ -92,6 +92,21 @@
     <script>
         $(function(){
             $(tabId+" .search-list").trigger("click");
+            $(tabId+" .{$controlName}-table").on("click",".read-clear",function(){
+                var id = $(this).data("id")
+                var userid = $(this).data("userid")
+                var project = $(this).parents("tr").children("td").eq(0).text();
+                
+                datas["data"]={}
+                datas["data"]["title"] = "清算催促！";
+                datas["data"]["content"] = encodeURI('<p>您好！请尽快提交【'+project+'】项目的清算！谢谢合作</p>');
+                datas["data"]["to_user"] = [userid];
+                datas["reqType"] = "messageAdd";
+                // console.log(datas);
+                post("{:U('Public/messageControl')}",datas,function(result){
+                    notice(result.errCode,result.error);
+                });
+            })
         })
     </script>
 </body>
