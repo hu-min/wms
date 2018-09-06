@@ -148,6 +148,7 @@ function setLevelTree($param=[]){
  * @Desc: utf8格式的截取字符串 
  */
 function utf8_substr($str,$length,$middle=false){
+    $str = strip_tags($str);
     $suf="";
     if(mb_strlen($str)>$length){
         $suf="……";
