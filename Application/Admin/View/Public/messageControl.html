@@ -244,12 +244,12 @@
                                 }
                                 
                             })
-                            if(message["status"]==0){
+                            if(message["status"]==0 && type == 1){
                                 datas["reqType"] = "statusEdit";
                                 datas["id"] = id;
                                 datas["status"] = 1;
                                 post("{$url}",datas,function(result){
-                                    if(result.errCode==0){
+                                    if(result.errCode==0 ){
                                         var noRead = Number($(tabId+" .mes-folder .message-no-read").text())
                                         noRead--;
                                         $(tabId+" .mes-folder .message-no-read").text(noRead)
