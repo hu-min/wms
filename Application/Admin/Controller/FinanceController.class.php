@@ -161,10 +161,74 @@ class FinanceController extends BaseController{
         ];
         $this->modalOne($modalPara);
     }
+    function fix_expenseCount(){
+        $reqType=I('reqType');
+        $this->assign("controlName","fix_expCount");
+
+        $fixexpNodeId = $this->nodeCom->getNodeInfo("controller","Finance/fix_expenseControl","nodeId");
+        $this->assign("fixexpNodeId",$fixexpNodeId);
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-09-07 15:10:58 
+     * @Desc: 月固定统计查询列表
+     */    
+    function fix_expCountList(){
+        $datas = I("data");
+        $p=I("p")?I("p"):1;
+        $where=["status"=>1];
+        
+        $fields = "FROM_UNIXTIME(payTime,'%Y') year ,FROM_UNIXTIME(payTime,'%m') date_time,SUM(fee) all_fee,SUM(payment) payment,SUM(noPayment) no_payment";
+        $groupBy = "FROM_UNIXTIME(payTime,'%Y'), FROM_UNIXTIME(payTime,'%m')";
+        if($datas["time-type"] == "year"){
+            $fields = "FROM_UNIXTIME(payTime,'%Y') date_time,SUM(fee) all_fee,SUM(payment) payment,SUM(noPayment) no_payment";
+            $groupBy = "FROM_UNIXTIME(payTime,'%Y')";
+        }else{
+            $year = $datas["year_date"] ? $datas["year_date"] : date("Y");
+            $where["_string"] = "FROM_UNIXTIME(payTime,'%Y') = '{$year}'";
+        }
+       
+
+        $parameter=[
+            'fields'=>$fields,
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>"payTime DESC",
+            'groupBy' => $groupBy,
+            "joins"=>[""],
+        ];
+        
+        $listResult=$this->fixExpenCom->getList($parameter);
+        //统计数据
+        $parameter["sum"] = [];
+        $countResult = $this->fixExpenCom->getOne($parameter);
+        $countStr = "<div><label>支出总额：<span class='text-light-blue'>".$countResult["list"]["all_fee"]."</span></label> | <label>已付总额：<span class='text-light-blue'>".$countResult["list"]["payment"]."</span></label> | <label>未支付总额：<span class='text-light-blue'>".$countResult["list"]["no_payment"]."</span></label></div>";
+        
+        // echo $this->fixExpenCom->M()->_sql();
+        $this->tablePage($listResult,'Finance/financeTable/fix_expCountList',"fix_expCount{}List",false,$countStr);
+    }
     function fix_expenseList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
         $where=[];
+        //
+        // $fields = "FROM_UNIXTIME(payTime,'%Y') year ,FROM_UNIXTIME(payTime,'%m') date_time,SUM(fee) all_fee,SUM(payment) payment,SUM(noPayment) no_payment";
+        // $groupBy = "FROM_UNIXTIME(payTime,'%Y'), FROM_UNIXTIME(payTime,'%m')";
+        if($data["month_date"] != ""){
+            $where["_string"] = "FROM_UNIXTIME(payTime,'%Y-%m') = '{$data['month_date']}'";
+            // $fields = "FROM_UNIXTIME(payTime,'%Y') date_time,SUM(fee) all_fee,SUM(payment) payment,SUM(noPayment) no_payment";
+            // $groupBy = "FROM_UNIXTIME(payTime,'%Y')";
+        }else{
+            $year = $data["year_date"] ? $data["year_date"] : date("Y");
+            $where["_string"] = "FROM_UNIXTIME(payTime,'%Y') = '{$year}'";
+        }
+        //
         if($data['expenClas']){
             $where['expenClas']=$data['expenClas'];
         }
@@ -178,7 +242,13 @@ class FinanceController extends BaseController{
         ];
         
         $listResult=$this->fixExpenCom->getList($parameter);
-        $this->tablePage($listResult,'Finance/financeTable/fix_expenseList',"fix_expenseList");
+
+        //统计数据
+        $parameter["sum"] = ["fee","payment","noPayment"];
+        $countResult = $this->fixExpenCom->getOne($parameter);
+        $countStr = "<div><label>支出总额：<span class='text-light-blue'>".$countResult["list"]["fee"]."</span></label> | <label>已付总额：<span class='text-light-blue'>".$countResult["list"]["payment"]."</span></label> | <label>未支付总额：<span class='text-light-blue'>".$countResult["list"]["noPayment"]."</span></label></div>";
+
+        $this->tablePage($listResult,'Finance/financeTable/fix_expenseList',"fix_expenseList",false,$countStr);
     }
     function manageFixExpenInfo(){
         $reqType=I("reqType");
@@ -880,7 +950,23 @@ class FinanceController extends BaseController{
             }else{
                 $datas['examine'] = $process["examine"];
             }
-            $datas['process_level']=$process["place"];
+            //如果是审批者自己提交的执行下列代码
+            $roleId = I("roleId");
+            $examineArr = explode(",",$datas['examine']);
+            $rolePlace = array_search($roleId,$examineArr);
+            $datas['status'] = 0;
+            if($rolePlace!==false){
+                $datas['process_level']=$rolePlace+2;
+                if(count($examineArr) == ($rolePlace+1)){
+                    $datas['status'] = 1;
+                }else{
+                    $datas['status'] = 2;
+                }
+            }else{
+                $datas['process_level']=$process["place"];
+            }
+
+            // $datas['process_level']=$process["place"];
             unset($datas['id']);
             return $datas;
         }else if($reqType=="staffClearEdit"){
@@ -1089,8 +1175,6 @@ class FinanceController extends BaseController{
         // $sumField = 
         // echo $this->clearCom->M()->_sql();exit;
         $parameter["sum"] = ["debit_num","debit_money","expense_num","expense_money","invoice_money","all_money"];
-        $parameter["page"] = 1;
-        $parameter["pageSize"] = 99999999999;
         $countResult = $this->clearCom->getOne($parameter);
         // print_r($countResult);
         // echo $this->clearCom->M()->_sql();exit;

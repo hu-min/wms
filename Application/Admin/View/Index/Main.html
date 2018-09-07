@@ -581,10 +581,16 @@
             e.preventDefault();
             var level = $(this).data('level')
             var id = $(this).data('id') ? $(this).data('id') : 0
+            var call = $(this).data('call') ? $(this).data('call') : false;
             var title = $(this).data('title') ? $(this).data('title') : $(this).children('span').text();
             var el=$(this)
             var nodeid=$(this).data("nodeid");
             breadcrumb(el,title,level);
+            if(call){
+              if(fun_is_exits(call)){
+                    eval(call+"(this)");//对不同的模块设置不同的响应数据
+                }
+            }
             if(nodeid>0){
                 $(".sidebar-menu").find(".nodeOn").removeClass("node-action");
                 $(this).addClass("node-action");
@@ -657,6 +663,7 @@
         tab_content.children('div').removeClass('active');
         if(tab.length>0){
             nav_tabs.find("[href='#"+id+"']").parents("li").addClass("active");
+            nav_tabs.find("[href='#"+id+"']").text(title);
             $("#"+id).addClass('active');
             $("#"+id).html(content);
         }else{

@@ -115,6 +115,7 @@ class CostController extends BaseController{
     function manageDebitInfo(){
         $reqType=I("reqType");
         $datas=I("data");
+        $roleId = session("roleId");
         if($datas["debit_date"] == 0){
             unset($datas["debit_date"] );
         }
@@ -140,7 +141,19 @@ class CostController extends BaseController{
             }else{
                 $datas['examine'] = $process["examine"];
             }
-            $datas['process_level']=$process["place"];
+            $examineArr = explode(",",$datas['examine']);
+            $rolePlace = array_search($roleId,$examineArr);
+            if($rolePlace!==false){
+                $datas['process_level']=$rolePlace+2;
+                if(count($examineArr) == ($rolePlace+1)){
+                    $datas['status'] = 1;
+                }else{
+                    $datas['status'] = 2;
+                }
+            }else{
+                $datas['process_level']=$process["place"];
+            }
+            //如果自己处于某个申请阶段，直接跳过下级;
             // $datas['process_level']=$this->processAuth["level"];
             unset($datas['id']);
             return $datas;
@@ -162,6 +175,11 @@ class CostController extends BaseController{
         }
         return "";
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-09-07 09:25:06 
+     * @Desc: 新增借支 
+     */    
     function debitAdd(){
         $info=$this->manageDebitInfo();
         if($info){
@@ -173,6 +191,11 @@ class CostController extends BaseController{
         }
         $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-09-07 09:25:14 
+     * @Desc: 编辑借支 
+     */    
     function debitEdit(){
         $updateInfo=$this->manageDebitInfo();
         $updateResult=$this->debitCom->update($updateInfo);
@@ -368,7 +391,7 @@ class CostController extends BaseController{
         $datas=I("data");
         $project_id=I("project_id");
         $leader=I("leader");
-
+        
         $expInfo = [
             "project_id"=>$project_id,
             "user_id"=>session("userId"),
@@ -385,7 +408,23 @@ class CostController extends BaseController{
         }else{
             $expInfo['examine'] = $process["examine"];
         }
-        $expInfo['process_level']=$process["place"];
+        //如果是审批者自己提交的执行下列代码
+        $roleId = I("roleId");
+        $examineArr = explode(",",$expInfo['examine']);
+        $rolePlace = array_search($roleId,$examineArr);
+        $expInfo['status'] = 0;
+        if($rolePlace!==false){
+            $expInfo['process_level']=$rolePlace+2;
+            if(count($examineArr) == ($rolePlace+1)){
+                $expInfo['status'] = 1;
+            }else{
+                $expInfo['status'] = 2;
+            }
+        }else{
+            $expInfo['process_level']=$process["place"];
+        }
+        
+        // $expInfo['process_level']=$process["place"];
 
         $isInsert = false;
         $insertRes = $this->expenseCom->insert($expInfo);
@@ -394,6 +433,7 @@ class CostController extends BaseController{
                 $dataInfo = $this->expenseManage($subExpInfo);
                 $dataInfo["parent_id"] = $insertRes->data;
                 $dataInfo["examine"] = $expInfo['examine'];
+                $dataInfo["status"] = $expInfo['status'];
                 $dataInfo['process_level'] = $expInfo["process_level"];
                 if($dataInfo){
                     $insertResult=$this->expenseSubCom->insert($dataInfo); 

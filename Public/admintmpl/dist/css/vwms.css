@@ -35,7 +35,7 @@
   	cursor:pointer;
 }
 .none{
-  	display:none;
+  	display:none!important;
 }
 .handle{
   	cursor:pointer;

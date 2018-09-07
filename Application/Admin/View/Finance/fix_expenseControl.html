@@ -35,7 +35,22 @@
                                         </volist>
                                     </select>
                                 </div>
-
+                                <div class="form-group ym-select date-year">
+                                    <div class="input-group date">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input class="form-control pull-right search-info date-input input-sm modal-info" readonly="readonly" data-type="year" name="year_date" type="text">
+                                    </div>
+                                </div>
+                                <div class="form-group ym-select date-month">
+                                    <div class="input-group date">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input class="form-control pull-right search-info date-input input-sm modal-info" readonly="readonly" data-type="month" name="month_date" type="text">
+                                    </div>
+                                </div>
                                 <div class="form-group">
                                     <label >状态：</label>
                                     <select class="form-control search-info input-sm" title="状态" name="status">
@@ -99,12 +114,26 @@
     <script>
         function fix_expense_initInfo(){
             $(tabId+" .global-modal .modal-content .chosen-select").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
-            init_date();
+            // init_date();
         }
 
         $(function(){
+            
+            if(typeof expCountInfo != "undefined"){
+                var year = expCountInfo.year
+                var month = expCountInfo.month ? expCountInfo.year+"-"+expCountInfo.month : "";
+                $(tabId+" .search-body .search-info[name='status']").find("option[value='1']").prop("selected",true);
+            }else{
+                var curDate = new Date();
+                var year = curDate.getFullYear();
+                var month = curDate.getMonth()+1;
+            }
             $(tabId+" .chosen-expenclas").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
-
+            
+            // $(tabId+" .date-year .date-input").val(curDate.getFullYear());
+            $(tabId+" .date-year .date-input").val(year);
+            $(tabId+" .date-month .date-input").val(month);
+            init_date();
             $(tabId+" .search-list").trigger("click");
         
             //新增固定支出

@@ -1,0 +1,11 @@
+<volist name="list" id="item">
+    <tr>
+        <td>{$item.date_time}</td>
+        <td>{$item.all_fee}</td>
+        <td>{$item.payment}</td>
+        <td>{$item.no_payment}</td>
+        <td>
+            <button type="button" class="btn btn-info btn-xs nodeOn" data-year="{$item.year}" data-month="{$item.date_time}" data-nodeid="{$fixexpNodeId}" data-call="fix_expCount_initInfo" href="{:U('Finance/fix_expenseControl')}"><i class="fa fa-list-alt"></i> <span> <if condition="$item.year neq ''"> {$item.year} 年 {$item.date_time} 月 <else /> {$item.date_time} 年 </if> 固定支付明细 </span></a> </button>
+        </td>
+    </tr>
+</volist>
