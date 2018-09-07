@@ -217,16 +217,20 @@ class FinanceController extends BaseController{
         $data=I("data");
         $p=I("p")?I("p"):1;
         $where=[];
+        $seatime = "addTime";
+        if(isset($data['status']) && $data['status']==1){
+            $seatime = "payTime";
+        }
         //
         // $fields = "FROM_UNIXTIME(payTime,'%Y') year ,FROM_UNIXTIME(payTime,'%m') date_time,SUM(fee) all_fee,SUM(payment) payment,SUM(noPayment) no_payment";
         // $groupBy = "FROM_UNIXTIME(payTime,'%Y'), FROM_UNIXTIME(payTime,'%m')";
         if($data["month_date"] != ""){
-            $where["_string"] = "FROM_UNIXTIME(payTime,'%Y-%m') = '{$data['month_date']}'";
-            // $fields = "FROM_UNIXTIME(payTime,'%Y') date_time,SUM(fee) all_fee,SUM(payment) payment,SUM(noPayment) no_payment";
+            $where["_string"] = "FROM_UNIXTIME({$seatime},'%Y-%m') = '{$data['month_date']}'";
+            // $fields = "FROM_UNIXTIME(addTime,'%Y') date_time,SUM(fee) all_fee,SUM(payment) payment,SUM(noPayment) no_payment";
             // $groupBy = "FROM_UNIXTIME(payTime,'%Y')";
         }else{
             $year = $data["year_date"] ? $data["year_date"] : date("Y");
-            $where["_string"] = "FROM_UNIXTIME(payTime,'%Y') = '{$year}'";
+            $where["_string"] = "FROM_UNIXTIME({$seatime},'%Y') = '{$year}'";
         }
         //
         if($data['expenClas']){

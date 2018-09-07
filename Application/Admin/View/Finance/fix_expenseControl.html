@@ -118,14 +118,13 @@
         }
 
         $(function(){
-            
+            var curDate = new Date();
+            var year = curDate.getFullYear();
             if(typeof expCountInfo != "undefined"){
-                var year = expCountInfo.year
+                year = expCountInfo.year ? expCountInfo.year : year;
                 var month = expCountInfo.month ? expCountInfo.year+"-"+expCountInfo.month : "";
                 $(tabId+" .search-body .search-info[name='status']").find("option[value='1']").prop("selected",true);
             }else{
-                var curDate = new Date();
-                var year = curDate.getFullYear();
                 var month = curDate.getMonth()+1;
             }
             $(tabId+" .chosen-expenclas").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
