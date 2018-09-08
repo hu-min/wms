@@ -70,9 +70,10 @@
 }
 .chosen-select{
 	padding: 0;
-	height: 30px;
+	height: auto;
 	line-height: 30px;
 	border: none;
+	min-height: 30px;
 }
 .chosen-select .chosen-single{
 	height: 30px!important;

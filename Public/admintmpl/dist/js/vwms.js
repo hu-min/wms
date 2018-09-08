@@ -882,16 +882,22 @@ function init_chosen(url,reqType,parental){
         }
         // console.log(option)
         $(this).chosen(option)
+
         if($(this).parents(".form-inline").length>0 && $(window).width() > 750){
+            var width = $(this).parents(".form-inline").find(".chosen-fcopy").width();
+            if(width){
+                $(this).next(".chosen-container").css("width",(Number(width)+22)+"px");
+            }
             
-            if($(this).parent(".form-group").parent("div[class^='col-md']").length>0){
-                $(this).parent(".form-group").css("width","100%")
-                var all = $(this).parent(".form-group").width()
-                var babel = $(this).prev(".control-label").width()
-                $(this).next(".chosen-container").css("width",(Number(all)-Number(babel)-3)+"px")
-            }else{
-                $(this).next(".chosen-container").css("width","auto");
-            }           
+            // if($(this).parent(".form-group").parent("div[class^='col-md']").length>0){
+            //     $(this).parent(".form-group").css("width","100%")
+            //     var all = $(this).parent(".form-group").width()
+            //     var babel = $(this).prev(".control-label").width()
+            //     $(this).next(".chosen-container").css("width",(Number(all)-Number(babel)-3)+"px")
+            // }else{
+            //     $(this).next(".chosen-container").css("width","100%");
+            //     console.log($(this).parent(".form-group").find("label").width());
+            // }           
         }
     })
 }
