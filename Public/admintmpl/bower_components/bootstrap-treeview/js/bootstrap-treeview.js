@@ -204,7 +204,7 @@
 	Tree.prototype.subscribeEvents = function () {
 
 		this.unsubscribeEvents();
-
+	
 		this.$element.on('click', $.proxy(this.clickHandler, this));
 
 		if (typeof (this.options.onNodeChecked) === 'function') {
@@ -319,10 +319,14 @@
 		if (!this.options.enableLinks) event.preventDefault();
 
 		var target = $(event.target);
+		// console.log(target[0].tagName.toLowerCase());
 		var node = this.findNode(target);
 		if (!node || node.state.disabled) return;
 		
 		var classList = target.attr('class') ? target.attr('class').split(' ') : [];
+		if(target[0].tagName.toLowerCase()=="input"){
+
+		}else
 		if ((classList.indexOf('expand-icon') !== -1)) {
 
 			this.toggleExpandedState(node, _default.options);
@@ -510,21 +514,24 @@
 
 		var _this = this;
 		$.each(nodes, function addNodes(id, node) {
-
+			// console.log(node.status)
 			var treeItem = $(_this.template.item)
 				.addClass('node-' + _this.elementId)
 				.addClass(node.state.checked ? 'node-checked' : '')
 				.addClass(node.state.disabled ? 'node-disabled': '')
 				.addClass(node.state.selected ? 'node-selected' : '')
 				.addClass(node.searchResult ? 'search-result' : '') 
+				.addClass(node.status != 1 ? node.status == 0 ? 'bg-yellow' : 'bg-red' : '') 
 				.attr('data-nodeid', node.nodeId)
 				.attr('style', _this.buildStyleOverride(node));
-
+			// console.log(node)
 			// Add indent/spacer to mimic tree structure
 			for (var i = 0; i < (level - 1); i++) {
 				treeItem.append(_this.template.indent);
 			}
-
+			if(node.sort!=undefined){
+				treeItem.append('<input type="text" class="node-input" style="width:20px;height:20px;margin:0px 5px;text-align:center;color:#666;" value="'+node.sort+'"/>');
+			}
 			// Add expand, collapse or empty spacer icons
 			var classList = [];
 			if (node.nodes) {

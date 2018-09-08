@@ -135,7 +135,7 @@
          function createNodeTree(){
             $(tabId+' #nodetree').treeview({showButton: true,highlightSelected:false,data: getNodeTree(),levels:1,color: "#428bca",});
             //节点编辑
-            $(tabId+' #nodetree').on("click",'li button',function(){
+            $(tabId+' #nodetree').offon("click",'li button',function(){
                 $(tabId+" #modal-nodeInfo h4").text("节点编辑");
                 $(tabId+" #modal-nodeInfo .save-info").data("gettype","Edit");
                 $(tabId+" #modal-nodeInfo .save-info").text("节点编辑");
@@ -160,6 +160,24 @@
                 })
                 $(tabId+" #modal-nodeInfo").modal('show')
                 
+            })
+            var node_sort = 0;
+            $(tabId+' #nodetree').offon("focus",'li .node-input',function(){
+                node_sort = $(this).val()
+            })
+            $(tabId+' #nodetree').offon("blur",'li .node-input',function(){
+                var new_sort = $(this).val()
+                if(node_sort !== new_sort){
+                    var nodeData= $(tabId+' #nodetree').treeview('getNode', $(this).parents(".node-nodetree").data("nodeid"));
+                    datas={}
+                    datas["reqType"] = 'nodeEdit';
+                    datas["data"] = {nodeId:nodeData.id,sort:new_sort};
+                    post("{$url}",datas,function(result){
+                        if(result.errCode==0){
+                            createNodeTree()
+                        }
+                    })
+                }
             })
         }
         $(function(){
@@ -228,21 +246,21 @@
             return '<option value="'+element.id+'">'+strs+element.text+'</option>'+option;
         }
         //节点信息
-        function node_setInfo(){
-            datas["data"]={}
-            $(tabId+" .modal-info").each(function(){
-                var name =$(this).attr("name");
-                var val =$(this).val();
-                if(name=="nodeTitle" && val==""){
-                    alert("节点标题不能为空");
-                    throw "节点标题不能为空";
-                }else if(val!=""){
-                    datas["data"][name]=val;
-                }
+        // function node_setInfo(){
+        //     datas["data"]={}
+        //     $(tabId+" .modal-info").each(function(){
+        //         var name =$(this).attr("name");
+        //         var val =$(this).val();
+        //         if(name=="nodeTitle" && val==""){
+        //             alert("节点标题不能为空");
+        //             throw "节点标题不能为空";
+        //         }else if(val!=""){
+        //             datas["data"][name]=val;
+        //         }
                 
-            })
-            datas["data"].status=$(tabId+" .status-group .active").attr("name")
-        }
+        //     })
+        //     datas["data"].status=$(tabId+" .status-group .active").attr("name")
+        // }
         /** 
          * @Author: vition 
          * @Date: 2018-02-23 10:08:52 

@@ -402,6 +402,7 @@ class BaseController extends \Common\Controller\BaseController{
         }else{
             $returnData["table"]="";
             $returnData["page"]="";
+            $returnData["count"]="";
         }
         $this->ajaxReturn($returnData);
     }

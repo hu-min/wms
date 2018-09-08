@@ -20,6 +20,7 @@ class CostController extends BaseController{
         $this->debitCom=getComponent('Debit');
         $this->expenseCom=getComponent('Expense');
         $this->expenseSubCom=getComponent('ExpenseSub');
+        $this->whiteCom=getComponent('White');
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
     }
@@ -237,6 +238,10 @@ class CostController extends BaseController{
         $process = $this->nodeCom->getProcess($nodeId);
         $this->assign("place",$process["place"]);
         $where=[];
+        $whites = $this->whiteCom->getWhites();
+        if($whites){
+            $where = ["user_id"=>["NOT IN",$whites]];
+        }
         $roleId = session('roleId');
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
             $where["_string"] = "FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0";
@@ -499,6 +504,10 @@ class CostController extends BaseController{
         $data=I("data");
         $p=I("p")?I("p"):1;
         $this->assign("tableName",$this->expenseCom->tableName());
+        $whites = $this->whiteCom->getWhites();
+        if($whites){
+            $where = ["user_id"=>["NOT IN",$whites]];
+        }
         // $nodeId = getTabId(I("vtabId"));
         // $process = $this->nodeCom->getProcess($nodeId);
         $roleId = session('roleId');

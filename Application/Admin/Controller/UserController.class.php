@@ -420,6 +420,7 @@ class UserController extends BaseController{
         $this->levelTree->setReplace(["nodeTitle"=>"text","nodeIcon"=>"icon","nodeId"=>"id"]);
         $this->levelTree->switchOption(["beNode"=>false,"idAsKey"=>false]);
         $nodeTree=$this->levelTree->createTree($nodeResult["list"]);
+        // print_r($nodeTree);exit;
         return $nodeTree;
     }
     /** 
@@ -479,6 +480,8 @@ class UserController extends BaseController{
      */    
     function nodeEdit(){
         $nodeInfo=$this->manageNodeInfo();
+
+        // print_r($nodeInfo);exit;
         $updateResult=$this->nodeCom->updateNode($nodeInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
@@ -490,36 +493,45 @@ class UserController extends BaseController{
     function manageNodeInfo(){
         $reqType=I("reqType");
         $datas=I("data");
-        $nodePInfo=$this->getNodeOne($datas['nodePid']);
-        $datas['level']=$nodePInfo['level']+1;
+        if(isset($datas['nodePid'])){
+            $nodePInfo=$this->getNodeOne($datas['nodePid']);
+            $datas['level']=$nodePInfo['level']+1;
+        }
+        
         if($reqType=="nodeAdd"){
+            $datas['nodeTitle'] = htmlspecialchars_decode($datas['nodeTitle']);
             unset($datas['nodeId']);
             return $datas;
         }else if($reqType=="nodeEdit"){
             $where=["nodeId"=>$datas['nodeId']];
             $data=[];
-            if(isset($datas['nodeNames'])){
-                $data['nodeNames']=$datas['nodeNames'];
+            foreach (['nodeNames','controller','nodeIcon','nodePid','nodeTitle','sort','status','level'] as $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=htmlspecialchars_decode($datas[$key]);
+                }
             }
-            if(isset($datas['controller'])){
-                $data['controller']=$datas['controller'];
-            }
-            if(isset($datas['nodeIcon'])){
-                $data['nodeIcon']=$datas['nodeIcon'];
-            }
-            if(isset($datas['nodePid'])){
-                $data['nodePid']=$datas['nodePid'];
-            }
-            if(isset($datas['nodeTitle'])){
-                $data['nodeTitle']=$datas['nodeTitle'];
-            }
-            if(isset($datas['sort'])){
-                $data['sort']=$datas['sort'];
-            }
-            $data['level']=$datas['level'];
-            if(isset($datas['status'])){
-                $data['status']=$datas['status'];
-            }
+            // if(isset($datas['nodeNames'])){
+            //     $data['nodeNames']=$datas['nodeNames'];
+            // }
+            // if(isset($datas['controller'])){
+            //     $data['controller']=$datas['controller'];
+            // }
+            // if(isset($datas['nodeIcon'])){
+            //     $data['nodeIcon']=$datas['nodeIcon'];
+            // }
+            // if(isset($datas['nodePid'])){
+            //     $data['nodePid']=$datas['nodePid'];
+            // }
+            // if(isset($datas['nodeTitle'])){
+            //     $data['nodeTitle']=htmlspecialchars_decode($datas['nodeTitle']);
+            // }
+            // if(isset($datas['sort'])){
+            //     $data['sort']=$datas['sort'];
+            // }
+            // $data['level']=$datas['level'];
+            // if(isset($datas['status'])){
+            //     $data['status']=$datas['status'];
+            // }
             return ["where"=>$where,"data"=>$data];
         }
     }

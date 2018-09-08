@@ -116,7 +116,8 @@
     <script>
         function fix_expense_initInfo(){
             $(tabId+" .global-modal .modal-content .chosen-select").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
-            // init_date();
+            init_date();
+            upload({url:"{:U('Finance/upload_filesAdd')}"})
         }
 
         $(function(){
@@ -155,21 +156,14 @@
             // })
         })
         function fix_expense_setInfo(info){
-            $(tabId+" .modal-info[name='expenClas']").find("option[value='"+info['expenClas']+"']").prop("selected",true)
-            $(tabId+" .modal-info[name='finanAccount']").find("option[value='"+info['finanAccount']+"']").prop("selected",true)
+            $(tabId+" .modal-info[name='expenClas']").find("option[value='"+info['expenClas']+"']").prop("selected",true);
+            $(tabId+" .modal-info[name='finanAccount']").find("option[value='"+info['finanAccount']+"']").prop("selected",true);
             //$(tabId+" .global-modal .modal-content .chosen-select").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
             //init_date();
-            $(tabId+" .modal-info[name='id']").val(info['id']);
-            $(tabId+" .modal-info[name='toObject']").val(info['toObject']);
-            $(tabId+" .modal-info[name='content']").val(info['content']);
-            $(tabId+" .modal-info[name='startDate']").val(info['startDate']);
-            $(tabId+" .modal-info[name='endDate']").val(info['endDate']);
-            $(tabId+" .modal-info[name='fee']").val(info['fee']);
-            $(tabId+" .modal-info[name='payment']").val(info['payment']);
-            $(tabId+" .modal-info[name='noPayment']").val(info['noPayment']);
-            $(tabId+" .modal-info[name='payTime']").val(info['payTime']);
-            $(tabId+" .modal-info[name='remark']").val(info['remark']);
-            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"),info,"{$Think.session.userId}","{$nodeAuth}")
+            ['id','toObject','content','startDate','endDate','fee','payment','noPayment','payTime','remark','detail_file'].forEach(element => {
+                $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
+            });
+            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"),info,"{$Think.session.userId}","{$nodeAuth}");
         }
         // function setCityOption(pid,whereCity,cityId){
         //     datas["reqType"]="getCityList";

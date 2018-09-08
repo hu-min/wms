@@ -17,6 +17,7 @@ class FinanceController extends BaseController{
         $this->purchaCom=getComponent('Purcha');
         $this->payCom=getComponent('Pay');
         $this->clearCom=getComponent('Liquidate');
+        $this->whiteCom=getComponent('White');
         $this->payGradeType = ["1"=>"A级[高]","2"=>"B级[次]","3"=>"C级[中]","4"=>"D级[低]"];
         $this->invoiceType = ["0"=>"无","1"=>"收据","2"=>"增值税普通","3"=>"增值税专用"];
         $this->payType = ['1'=>'公对公','2'=>'现金付款','3'=>'支票付款'];
@@ -237,7 +238,7 @@ class FinanceController extends BaseController{
             $where['expenClas']=$data['expenClas'];
         }
         $parameter=[
-            'fields'=>"`id`,`expenClas`,expenClass,`finanAccount`,finanAccs,`toObject`,`content`,`startDate`,`endDate`,`fee`,`payment`,noPayment,payTime,remark,addTime,status,process_level,author,examine",
+            'fields'=>"`id`,`expenClas`,expenClass,`finanAccount`,finanAccs,`toObject`,`content`,`startDate`,`endDate`,`fee`,`payment`,noPayment,payTime,remark,addTime,status,process_level,author,examine,detail_file",
             'where'=>$where,
             'page'=>$p,
             'pageSize'=>$this->pageSize,
@@ -1067,19 +1068,27 @@ class FinanceController extends BaseController{
     function readClearList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
-        $where=[];
+        // $where=[];
+        
         $roleId = session('roleId');
         $clearType = [["title"=>"未清算","color"=>"blue"],["title"=>"已清算","color"=>"green"],["title"=>"清算中","color"=>"orange"]];
         // if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
         //     $where["_string"] = "FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0";
         // }
         // $table  = "SELECT p.project_id project_id,vp.name,vp.code,SUM(debit_money) debit_money,COUNT(debit_money) debit_num,SUM(money) expense_money,COUNT(money) expense_num,SUM(invoice_money) invoice_money,GROUP_CONCAT(did) debit_ids,GROUP_CONCAT(eid) expense_ids,leader,clear_status,user_id,user_name FROM (SELECT project_id,user_id,clear_status FROM v_debit WHERE `status`=1 UNION SELECT project_id,user_id,clear_status FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m1 ON m1.exId=parent_id ) p LEFT JOIN (SELECT project_id,debit_money,id did FROM v_debit WHERE `status`=1) d ON d.project_id=p.project_id LEFT JOIN (SELECT project_id,parent_id,money,invoice_money,id eid FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id FROM v_expense WHERE `status`=1) m ON m.exId=parent_id ) e ON e.project_id=p.project_id LEFT JOIN (SELECT projectId,name,code,leader FROM v_project) vp ON vp.projectId=p.project_id LEFT JOIN (SELECT userId ,userName user_name FROM v_user) u ON u.userId = user_id GROUP BY p.project_id ORDER BY project_id DESC";
-        $table = "SELECT p.project_id project_id,SUM(debit_money) debit_money,COUNT(debit_money) debit_num,SUM(money) expense_money,COUNT(money) expense_num,SUM(invoice_money) invoice_money,GROUP_CONCAT(did) debit_ids,GROUP_CONCAT(eid) expense_ids,user_id, clear_status,vp.name,vp.code,user_name  FROM (SELECT project_id,user_id,clear_status FROM v_debit WHERE `status`=1 UNION SELECT project_id,user_id,clear_status FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m1 ON m1.exId=parent_id) p LEFT JOIN (SELECT project_id,debit_money,id did,user_id user_did FROM v_debit WHERE `status`=1) d ON d.project_id=p.project_id AND d.user_did = p.user_id LEFT JOIN (SELECT project_id,parent_id,money,invoice_money,id eid,user_id user_eid  FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m ON m.exId=parent_id ) e ON e.project_id=p.project_id AND e.user_eid=p.user_id LEFT JOIN (SELECT projectId,name,code,leader FROM v_project) vp ON vp.projectId=p.project_id LEFT JOIN (SELECT userId ,userName user_name FROM v_user) u ON u.userId = user_id GROUP BY p.project_id,clear_status";
-        $sql="SELECT * FROM ({$table}) c LIMIT ".(($p-1)*$this->pageSize).",".$this->pageSize;
+        $whites = $this->whiteCom->getWhites();
+        if($whites){
+            $where = " WHERE c.user_id NOT IN (".implode(',',$whites).")";
+        }else{
+            $where = "";
+        }
+    $table = "SELECT p.project_id project_id,SUM(debit_money) debit_money,COUNT(debit_money) debit_num,SUM(money) expense_money,COUNT(money) expense_num,SUM(invoice_money) invoice_money,GROUP_CONCAT(did) debit_ids,GROUP_CONCAT(eid) expense_ids,user_id, clear_status,vp.name,vp.code,user_name  FROM (SELECT project_id,user_id,clear_status FROM v_debit WHERE `status`=1 UNION SELECT project_id,user_id,clear_status FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m1 ON m1.exId=parent_id) p LEFT JOIN (SELECT project_id,debit_money,id did,user_id user_did FROM v_debit WHERE `status`=1) d ON d.project_id=p.project_id AND d.user_did = p.user_id LEFT JOIN (SELECT project_id,parent_id,money,invoice_money,id eid,user_id user_eid  FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m ON m.exId=parent_id ) e ON e.project_id=p.project_id AND e.user_eid=p.user_id LEFT JOIN (SELECT projectId,name,code,leader FROM v_project) vp ON vp.projectId=p.project_id LEFT JOIN (SELECT userId ,userName user_name FROM v_user) u ON u.userId = user_id GROUP BY p.project_id,clear_status";
+
+        $sql="SELECT * FROM ({$table}) c {$where} LIMIT ".(($p-1)*$this->pageSize).",".$this->pageSize;
         $db = M();
         $addResult = $db->query($sql);
         
-        $countResult = $db->query("SELECT count(*) vcount FROM ({$table}) c");
+        $countResult = $db->query("SELECT count(*) vcount FROM ({$table}) c {$where}");
         // print_r($countResult);
         $count = isset($countResult[0]["vcount"]) ? $countResult[0]["vcount"] : 0;
         $listResult=["list" => $addResult,"count" => count($count)];
@@ -1131,6 +1140,7 @@ class FinanceController extends BaseController{
         // $userGroup = I("userGroup");
         $user_id = I("userId");
         $where=[];
+
         $roleId = session('roleId');
         //test
         // $group = true;
@@ -1145,6 +1155,16 @@ class FinanceController extends BaseController{
                 $where[$param] = $$param;
             }
         }
+
+        $whites = $this->whiteCom->getWhites();
+        if($whites){
+            if(isset($where["_string"])){
+                $where["_string"].=" AND user_id NOT IN (".implode(',',$whites).")";
+            }else{
+                $where["_string"] = " user_id NOT IN (".implode(',',$whites).")";
+            }
+        }
+
         $fields = "*,FIND_IN_SET({$roleId},examine) place,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_time";
         $groupBy = NULL;
         $orderStr = "id DESC";
@@ -1183,6 +1203,7 @@ class FinanceController extends BaseController{
         // print_r($countResult);
         // echo $this->clearCom->M()->_sql();exit;
         $countStr = "<div><label>借支次数总计：<span class='text-light-blue'>".$countResult["list"]["debit_num"]."</span></label> | <label>借支金额总计：<span class='text-light-blue'>".$countResult["list"]["debit_money"]."</span></label> | <label>报销金额总计：<span class='text-light-blue'>".$countResult["list"]["expense_num"]."</span></label> | <label>报销金额总计：<span class='text-light-blue'>".$countResult["list"]["expense_money"]."</span></label> | <label>清算金额总计：<span class='text-light-blue'>".$countResult["list"]["all_money"]."</span></label></div>";
+        // echo $countStr;exit;
         $this->tablePage($listResult,'Finance/financeTable/'.$template,"finance_clearList",false,$countStr);
     }
     function financeClear_modalOne(){

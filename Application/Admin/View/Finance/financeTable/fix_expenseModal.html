@@ -8,85 +8,114 @@
     <form role="form">
         <div class="box-body">
             <input class="modal-info" value="0" name="id" type="hidden">
-            <div class="form-group"> 
-                <label class="control-label">固定支出类别：</label>
-                <select class="form-control modal-info chosen-expenclas chosen-select" title="固定支出类别" name="expenClas">
-                    <volist name="expenClasArr" id="item">
-                        <option value="{$item.basicId}">{$item.name}</option>
-                    </volist>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="info-title">公司账户：</label>
-                <select class="form-control modal-info chosen-accName chosen-select" title="公司账户" name="finanAccount">
-                    <volist name="companyAccount" id="item">
-                        <option value="{$item.basicId}">{$item.accName}:{$item.name}</option>
-                    </volist>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="info-title">支付对象：</label>
-                <input class="form-control modal-info datetime" required="required" name="toObject" title="支付对象" placeholder="支付对象" type="text">
-            </div>
-            <div class="form-group">
-                <label for="info-title">内容：</label>
-                <input class="form-control modal-info" name="content" title="内容" placeholder="内容" type="text">
-            </div>
-            <div class="col-md-6 pad-left-0">
-                <div class="form-group">
-                    <label>起始日期:</label>
-                    <div class="input-group date">
-                        <div class="input-group-addon">
-                            <i class="fa fa-calendar"></i>
-                        </div>
-                        <input class="form-control pull-right date-input modal-info" name="startDate" type="text">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group"> 
+                        <label class="control-label">固定支出类别：</label>
+                        <select class="form-control modal-info chosen-expenclas chosen-select" title="固定支出类别" name="expenClas">
+                            <volist name="expenClasArr" id="item">
+                                <option value="{$item.basicId}">{$item.name}</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">公司账户：</label>
+                        <select class="form-control modal-info chosen-accName chosen-select" title="公司账户" name="finanAccount">
+                            <volist name="companyAccount" id="item">
+                                <option value="{$item.basicId}">{$item.accName}:{$item.name}</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">支付对象：</label>
+                        <input class="form-control modal-info datetime" required="required" name="toObject" title="支付对象" placeholder="支付对象" type="text">
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 pad-right-0">
-                <div class="form-group">
-                    <label>结束日期:</label>
-                    <div class="input-group date">
-                        <div class="input-group-addon">
-                            <i class="fa fa-calendar"></i>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">内容：</label>
+                        <input class="form-control modal-info" name="content" title="内容" placeholder="内容" type="text">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>起始日期:</label>
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <input class="form-control pull-right date-input modal-info" name="startDate" type="text">
                         </div>
-                        <input class="form-control pull-right date-input modal-info" name="endDate" type="text">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>结束日期:</label>
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <input class="form-control pull-right date-input modal-info" name="endDate" type="text">
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 pad-left-0">
-                <div class="form-group">
-                    <label for="info-title">总额：</label>
-                    <input class="form-control modal-info" name="fee" title="总额" placeholder="总额" type="text">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">总额：</label>
+                        <input class="form-control modal-info" name="fee" title="总额" placeholder="总额" type="text">
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-6 pad-right-0">
-                <div class="form-group">
-                    <label for="info-title">当月已付：</label>
-                    <input class="form-control modal-info" name="payment" title="当月已付" placeholder="当月已付" type="text">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">当月已付：</label>
+                        <input class="form-control modal-info" name="payment" title="当月已付" placeholder="当月已付" type="text">
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-6 pad-left-0">
-                <div class="form-group">
-                    <label for="info-title">剩余未付：</label>
-                    <input class="form-control modal-info" name="noPayment" title="剩余未付" placeholder="剩余未付" type="text">
-                </div>
-            </div>
-            <div class="col-md-6 pad-right-0">
-                <div class="form-group">
-                    <label>支付日期:</label>
-                    <div class="input-group date">
-                        <div class="input-group-addon">
-                            <i class="fa fa-calendar"></i>
-                        </div>
-                        <input class="form-control pull-right date-input modal-info" name="payTime" type="text">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">剩余未付：</label>
+                        <input class="form-control modal-info" name="noPayment" title="剩余未付" placeholder="剩余未付" type="text">
                     </div>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="info-title">财务备注：</label>
-                <input class="form-control modal-info" name="remark" title="财务备注" placeholder="财务备注" type="text">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>支付日期:</label>
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <input class="form-control pull-right date-input modal-info" name="payTime" type="text">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">明细上传/查看：</label>
+                        <div class="input-group">
+                            <input class="form-control modal-info upload-file" readonly="readonly" name="detail_file" title="合同上传/查看"  type="text">
+                            <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
+                        </div>
+                    </div>
+                </div>
             </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="info-title">财务备注：</label>
+                        <input class="form-control modal-info" name="remark" title="财务备注" placeholder="财务备注" type="text">
+                    </div>
+                </div>
+            </div>            
             <div class="form-group">
                 <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
                     <input class="modal-info" value="0" name="status" type="hidden">
