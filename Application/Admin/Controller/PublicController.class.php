@@ -64,7 +64,7 @@ class PublicController extends BaseController{
         $listResult = $this->MesCom->getList($parameter);
         $this->assign("type",$type);
         // print_r($parameter);
-        $this->tablePage($listResult,'Public/publicTable/messageList',"messageList",10,"",["bigSize"=>false,"returnData"=>true]);
+        $this->tablePage($listResult,'Public/publicTable/messageList',"lastLoginList",10,"",["bigSize"=>false,"returnData"=>true]);
     }
     function readMesOne(){
 

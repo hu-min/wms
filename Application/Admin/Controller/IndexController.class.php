@@ -138,8 +138,40 @@ class IndexController extends BaseController{
         
         // echo "SELECT `moudle_name`,`name`,`user_id`,`user_name`,`process_level`,`all`,`status`,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time FROM ({$sql}) p LEFT JOIN (SELECT userId,userName `user_name` FROM v_user WHERE status =1) u ON userId = `user_id` ORDER BY add_time DESC";
         
-        $this->tablePage($listResult,'Index/table/appList',"homeAppList",5,["bigSize"=>false]);
+        $this->tablePage($listResult,'Index/table/appList',"homeAppList",5,"",["bigSize"=>false]);
         // $this->ajaxReturn($result);
+    }
+    function relItemList(){
+        $page=I("p")?I("p"):1;
+        $pageNum = 5;
+        $where = [];
+        $userId = session("userId");
+        $where["_string"] = "business = {$userId} OR leader = {$userId} OR FIND_IN_SET({$userId},earlier_user) > 0 OR FIND_IN_SET({$userId},scene_user) > 0";
+        $param=[
+            "where" => $where,
+            'page'=>$page,
+            "fields" => "*,CASE WHEN business = {$userId} THEN '营业主担' WHEN leader = {$userId} THEN '项目主担' WHEN FIND_IN_SET({$userId},earlier_user) > 0 THEN '前期项目人员' WHEN FIND_IN_SET({$userId},scene_user) THEN '现场执行人员' ELSE '其他职务' END duties ",
+            'pageSize' => 5,
+            'orderStr' => "addTime DESC",
+            'joins' => [
+                "LEFT JOIN (SELECT basicId stage_id,name stage_name FROM v_basic WHERE class = 'stage' ) s ON s.stage_id = stage",
+            ]
+        ];
+        $listResult = getComponent('Project')->getList($param);
+        $this->tablePage($listResult,'Index/table/relItemList',"relItemList",5,"",["rollPage"=>5,"onlyPage"=>true,"bigSize"=>false]);
+    }
+    function lastLoginList(){
+        $page=I("p")?I("p"):1;
+        $param=[
+            "where" => ["class"=>"login"],
+            'page'=>$page,
+            "fields" => "userName user_name,FROM_UNIXTIME(addTime,'%Y-%m-%d %H:%i:%s') login_time",
+            'pageSize' => 5,
+            'orderStr' => "addTime DESC",
+        ];
+        $listResult = $this->LogCom->getList($param);
+        $listResult["count"] = $listResult["count"]>100 ? 100 : $listResult["count"];
+        $this->tablePage($listResult,'Index/table/lastLoginList',"lastLoginList",5,"",["rollPage"=>5,"onlyPage"=>true,"bigSize"=>false]);
     }
 }
 

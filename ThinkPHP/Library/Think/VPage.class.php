@@ -16,7 +16,7 @@ class VPage{
     public $parameter; // 分页跳转时要带的参数
     public $totalRows; // 总行数
     public $totalPages; // 分页总页面数
-    public $rollPage   = 11;// 分页栏每页显示的页数
+    public $rollPage   = 10;// 分页栏每页显示的页数
     public $lastSuffix = true; // 最后一页是否显示总页数
     public $bigSize = true;
 
@@ -29,7 +29,7 @@ class VPage{
         'header' => '<div class="col-sm-5"><div class="dataTables_info">共 %TOTAL_ROW% 条记录</div></div>',
         'prev'   => '<<',
         'next'   => '>>',
-        'first'  => '1...',
+        'first'  => '1',
         'last'   => '...%TOTAL_PAGE%',
         'theme'  => '%FIRST% %UP_PAGE% %LINK_PAGE% %DOWN_PAGE% %END%',
         'head'=>'%HEADER%',
@@ -41,11 +41,12 @@ class VPage{
      * @param array $listRows  每页显示记录数
      * @param array $parameter  分页跳转的参数
      */
-    public function __construct($totalRows, $listRows=20, $parameter = array()) {
+    public function __construct($totalRows, $listRows=20, $rollPage=false,$parameter = array()) {
         C('VAR_PAGE') && $this->p = C('VAR_PAGE'); //设置分页参数名称
         /* 基础设置 */
         $this->totalRows  = $totalRows; //设置总记录数
         $this->listRows   = $listRows;  //设置每页显示行数
+        $this->rollPage   = $rollPage ? $rollPage : $this->rollPage;  //分页栏每页显示的页数
         $this->parameter  = empty($parameter) ? $_GET : $parameter;
         $this->nowPage    = empty($_GET[$this->p]) ? 1 : intval($_GET[$this->p]);
         $this->nowPage    = $this->nowPage>0 ? $this->nowPage : 1;
@@ -76,7 +77,7 @@ class VPage{
      * 组装分页链接
      * @return string
      */
-    public function show() {
+    public function show($onlyPage=false) {
         if(0 == $this->totalRows) return '';
 
         /* 生成URL */
@@ -105,13 +106,13 @@ class VPage{
         //第一页
         $the_first = '';
         if($this->totalPages > $this->rollPage && ($this->nowPage - $now_cool_page) >= 1){
-            $the_first = '<li class="paginate_button active"><a href="#" data-page="1">'. $this->config['first'] .'</a></li>';
+            $the_first = '<li class="paginate_button"><a href="#" class="vpage" data-page="1">'. $this->config['first'] .'</a></li>';
         }
 
         //最后一页
         $the_end = '';
         if($this->totalPages > $this->rollPage && ($this->nowPage + $now_cool_page) < $this->totalPages){
-            $the_end = '<a class="end vpage" data-page="'.$this->totalPages.'" >' . $this->config['last'] . '</a>';
+            $the_end = '<li class="paginate_button"><a href="#" class="vpage" data-page="'.$this->totalPages.'" >' . $this->config['last'] . '</a></li>';
         }
 
         //数字连接
@@ -148,6 +149,9 @@ class VPage{
         $ulClass = "pagination";
         if(!$bigSize){
             $ulClass = "pagination pagination-sm no-margin pull-right";
+        }
+        if($onlyPage){
+            return "<div class='col-sm-12'><div class='dataTables_paginate paging_simple_numbers'><ul class='{$ulClass}'>{$page_str}</ul></div></div>";
         }
         return "{$header_str}<div class='col-sm-7'><div class='dataTables_paginate paging_simple_numbers'><ul class='{$ulClass}'>{$page_str}</ul></div></div>";
     }

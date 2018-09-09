@@ -165,3 +165,9 @@ td > .approve-group > button{
 #approve-log-modal{
 	box-shadow: 0px 0px 10px 4px #3c8dbc;
 }
+.box .box-header .box-title{
+	font-size:15px;
+}
+.pagination-sm > li > a{
+	padding:2px 8px;
+}

@@ -12,7 +12,7 @@
 <body>
     <section class="content">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-5">
                 <div class="box box-primary box-solid">
                     <div class="box-header with-border">
                       <h3 class="box-title">待审批列表</h3>
@@ -45,24 +45,171 @@
 								
 							</div>
 						</div>
-                      <!-- <ul class="pagination pagination-sm no-margin pull-right">
-                        <li><a href="#">«</a></li>
-                        <li><a href="#">1</a></li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">»</a></li>
-                      </ul> -->
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-				
+            <div class="col-md-4">
+                <div class="box box-primary box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">与我有关的项目</h3>
+                        <div class="box-tools">
+                        <button type="button" name="relItemList" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
+                        </button>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>项目名称</th>
+                            <th>项目阶段</th>
+                            <th>负责职务</th>
+                        </tr>
+                    </thead>
+                        <tbody class="relItem-table"></tbody>
+                    </table>
+                    </div>
+                    <!-- /.box-body -->
+                    <div class="box-footer clearfix">
+                        <div class="">
+                            <div  class="relItem-page row page-div" data-url="{$url}" data-reqtype="relItemList" data-con="relItem">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="box box-primary box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">最新登录 TOP100</h3>
+                        <div class="box-tools">
+                        <button type="button" name="lastLoginList" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
+                        </button>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>员工姓名</th>
+                            <th>登录时间</th>
+                        </tr>
+                    </thead>
+                        <tbody class="lastLogin-table"></tbody>
+                    </table>
+                    </div>
+                    <!-- /.box-body -->
+                    <div class="box-footer clearfix">
+                        <div class="">
+                            <div  class="lastLogin-page row page-div" data-url="{$url}" data-reqtype="lastLoginList" data-con="lastLogin">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="box box-warning box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">虚位以待</h3>
+                        <div class="box-tools">
+                        <button type="button" name="" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
+                        </button>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>更多功能开发中</th>
+                        </tr>
+                    </thead>
+                        <tbody class="-table"></tbody>
+                    </table>
+                    </div>
+                    <!-- /.box-body -->
+                    <div class="box-footer clearfix">
+                        <div class="">
+                            <div  class="-page row page-div" data-url="{$url}" data-reqtype="" data-con="">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="box box-warning box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">虚位以待</h3>
+                        <div class="box-tools">
+                        <button type="button" name="" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
+                        </button>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>更多功能开发中</th>
+                        </tr>
+                    </thead>
+                        <tbody class="-table"></tbody>
+                    </table>
+                    </div>
+                    <!-- /.box-body -->
+                    <div class="box-footer clearfix">
+                        <div class="">
+                            <div  class="-page row page-div" data-url="{$url}" data-reqtype="" data-con="">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="box box-warning box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">虚位以待</h3>
+                        <div class="box-tools">
+                        <button type="button" name="" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
+                        </button>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>更多功能开发中</th>
+                        </tr>
+                    </thead>
+                        <tbody class="-table"></tbody>
+                    </table>
+                    </div>
+                    <!-- /.box-body -->
+                    <div class="box-footer clearfix">
+                        <div class="">
+                            <div  class="-page row page-div" data-url="{$url}" data-reqtype="" data-con="">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
     <script>
         $(function(){
             updateList("getAppList")
+            updateList("relItemList")
+            updateList("lastLoginList")
             $(tabId+" .refresh").on("click",function(){
 				updateList($(this).attr("name"))
             })
@@ -74,7 +221,7 @@
 				self.find("tbody").html(result.table);
 				self.find(".page-div").html(result.page);
                 // console.log(result);
-            })
+            },false)
         }
     </script>
 </body>

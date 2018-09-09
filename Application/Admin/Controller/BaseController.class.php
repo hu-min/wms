@@ -385,14 +385,22 @@ class BaseController extends \Common\Controller\BaseController{
             if($redisName){
                 $this->Redis->set($redisName,json_encode($data['list']),7200);
             }
-            $page = new \Think\VPage($data['count'], $pageSize ? $pageSize : $this->pageSize);
-            if(isset($config["bigSize"])){
-                $page->bigSize = $config["bigSize"];
+            if(isset($config["noPage"])){
+                $pageShow = "";
+            }else{
+                $rollPage = isset($config["rollPage"]) ? $config["rollPage"] : false;
+                $page = new \Think\VPage($data['count'], $pageSize ? $pageSize : $this->pageSize,$rollPage);
+                if(isset($config["bigSize"])){
+                    $page->bigSize = $config["bigSize"];
+                }
+                
+                $pageShow = isset($config["onlyPage"]) ? $page->show(true) : $page->show();
             }
+            
             if(isset($config["returnData"])){
                 $returnData["data"] = $data['list'];
             }
-            $pageShow = $page->show();
+            
             $this->assign('list',$data['list']);
             $returnData["table"]=$this->fetch($templet);
             $returnData["page"]=$pageShow;
