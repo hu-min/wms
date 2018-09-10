@@ -115,6 +115,8 @@ class FinanceController extends BaseController{
         $reqType=I('reqType');
         $this->assign("controlName","fix_expense");
         $this->assign('dbName',"FixldExpense");//删除数据的时候需要
+        $this->statusType = [0=>"未启用",1=>"启用",3=>"无效",4=>"删除"];
+        $this->assign('statusType',$this->statusType );
         $parameter=[
             'where'=>["class"=>"expenClas"],
             'page'=>1,
@@ -270,6 +272,7 @@ class FinanceController extends BaseController{
         if($reqType=="fix_expenseAdd"){
             $datas['addTime']=time();
             $datas['author']=session("userId");
+            $datas['status']=1;
             unset($datas['id']);
             return $datas;
         }else if($reqType=="fix_expenseEdit"){

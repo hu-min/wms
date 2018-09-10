@@ -24,7 +24,7 @@
                         <div class="box-body no-padding">
                             <ul class="nav nav-pills nav-stacked">
                                 <li class="active"><a href="#" data-type="1" ><i class="fa fa-inbox"></i><span class="foler-name"> 收件箱 </span> <span class="label label-primary pull-right message-no-read">{$no_read}</span></a></li>
-                                <li><a href="#" data-type="2" ><i class="fa fa-envelope-o"></i><span class="foler-name"> 发送箱 </span></a></li>
+                                <li class="send-box"><a href="#" data-type="2" ><i class="fa fa-envelope-o"></i><span class="foler-name"> 发送箱 </span></a></li>
                                 <!-- <li><a href="#" data-type="3" ><i class="fa fa-file-text-o"></i><span class="foler-name"> 草稿箱 </span></a></li> -->
                                 <!-- <li><a href="#" data-type="4" ><i class="fa fa-trash-o"></i><span class="foler-name"> 废纸篓 </span></a></li> -->
                             </ul>
@@ -263,6 +263,7 @@
                 })
                 $(tabId+" .message-box .message-compose").on("click",function(e){
                     e.preventDefault();
+                    $(tabId+" .message-box .message-compose-box .modal-info").val("")
                     $(tabId+" .message-box .box-primary").removeClass("none");
                     $(tabId+" .message-box .message-compose-box").siblings().addClass("none");
                 })
@@ -289,11 +290,11 @@
                     datas["reqType"] = "messageAdd";
                     post("{$url}",datas,function(result){
                         notice(result.errCode,result.error);
-                        // if(result.errCode==0){
+                        if(result.errCode==0){
+                            $(tabId+" .message-box .mes-folder ul").find("li.send-box a").click()
+                        }else{
 
-                        // }else{
-
-                        // }
+                        }
                     });
                 })
                 //Handle starring for glyphicon and font awesome

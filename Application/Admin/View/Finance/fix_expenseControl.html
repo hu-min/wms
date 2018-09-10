@@ -23,12 +23,12 @@
                         {:add_btn(get_defined_vars(),"新增固定支出")}
                        
                     </div>
-                    <div class="box-body search-body company-search-box">
+                    <div class="box-body search-body search-box">
                         <div class="col-md-12">
                             <div class="form-inline">
                                 <div class="form-group"> 
                                     <label class="control-label">固定支出类别：</label>
-                                    <select class="form-control search-info chosen-expenclas chosen-select" title="固定支出类别" name="expenClas">
+                                    <select class="form-control search-info chosen-select" title="固定支出类别" name="expenClas">
                                         <option value="">全部</option>
                                         <volist name="expenClasArr" id="item">
                                             <option value="{$item.basicId}">{$item.name}</option>
@@ -41,7 +41,7 @@
                                         <div class="input-group-addon">
                                             <i class="fa fa-calendar"></i>
                                         </div>
-                                        <input class="form-control pull-right search-info date-input input-sm modal-info" readonly="readonly" data-type="year" name="year_date" type="text">
+                                        <input class="form-control pull-right search-info date-input input-sm modal-info chosen-fcopy" readonly="readonly" data-type="year" name="year_date" type="text">
                                     </div>
                                 </div>
                                 <div class="form-group ym-select date-month">
@@ -128,10 +128,12 @@
                 var month = expCountInfo.month ? expCountInfo.year+"-"+expCountInfo.month : "";
                 $(tabId+" .search-body .search-info[name='status']").find("option[value='1']").prop("selected",true);
             }else{
-                var month = curDate.getMonth()+1;
+                var _month = (curDate.getMonth()+1);
+                var month =  _month < 10 ? year+"-0"+_month : year+"-"+_month;
             }
-            $(tabId+" .chosen-expenclas").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
+            // $(tabId+" .chosen-expenclas").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
             
+            init_chosen("{$url}","getOptionList",".search-body");
             // $(tabId+" .date-year .date-input").val(curDate.getFullYear());
             $(tabId+" .date-year .date-input").val(year);
             $(tabId+" .date-month .date-input").val(month);
