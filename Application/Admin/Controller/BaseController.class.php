@@ -370,8 +370,12 @@ class BaseController extends \Common\Controller\BaseController{
         foreach ($assign as $key => $value) {
             $this->assign($key,$value);
         }
+        if(isset($parameter["dataList"])){
+            $this->assign("list",$data["list"]);
+            $html=$this->fetch($templets);
+            $this->ajaxReturn(['html'=>$html,"errCode"=>$errCode,"error"=>$error]);
+        }
         $html=$this->fetch($templets);
-
         $this->ajaxReturn(['html'=>$html,"data"=>$data,"errCode"=>$errCode,"error"=>$error]);
     }
     /** 

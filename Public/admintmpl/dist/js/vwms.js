@@ -180,12 +180,12 @@ function searchFun(url,datas,table,page,count){
  * javascript comment 
  * @Author: vition 
  * @Date: 2018-06-02 17:08:13 
- * @Desc: 弹出 global-modal 操作 new
+ * @Desc: 弹出 modal 操作 new
  */
 $(document).on("click",".v-showmodal",function(){
-
     var vtarget = $(this).data("vtarget")
     vtarget = vtarget ? vtarget : $(this).parent(".status-con").data("vtarget");
+
     var url = $(this).data("url")
     url = url ? url : $(this).parent(".status-con").data("url");
     var con = $(this).data("con")
@@ -206,7 +206,7 @@ $(document).on("click",".v-showmodal",function(){
         // console.log(result)
         if(result.errCode==0){
              
-            $(tabId+" .global-modal .modal-content").html(result.html);
+            $(tabId+" "+vtarget+" .modal-content").html(result.html);
             $(tabId+" "+vtarget).modal('toggle')
             // $(tabId+" .global-modal .modal-content").find("[required='required']").each(function(){
             //     $(this).before('<span class="required"></span>')
@@ -281,6 +281,7 @@ $(document).on("click",'.search-refresh',function(){
  */
 $(document).on("click",'.save-info',function(){
     datas={}
+    var self = this
     var url=$(this).data("url");
     var gettype=$(this).data("gettype");
     var con=$(this).data("con");
@@ -349,7 +350,8 @@ $(document).on("click",'.save-info',function(){
                 searchFun(url,datas,table,page,count)
             }
             if($('body').hasClass('modal-open')){
-                $(tabId+" .global-modal").modal('toggle')
+                // $(tabId+" .modal").modal('toggle')
+                $(self).parents(".modal").modal('toggle')
             }
         }else{
             notice(100,result.error);
@@ -935,7 +937,8 @@ function upload(option){
     // console.log(urlArr);
     $(document).offon("click",tabId+" "+el,function(){
         $fileInput = $(this)
-        if($(tabId+"-upload-modal").html() == undefined){
+        var onlyread = $(this).attr("onlyread")
+        if($(tabId+"-upload-modal").html() == undefined && onlyread ==undefined){
             var html='<div class="modal fade in" id="'+tabId.replace("#","")+'-upload-modal" style="display: block; padding-right: 17px;"><div class="modal-dialog" style="top: 10%;"><div class="modal-content"><div class="modal-header"><button type="button" class="close modal-close" data-dismiss="modal" aria-label="关闭"><span aria-hidden="true"> × </span></button><h4 class="modal-title">文件上传</h4></div><div class="modal-body"><div class="input-group"><input readonly="readonly" class="form-control upload-item" type="text"><div class="input-file none"><input class="upload-item-file" name="upload-file-name" multiple="multiple" type="file"></div><span class="input-group-btn"><button type="button" class="btn btn-info btn-flat load-files-btn"><i class="fa  fa-file"></i> 选择文件 </button></span></div></div><div class="modal-footer"><button type="button" class="btn btn-default pull-left modal-close" data-dismiss="modal">关闭</button><button type="button" class="btn btn-primary upload-file-btn"><i class="fa fa-upload" ></i> 全部上传</button></div></div></div></div>'
             $(document).find("body").append(html);
             
@@ -999,9 +1002,20 @@ function upload(option){
                         for (let index = 0; index < this.files.length; index++){
                             var element = this.files[index];
                             if(Math.floor(element.size/1024/1024)<=10){
+                                var thisFile = element.name.split(".")
+                                var src = window.URL.createObjectURL(element)
+                                var fileType = thisFile[thisFile.length-1].toLowerCase()
+                                if(in_array(fileType,["jpeg","jpg","png","gif"])){
+                                    
+                                }else if (in_array(fileType,["doc","docx","xls","xlsx","ppt","pptx"])){
+                                    src = "/Public/admintmpl/dist/img/office.jpg" 
+                                }else if(in_array(fileType,["pdf"])){
+                                    src = "/Public/admintmpl/dist/img/pdf.jpg"
+                                }else{
+                                    src = "/Public/admintmpl/dist/img/files.jpg" 
+                                }
                                 
-                                var src = "/Public/admintmpl/dist/img/default-50x50.gif" 
-                                var liHtml = '<li class="item" name="'+"file"+index+'"><div class="product-img"><img src="'+window.URL.createObjectURL(element)+'" alt="Product Image"></div><div class="product-info"><a href="javascript:void(0)" name="'+element.name+'" lass="product-title">'+element.name+'<span class="btn btn-warning btn-flat pull-right insert-file-btn none"><i class="fa fa-link" ></i> 插入 </span><span class="btn btn-danger btn-flat pull-right delete-file-btn"><i class="fa fa-close"></i> 删除 </span></a><span class="product-description">文件大小：'+float(element.size/1024/1024)+'M 文件类型：'+element.type+'</span><div class="progress progress-sm active"><div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">0% Complete</span></div></div></div></li>';
+                                var liHtml = '<li class="item" name="'+"file"+index+'"><div class="product-img"><img src="'+src+'" alt="Product Image"></div><div class="product-info"><a href="javascript:void(0)" name="'+element.name+'" lass="product-title">'+element.name+'<span class="btn btn-warning btn-flat pull-right insert-file-btn none"><i class="fa fa-link" ></i> 插入 </span><span class="btn btn-danger btn-flat pull-right delete-file-btn"><i class="fa fa-close"></i> 删除 </span></a><span class="product-description">文件大小：'+float(element.size/1024/1024)+'M 文件类型：'+fileType+'</span><div class="progress progress-sm active"><div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">0% Complete</span></div></div></div></li>';
                                 $(tabId+"-upload-modal .modal-body .products-list").append(liHtml);
                                 if(uploadItem!=""){
                                     uploadItem+=","+element.name
@@ -1015,7 +1029,7 @@ function upload(option){
                     })
                 })
             })
-        }else{
+        }else if(onlyread ==undefined){
             $(tabId+"-upload-modal").toggleClass("modal fade in")
             $(tabId+"-upload-modal").prev(".modal-backdrop").toggleClass("none")
             $(tabId+"-upload-modal").css("display","block")

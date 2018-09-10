@@ -19,6 +19,7 @@ class ProjectController extends BaseController{
         $this->filesCom=getComponent('ProjectFiles');
         $this->processArr=["0"=>"沟通","1"=>"完结","2"=>"裁决","3"=>"提案","4"=>"签约","5"=>"LOST","6"=>"筹备","7"=>"执行","8"=>"完成"];
         $this->dateArr=["0"=>"立项日期","1"=>"提案日期","2"=>"项目日期","3"=>"结束日期"];
+
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
     }
@@ -94,6 +95,8 @@ class ProjectController extends BaseController{
         $this->assign('ptypeArr',$this->_getOption("projectType"));
         $this->assign('stageArr',$this->_getOption("stage"));
         $this->assign("provinceArr",$this->basicCom->get_provinces());
+       
+        $this->assign("nodeAuth",$this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]);
         if($reqType){
             $this->$reqType();
         }else{
@@ -879,5 +882,78 @@ class ProjectController extends BaseController{
             "template"=>"businessModal",
         ];
         $this->modalOne($modalPara);
+    }
+    function project_file_modalOne(){
+        $title = "报价/成本 文件列表";
+        $btnTitle = "确定添加";
+        $gettype = I("gettype");
+        $this->assign("controlName","project_file");
+        if($gettype=="business"){
+            $this->assign("fileType",[1=>"报价",2=>"成本"]);
+            $typeWhere = ["IN",[1,2]];
+        }else{
+            $this->assign("fileType",[3=>"方案",4=>"标书"]);
+            $typeWhere = ["IN",[3,4]];
+        }
+        $project_id = I("id");
+        
+        $projectResult = $this->projectCom->getOne(["where"=>["projectId"=>$project_id],"fields"=>"business,leader"])["list"];
+        $hasEdit = false;
+        if($projectResult[$gettype] == session("userId")){
+            $hasEdit = true;
+        }
+        $this->assign("hasEdit",$hasEdit);
+        $this->assign("project_id",$project_id);
+        $where = [
+            "file_type" => $typeWhere,
+            "project_id" => $project_id,
+        ];
+        $param = [
+            "fields" => "*,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time",
+            "where" => $where,
+            "joins" =>[
+                "LEFT JOIN (SELECT userId,userName user_name FROM v_user) u ON u.userId = user_id",
+            ],
+        ];
+        $resultData = $this->filesCom->getList($param);
+        // print_r($resultData);
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "template"=>"filesModal",
+            "dataList" => true,
+        ];
+        
+        $this->modalOne($modalPara);
+    }
+    function project_fileAdd(){
+        extract($_REQUEST);
+        $allNum = count($data);
+        $num = 0;
+        $this->filesCom->M()->startTrans();
+        foreach ($data as $fileInfo) {
+            $insertData = [
+                'project_id' => $project_id,
+                'file_type' => $fileInfo["file_type"],
+                'user_id' => session("userId"),
+                'add_time' => time(),
+                'file_path' => $fileInfo["file_path"],
+            ];
+            $fileArr = explode("/",$fileInfo["file_path"]);
+            $insertData['file_name'] = isset($fileInfo["file_name"]) && $fileInfo["file_name"]!="" ? $fileInfo["file_name"] : explode(".",$fileArr[count($fileArr)-1])[0];
+            $insertRes = $this->filesCom->insert($insertData);
+            if(isset($insertRes->errCode) && $insertRes->errCode ==0){
+                $num++;
+            }
+        }
+        if($num>0 && $allNum==$num){
+            $this->filesCom->M()->commit();
+            $this->ajaxReturn(['errCode'=>0,'data' => getError(0)]);
+        }else{
+            $this->filesCom->M()->rollback();
+            $this->ajaxReturn(['errCode'=>111,'data' => getError(111)]);
+        }
+        // $this->filesCom->insert($insertData);
     }
 }

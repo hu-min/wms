@@ -91,6 +91,7 @@
                             <th>纯利</th>
                             <th>纯利率</th>
                             <th>项目阶段</th>
+                            <th>报价/成本</th>
                             <th>审批记录</th>
                             <th>状态</th>
                             <th>操作</th>
@@ -113,8 +114,47 @@
             <div class="modal-content"></div>
         </div>
     </div>
+    <div class="modal fade files-modal" aria-hidden="true" data-backdrop="static" >
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
     <!-- date-range-picker -->
     <script>
+        var  project_file_initInfo = function(){
+            upload({url:"{:U('Project/upload_filesAdd')}"})
+            $(tabId+" .files-modal").offon("click",".add-filecom",function(){
+                var fileCom = $(tabId+" .files-modal .demo").clone()
+                $(fileCom).removeClass("none demo");
+                $(fileCom).addClass("new-file");
+                $(tabId+" .files-modal .files-table").append(fileCom);
+            })
+        };
+        var project_file_getInfo = function(){
+            datas["reqType"] = "project_fileAdd"
+            datas["data"] = [];
+            
+            var project_id = $(tabId+" .files-modal .modal-info[name='project_id']").val()
+            datas["project_id"] = project_id
+            $(tabId+" .files-modal .files-table .new-file").each(function(){
+                var temp = {}
+                $(this).find(".modal-info").each(function(){
+                    var name = $(this).attr("name");
+                    var title = $(this).attr("title");
+                    var val = $(this).val();
+                    if(val != ""){
+                        temp[name] = val
+                    }
+                })
+                if(temp["file_path"]!=undefined){
+                    datas["data"].push(temp);
+                }
+            })
+            if(JSON.stringify(datas["data"])=="[]"){
+                notice(110,"没有添加任何文件","输入异常");
+                throw "没有添加任何文件";
+            }
+        };
         $(function(){
             init_chosen("{$url}","getOptionList",".search-body");
             // upload({url:"{:U('Project/upload_filesAdd')}"})

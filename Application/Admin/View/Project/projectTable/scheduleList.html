@@ -11,5 +11,8 @@
         <td>{$item['leader_name']}</td>
         <td>{$item['earlier_users']}</td>
         <td>{$item['stage_name']}</td>
+        <td  class="status-con"  data-con="project_file" data-id="{$item['projectId']}" data-url="{$url}">
+            <button type="button" data-gettype="leader"" data-toggle="modal" data-vtarget=".files-modal" class="btn btn-xs btn-info v-showmodal">查看</button>
+        </td>
     </tr>
 </volist>
