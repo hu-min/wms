@@ -162,7 +162,7 @@
             $(tabId+" .modal-info[name='finanAccount']").find("option[value='"+info['finanAccount']+"']").prop("selected",true);
             //$(tabId+" .global-modal .modal-content .chosen-select").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true})
             //init_date();
-            ['id','toObject','content','startDate','endDate','fee','payment','noPayment','payTime','remark','detail_file'].forEach(element => {
+            ['id','toObject','content','startDate','endDate','fee','payment','noPayment','payTime','remark','detail_file',"status"].forEach(element => {
                 $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
             });
             set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"),info,"{$Think.session.userId}","{$nodeAuth}");

@@ -312,13 +312,22 @@ class FinanceController extends BaseController{
             if(isset($datas['remark'])){
                 $data['remark']=$datas['remark'];
             }
-            if(isset($datas['status'])){
-                $parameter=[
-                    'where'=>["id"=>$id],
-                ];
-                $result=$this->fixExpenCom->getList($parameter,true);
-                $data = $this->status_update($result,$datas["status"],$data);
+            if(isset($datas['remark'])){
+                $data['remark']=$datas['remark'];
             }
+            if(isset($datas['detail_file'])){
+                $data['detail_file']=$datas['detail_file'];
+            }
+            if(isset($datas['status'])){
+                $data['status']=$datas['status'];
+            }
+            // if(isset($datas['status'])){
+            //     $parameter=[
+            //         'where'=>["id"=>$id],
+            //     ];
+            //     $result=$this->fixExpenCom->getList($parameter,true);
+            //     $data = $this->status_update($result,$datas["status"],$data);
+            // }
             return ["where"=>$where,"data"=>$data];
         }
         return "";
