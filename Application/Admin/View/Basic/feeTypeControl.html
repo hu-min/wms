@@ -24,9 +24,9 @@
                     <i class="fa fa-plus-square"></i>
                     <h4 class="box-title">费用类别列表</h4>
                     <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 2">
-                        <div class="form-group">
-                            <button type="button" data-gettype="Add" data-toggle="modal" data-url="{$url}"  data-vtarget=".global-modal" data-con="{$controlName}" class="btn margin pull-right btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 新建费用类别</button>
-                        </div>
+                        <!-- <div class="form-group"> -->
+                            <button type="button" data-gettype="Add" data-toggle="modal" data-url="{$url}"  data-vtarget=".global-modal" data-con="{$controlName}" class="btn margin  btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 新建费用类别</button>
+                        <!-- </div> -->
                     </if>
                 </div>
                 <div class='box-body'>
@@ -41,11 +41,13 @@
                             <span class="tree-minus handle" data-id="#feeTypetree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
                         </div>
                     </div>
-                    <div class="col-sm-4">
-                        <div id="feeTypetree"></div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div id="feeTypetree"></div>
+                        </div>
                     </div>
-                    <div class="box-footer">
-                    </div>
+                    <!-- <div class="box-footer">
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -68,7 +70,8 @@
             return tree;
         }
         function basic_feeType_initInfo(){
-            init_chosen("{$url}","",".global-modal");
+            // init_chosen("{$url}","",".global-modal");
+            init_chosen("{$url}","",$(tabId+" .global-modal .modal-info[name='pId']").parent());
         }
          //生成费用类别树和费用类别树选中的事件
          function createfeeTypeTree(){
@@ -84,22 +87,38 @@
                 datas.con = con
                 datas.reqType = datas.con+"_modalOne"
                 get("{$url}",datas,function(result){
-                    // console.log(result)
                     if(result.errCode==0){
                         $(tabId+" .global-modal .modal-content").html(result.html);
-                        $(tabId+" .global-modal").modal('toggle')
-                        $(tabId+" .modal-info[name='name']").val(result.data['name']);
-                        $(tabId+" .modal-info[name='alias']").val(result.data['alias']);
-                        $(tabId+" .modal-info[name='basicId']").val(result.data['basicId']);
-                        $(tabId+" .modal-info[name='remark']").val(result.data['remark']);
-                        $(tabId+" .modal-info[name='pId']").find("option[value='"+result.data['pId']+"']").prop("selected",true);
+                        $(tabId+" .global-modal").modal('toggle');
+                        ['name','alias','remark','pId','basicId',"level"].forEach(element => {
+                            $(tabId+" .global-modal .modal-info[name='"+element+"']").val(result.data[element]);
+                        });
                         $(tabId+" .modal-info[name='pId']").trigger('chosen:updated');
-                        // if(gettype=="Edit"){
-                        //     if(fun_is_exits(con+"_setInfo")){
-                        //         eval(con+"_setInfo(result.data)");//对不同的模块设置不同的响应数据
-                        //     }
-                        // }
+                        if(result.data["limits"]){
+                            result.data["limits"].forEach(ele =>{
+                                var regionLimit = $(tabId+" .regLimit-table .demo").clone()
+                                $(regionLimit).removeClass("none demo");
+                                var option = ""
+                                JSON.parse(ele.alias).forEach(opt => {
+                                    option += "<option value='"+opt[0]+"' selected>"+opt[1]+"</option>"
+                                });
+                                
+                                regionLimit.find(".chosen-select[name='province']").data("cname","city"+ele.basicId)
+                                regionLimit.find(".chosen-select[name='province']").attr("name","province"+ele.basicId)
+
+                                regionLimit.find(".chosen-select[name='city']").data("pname","province"+ele.basicId)
+                                regionLimit.find(".chosen-select[name='city']").attr("name","city"+ele.basicId)
+
+                                regionLimit.find(".modal-info[name='regions']").append(option);
+                                regionLimit.find(".modal-info[name='limitId']").val(ele.basicId);
+                                regionLimit.find(".modal-info[name='limit_money']").val(ele.remark)
+                                $(tabId+" .global-modal .regLimit-table").append(regionLimit);
+                            })
+                        }
+                        init_chosen("{$url}","",$(tabId+" .regLimit-table .demo").siblings());
+                        init_chosen("{$url}","",$(tabId+" .global-modal .modal-info[name='pId']").parent());
                     }
+
                 })
                 // $(tabId+" #modal-feeTypeInfo h4").text("费用类别编辑");
                 // $(tabId+" #modal-feeTypeInfo .save-info").data("reqtype","Edit");
@@ -121,6 +140,35 @@
                 
             })
         }
+        var basic_feeType_getInfo = function(){
+            datas["data"] = {};
+            ['name','alias','remark','pId','basicId'].forEach(element => {
+                datas["data"][element] = $(tabId+" .global-modal .modal-info[name='"+element+"']").val();
+            });
+            datas["data"]["region"] = [];
+            $(tabId+" .global-modal .regLimit-table .demo").siblings().each(function(){
+                var temp ={};
+                $(this).find(".modal-info").each(function(){
+                    var name = $(this).attr("name");
+                    var val = $(this).val();
+                    temp[name] = val
+                });
+                if(temp.regions !=""){
+                    temp["regionStr"] = [];
+                    $(this).find(".modal-info[name='regions']").find("option:selected").each(function(){
+                        temp["regionStr"].push([$(this).val(),$(this).text()]);
+                    })
+                    // var regionStr = $(this).find(".modal-info[name='regions']").find("option:selected").text();
+                    // console.log(regionStr)
+                    // temp["regionStr"]
+                }
+                if(temp.regions !=""  && temp.limit_money != "" && temp.limit_money > 0){
+                    datas["data"]["region"].push(temp);
+                    temp = {}
+                }
+            });
+        }
+
         $(function(){
             createfeeTypeTree()
             $(tabId+" .search-list").trigger("click");
@@ -144,7 +192,31 @@
                 $(tabId+" #feeTypePid").trigger('chosen:updated');
                 $(tabId+" .status-btn").removeClass("active");
                 $(tabId+" .status-btn[name='1']").addClass("active");
-            })
+            });
+
+            $(tabId).offon("click",".add-region",function(){
+                var rows=$(tabId+" .global-modal .regLimit-table tr").length;
+                var regionLimit = $(tabId+" .regLimit-table .demo").clone()
+                $(regionLimit).removeClass("none demo");
+                $(regionLimit).addClass("new-region");
+                $(tabId+" .global-modal .regLimit-table").append(regionLimit);
+                init_chosen("{$url}","getProjectOne",$(tabId+" .global-modal .regLimit-table tr").eq(rows));
+            });
+
+            $(tabId+" .global-modal").offon("change",".chosen-select[name='city']",function(){
+                var cityId = $(this).val();
+                var cityName = $(this).find("option:selected").text();
+                if(cityId>0 && cityId!=""){
+                    var region = $(this).parents("tr").find(".chosen-select[name='regions']");
+                    if(region.find("option[value='"+cityId+"']").length==0){
+                        var option = "<option value='"+cityId+"' selected>"+cityName+"</option>"
+                        region.append(option);
+                        region.trigger("chosen:updated");
+                    }
+                }
+                
+                // console.log(cityId+cityName)
+            });
         })
         //初始化父费用类别的select数据
         // function intPfeeTypeSelect(data){

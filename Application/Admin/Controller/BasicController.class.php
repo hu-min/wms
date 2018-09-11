@@ -673,12 +673,18 @@ class BasicController extends BaseController{
         $gettype = I("gettype");
         $resultData=[];
         $id = I("id");
-        
+        $this->assign("provinceArr",$this->basicCom->get_provinces());
         if($gettype=="Edit"){
             $title = "编辑费用类型";
             $btnTitle = "保存数据";
             $redisName="feeTypeList";
             $resultData=$this->basicCom->redis_one($redisName,"basicId",$id);
+            $param = [
+                "where" => ['class'=> 'regLimit','pId'=> $id,]
+            ];
+            $limitRes = $this->basicCom->getList($param);
+            // print_r($limitRes);exit;
+            $resultData["limits"] = $limitRes["list"];
         }
         $modalPara=[
             "data"=>$resultData,
@@ -769,25 +775,16 @@ class BasicController extends BaseController{
         $datas['level']=$feeTypePInfo['level']?($feeTypePInfo['level']+1):1;
         if($reqType=="basic_feeTypeAdd"){
             $datas['class']="feeType";
+            $datas['status']="1";
             unset($datas['basicId']);
             return $datas;
         }else if($reqType=="basic_feeTypeEdit"){
             $where=["basicId"=>$datas['basicId']];
             $data=[];
-            if(isset($datas['name'])){
-                $data['name']=$datas['name'];
-            }
-            if(isset($datas['alias'])){
-                $data['alias']=$datas['alias'];
-            }
-            if(isset($datas['remark'])){
-                $data['remark']=$datas['remark'];
-            }
-            if(isset($datas['pId'])){
-                $data['pId']=$datas['pId'];
-            }
-            if(isset($datas['level'])){
-                $data['level']=$datas['level'];
+            foreach (['name','alias','remark','pId','level',] as $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
             }
             return ["where"=>$where,"data"=>$data];
         }
@@ -795,17 +792,79 @@ class BasicController extends BaseController{
     }
     function basic_feeTypeAdd(){
         $feeTypeInfo=$this->manageFeeTypeInfo();
+        $region = $feeTypeInfo["region"];
+        $all = count($region);
+        $num = 0;
+        unset($feeTypeInfo["region"]);
         if($feeTypeInfo){
+            $this->basicCom->M()->startTrans();
             $insertResult=$this->basicCom->insertBasic($feeTypeInfo);
             if($insertResult && $insertResult->errCode==0){
-                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+                foreach ($region as $regInfo) {
+                    $param = [
+                        'class'=> 'regLimit',
+                        'name'=> implode(",",$regInfo["regions"]),
+                        'alias'=> json_encode($regInfo["regionStr"],JSON_UNESCAPED_UNICODE),
+                        'pId'=> $insertResult->data,
+                        'remark'=> $regInfo["limit_money"],
+                        'status'=> 1,
+                    ];
+                    $limitRes = $this->basicCom->insert($param);
+                    if(isset($limitRes->errCode) && $limitRes->errCode == 0){
+                        $num ++;
+                    }
+                }
+                if($num>0 && $num == $all){
+                    $this->basicCom->M()->commit();
+                    $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+                }
+                
             }
+            $this->basicCom->M()->rollback();
         }
         $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
     } 
     function basic_feeTypeEdit(){
+        $datas = I("data");
+        $region = $datas["region"];
+        $all = count($region);
+        $num = 0;
+        $this->basicCom->M()->startTrans();
+
         $feeTypeInfo=$this->manageFeeTypeInfo();
         $updateResult=$this->basicCom->updateBasic($feeTypeInfo);
+        foreach ($region as $regInfo) {
+            if($regInfo["limitId"]>0){
+                $param = [
+                    "where"=> $updateResult["where"],
+                    "data" =>[
+                        'name'=> implode(",",$regInfo["regions"]),
+                        'alias'=> json_encode($regInfo["regionStr"],JSON_UNESCAPED_UNICODE),
+                        'remark'=> $regInfo["limit_money"],
+                    ],
+                ];
+                $limitRes = $this->basicCom->update($param);
+            }else{
+                $param = [
+                    'class'=> 'regLimit',
+                    'name'=> implode(",",$regInfo["regions"]),
+                    'alias'=> json_encode($regInfo["regionStr"],JSON_UNESCAPED_UNICODE),
+                    'pId'=> $feeTypeInfo["where"]["basicId"],
+                    'remark'=> $regInfo["limit_money"],
+                    'status'=> 1,
+                ];
+                $limitRes = $this->basicCom->insert($param);
+            }
+            
+            if(isset($limitRes->errCode) && $limitRes->errCode == 0){
+                $num ++;
+            }
+        }
+        if($num>0 && $num == $all){
+            $this->basicCom->M()->commit();
+            $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+        }
+        $this->basicCom->M()->rollback();
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
     /** 
