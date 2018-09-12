@@ -279,48 +279,12 @@ class FinanceController extends BaseController{
             $where=["id"=>$datas['id']];
             $data=[];
             $data['updateTime']=time();
-            if(isset($datas['expenClas'])){
-                $data['expenClas']=$datas['expenClas'];
+            foreach (['expenClas','finanAccount','toObject','content','startDate','endDate','fee','payment','noPayment','payTime','remark','detail_file','status'] as $key ) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
             }
-            if(isset($datas['finanAccount'])){
-                $data['finanAccount']=$datas['finanAccount'];
-            }
-            if(isset($datas['toObject'])){
-                $data['toObject']=$datas['toObject'];
-            }
-            if(isset($datas['content'])){
-                $data['content']=$datas['content'];
-            }
-            if(isset($datas['startDate'])){
-                $data['startDate']= $datas['startDate'];
-            }
-            if(isset($datas['endDate'])){
-                $data['endDate']=$datas['endDate'];
-            }
-            if(isset($datas['fee'])){
-                $data['fee']=$datas['fee'];
-            }
-            if(isset($datas['payment'])){
-                $data['payment']=$datas['payment'];
-            }
-            if(isset($datas['noPayment'])){
-                $data['noPayment']=$datas['noPayment'];
-            }
-            if(isset($datas['payTime'])){
-                $data['payTime']=$datas['payTime'];
-            }
-            if(isset($datas['remark'])){
-                $data['remark']=$datas['remark'];
-            }
-            if(isset($datas['remark'])){
-                $data['remark']=$datas['remark'];
-            }
-            if(isset($datas['detail_file'])){
-                $data['detail_file']=$datas['detail_file'];
-            }
-            if(isset($datas['status'])){
-                $data['status']=$datas['status'];
-            }
+           
             // if(isset($datas['status'])){
             //     $parameter=[
             //         'where'=>["id"=>$id],

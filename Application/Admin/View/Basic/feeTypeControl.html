@@ -203,7 +203,7 @@
                 init_chosen("{$url}","getProjectOne",$(tabId+" .global-modal .regLimit-table tr").eq(rows));
             });
 
-            $(tabId+" .global-modal").offon("change",".chosen-select[name='city']",function(){
+            $(tabId+" .global-modal").offon("change",".chosen-select[name^='city']",function(){
                 var cityId = $(this).val();
                 var cityName = $(this).find("option:selected").text();
                 if(cityId>0 && cityId!=""){
@@ -214,8 +214,6 @@
                         region.trigger("chosen:updated");
                     }
                 }
-                
-                // console.log(cityId+cityName)
             });
         })
         //初始化父费用类别的select数据

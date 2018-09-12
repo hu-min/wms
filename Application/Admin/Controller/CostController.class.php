@@ -107,7 +107,6 @@ class CostController extends BaseController{
         ];
         $option='<option value="0">费用类别</option>';
         foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
-            // print_r($value);
             $option.=A("Basic")->getfeeType($value,0);
         }
         $this->assign("pidoption",$option);
@@ -315,7 +314,13 @@ class CostController extends BaseController{
         $gettype = I("gettype");
         $resultData=[];
         $id = I("id");
-        
+        $this->assign("provinceArr",$this->basicCom->get_provinces());
+        $option='<option value="0">费用类别</option>';
+        foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
+            $option.=A("Basic")->getfeeType($value,0);
+        }
+        $this->assign("pidoption",$option);
+
         if($gettype=="Edit"){
             $title = "编辑报销";
             $btnTitle = "保存数据";
@@ -324,8 +329,13 @@ class CostController extends BaseController{
         }
         if($resultData){
             $resultData["tableData"] = [];
-            $resultData["tableData"]["expense-list"] = ["list"=>$this->expenseSubCom->getList(["where"=>["parent_id"=>$id],"fields"=>"*,FROM_UNIXTIME(happen_date,'%Y-%m-%d') happen_date"])["list"],"template"=>$this->fetch('Cost/costTable/expenseLi')];
+            $subExpRes = $this->expenseSubCom->getList(["where"=>["parent_id"=>$id],"fields"=>"*,FROM_UNIXTIME(happen_date,'%Y-%m-%d') happen_date",'joins'=>["LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct ON ct.ctid = city",]])["list"];
+            foreach ($subExpRes as $key => $subInfo) {
+                $subExpRes[$key]["citys"] = $this->basicCom->get_citys($subInfo["cpid"]);
+            }
+            $resultData["tableData"]["expense-list"] = ["list"=>$subExpRes,"template"=>$this->fetch('Cost/costTable/expenseLi')];
         }
+        
         $modalPara=[
             "data"=>$resultData,
             "title"=>$title,
@@ -376,7 +386,7 @@ class CostController extends BaseController{
             $where=["id"=>$datas['id']];
             $data=[];
             $data['updateTime']=time();
-            foreach (["id","account","account_type","cost_desc","expen_vouch_type","expense_type","happen_date","money","remark","vouch_file","status"] as $key) {
+            foreach (["id","account","account_type","cost_desc","expen_vouch_type","expense_type","happen_date","money","remark","vouch_file","fee_type","city","status"] as $key) {
                 if(isset($datas[$key])){
                     $data[$key] = $datas[$key];
                 } 
@@ -483,6 +493,33 @@ class CostController extends BaseController{
         }
         $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
     }
+    function feeLimitOne(){
+        $datas = I("data");
+        // print_r($datas);
+        if($datas['feeType']>0){
+            $param = [
+                'where' => ["basicId"=>$datas['feeType']],
+            ];
+            $feeRes = $this->basicCom->getOne($param)['list'];
+            $baseLimit = $feeRes['remark'];
+            $where = ["class"=>'regLimit','pId'=>$datas['feeType']];
+            if($datas['city']){
+                $where['_string'] = "FIND_IN_SET({$datas['city']},name)";
+            }
+            $param = [
+                'where' => $where,
+                'fields' => 'remark limit_money',
+            ];
+            $reLimit = $this->basicCom->getOne($param)['list']['limit_money'];
+            $limit_money = $reLimit > 0 ? $reLimit : $baseLimit;
+            if($datas['money']>$limit_money && $limit_money > 0){
+                $this->ajaxReturn(['errCode'=>100,'error'=>$feeRes['name'].'报销金额不能超过'.$limit_money,'data'=>['limit_money'=>$limit_money]]);
+            }else{
+                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+            }
+        }
+        $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+    }
     //个人报销结束
     //财务报销管理开始
     function fin_expenseControl(){
@@ -585,7 +622,12 @@ class CostController extends BaseController{
     }
     function getExpenseLiOne(){
         $rows = I("rows");
-
+        $this->assign("provinceArr",$this->basicCom->get_provinces());
+        $option='<option value="0">费用类别</option>';
+        foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
+            $option.=A("Basic")->getfeeType($value,0);
+        }
+        $this->assign("pidoption",$option);
         $this->assign('rows',$rows);
         $html=$this->fetch('Cost/costTable/expenseLi');
         $this->ajaxReturn(['html'=>$html]);

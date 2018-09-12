@@ -814,7 +814,7 @@ class BasicController extends BaseController{
                         $num ++;
                     }
                 }
-                if($num>0 && $num == $all){
+                if(($num>0 && $num == $all) || ($all==0 && $updateResult->errCode==0)){
                     $this->basicCom->M()->commit();
                     $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
                 }
@@ -860,7 +860,7 @@ class BasicController extends BaseController{
                 $num ++;
             }
         }
-        if($num>0 && $num == $all){
+        if(($num>0 && $num == $all) || ($all==0 && $updateResult->errCode==0)){
             $this->basicCom->M()->commit();
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
         }
@@ -1113,9 +1113,7 @@ class BasicController extends BaseController{
     }
     //固定支出分类结束
 
-    function getCityList(){
-        $this->ajaxReturn(["data"=>A("Project")->_getOption("city")]);
-    }
+    
     //报销类别开始
     /** 
      * @Author: vition 

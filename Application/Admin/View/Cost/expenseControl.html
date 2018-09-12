@@ -121,7 +121,7 @@
         }
         function expense_setInfo(info){
             // console.log(info)
-            ["project_id","code","project_name","project_date","business_name","leader_name","all_money"].forEach(element=>{
+            ["project_id","code","project_name","project_date","business_name","leader_name","all_money","city"].forEach(element=>{
                 if(element == "project_id"){
                     var projectChosen= $(tabId+" .chosen-select[name='project_id']");
                     var projectId = info["projectId"];
@@ -131,7 +131,7 @@
                 }
                 $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
             });
-            ["id","debit_money","free_type","require_date","account_type","account","invoice_money","debit_cause","leader"].forEach(element=>{
+            ["id","debit_money","fee_type","require_date","account_type","account","invoice_money","debit_cause","leader"].forEach(element=>{
                 if(info[element]!="" || info[element]!="0"){
                     $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
                 }
@@ -146,6 +146,17 @@
                         }
                         $current.find("td[name='"+key+"']").text(statusType[status]);
                         $current.find(".modal-info[name='"+key+"']").val(listData[key]);
+                    }else  if(key == "city"){
+                        // console.log(listData)
+                        // console.log($(tabId+" .expense-list .chosen-select[name='province']"))
+                        $current.find(".chosen-select[name='province']").find("option[value='"+listData["cpid"]+"']").prop("selected",true)
+ 
+                        var city_optoin = '<option value="">城市</option>'
+                        listData["citys"].forEach(city => {
+                            city_optoin+='<option value="'+city["cid"]+'">'+city["city"]+'</option>'
+                        });
+                        $current.find(".chosen-select[name='city']").html(city_optoin);
+                        $current.find(".chosen-select[name='city']").find("option[value='"+listData['city']+"']").prop("selected",true);
                     }else{
                         if(key == "id"){
                             $current.find(".approve-group").data("id",listData[key])
@@ -189,7 +200,7 @@
             //     }
             // });
         }
-        function expense_getInfo(){
+        var expense_getInfo = function (){
             var expense_id = $(tabId+" .expense-id[name='id']").val();
             var status = $(tabId+" .modal-info[name='status']").val();
             var project_id = $(tabId+" .modal-info[name='project_id']").val();
@@ -224,6 +235,27 @@
                     }
                 })
             });
+        }
+        var feeLimit = function(self) {
+            var city = self.find(".modal-info[name='city']").val()
+            var feeType = self.find(".modal-info[name='fee_type']").val()
+            var money = self.find(".modal-info[name='money']").val()
+            datas["data"] = {city:city,feeType:feeType,money:money};
+            datas["reqType"] = "feeLimitOne";
+            get("{$url}",datas,function(result){
+                if(result.errCode!=0){
+                    notice(result.errCode,result.error,"输入异常");
+                    self.find(".modal-info[name='money']").val(result.data.limit_money)
+                }
+                sum_expense_money();
+            })
+        }
+        var sum_expense_money = function(){
+            var all_money = 0;
+            $(tabId+" .global-modal").find(".modal-info[name='money']").each(function(){
+                all_money += float($(this).val());
+            })
+            $(tabId+" .global-modal").find(".project-info[name='all_money']").val(all_money);
         }
         $(function(){
             $(tabId+" .search-list").trigger("click");
@@ -264,11 +296,10 @@
             });
 
             $(tabId+" .global-modal").on("input",".modal-info[name='money']",function(){
-                var all_money = 0;
-                $(tabId+" .global-modal").find(".modal-info[name='money']").each(function(){
-                    all_money += float($(this).val());
-                })
-                $(tabId+" .global-modal").find(".project-info[name='all_money']").val(all_money);
+                sum_expense_money();
+            })
+            $(tabId+" .global-modal").on("change",".modal-info[name='city'],.modal-info[name='fee_type'],.modal-info[name='money']",function(){
+                feeLimit($(this).parents("tr"))
             })
         })
     </script>

@@ -20,6 +20,26 @@
             </volist>
         </select>
     </td>
+    <td style="width: 250px;">
+        <div style="display:inline-block">
+            <select class="form-control chosen-select" title="项目省份" name="province" data-cname="city">
+                <option value="">省份</option>
+                <volist name="provinceArr" id="item">
+                    <option value="{$item['pid']}">{$item['province']}</option>
+                </volist>
+            </select>
+        </div>
+        <div style="display:inline-block">
+            <select class="form-control chosen-select modal-info" data-req="getCityList" data-value="cid"  data-text="city" data-noupdate="true" data-pname="province" title="城市" name="city">
+            <option value="">城市</option>
+        </select>
+        </div>
+    </td>
+    <td style="width: 160px;">
+        <select class="form-control modal-info chosen-select" required="required" title="费用类别"  name="fee_type" >
+            {$pidoption}
+        </select>
+    </td>
     <td>
         <input class="form-control modal-info input-sm"  name="cost_desc" title="费用说明"  value="" placeholder="费用说明" type="text">
     </td>

@@ -380,6 +380,14 @@ class BaseController extends \Common\Controller\BaseController{
     }
     /** 
      * @Author: vition 
+     * @Date: 2018-09-12 09:32:09 
+     * @Desc: 获取城市 
+     */    
+    function getCityList(){
+        $this->ajaxReturn(["data"=>A("Project")->_getOption("city")]);
+    }
+    /** 
+     * @Author: vition 
      * @Date: 2018-06-03 14:28:59 
      * @Desc: 返回表格和分页数据 
      */    
