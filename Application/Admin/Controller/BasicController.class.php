@@ -814,7 +814,7 @@ class BasicController extends BaseController{
                         $num ++;
                     }
                 }
-                if(($num>0 && $num == $all) || ($all==0 && $updateResult->errCode==0)){
+                if(($num>0 && $num == $all) || ($updateResult->errCode==0)){
                     $this->basicCom->M()->commit();
                     $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
                 }
@@ -832,11 +832,12 @@ class BasicController extends BaseController{
         $this->basicCom->M()->startTrans();
 
         $feeTypeInfo=$this->manageFeeTypeInfo();
+        // print_r($feeTypeInfo);
         $updateResult=$this->basicCom->updateBasic($feeTypeInfo);
         foreach ($region as $regInfo) {
             if($regInfo["limitId"]>0){
                 $param = [
-                    "where"=> $updateResult["where"],
+                    "where"=> ["basicId"=>$regInfo["limitId"]],
                     "data" =>[
                         'name'=> implode(",",$regInfo["regions"]),
                         'alias'=> json_encode($regInfo["regionStr"],JSON_UNESCAPED_UNICODE),
@@ -860,7 +861,7 @@ class BasicController extends BaseController{
                 $num ++;
             }
         }
-        if(($num>0 && $num == $all) || ($all==0 && $updateResult->errCode==0)){
+        if(($num>0 && $num == $all) || ($updateResult->errCode==0)){
             $this->basicCom->M()->commit();
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
         }
