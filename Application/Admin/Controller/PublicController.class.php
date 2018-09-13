@@ -100,6 +100,9 @@ class PublicController extends BaseController{
         $userRes = $this->userCom->getOne($param);
         if($userRes){
             $updateData=[];
+            if(isset($datas['avatar'])){
+                $updateData['avatar'] =  $datas['avatar'];
+            }
             foreach (['seniorPassword','password'] as $key) {
                 if(isset($datas[$key] )){
                     $updateData[$key] =  sha1(sha1($datas[$key]));
