@@ -91,7 +91,7 @@ class PublicController extends BaseController{
     function seniorOne(){
         $datas = I('data');
         $senior = I('senior');
-        $datas['birthday'] = strtotime($datas['birthday']);
+        // $datas['birthday'] = strtotime($datas['birthday']);
         // echo $senior;
         $param = [
             'where' => ['seniorPassword'=>sha1(sha1($senior)),'userId'=>session('userId')],
@@ -111,6 +111,16 @@ class PublicController extends BaseController{
             $updateRes = $this->userCom->update(["where"=>['userId'=>session('userId')],"data"=>$updateData]);
 
             if(isset($updateRes->errCode) && $updateRes->errCode == 0){
+                $parArray=[
+                    'where'=>['userId'=>session('userId')],
+                    'fields'=>'*',
+                    'joins'=>[
+                        'LEFT JOIN (SELECT roleId role_id ,rolePid,roleName FROM v_role) r ON r.role_id = roleId',
+                        'LEFT JOIN (SELECT roleId role_pid ,roleName rolePName FROM v_role) rp ON rp.role_pid = r.rolePid',
+                    ],
+                ];
+                $userInfo = $this->userCom->getOne($parArray)['list'];
+                $this->setLogin($userInfo);
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
             $this->ajaxReturn(['errCode'=>$updateRes->errCode,'error'=>getError($updateRes->errCode)]);
