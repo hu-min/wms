@@ -99,24 +99,15 @@ class PublicController extends BaseController{
         ];
         $userRes = $this->userCom->getOne($param);
         if($userRes){
+            $updateData=[];
             foreach (['seniorPassword','password'] as $key) {
                 if(isset($datas[$key] )){
-                    $datas[$key] =  sha1(sha1($datas[$key]));
+                    $updateData[$key] =  sha1(sha1($datas[$key]));
                 }
             }
-            $updateRes = $this->userCom->update(["where"=>['userId'=>session('userId')],"data"=>$datas]);
+            $updateRes = $this->userCom->update(["where"=>['userId'=>session('userId')],"data"=>$updateData]);
 
             if(isset($updateRes->errCode) && $updateRes->errCode == 0){
-                $parArray=[
-                    'where'=>['userId'=>session('userId')],
-                    'fields'=>'*',
-                    'joins'=>[
-                        'LEFT JOIN (SELECT roleId role_id ,rolePid,roleName FROM v_role) r ON r.role_id = roleId',
-                        'LEFT JOIN (SELECT roleId role_pid ,roleName rolePName FROM v_role) rp ON rp.role_pid = r.rolePid',
-                    ],
-                ];
-                $userInfo = $this->userCom->getOne($parArray)['list'];
-                $this->setLogin($userInfo);
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
             $this->ajaxReturn(['errCode'=>$updateRes->errCode,'error'=>getError($updateRes->errCode)]);

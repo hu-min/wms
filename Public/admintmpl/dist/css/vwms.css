@@ -171,3 +171,8 @@ td > .approve-group > button{
 .pagination-sm > li > a{
 	padding:2px 8px;
 }
+.fill-blank{
+	border: none;
+	background: none!important;
+	border-bottom: 1px solid #999;
+}

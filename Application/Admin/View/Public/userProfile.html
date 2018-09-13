@@ -60,79 +60,34 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label >登录密码：</label>
-                                        <input class="form-control modal-info" autocomplete="off" required="required" title="请输入密码" name="password" placeholder="******" type="password">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label >二级密码：</label>
-                                        <input class="form-control modal-info"  title="二级密码" name="seniorPassword" placeholder="初始密码和登录密码一致" type="password">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label >手机号码：</label>
-                                        <input class="form-control modal-info"  title="手机号码" name="phone" value="{$Think.session.userInfo.phone}" placeholder="手机号码" type="text">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="info-title">生日：</label>
-                                        <div class="input-group date">
-                                            <div class="input-group-addon">
-                                                <i class="fa fa-birthday-cake"></i>
-                                            </div>
-                                            <if condition="$Think.session.userInfo.birthday gt 0">
-                                                <input class="form-control pull-right date-input modal-info" value=" {$Think.session.userInfo.birthday|date='Y-m-d',###}" name="birthday" type="text">
-                                            <else/>
-                                                <input class="form-control pull-right date-input modal-info" name="birthday" type="text">
-                                            </if>
-                                            
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
                                         <label >性别：</label>
-                                        <select class="form-control modal-info" required="required" title="请选择性别" name="gender" >
+                                        <!-- <select class="form-control modal-info" disabled="disabled" title="请选择性别" name="gender" > -->
                                             <if condition="$Think.session.userInfo.gender eq 1">
-                                                <option value="1" selected>男性</option>
-                                                <option value="2">女性</option>
+                                                <input class="form-control fill-blank" value="男性" disabled="disabled" name="gender" type="text">
                                             <else/>
-                                                <option value="1">男性</option>
-                                                <option value="2" selected>女性</option>
+                                                <input class="form-control fill-blank" value="女性" disabled="disabled" name="gender" type="text">
                                             </if>
-                                            
-                                        </select>
+                                        <!-- </select> -->
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label >身份证：</label>
-                                        <input class="form-control modal-info" name="id_card" title="请输入身份证" value="{$Think.session.userInfo.id_card}" placeholder="身份证号码" type="text">
+                                        <input class="form-control fill-blank" name="id_card" disabled="disabled" title="请输入身份证" value="{$Think.session.userInfo.id_card}" placeholder="身份证号码" type="text">
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label >电子邮箱：</label>
-                                        <input class="form-control modal-info" name="email" title="请输入电子邮箱" value="{$Think.session.userInfo.email}" placeholder="电子邮箱" type="text">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
                                         <label >开户行名称：</label>
-                                        <input class="form-control modal-info" name="bank_name" title="请输入开户行名称" value="{$Think.session.userInfo.bank_name}" placeholder="开户行名称" type="text">
+                                        <input class="form-control fill-blank" name="bank_name" disabled="disabled" title="请输入开户行名称" value="{$Think.session.userInfo.bank_name}" placeholder="开户行名称" type="text">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label >银行卡号：</label>
-                                        <input class="form-control modal-info" name="bank_card" title="请输入银行卡号" value="{$Think.session.userInfo.bank_card}" placeholder="银行卡号" type="text">
+                                        <input class="form-control fill-blank" name="bank_card" disabled="disabled" title="请输入银行卡号" value="{$Think.session.userInfo.bank_card}" placeholder="银行卡号" type="text">
                                     </div>
                                 </div>
                             </div>
@@ -140,13 +95,27 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label >微信号：</label>
-                                        <input class="form-control modal-info" name="wechat" title="请输入微信号" value="{$Think.session.userInfo.wechat}" placeholder="微信号" type="text">
+                                        <input class="form-control fill-blank" name="wechat" disabled="disabled" title="请输入微信号" value="{$Think.session.userInfo.wechat}" placeholder="微信号" type="text">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label >支付宝账号：</label>
-                                        <input class="form-control modal-info" name="alipay" title="请输入支付宝账号" value="{$Think.session.userInfo.alipay}" placeholder="支付宝账号" type="text">
+                                        <input class="form-control fill-blank" name="alipay" disabled="disabled" title="请输入支付宝账号" value="{$Think.session.userInfo.alipay}" placeholder="支付宝账号" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label >登录密码：</label>
+                                        <input class="form-control modal-info" autocomplete="off" title="请输入密码" name="password" placeholder="******" type="password">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label >二级密码：</label>
+                                        <input class="form-control modal-info"  title="二级密码" name="seniorPassword" placeholder="初始密码和登录密码一致" type="password">
                                     </div>
                                 </div>
                             </div>
@@ -173,21 +142,21 @@
                 })
             }
             $(function(){
-                init_date();
+                // init_date();
                 upload({url:"{:U('User/upload_filesAdd')}",call:function(result){
                     $(tabId+" .profile-user-img").attr("src","/"+$(result).attr("name"));
                 }})
-                $(tabId+" .profile-user-img").on("click",function(){
+                $(tabId+" .profile-user-img").offon("click",function(){
                     $(tabId+" .upload-file").trigger("click");
                 })
-                $(tabId+" .show-confirm").on("click",function(){
+                $(tabId+" .show-confirm").offon("click",function(){
                     notice(100,'<div class="form-group"><input type="password" placeholder="输入二级密码" class="form-control input-sm senior-password" /></div><div class="form-group"><button type="button" class="btn btn-block btn-danger btn-sm save-userInfo">确认修改</button></div>',"安全提示！",0);
                     $("#v-notice-window").find(".senior-password").trigger('focus')
                 })
-                $("#v-notice-window").on("click",".save-userInfo",function(){
+                $("#v-notice-window").offon("click",".save-userInfo",function(){
                     submit_profile()
                 })
-                $("#v-notice-window").on("keydown",".senior-password",function(e){
+                $("#v-notice-window").offon("keydown",".senior-password",function(e){
                     if(e.keyCode == 13){
                         submit_profile()
                     }
