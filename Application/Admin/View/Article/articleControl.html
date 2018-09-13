@@ -104,7 +104,7 @@
             editor.create()
             editor.txt.html($(tabId+" .modal-info[name='content']").val())
             
-            $(tabId).on("blur",".art-editor div[id^='text']",function(){
+            $(tabId).offon("blur",".art-editor div[id^='text']",function(){
                 var editorContent=editor.txt.html()
                 $(tabId+" .modal-info[name='content']").val(editorContent)
             })
@@ -123,21 +123,6 @@
         $(function(){
             $(tabId+" .search-list").trigger("click");
         
-            // getArtClsTree();
-            //新增文章
-            // $(tabId+" .box-header button").on("click",function(){
-            //     $(tabId+" .modal-info").val("");
-            //     $(tabId+" #modal-artclass h4").text("新增文章");
-            //     $(tabId+" #modal-artclass .save-info").data("reqtype","Add");
-            //     $(tabId+" #modal-artclass .save-info").text("新增文章");
-            //     $(tabId+" .modal-dialog .artclass").find("option[value='0']").prop("selected",true);
-            //     $(tabId+" .modal-dialog .artclass").trigger('chosen:updated');
-            //     $(tabId+" .status-btn").removeClass("active");
-            //     $(tabId+" .status-btn[name='1']").addClass("active");
-            //     editor.txt.html("")
-            // })
-            // editor.customConfig.uploadImgShowBase64 = true
-            // editor.create()
         })
         function articleReFuns(){
 

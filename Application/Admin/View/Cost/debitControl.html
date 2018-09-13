@@ -152,6 +152,11 @@
                     })
                 }
             });
+            $(tabId+" .global-modal").on("change",".modal-info[name='account_type']",function(){
+                var accKey = $(this).val();
+                var accounts = JSON.parse('{$accounts}')
+                $(this).parents(".row").find(".modal-info[name='account']").val(accounts[accKey]);
+            })
         })
     </script>
 </body>

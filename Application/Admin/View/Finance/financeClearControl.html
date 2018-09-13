@@ -129,7 +129,7 @@
     <script>
         $(function(){
             $(tabId+" .search-list").trigger("click");
-            $(tabId+" .search-info[name='countype']").on("change",function(){
+            $(tabId+" .search-info[name='countype']").offon("change",function(){
                 $(tabId+" .data-table thead tr").removeClass("none");
                 $(tabId+" .data-table thead .count-model"+$(this).val()).siblings().addClass("none");
                 $(tabId+" .search-list").trigger("click");

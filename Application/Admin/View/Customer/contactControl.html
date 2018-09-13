@@ -105,7 +105,7 @@
             $(tabId+" .search-list").trigger("click");
 
             //新增联系人
-            $(tabId+" .box-header button").on("click",function(){
+            $(tabId+" .box-header button").offon("click",function(){
                 $(tabId+" .modal-info").val("");
                 $(tabId+" .status-btn").removeClass("active");
                 $(tabId+" .status-btn[name='0']").addClass("active");

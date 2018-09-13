@@ -295,11 +295,16 @@
                 })
             });
 
-            $(tabId+" .global-modal").on("input",".modal-info[name='money']",function(){
+            $(tabId+" .global-modal").offon("input",".modal-info[name='money']",function(){
                 sum_expense_money();
             })
-            $(tabId+" .global-modal").on("change",".modal-info[name='city'],.modal-info[name='fee_type'],.modal-info[name='money']",function(){
+            $(tabId+" .global-modal").offon("change",".modal-info[name='city'],.modal-info[name='fee_type'],.modal-info[name='money']",function(){
                 feeLimit($(this).parents("tr"))
+            })
+            $(tabId+" .global-modal").offon("change",".modal-info[name='account_type']",function(){
+                var accKey = $(this).val();
+                var accounts = JSON.parse('{$accounts}')
+                $(this).parents("tr").find(".modal-info[name='account']").val(accounts[accKey]);
             })
         })
     </script>

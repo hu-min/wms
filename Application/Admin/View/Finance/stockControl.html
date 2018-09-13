@@ -147,7 +147,7 @@
     <script>
         $(function(){
             $(tabId+" .search-list").trigger("click");
-            $(tabId+" .add-subcompany").on("click",function(){
+            $(tabId+" .add-subcompany").offon("click",function(){
                 var target = $(this).data("target");
                 if(target==".bankstock-tab"){
                     var dataClass="bank-info";
@@ -157,7 +157,7 @@
                 var tr="<tr><td><input class='form-control input-info "+dataClass+"' name='new"+Number($("."+dataClass).length+1)+"' placeholder='子公司名称' type='text' /></td><td><input class='form-control input-info' placeholder='库存金额' type='text' /><button type='button' class='close bank-remove'><span>×</span></button></td></tr>";
                 $(tabId+" ."+dataClass+"-count").before(tr);
             })
-            $(tabId+" .content").on("click"," .bank-remove",function(){
+            $(tabId+" .content").offon("click"," .bank-remove",function(){
                 
                 // console.log("a")
                 var thisTr = $(this).parents("tr");

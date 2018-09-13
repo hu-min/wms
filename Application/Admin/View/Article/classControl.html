@@ -72,7 +72,7 @@
          function createArtClassTree(){
             $(tabId+' #artClasstree').treeview({showButton: true,highlightSelected:false,data: getArtClassTree(),levels:1,color: "#428bca",});
             //文章分类编辑
-            $(tabId+' #artClasstree').on("click",'li button',function(){
+            $(tabId+' #artClasstree').offon("click",'li button',function(){
                 datas={}
                 var artClassData= $(tabId+' #artClasstree').treeview('getNode', $(this).parent(".node-artClasstree").data("nodeid"));
                 datas.id = artClassData.id;
@@ -101,7 +101,7 @@
         $(function(){
             createArtClassTree()
             //搜索文章分类
-            $(tabId+' .input-expand-feeType').on("input",function(){
+            $(tabId+' .input-expand-feeType').offon("input",function(){
                 $(tabId+' #artClasstree').treeview('collapseAll', { silent: true });
                 var prvefeeType=$('#artClasstree').treeview('search', [$(tabId+' .input-expand-feeType').val(), {
                     ignoreCase: false,     // case insensitive

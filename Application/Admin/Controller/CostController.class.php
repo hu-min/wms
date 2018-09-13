@@ -23,6 +23,7 @@ class CostController extends BaseController{
         $this->whiteCom=getComponent('White');
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
+        $this->accounts = ["2"=>session("userInfo.wechat"),"3"=>session("userInfo.alipay"),"4"=>session("userInfo.bank_card")];
     }
     /** 
      * @Author: vition 
@@ -52,6 +53,7 @@ class CostController extends BaseController{
         $nodeId = getTabId(I("vtabId"));
         $process = $this->nodeCom->getProcess($nodeId);
         $this->assign("place",$process["place"]);
+        $this->assign('accounts',json_encode($this->accounts));
 
         if($reqType){
             $this->$reqType();
@@ -302,6 +304,7 @@ class CostController extends BaseController{
         $this->assign('projectArr',$this->project->_getOption("project_id"));
         $this->assign('expTypeArr',$this->project->_getOption("expense_type"));
         $this->assign('expVouchType',$this->expVouchType);
+        $this->assign('accounts',json_encode($this->accounts));
         if($reqType){
             $this->$reqType();
         }else{

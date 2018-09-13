@@ -156,7 +156,7 @@
         $(function(){
             $(tabId+" .search-list").trigger("click");
         
-            $(tabId).on("change",".chosen-project[name='project_id']",function(){
+            $(tabId).offon("change",".chosen-project[name='project_id']",function(){
                 var project_id = $(this).val()
                 if(project_id==0){
                     $(tabId+" .project-info").val("");

@@ -121,7 +121,7 @@
             //     $(tabId+" .status-btn[name='0']").addClass("active");
             //     $(tabId+" .modal-info").prop("disabled",false)
             // })
-            $(tabId).on("change","select[name='provinceId']",function(){
+            $(tabId).offon("change","select[name='provinceId']",function(){
                 var provinceId=$(this).val()
                 var whereCity=$(this).data("city")
                 if(provinceId>0){

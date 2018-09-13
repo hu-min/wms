@@ -215,7 +215,7 @@
      
             $(tabId+" .search-list").trigger("click");
         
-            $(tabId).on("change",".chosen-project[name='cost_id']",function(){
+            $(tabId).offon("change",".chosen-project[name='cost_id']",function(){
                 var cost_id = $(this).val()
                 $(tabId+" .project-info").val("");
                 $(tabId+" .modal-info").val("");
@@ -239,24 +239,24 @@
                     })
                 }
             })
-            $(tabId).on("change",".modal-info[name='supplier_com']",function(){
+            $(tabId).offon("change",".modal-info[name='supplier_com']",function(){
                 var typename = $(this).find("option:selected").data("typename");
                 $(tabId+" .project-info[name='supplier_type']").val(typename)
             })
             //预付款计算比率
-            $(tabId+" .global-modal").on("input",".modal-info[name='advance']",function(){
+            $(tabId+" .global-modal").offon("input",".modal-info[name='advance']",function(){
                 compute($(this).attr("name"))
             })
             //比率计算预付款
-            $(tabId+" .global-modal").on("input",".modal-info[name='advance_ratio']",function(){
+            $(tabId+" .global-modal").offon("input",".modal-info[name='advance_ratio']",function(){
                 compute($(this).attr("name"))
             })
             //付款计算比率
-            $(tabId+" .global-modal").on("input",".modal-info[name='pay_amount']",function(){
+            $(tabId+" .global-modal").offon("input",".modal-info[name='pay_amount']",function(){
                 compute($(this).attr("name"))
             })
             //比率计算付款
-            $(tabId+" .global-modal").on("input",".modal-info[name='pay_ratio']",function(){
+            $(tabId+" .global-modal").offon("input",".modal-info[name='pay_ratio']",function(){
                 compute($(this).attr("name"))
             })         
         })

@@ -210,7 +210,7 @@
             updateList("getAppList")
             updateList("relItemList")
             updateList("lastLoginList")
-            $(tabId+" .refresh").on("click",function(){
+            $(tabId+" .refresh").offon("click",function(){
 				updateList($(this).attr("name"))
             })
         })

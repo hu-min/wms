@@ -77,7 +77,7 @@
          function createfeeTypeTree(){
             $(tabId+' #feeTypetree').treeview({showButton: true,highlightSelected:false,data: getfeeTypeTree(),levels:1,color: "#428bca",});
             //费用类别编辑
-            $(tabId+' #feeTypetree').on("click",'li button',function(){
+            $(tabId+' #feeTypetree').offon("click",'li button',function(){
                 datas={}
                 var feeTypeData= $(tabId+' #feeTypetree').treeview('getNode', $(this).parent(".node-feeTypetree").data("nodeid"));
                 datas.id = feeTypeData.id;
@@ -173,7 +173,7 @@
             createfeeTypeTree()
             $(tabId+" .search-list").trigger("click");
             //搜索费用类别
-            $(tabId+' .input-expand-feeType').on("input",function(){
+            $(tabId+' .input-expand-feeType').offon("input",function(){
                 $(tabId+' #feeTypetree').treeview('collapseAll', { silent: true });
                 var prvefeeType=$('#feeTypetree').treeview('search', [$(tabId+' .input-expand-feeType').val(), {
                     ignoreCase: false,     // case insensitive
@@ -183,7 +183,7 @@
             })
             //上级费用类别chosen
             //新增费用类别
-            $(tabId+" .box-header button").on("click",function(){
+            $(tabId+" .box-header button").offon("click",function(){
                 $(tabId+" .modal-info").val("");
                 $(tabId+" #modal-feeTypeInfo h4").text("新增费用类别");
                 $(tabId+" #modal-feeTypeInfo .save-info").data("reqtype","Add");

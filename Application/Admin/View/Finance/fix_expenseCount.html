@@ -115,7 +115,7 @@
             var curDate = new Date();
             $(tabId+" .date-year .date-input").val(curDate.getFullYear());
             init_date();
-            $(tabId+" .time-type").on("change",function(){
+            $(tabId+" .time-type").offon("change",function(){
                 $(tabId+" .table .time-th").removeClass("none");
                 $(tabId+" .table .sel-"+$(this).val()).siblings(".time-th").addClass("none");
                 if($(this).val()=="year"){
