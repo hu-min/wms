@@ -146,13 +146,13 @@
           <!-- User Account: style can be found in dropdown.less -->
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <img src="{$Think.session.avatar}" class="user-image" alt="User Image">
+              <img src="/{$Think.session.avatar}" class="user-image" alt="User Image">
               <span class="hidden-xs">{$Think.session.userName}</span>
             </a>
             <ul class="dropdown-menu">
               <!-- User image -->
               <li class="user-header">
-                <img src="{$Think.session.avatar}" class="img-circle" alt="User Image">
+                <img src="/{$Think.session.avatar}" class="img-circle" alt="User Image">
 
                 <p>
                   {$Think.session.userInfo.rolePName} >> {$Think.session.userInfo.roleName}
@@ -176,7 +176,8 @@
               <!-- Menu Footer-->
               <li class="user-footer">
                 <div class="pull-left">
-                  <a href="#" class="btn btn-default btn-flat">个人资料</a>
+                  <!-- <a href="#" class="btn btn-default btn-flat">个人资料</a> -->
+                  <a class="btn btn-default btn-flat nodeOn" data-level="1" data-nodeid="10002" href="{:U('Public/userProfile')}"><span>个人资料</span></a>
                 </div>
                 <div class="pull-right">
                   <a href="{:U($logout)}" class="btn btn-default btn-flat">退出</a>
@@ -202,7 +203,7 @@
       <!-- Sidebar user panel -->
       <div class="user-panel">
         <div class="pull-left image">
-          <img src="{$Think.session.avatar}" class="img-circle" alt="User Image">
+          <img src="/{$Think.session.avatar}" class="img-circle" alt="User Image">
         </div>
         <div class="pull-left info">
           <p>{$Think.session.userName}</p>
@@ -225,7 +226,7 @@
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header">主菜单导航</li>
-        <li><a class="nodeOn" data-level="1" data-nodeid="10000" href="/Admin/Index/home.html"><span class="glyphicon glyphicon-home"></span><span>后台首页</span></a></li>
+        <li><a class="nodeOn" data-level="1" data-nodeid="10000" href="{:U('Index/home')}"><span class="glyphicon glyphicon-home"></span><span>后台首页</span></a></li>
         {$nodeHtml}
         <!-- <volist name="nodeList" id="node">
             <if condition="is_array($node['node']) neq true">

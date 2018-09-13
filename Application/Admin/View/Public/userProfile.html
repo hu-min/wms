@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="__ADMINT__/dist/css/skins/_all-skins.min.css">
+    <!-- iCheck -->
+    <!-- <link rel="stylesheet" href="__ADMINT__/plugins/iCheck/flat/blue.css"> -->
+    <!-- <link rel="stylesheet" href="__ADMINT__/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css"> -->
+</head>
+    <body>
+        <section class="content">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="box box-primary">
+                        <div class="box-body box-profile">
+                            <input class="form-control modal-info upload-file" name="avatar" type="hidden">
+                            <img class="profile-user-img img-responsive img-circle" src="/{$Think.session.avatar}" alt="User profile picture" style="cursor: pointer;">
+            
+                            <h3 class="profile-username text-center">{$Think.session.userName}</h3>
+            
+                            <p class="text-muted text-center">{$Think.session.loginName}</p>
+            
+                            <ul class="list-group list-group-unbordered">
+                                <li class="list-group-item">
+                                    <b>分组/角色</b> <a class="pull-right">{$Think.session.userInfo.rolePName} >> {$Think.session.userInfo.roleName}</a>
+                                </li>
+                                
+                                <li class="list-group-item">
+                                    <b>出生日期</b> <a class="pull-right">
+                                        <if condition="$Think.session.userInfo.birthday gt 0">
+                                            {$Think.session.userInfo.birthday|date="Y-m-d",###}
+                                        <else/>
+                                            未知
+                                        </if>
+                                    </a>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>手机号码</b> <a class="pull-right">{$Think.session.userInfo.phone}</a>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>电子邮箱</b> <a class="pull-right">{$Think.session.userInfo.email}</a>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>注册时间</b> <a class="pull-right">{$Think.session.userInfo.regTime|date="Y-m-d H:i:s",###}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="box box-info">
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label >登录密码：</label>
+                                        <input class="form-control modal-info" autocomplete="off" required="required" title="请输入密码" name="password" placeholder="******" type="password">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label >二级密码：</label>
+                                        <input class="form-control modal-info"  title="二级密码" name="seniorPassword" placeholder="初始密码和登录密码一致" type="password">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label >手机号码：</label>
+                                        <input class="form-control modal-info"  title="手机号码" name="phone" value="{$Think.session.userInfo.phone}" placeholder="手机号码" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="info-title">生日：</label>
+                                        <div class="input-group date">
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-birthday-cake"></i>
+                                            </div>
+                                            <if condition="$Think.session.userInfo.birthday gt 0">
+                                                <input class="form-control pull-right date-input modal-info" value=" {$Think.session.userInfo.birthday|date='Y-m-d',###}" name="birthday" type="text">
+                                            <else/>
+                                                <input class="form-control pull-right date-input modal-info" name="birthday" type="text">
+                                            </if>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label >性别：</label>
+                                        <select class="form-control modal-info" required="required" title="请选择性别" name="gender" >
+                                            <if condition="$Think.session.userInfo.gender eq 1">
+                                                <option value="1" selected>男性</option>
+                                                <option value="2">女性</option>
+                                            <else/>
+                                                <option value="1">男性</option>
+                                                <option value="2" selected>女性</option>
+                                            </if>
+                                            
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label >身份证：</label>
+                                        <input class="form-control modal-info" name="id_card" title="请输入身份证" value="{$Think.session.userInfo.id_card}" placeholder="身份证号码" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label >电子邮箱：</label>
+                                        <input class="form-control modal-info" name="email" title="请输入电子邮箱" value="{$Think.session.userInfo.email}" placeholder="电子邮箱" type="text">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label >开户行名称：</label>
+                                        <input class="form-control modal-info" name="bank_name" title="请输入开户行名称" value="{$Think.session.userInfo.bank_name}" placeholder="开户行名称" type="text">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label >银行卡号：</label>
+                                        <input class="form-control modal-info" name="bank_card" title="请输入银行卡号" value="{$Think.session.userInfo.bank_card}" placeholder="银行卡号" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label >微信号：</label>
+                                        <input class="form-control modal-info" name="wechat" title="请输入微信号" value="{$Think.session.userInfo.wechat}" placeholder="微信号" type="text">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label >支付宝账号：</label>
+                                        <input class="form-control modal-info" name="alipay" title="请输入支付宝账号" value="{$Think.session.userInfo.alipay}" placeholder="支付宝账号" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#" class="btn btn-primary show-confirm"><b>保存个人信息</b></a>
+                        </div>
+                    </div>
+                </div>
+            </div>        
+        </section>
+        <script>
+            var submit_profile = function(){
+                var senior = $("#v-notice-window").find(".senior-password").val();
+                datas["data"]={}
+                datas["senior"] = senior
+                $(tabId+" .modal-info").each(function(){
+                    var name = $(this).attr("name")
+                    var val = $(this).val()
+                    if(val!=""){
+                        datas["data"][name] = val
+                    }
+                })
+                post("{:U('Public/seniorOne')}",datas,function(result){
+                    notice(result.errCode,result.error,"修改提示");
+                })
+            }
+            $(function(){
+                init_date();
+                upload({url:"{:U('User/upload_filesAdd')}",call:function(result){
+                    $(tabId+" .profile-user-img").attr("src","/"+$(result).attr("name"));
+                }})
+                $(tabId+" .profile-user-img").on("click",function(){
+                    $(tabId+" .upload-file").trigger("click");
+                })
+                $(tabId+" .show-confirm").on("click",function(){
+                    notice(100,'<div class="form-group"><input type="password" placeholder="输入二级密码" class="form-control input-sm senior-password" /></div><div class="form-group"><button type="button" class="btn btn-block btn-danger btn-sm save-userInfo">确认修改</button></div>',"安全提示！",0);
+                    $("#v-notice-window").find(".senior-password").trigger('focus')
+                })
+                $("#v-notice-window").on("click",".save-userInfo",function(){
+                    submit_profile()
+                })
+                $("#v-notice-window").on("keydown",".senior-password",function(e){
+                    if(e.keyCode == 13){
+                        submit_profile()
+                    }
+                })
+            })
+        </script>
+    </body>
+</html>

@@ -6,54 +6,134 @@
 <div class="modal-body">
     <form role="form">
         <div class="box-body">
-            <div class="form-group">
-                <label >登录名：</label>
-                <input  class="modal-info" title="userId" name="userId" type="hidden">
-                <input class="form-control modal-info" required="required" name="loginName" title="请输入登录名" placeholder="登录名" type="text">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label >登录名：</label>
+                        <input  class="modal-info" title="userId" name="userId" type="hidden">
+                        <input class="form-control modal-info" required="required" name="loginName" title="请输入登录名" placeholder="登录名" type="text">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label >用户名：</label>
+                        <input class="form-control modal-info" required="required" name="userName" title="请输入用户名" placeholder="用户名" type="text">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label >头像：</label>
+                        <div class="input-group">
+                            <input class="form-control modal-info upload-file" name="avatar" type="text">
+                            <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
+                        </div>
+                        <!-- <input class="form-control modal-info" name="avatar" title="头像" placeholder="头像" type="text">
+                        <input  class="fileupdate" data-input="#info-avatar" type="file"> -->
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label >用户名：</label>
-                <input class="form-control modal-info" required="required" name="userName" title="请输入用户名" placeholder="用户名" type="text">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label >登录密码：</label>
+                        <input class="form-control modal-info" autocomplete="off" required="required" title="请输入登录密码" name="password" placeholder="登录密码" type="password">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label >手机号码：</label>
+                        <input class="form-control modal-info"  title="手机号码" name="phone" placeholder="手机号码" type="text">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">生日：</label>
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-birthday-cake"></i>
+                            </div>
+                            <input class="form-control pull-right date-input modal-info" name="birthday" type="text">
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label >头像：</label>
-                <input class="form-control modal-info" name="avatar" title="头像" placeholder="头像" type="text">
-                <input  class="fileupdate" data-input="#info-avatar" type="file">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label >性别：</label>
+                        <select class="form-control modal-info" required="required" title="请选择性别" name="gender" >
+                            <option value="1">男性</option>
+                            <option value="2">女性</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label >身份证：</label>
+                        <input class="form-control modal-info" name="id_card" title="请输入身份证" placeholder="身份证号码" type="text">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label >电子邮箱：</label>
+                        <input class="form-control modal-info" name="email" title="请输入电子邮箱" placeholder="电子邮箱" type="text">
+                    </div>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label >密码：</label>
-                <input class="form-control modal-info" autocomplete="off" required="required" title="请输入密码" name="password" placeholder="密码" type="password">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label >开户行名称：</label>
+                        <input class="form-control modal-info" name="bank_name" title="请输入开户行名称" placeholder="开户行名称" type="text">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label >银行卡号：</label>
+                        <input class="form-control modal-info" name="bank_card" title="请输入银行卡号" placeholder="银行卡号" type="text">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label >微信号：</label>
+                        <input class="form-control modal-info" name="wechat" title="请输入微信号" placeholder="微信号" type="text">
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label >手机号码：</label>
-                <input class="form-control modal-info"  title="手机号码" name="phone" placeholder="手机号码" type="text">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label >支付宝账号：</label>
+                        <input class="form-control modal-info" name="alipay" title="请输入支付宝账号" placeholder="支付宝账号" type="text">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label >用户类型：</label>
+                        <select class="form-control modal-info" title="用户类型"  name="userType">
+                            <option value="0">全部</option>
+                            <volist name="userType" id="item">
+                                <option value="{$key}">{$item}</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label >角色：</label>
+                        <select class="form-control modal-info chosen-select" required="required" title="请选择角色" name="roleId" >
+                            <option value="0">全部</option>
+                            <volist name="roleList" id="item">
+                                <option value="{$item['roleId']}">{$item['roleName']}</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label >性别：</label>
-                <select class="form-control modal-info" required="required" title="请选择性别" name="gender" >
-                    <option value="0">全部</option>
-                    <option value="1">男性</option>
-                    <option value="2">女性</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label >用户类型：</label>
-                <select class="form-control modal-info" title="用户类型"  name="userType">
-                    <option value="0">全部</option>
-                    <volist name="userType" id="item">
-                        <option value="{$key}">{$item}</option>
-                    </volist>
-                </select>
-            </div>
-            <div class="form-group">
-                <label >角色：</label>
-                <select class="form-control modal-info chosen-select" required="required" title="请选择角色" name="roleId" >
-                    <option value="0">全部</option>
-                    <volist name="roleList" id="item">
-                        <option value="{$item['roleId']}">{$item['roleName']}</option>
-                    </volist>
-                </select>
+            <div class="row">
+                <div class="col-md-4"></div>
+                <div class="col-md-4"></div>
+                <div class="col-md-4"></div>
             </div>
             <div class="form-group">
                 <div class="btn-group modal-status status-group" data-toggle="btn-toggle">

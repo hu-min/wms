@@ -962,6 +962,9 @@ function upload(option){
                     })
                     $(tabId+"-upload-modal").offon("click",".modal-body .products-list .product-info .insert-file-btn",function(){
                         $fileInput.val($(this).attr("name"))
+                        if(option.call){
+                            option.call(this)
+                        }
                     })
                     $(tabId+"-upload-modal").offon("click",".modal-footer .upload-file-btn",function(){
                         for (const fileName in tempFiles) {

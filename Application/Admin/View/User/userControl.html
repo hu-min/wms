@@ -128,6 +128,10 @@
         </div>
     </div>
     <script>
+        var user_initInfo =function(){
+            upload({url:"{:U('Project/upload_filesAdd')}"})
+            init_date();
+        }
         $(function(){
             $(tabId+" .search-list").trigger("click");
         })
@@ -149,10 +153,10 @@
         // }
         /*设置编辑用户信息*/
         function user_setInfo(info){
-            $(tabId+" .modal-info[name='userId']").val(info['userId']);
-            $(tabId+" .modal-info[name='loginName']").val(info['loginName']);
-            $(tabId+" .modal-info[name='userName']").val(info['userName']);
-            $(tabId+" .modal-info[name='avatar']").val(info['avatar']);
+            ['userId','loginName','userName','avatar','phone','birthday','id_card','email','bank_name','bank_card','wechat','alipay'].forEach(element => {
+                $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
+            });
+   
             $(tabId+" .modal-info[name='phone']").val(info['phone']);
             $(tabId+" .modal-info[name='password']").val('');
             $(tabId+" .modal-info[name='password']").removeAttr("required")

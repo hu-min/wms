@@ -147,7 +147,7 @@ class VPage{
             $this->config['theme']);
             //id='example2_paginate'
         $ulClass = "pagination";
-        if(!$bigSize){
+        if(!$this->bigSize){
             $ulClass = "pagination pagination-sm no-margin pull-right";
         }
         if($onlyPage){

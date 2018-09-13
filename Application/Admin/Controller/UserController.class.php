@@ -6,12 +6,15 @@ class UserController extends BaseController{
     protected $pageSize=15;
 
     public function _initialize() {
-        parent::_initialize();
+        
         $this->roleCom=getComponent('Role');
         $this->rNodeCom=getComponent('RoleNode');
         $this->processCom=getComponent('Process');
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
+        $this->pageSize=10;
+        $this->statusType=[0=>"未激活",1=>"激活",2=>"冻结",3=>"删除"];
+        parent::_initialize();
     }
     /*用户管理*/
     /** 
@@ -24,6 +27,7 @@ class UserController extends BaseController{
         $userStatus=C("userStatus");
         $regFrom=C("regFrom");
         $reqType=I('reqType');
+        
         $this->assign("controlName","user");
         $this->assign('userType',$userType);
         $this->assign('userStatus',$userStatus);
@@ -79,6 +83,9 @@ class UserController extends BaseController{
     function manageUserInfo(){
         $reqType=I("reqType");
         $datas=I("data");
+        if(isset($datas['birthday'])){
+            $datas['birthday'] = strtotime($datas['birthday']." 00:00:00");
+        }
         $filesData=I("filesData");
         if($filesData[urlencode($datas['avatar'])]){
             $datas['avatar']=base64Img($filesData[urlencode($datas['avatar'])])["url2"];
@@ -88,35 +95,27 @@ class UserController extends BaseController{
         $userInfo=[];
         if($reqType=="Add"){
             $userInfo=[
-                'userId'=>$datas['userId'],
-                'loginName'=>$datas['loginName'],
-                'userName'=>$datas['userName'],
-                'avatar'=>$datas['avatar'],
                 'password'=>sha1(sha1($datas['password'])),
+                'seniorPassword' => sha1(sha1($datas['password'])),
                 'phone'=>$datas['phone']?$datas['phone']:0,
-                'gender'=>$datas['gender'],
-                'userType'=>$datas['userType'],
                 'regFrom'=>1,
                 'regTime'=>time(),
                 'openId'=>'',
                 'lastIp'=>ipTolong(getIp()),
                 'lastTime'=>time(),
                 'loginNum'=>0,
-                'roleId'=>$datas['roleId'],
-                'status'=>$datas['status'],
             ];
+            foreach (['userId','loginName','userName','avatar','gender','birthday','userType','roleId','id_card','email','bank_name','bank_card','wechat','alipay','status'] as $key ) {
+                if(isset($datas[$key])){
+                    $userInfo[$key] = $datas[$key];
+                }
+            }
         }elseif($reqType=="Edit"){
-            $userInfo=[
-                'userId'=>$datas['userId'],
-                'loginName'=>$datas['loginName'],
-                'userName'=>$datas['userName'],
-                'avatar'=>$datas['avatar'],
-                'phone'=>$datas['phone'],
-                'gender'=>$datas['gender'],
-                'userType'=>$datas['userType'],
-                'status'=>$datas['status'],
-                'roleId'=>$datas['roleId'],
-            ];
+            foreach (['userId','loginName','userName','avatar','gender','phone','userType','roleId','birthday','id_card','email','bank_name','bank_card','wechat','alipay','status'] as $key ) {
+                if(isset($datas[$key])){
+                    $userInfo[$key] = $datas[$key];
+                }
+            }
             if($datas['password']!=""){
                 $userInfo['password']=sha1(sha1($datas['password']));
             }
@@ -188,9 +187,11 @@ class UserController extends BaseController{
             $where['regFrom']=$data['regFrom'];
         }
         $parameter=[
+            'fields'=>'*,FROM_UNIXTIME(birthday,"%Y-%m-%d") birthday',
             'where'=>$where,
             'page'=>$p,
             'pageSize'=>$this->pageSize,
+            'orderStr'=>'regTime DESC',
         ];
         
         $userResult=$this->userCom->getUserList($parameter);

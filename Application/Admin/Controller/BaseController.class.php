@@ -158,21 +158,20 @@ class BaseController extends \Common\Controller\BaseController{
             $this->redirect('Index/Login');
         }else{
             //登录设置
+            foreach (['userId','loginName','userName','roleId','rolePid','avatar','usertype','roleId','rolePid'] as $key ) {
+                if(isset($userInfo[$key])){
+                    session($key,$userInfo[$key]);
+                }
+            }
             session("userInfo",$userInfo);
-            session('userId',$userInfo['userId']);
             session('isLogin',1);
-            session('loginName',$userInfo['loginName']);
-            session('userName',$userInfo['userName']);
-            session('roleId',$userInfo['roleId']);
-            session('rolePid',$userInfo['rolePid']);
 	        $this->vlog(1);
             if($userInfo['avatar']==""){
                 $userInfo['avatar']=U(__ROOT__.'/Public'.'/admintmpl'."/dist/img/avatar/avatar".rand(1,5).".png",'','');
             }else{
-                $userInfo['avatar']=U('Uploads/'.$userInfo['avatar'],'','');
+                $userInfo['avatar']=U($userInfo['avatar'],'','');
             }
-            session('avatar',$userInfo['avatar']);
-            session('usertype',$userInfo['usertype']);
+
             $this->userCom->logIORec($userInfo['userId']);
         }
     }
