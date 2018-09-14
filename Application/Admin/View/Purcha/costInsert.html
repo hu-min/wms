@@ -134,7 +134,10 @@
                         
                         if(!$current.find(".modal-info[name='"+element+"']").hasClass("chosen-select")){
                             if(element=="region"){
-                                $current.find(".modal-info[name='"+element+"']").val(supritem["province_name"]+"-"+supritem["city_name"]);
+                                if(supritem["province_name"] && supritem["city_name"]){
+                                    $current.find(".modal-info[name='"+element+"']").val(supritem["province_name"]+"-"+supritem["city_name"]);
+                                }
+                                
                             }else{
                                 $current.find(".modal-info[name='"+element+"']").val(supritem[element]);
                             }
