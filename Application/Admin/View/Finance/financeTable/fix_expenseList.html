@@ -10,6 +10,12 @@
         <td>{$item['payment']}</td>
         <td>{$item['noPayment']}</td>
         <td><if condition="$item['payTime'] gt 0">{$item['payTime']|date="Y-m-d",###}</if></td>
+        <td>
+            <if condition="$item['detail_file'] neq ''">
+                <input class="upload-file" value="{$item['detail_file']}" type="hidden">
+                <span class="show-media-btn show-media"><i class="fa fa-eye"></i></span>
+            </if>
+        </td>
         <td>{$item['remark']}</td>
         {:list_btn(get_defined_vars(),"id")}
     </tr>
