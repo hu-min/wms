@@ -188,14 +188,22 @@
         /*设置编辑用户信息*/
         function sup_company_setInfo(info){
 
+
             $(tabId+" .modal-info[name='companyId']").val(info['companyId']);
             $(tabId+" .modal-info[name='company']").val(info['company']);
             $(tabId+" .modal-info[name='alias']").val(info['alias']);
             $(tabId+" .modal-info[name='address']").val(info['address']);
             $(tabId+" .modal-info[name='remarks']").val(info['remarks']);
 
-            $(tabId+" .modal-info[name='type']").html('<option value="'+info['basicId']+'">'+info['typeName']+'</option>');
-            $(tabId+" .modal-info[name='type']").trigger("chosen:updated");
+            if(info['type']>0){
+                if($(tabId+" .modal-info[name='type']").find("option[value='"+info['type']+"']").length==0){
+                    $(tabId+" .modal-info[name='type']").append('<option value="'+info['type']+'">'+info['typeName']+'</option>');
+                }
+                $(tabId+" .modal-info[name='type']").find("option[value='"+info['type']+"']").prop("selected",true)
+                $(tabId+" .modal-info[name='type']").trigger("chosen:updated");
+            }
+            // $(tabId+" .modal-info[name='type']").html('<option value="'+info['basicId']+'">'+info['typeName']+'</option>');
+            // $(tabId+" .modal-info[name='type']").trigger("chosen:updated");
 
             set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"),info,"{$Think.session.userId}","{$nodeAuth}")
 
