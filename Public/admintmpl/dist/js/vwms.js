@@ -297,7 +297,7 @@ $(document).on("click",'.save-info',function(){
     	eval(con+"_getInfo()");//对不同的id设置不同的发送数据
     }else{
         datas["data"]={}
-        $(tabId+" .modal-info").each(function(){
+        $(tabId+" .global-modal .modal-info").each(function(){
             var name =$(this).attr("name");
             var val =$(this).val();
             var required=$(this).attr("required");
