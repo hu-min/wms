@@ -48,6 +48,18 @@ class MessageController extends BaseController{
         $userId = $userId ? $userId : session("userId") ;
         return $this->M()->countList(["to_user"=>$userId,"status"=>0]);
     }
+    function newMesg($userId=NULL){
+        $userId = $userId ? $userId : session("userId") ;
+        $param = [
+            'where' => ["to_user"=>$userId,"status"=>0],
+            'orderStr'=>'add_time DESC',
+            'pageSize'=>5,
+            'joins' => [
+                "LEFT JOIN (SELECT userId,userName user_name,avatar FROM v_user) u ON u.userId = from_user",
+            ],
+        ];
+        return $this->getList($param)['list'];
+    }
     /** 
      * @Author: vition 
      * @Date: 2018-09-06 20:08:09 

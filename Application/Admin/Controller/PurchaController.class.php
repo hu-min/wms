@@ -32,7 +32,7 @@ class PurchaController extends BaseController{
     function costInsert(){
         $reqType=I('reqType');
         $this->assign("controlName","cost_insert");
-        $this->assign('dbName',"");//删除数据的时候需要
+        $this->assign('tableName',$this->purchaCom->tableName());//删除数据的时候需要
         $this->assign('projectArr',$this->project->_getOption("project_id"));
         $this->assign('supplierArr',$this->supplier->getSupType());
         $this->assign('companyArr',$this->supplier->getSupplier());
@@ -149,7 +149,7 @@ class PurchaController extends BaseController{
         }
         $parameter=[
             'where'=>$where,
-            'fields'=>"project_id,state status,user_id,COUNT(supplier_com) supr_num,SUM(contract_amount) amount, name,code,business_name,leader_name,FIND_IN_SET({$roleId},examine) place",
+            'fields'=>"id,project_id,state status,user_id,COUNT(supplier_com) supr_num,SUM(contract_amount) amount, name,code,business_name,leader_name,FIND_IN_SET({$roleId},examine) place",
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"id DESC",
@@ -164,7 +164,7 @@ class PurchaController extends BaseController{
         
         $listResult=$this->purchaCom->getList($parameter);
         // echo $this->purchaCom->M()->_sql();
-        $this->tablePage($listResult,'Purcha/purchaTable/costInsertList',"sup_companyList");
+        $this->tablePage($listResult,'Purcha/purchaTable/costInsertList',"cost_insertList");
     }
     function manageCostInsertInfo($datas,$reqType=false){
         $reqType = $reqType ? $reqType : I("reqType");
@@ -272,7 +272,7 @@ class PurchaController extends BaseController{
     function purchaApply(){
         $reqType=I('reqType');
         $this->assign("controlName","purcha_apply");
-        $this->assign('dbName',"");//删除数据的时候需要
+        // $this->assign('tableName',"");//删除数据的时候需要
         $this->assign('payType',$this->payType);//
         $this->assign('invoiceType',$this->invoiceType);//
         $this->assign("tableName",$this->purchaCom->tableName());

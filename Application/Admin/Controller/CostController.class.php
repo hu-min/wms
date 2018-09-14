@@ -138,7 +138,7 @@ class CostController extends BaseController{
             if($datas["project_id"]>0){ 
                 //存在项目，则第一个审批的人是项目主管,examine需要
                 $userRole = $this->userCom->getUserInfo($datas['leader']);
-                $datas['examine'] = $userRole['roleId'].",".$process["examine"];
+                $datas['examine'] = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"]))) ;
                 unset($datas['leader']);
             }else{
                 $datas['examine'] = $process["examine"];
@@ -421,7 +421,7 @@ class CostController extends BaseController{
         if($expInfo["project_id"]>0){ 
             //存在项目，则第一个审批的人是项目主管,examine需要
             $userRole = $this->userCom->getUserInfo($leader);
-            $expInfo['examine'] = $userRole['roleId'].",".$process["examine"];
+            $expInfo['examine'] = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"]))) ;
             // unset($expInfo['leader']);
         }else{
             $expInfo['examine'] = $process["examine"];

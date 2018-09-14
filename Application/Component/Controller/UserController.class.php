@@ -82,8 +82,8 @@ class UserController extends BaseController{
             $res->data=$userResult;
             return $res;
         }
-        $res->errCode=10000;
-        $res->error=getError(10000);
+        $res->errCode=10006;
+        $res->error=getError(10006);
         return $res;
     }
     /** 

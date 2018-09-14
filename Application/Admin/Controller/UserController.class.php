@@ -32,7 +32,7 @@ class UserController extends BaseController{
         $this->assign('userType',$userType);
         $this->assign('userStatus',$userStatus);
         $this->assign('regFrom',$regFrom);
-        $this->assign('dbName',"User");//删除数据的时候需要
+        $this->assign('tableName',$this->userCom->tableName());//删除数据的时候需要
         $where=[
             'rolePid'=>['gt',0],
             'status'=>['eq',1],
@@ -242,7 +242,7 @@ class UserController extends BaseController{
     function roleControl(){
         $regFrom=C("regFrom");
         $reqType=I('reqType');
-        $this->assign('dbName',"Role");//删除数据的时候需要
+        $this->assign('tableName',$this->roleCom->tableName());//删除数据的时候需要
         $this->assign("controlName","rolerNode");
         if($reqType){
             $this->$reqType();
@@ -383,7 +383,7 @@ class UserController extends BaseController{
     function nodeControl(){
         $regFrom=C("regFrom");
         $reqType=I('reqType');
-        $this->assign('dbName',"Node");//删除数据的时候需要
+        $this->assign('tableName',$this->nodeCom->tableName());//删除数据的时候需要
         if($reqType){
             $this->$reqType();
         }else{
@@ -726,7 +726,7 @@ class UserController extends BaseController{
     function processAuth(){
         $reqType=I('reqType');
         $this->assign("controlName","process_auth");
-        $this->assign('dbName',"Process");//删除数据的时候需要
+        $this->assign('tableName',$this->processCom->tableName());//删除数据的时候需要
         if($reqType){
             $this->$reqType();
         }else{
@@ -804,7 +804,7 @@ class UserController extends BaseController{
     function whiteControl(){
         $reqType=I('reqType');
         $this->assign("controlName","white_user");
-        $this->assign('dbName',"White");//删除数据的时候需要
+        $this->assign('tableName',"VWhite");//删除数据的时候需要
         $this->assign('userArr',A("Project")->_getOption("create_user"));
         if($reqType){
             $this->$reqType();

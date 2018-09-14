@@ -4,25 +4,28 @@
         <td><input type="checkbox"></td>
         <if condition="$type eq 1">
             <td>
-                <if condition="$item.status eq 0">
-                    <i class="fa fa-envelope"></i> 未读 
-                <else/>
-                    <i class="fa fa-envelope-o"></i> 已读 
-                </if>
+                <a href="#" class="read-message" data-id="{$item.id}">
+                    <if condition="$item.status eq 0">
+                        <i class="fa fa-envelope"></i> 未读 
+                    <else/>
+                        <i class="fa fa-envelope-o"></i> 已读 
+                    </if>
+                </a>
             </td>
         </if>
         <!-- <td class="mailbox-star"><a href="#"><i class="fa fa-star text-yellow"></i></a></td> -->
         <td class="mailbox-name"><a href="#" class="read-message" data-id="{$item.id}">{$item.title}</a></td>
         <td class="mailbox-user">
-            <if condition="$item['relation_uname']">
-                {$item.relation_uname}
-            <else/>
-                {$item.user_name}
-            </if>
-            
+            <a href="#" class="read-message" data-id="{$item.id}">
+                <if condition="$item['relation_uname']">
+                    {$item.relation_uname}
+                <else/>
+                    {$item.user_name}
+                </if>
+            </a>
         </td>
-        <td class="mailbox-subject">{$item.content|utf8_substr=25}</td>
+        <td class="mailbox-subject"><a href="#" class="read-message" data-id="{$item.id}">{$item.content|utf8_substr=25}</a></td>
         <td class="mailbox-attachment"></td>
-        <td class="mailbox-date">{$item.add_time|disTime}</td>
+        <td class="mailbox-date"><a href="#" class="read-message" data-id="{$item.id}">{$item.add_time|disTime}</a></td>
     </tr>
 </volist>

@@ -30623,7 +30623,7 @@ var OpenTypeFileBuilder = function OpenTypeFileBuilderClosure() {
       var tablesNames = Object.keys(tables);
       tablesNames.sort();
       var numTables = tablesNames.length;
-      var i, j, jj, table, tableName;
+      var i, j, jj, table, dbName;
       var offset = OTF_HEADER_SIZE + numTables * OTF_TABLE_ENTRY_SIZE;
       var tableOffsets = [offset];
       for (i = 0; i < numTables; i++) {
@@ -30651,11 +30651,11 @@ var OpenTypeFileBuilder = function OpenTypeFileBuilderClosure() {
       writeInt16(file, 10, searchParams.rangeShift);
       offset = OTF_HEADER_SIZE;
       for (i = 0; i < numTables; i++) {
-        tableName = tablesNames[i];
-        file[offset] = tableName.charCodeAt(0) & 0xFF;
-        file[offset + 1] = tableName.charCodeAt(1) & 0xFF;
-        file[offset + 2] = tableName.charCodeAt(2) & 0xFF;
-        file[offset + 3] = tableName.charCodeAt(3) & 0xFF;
+        dbName = tablesNames[i];
+        file[offset] = dbName.charCodeAt(0) & 0xFF;
+        file[offset + 1] = dbName.charCodeAt(1) & 0xFF;
+        file[offset + 2] = dbName.charCodeAt(2) & 0xFF;
+        file[offset + 3] = dbName.charCodeAt(3) & 0xFF;
         var checksum = 0;
         for (j = tableOffsets[i], jj = tableOffsets[i + 1]; j < jj; j += 4) {
           var quad = (0, _util.readUint32)(file, j);
@@ -30663,7 +30663,7 @@ var OpenTypeFileBuilder = function OpenTypeFileBuilderClosure() {
         }
         writeInt32(file, offset + 4, checksum);
         writeInt32(file, offset + 8, tableOffsets[i]);
-        writeInt32(file, offset + 12, tables[tableName].length);
+        writeInt32(file, offset + 12, tables[dbName].length);
         offset += OTF_TABLE_ENTRY_SIZE;
       }
       return file;

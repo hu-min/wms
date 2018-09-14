@@ -217,7 +217,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">竞标类型：</label>
-                                            <select class="form-control modal-info" title="竞标类型" name="bidding">
+                                            <select class="form-control modal-info bid-group" title="竞标类型" name="bidding">
                                                 <option value="">竞标类型</option>
                                                 <option value="1">技术标</option>
                                                 <option value="2">商务标</option>
@@ -233,7 +233,7 @@
                                                 <div class="input-group-addon">
                                                     <i class="fa fa-calendar"></i>
                                                 </div>
-                                                <input class="form-control pull-right date-input modal-info" name="bid_date" type="text">
+                                                <input class="form-control pull-right date-input modal-info bid-group" name="bid_date" type="text">
                                             </div>
                                         </div>
                                     </div>
@@ -244,7 +244,7 @@
                                                 <div class="input-group-addon">
                                                     <i class="fa fa-calendar"></i>
                                                 </div>
-                                                <input class="form-control pull-right date-input modal-info" name="bid_time" data-type="time" type="text">
+                                                <input class="form-control pull-right date-input modal-info bid-group" name="bid_time" data-type="time" type="text">
                                             </div>
                                         </div>
                                     </div>
@@ -266,7 +266,7 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="info-title">营业主担：</label>
-                                                <select class="form-control modal-info chosen-project chosen-select" title="营业主担" name="business" data-value="userId"  data-text="userName">
+                                                <select class="form-control modal-info chosen-project chosen-select" required="required" title="营业主担" name="business" data-value="userId"  data-text="userName">
                                                     <option value="">营业主担</option>
                                                     <volist name="userArr" id="item">
                                                         <option value="{$item['userId']}">【{$item['roleName']}】{$item['userName']}</option>
@@ -277,7 +277,7 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="info-title">项目主担：</label>
-                                                <select class="form-control modal-info chosen-project chosen-select" title="项目主担" name="leader" data-value="userId"  data-text="userName">
+                                                <select class="form-control modal-info chosen-project chosen-select" required="required" title="项目主担" name="leader" data-value="userId"  data-text="userName">
                                                     <option value="">项目主担</option>
                                                     <volist name="userArr" id="item">
                                                         <option value="{$item['userId']}">【{$item['roleName']}】{$item['userName']}</option>

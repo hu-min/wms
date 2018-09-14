@@ -30,7 +30,7 @@ class ArticleController extends BaseController{
             $option.=$this->getArtCls($value,0);
         }
         $this->assign("classOption",$option);
-        $this->assign('dbName',"Article");//删除数据的时候需要
+        $this->assign('tableName',$this->articleCom->tableName());//删除数据的时候需要
         $this->assign("controlName","article");//名字对应cust_company_modalOne，和cust_companyModal.html
 
         $reqType=I('reqType');

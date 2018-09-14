@@ -319,8 +319,15 @@ class BaseController extends \Common\Controller\BaseController{
         extract($_REQUEST);
         $dbObject=M($db,NULL);
         $msg="删除成功！";
+        if(!$id){
+            $this->ajaxReturn(['errCode'=>110,'error'=>'ID异常']);
+        }
+        if(!$db){
+            $this->ajaxReturn(['errCode'=>110,'error'=>'数据表名称异常']);
+        }
         if($statusType=="del"){
             $conResult=$dbObject->save([$dbObject->getPk()=>$id,"status"=>$status]);
+            // echo $dbObject->getPk();exit;
         }else if($statusType=="deepDel"){
             $seniorResult=$this->userCom->checkSeniorPwd(session("userId"),$seniorPwd);
             if($seniorResult->errCode!==0){

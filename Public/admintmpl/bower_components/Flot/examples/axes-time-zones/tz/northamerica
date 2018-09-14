@@ -892,7 +892,7 @@ Zone America/Kentucky/Louisville -5:43:02 -	LMT	1883 Nov 18 12:16:58
 #
 # From Paul Eggert (2001-07-16):
 # The final rule was published in the
-# <a href="http://frwebgate.access.gpo.gov/cgi-bin/getdoc.cgi?dbname=2000_register&docid=fr17au00-22">
+# <a href="http://frwebgate.access.gpo.gov/cgi-bin/getdoc.cgi?tableName=2000_register&docid=fr17au00-22">
 # Federal Register 65, 160 (2000-08-17), page 50154-50158.
 # </a>
 #
@@ -919,7 +919,7 @@ Zone America/Kentucky/Monticello -5:39:24 - LMT	1883 Nov 18 12:20:36
 # See America/North_Dakota/Center for the Oliver County, ND change.
 # West Wendover, NV officially switched from Pacific to mountain time on
 # 1999-10-31.  See the
-# <a href="http://frwebgate.access.gpo.gov/cgi-bin/getdoc.cgi?dbname=1999_register&docid=fr21oc99-15">
+# <a href="http://frwebgate.access.gpo.gov/cgi-bin/getdoc.cgi?tableName=1999_register&docid=fr21oc99-15">
 # Federal Register 64, 203 (1999-10-21), page 56705-56707.
 # </a>
 # However, the Federal Register says that West Wendover already operated

@@ -57,7 +57,7 @@ class ToolsController extends BaseController{
         if(in_array($examineRes["status"],[3,5])){
             $nextExamine = "已".$this->statusType[$examineRes["status"]];
         }else{
-            if(($examineRes["process_level"]-1)==$allProcess){
+            if(($examineRes["process_level"]-1)==$allProcess || $examineRes["status"] ==1 ){
                 $nextExamine = "已完成";
             }else{
                 $nextRoleId = $examine[$examineRes["process_level"]-1];

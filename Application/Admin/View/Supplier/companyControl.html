@@ -31,7 +31,7 @@
                                 </div>
                                 <div class="form-group"> 
                                     <label class="control-label">供应商类型：</label>
-                                    <select class="form-control search-info chosen-suptype chosen-select" title="供应商类型" name="type">
+                                    <select class="form-control search-info chosen-suptype chosen-select" title="供应商类型" name="type" data-value="basicId" data-title="name">
                                         <option value="">全部</option>
                                         <volist name="supTypeList" id="item">
                                             <option value="{$item.basicId}">{$item.name}</option>
@@ -40,7 +40,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label">供应商别名：</label>
-                                    <input class="form-control search-info input-sm" name="alias" placeholder="供应商别名" type="text">
+                                    <input class="form-control search-info input-sm chosen-fcopy" name="alias" placeholder="供应商别名" type="text">
                                 </div>
                                 <div class="form-group">
                                     <label >省份：</label>
@@ -124,7 +124,7 @@
         $(function(){
 
             $(tabId+" .search-list").trigger("click");
-        
+            init_chosen("{$url}","getSupTypeList",".search-body");
             //新增供应商
             $(tabId+" .box-header button").on("click",function(){
                 $(tabId+" .modal-info").val("");
@@ -142,7 +142,7 @@
                 }
             })
             //供应商类型
-            $(tabId+" .chosen-suptype").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true,ajax_load:{url:"{$url}",data:{reqType:"getSupTypeList"},value:"basicId",text:"name"}})
+            // $(tabId+" .chosen-suptype").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true,ajax_load:{url:"{$url}",data:{reqType:"getSupTypeList"},value:"basicId",text:"name"}})
         })
 
         function setCityOption(pid,whereCity){

@@ -77,7 +77,6 @@ class ProjectController extends BaseController{
     }
     function projectItem(){
         $reqType=I('reqType');
-        $this->assign('dbName',"Project");//删除数据的时候需要
         $this->assign("controlName","project");//名字对应cust_company_modalOne，和cust_companyModal.html
         $this->assign('processArr',$this->processArr);
         $this->assign('btnTitle','确认立项');
@@ -392,7 +391,7 @@ class ProjectController extends BaseController{
         // print_r($where);
         $roleId = session('roleId');
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
-            $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (create_user = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId})) AND status =1 )";
+            $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (create_user = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 )";
 
         }
         // if($nodeAuth<7){
@@ -413,6 +412,10 @@ class ProjectController extends BaseController{
             
             $where['_string'] = isset($where['_string']) ? $where['_string'].=" AND status < 3" : $where['_string'].=" status < 3";
         }
+        $file_type="1,2";
+        if($data['template'] == 'schedule'){
+            $file_type="3,4";
+        }
         $parameter=[
             'where'=>$where,
             'fields'=>"*,FIND_IN_SET({$roleId},examine) place",
@@ -428,6 +431,7 @@ class ProjectController extends BaseController{
                 "LEFT JOIN (SELECT basicId stage_id,name stage_name FROM v_basic WHERE class = 'stage' ) s ON s.stage_id = stage",
                 "LEFT JOIN (SELECT basicId type_id,name type_name FROM v_basic WHERE class = 'projectType' ) t ON t.type_id = type",
                 "LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct ON ct.ctid = city AND ct.cpid = province",
+                "LEFT JOIN (SELECT project_id fproject_id , count(id) file_num FROM v_project_files WHERE file_type IN ({$file_type})) f ON f.fproject_id = projectId "
             ],
         ];
         $listResult=$this->projectCom->getProjectList($parameter);
@@ -493,12 +497,29 @@ class ProjectController extends BaseController{
             $datas['author']=session('userId');
             $datas['process_level']=$this->processAuth["level"];
             //添加时必备数据
-            $process = $this->nodeCom->getProcess(I("vtabId"));
+            // $process = $this->nodeCom->getProcess(I("vtabId"));
 
-            $datas['process_id'] = $process["processId"];
-            $userRole = $this->userCom->getUserInfo($datas['leader']);
-            $datas['examine'] = $userRole['roleId'].",".$process["examine"];
-            $datas['process_level']=$process["place"];
+            // $datas['process_id'] = $process["processId"];
+            // $userRole = $this->userCom->getUserInfo($datas['leader']);
+            // $datas['examine'] = $userRole['roleId'].",".$process["examine"];
+            $examines = getComponent('Process')->getExamine(I("vtabId"),$datas['leader']);
+            $datas['examine'] = $examines['examine'];
+            $datas['process_id'] = $examines['process_id'];
+            //如果是审批者自己提交的执行下列代码
+            $roleId = I("roleId");
+            $examineArr = explode(",",$expInfo['examine']);
+            $rolePlace = array_search($roleId,$examineArr);
+            $datas['status'] = 0;
+            if($rolePlace!==false){
+                $datas['process_level']=$rolePlace+2;
+                if(count($examineArr) == ($rolePlace+1)){
+                    $datas['status'] = 1;
+                }else{
+                    $datas['status'] = 2;
+                }
+            }else{
+                $datas['process_level']=$examines["place"];
+            }
 
             unset($datas['projectId']);
             return $datas;
@@ -533,6 +554,7 @@ class ProjectController extends BaseController{
      */    
     function projectAdd(){
         $projectInfo=$this->manageProjectInfo();
+        // print_r($projectInfo);exit;
         if($projectInfo){
             $insertResult=$this->projectCom->insertProject($projectInfo);
             if($insertResult && $insertResult->errCode==0){

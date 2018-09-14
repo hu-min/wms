@@ -162,6 +162,7 @@
             $(tabId).on("change",".modal-info[name='project_id']",function(){
                 var project_id = $(this).val()
                 if(project_id==0){
+                    $(tabId+" .modal-info").prop("disabled",false)
                     $(tabId+" .modal-info").val("");
                     $(tabId+" .modal-info[name='session_all']").val(1)
                     $(tabId+" .modal-info[name='session_cur']").val(1)
@@ -195,6 +196,14 @@
                     get_project_code(id)
                 }else{
                     $(tabId+" .modal-info[name='code']").val("")
+                }
+            })
+            $(tabId).on("change",".global-modal .modal-info[name='is_bid']",function(){
+                var is_bid = $(this).val();
+                if(is_bid>0){
+                    $(tabId+" .global-modal .bid-group").prop("disabled",false);
+                }else{
+                    $(tabId+" .global-modal .bid-group").prop("disabled",true);
                 }
             })
         })

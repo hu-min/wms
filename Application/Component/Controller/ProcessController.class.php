@@ -65,4 +65,23 @@ class ProcessController extends BaseController{
         print_r($processAppList);
         // print_r($nodeProce);
     }
+    function getExamine($vtabId=false,$leader=0){
+        $vtabId = $vtabId ? $vtabId : I("vtabId");
+        $returnData = ["examine"=>'',"place"=>0,'process_id'];
+        if(!$vtabId){
+            return $returnData;
+        }
+        $process = A("Component/Node")->getProcess($vtabId);
+        $roleId = '';
+        if($leader>0){
+            $userRole = A("Component/User")->getUserInfo($leader);
+            $roleId = $userRole['roleId'];
+        }
+        $examines = $roleId.",".$process["examine"];
+        
+        $returnData['examine'] = implode(",",array_unique(explode(",",$examines)));
+        $returnData['place'] = $process["place"];
+        $returnData['process_id'] = $process["processId"];
+        return $returnData;
+    }
 }

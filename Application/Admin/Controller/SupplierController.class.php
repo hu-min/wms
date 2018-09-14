@@ -73,7 +73,7 @@ class SupplierController extends BaseController{
     function supType(){
         $reqType=I('reqType');
         $this->assign("controlName","supType");
-        $this->assign('dbName',"Basic");
+        $this->assign('tableName',$this->basicCom->tableName());
         if($reqType){
             $this->$reqType();
         }else{
@@ -233,7 +233,7 @@ class SupplierController extends BaseController{
         $this->assign("controlName","sup_company");
         $this->assign("supTypeList",$this->getSupType());
         $this->assign("province",$this->basicCom->get_provinces());
-        $this->assign('dbName',"SupplierCompany");//删除数据的时候需要
+        $this->assign('tableName',"VSupplierCompany");//删除数据的时候需要
         if($reqType){
             $this->$reqType();
         }else{
@@ -452,7 +452,7 @@ class SupplierController extends BaseController{
         $reqType=I('reqType');
         $this->assign("controlName","supcontact");
         $this->assign("supplierList",$this->getSupplier());
-        $this->assign('dbName',"SupplierContact");//删除数据的时候需要
+        $this->assign('tableName',"VSupplierContact");//删除数据的时候需要
         if($reqType){
             $this->$reqType();
         }else{

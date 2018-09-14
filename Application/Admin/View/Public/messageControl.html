@@ -183,8 +183,7 @@
                         checkboxClass: 'icheckbox_flat-blue',
                         radioClass: 'iradio_flat-blue'
                     });
-
-                })
+                },false)
             }
             $(function () {
                 getMessageList(1);
@@ -252,7 +251,8 @@
                                     if(result.errCode==0 ){
                                         var noRead = Number($(tabId+" .mes-folder .message-no-read").text())
                                         noRead--;
-                                        $(tabId+" .mes-folder .message-no-read").text(noRead)
+                                        // $(tabId+" .mes-folder .message-no-read").text(noRead)
+                                        $(".message-no-read").text(noRead)
                                     }
                                 })
                             }

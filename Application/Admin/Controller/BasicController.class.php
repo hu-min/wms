@@ -11,7 +11,7 @@ class BasicController extends BaseController{
         $this->statusType = [0=>"未启用",1=>"启用",3=>"无效",4=>"删除"];
         parent::_initialize();
         // $this->basicCom=getComponent('Basic');
-        $this->assign('dbName',"Basic");//删除数据的时候需要
+        $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
         $this->fieldCom=getComponent('Field');
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
@@ -138,7 +138,7 @@ class BasicController extends BaseController{
     function fieldControl(){
         $reqType=I('reqType');
         $this->assign("controlName","basic_field");
-        $this->assign("dbName","Field");
+        $this->assign("tableName",$this->fieldCom->tableName());
         $this->assign("provinceArr",$this->basicCom->get_provinces());
         if($reqType){
             $this->$reqType();

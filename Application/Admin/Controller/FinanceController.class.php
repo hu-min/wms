@@ -25,7 +25,7 @@ class FinanceController extends BaseController{
     }
     function stockControl(){
         $reqType=I('reqType');
-        $this->assign('dbName',"Basic");//删除数据的时候需要
+        $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
         if($reqType){
             $this->$reqType();
         }else{
@@ -114,7 +114,7 @@ class FinanceController extends BaseController{
     function fix_expenseControl(){
         $reqType=I('reqType');
         $this->assign("controlName","fix_expense");
-        $this->assign('dbName',"FixldExpense");//删除数据的时候需要
+        $this->assign('tableName',"VFixldExpense");//删除数据的时候需要
         $this->statusType = [0=>"未启用",1=>"启用",3=>"无效",4=>"删除"];
         $this->assign('statusType',$this->statusType );
         $parameter=[
@@ -184,7 +184,7 @@ class FinanceController extends BaseController{
     function fix_expCountList(){
         $datas = I("data");
         $p=I("p")?I("p"):1;
-        $where=["status"=>1];
+        $where=["status"=>1,'payTime'=>['GT',0]];
         
         $fields = "FROM_UNIXTIME(payTime,'%Y') year ,FROM_UNIXTIME(payTime,'%m') date_time,SUM(fee) all_fee,SUM(payment) payment,SUM(noPayment) no_payment";
         $groupBy = "FROM_UNIXTIME(payTime,'%Y'), FROM_UNIXTIME(payTime,'%m')";
@@ -222,18 +222,20 @@ class FinanceController extends BaseController{
         $where=[];
         $seatime = "addTime";
         if(isset($data['status']) && $data['status']==1){
+            $where["status"] = $data['status'];
             $seatime = "payTime";
         }
+
         //
         // $fields = "FROM_UNIXTIME(payTime,'%Y') year ,FROM_UNIXTIME(payTime,'%m') date_time,SUM(fee) all_fee,SUM(payment) payment,SUM(noPayment) no_payment";
         // $groupBy = "FROM_UNIXTIME(payTime,'%Y'), FROM_UNIXTIME(payTime,'%m')";
         if($data["month_date"] != ""){
-            $where["_string"] = "FROM_UNIXTIME({$seatime},'%Y-%m') = '{$data['month_date']}'";
+            $where["_string"] = "({$seatime} > 0 AND FROM_UNIXTIME({$seatime},'%Y-%m') = '{$data['month_date']}')";
             // $fields = "FROM_UNIXTIME(addTime,'%Y') date_time,SUM(fee) all_fee,SUM(payment) payment,SUM(noPayment) no_payment";
             // $groupBy = "FROM_UNIXTIME(payTime,'%Y')";
         }else{
             $year = $data["year_date"] ? $data["year_date"] : date("Y");
-            $where["_string"] = "FROM_UNIXTIME({$seatime},'%Y') = '{$year}'";
+            $where["_string"] = "({$seatime} > 0 AND FROM_UNIXTIME({$seatime},'%Y') = '{$year}')";
         }
         //
         if($data['expenClas']){
@@ -249,7 +251,7 @@ class FinanceController extends BaseController{
         ];
         
         $listResult=$this->fixExpenCom->getList($parameter);
-
+        // echo $this->fixExpenCom->M()->_sql();exit;
         //统计数据
         $parameter["sum"] = ["fee","payment","noPayment"];
         $countResult = $this->fixExpenCom->getOne($parameter);
@@ -318,7 +320,7 @@ class FinanceController extends BaseController{
     //应收款项开始
     function receivableControl(){
         $reqType=I('reqType');
-        $this->assign('dbName',"Receivable");//删除数据的时候需要
+        $this->assign('tableName',"VReceivable");//删除数据的时候需要
         $this->assign("controlName","receivable");//名字对应cust_company_modalOne，和cust_companyModal.html
         $this->assign('projectArr',A("Project")->_getOption("project_id"));
         if($reqType){
@@ -453,7 +455,7 @@ class FinanceController extends BaseController{
         // print_r($supplier->getSupplier());
         $this->assign("supComArr",A("Project")->_getOption("supplier_com"));
         $reqType=I('reqType');
-        $this->assign('dbName',"Wouldpay");//删除数据的时候需要
+        $this->assign('tableName',"VWouldpay");//删除数据的时候需要
         $this->assign("controlName","wouldpay");//名字对应cust_company_modalOne，和cust_companyModal.html
         $this->assign('costArr',A("Project")->_getOption("cost_id"));
         $this->assign('financeArr',A("Project")->_getOption("finance_id"));
@@ -661,7 +663,7 @@ class FinanceController extends BaseController{
      */    
     function purchaControl(){
         $reqType=I('reqType');
-        $this->assign('dbName',"Purcha");//删除数据的时候需要
+        $this->assign('tableName',"VPurcha");//删除数据的时候需要
         $this->assign("controlName","purcha");//名字对应cust_company_modalOne，\
         $this->assign('projectArr',A("Project")->_getOption("project_id"));
         $this->assign("supComArr",A("Project")->_getOption("supplier_com"));
@@ -836,7 +838,7 @@ class FinanceController extends BaseController{
 
     function staffClearControl(){//Finance/staffClearControl
         $reqType=I('reqType');
-        // $this->assign('dbName',"Clear");//删除数据的时候需要
+        // $this->assign('tableName',"Clear");//删除数据的时候需要
         $this->assign("controlName","staffClear");
         $this->assign("tableName",$this->clearCom->tableName()); 
         if($reqType){
@@ -926,7 +928,7 @@ class FinanceController extends BaseController{
             if($datas["project_id"]>0){ 
                 //存在项目，则第一个审批的人是项目主管,examine需要
                 $userRole = $this->userCom->getUserInfo($datas['leader']);
-                $datas['examine'] = $userRole['roleId'].",".$process["examine"];
+                $datas['examine'] = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"])));
                 unset($datas['leader']);
             }else{
                 $datas['examine'] = $process["examine"];
@@ -1030,7 +1032,7 @@ class FinanceController extends BaseController{
      */    
     function readClearControl(){//Finance/staffClearControl
         $reqType=I('reqType');
-        $this->assign('dbName',"Clear");//删除数据的时候需要
+        $this->assign('tableName',"Clear");//删除数据的时候需要
         $this->assign("controlName","readClear");
         $this->assign("tableName",$this->clearCom->tableName()); 
         $clearNodeId = $this->nodeCom->getNodeInfo("controller","Finance/financeClearControl","nodeId");
@@ -1093,7 +1095,7 @@ class FinanceController extends BaseController{
     }
     function financeClearControl(){//Finance/financeClearControl
         $reqType=I('reqType');
-        $this->assign('dbName',"Clear");//删除数据的时候需要
+        // $this->assign('tableName',"Clear");//删除数据的时候需要
         $this->assign("controlName","financeClear");
         $this->assign("tableName",$this->clearCom->tableName()); 
         $readNodeId = $this->nodeCom->getNodeInfo("controller","Finance/readClearControl","nodeId");

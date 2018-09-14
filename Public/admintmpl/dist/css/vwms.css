@@ -176,3 +176,10 @@ td > .approve-group > button{
 	background: none!important;
 	border-bottom: 1px solid #999;
 }
+.files-num-label{
+	font-size: 10px;
+	padding: 2px 3px;
+	position: relative;
+	top: -9px;
+	left: -2px;
+}

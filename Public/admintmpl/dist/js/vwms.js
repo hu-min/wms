@@ -660,12 +660,15 @@ function chUrlAction(nodelId){
     $(document).find(".nodeOn").each(function(elem){
         if(parseInt(nodelId)==parseInt($(this).data("nodeid"))){
             var tController=$(this).attr("href")
-            var tMatch=tController.match(/\/Admin\/([\S\/]*)\./)
-            
+            var tMatch = tController.match(/\/Admin\/([\S\/]*)\./)
+            var param = tController.match(/\&[\S\/\&]*/)
             urlParam=getUrlAction()
             if(tMatch!=null && tMatch[1]!=urlParam){
                 $(".sidebar-menu").find(".nodeOn").removeClass("node-action");
                 $(".sidebar-menu").find("a[href='"+tMatch[0]+"html']").addClass("node-action");
+                if(param){
+                    tMatch[1]+=param[0];
+                  }
                 setUrlAction(tMatch[1],tMatch[1])
             }
             return false;

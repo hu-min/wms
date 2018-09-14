@@ -26,7 +26,7 @@
                             <div class="form-inline">
                                 <div class="form-group"> 
                                     <label class="control-label">供应商名称：</label>
-                                    <select class="form-control search-info chosen-supplier chosen-select" title="供应商名称" name="companyId">
+                                    <select class="form-control search-info chosen-supplier chosen-select" title="供应商名称" name="companyId" data-value="companyId" data-text="company">
                                         <option value="">全部</option>
                                         <volist name="supplierList" id="item">
                                             <option value="{$item.companyId}">{$item.company}</option>
@@ -35,7 +35,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label">联系人：</label>
-                                    <input class="form-control search-info input-sm" name="contact" placeholder="联系人" type="text">
+                                    <input class="form-control search-info input-sm chosen-fcopy" name="contact" placeholder="联系人" type="text">
                                 </div>
                                 <div class="form-group">
                                     <label >状态：</label>
@@ -101,7 +101,7 @@
         // var prefix ="{$contact['prefix']}";
 
         $(function(){
-
+            init_chosen("{$url}","getSupplierList",".search-body");
             $(tabId+" .search-list").trigger("click");
         
             //新增联系人
@@ -111,7 +111,7 @@
                 $(tabId+" .status-btn[name='0']").addClass("active");
             })
             //供应商列表
-            $(tabId+" .chosen-supplier").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true,ajax_load:{url:"{$url}",data:{reqType:"getSupplierList"},value:"companyId",text:"company"}})
+            // $(tabId+" .chosen-supplier").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true,ajax_load:{url:"{$url}",data:{reqType:"getSupplierList"},value:"companyId",text:"company"}})
         })
 
         // function supcontactSearchFuns(){
@@ -143,9 +143,14 @@
         function supcontact_setInfo(info){
 
             $(tabId+" .modal-info[name='contactId']").val(info['contactId']);
-
-            $(tabId+" .modal-info[name='companyId']").html('<option value="'+info['companyId']+'">'+info['company']+'</option>');
-            $(tabId+" .modal-info[name='companyId']").trigger("chosen:updated");
+            if(info['companyId']>0){
+                if($(tabId+" .modal-info[name='companyId']").find("option[value='"+info['companyId']+"']").length==0){
+                    $(tabId+" .modal-info[name='companyId']").append('<option value="'+info['companyId']+'">'+info['company']+'</option>');
+                }
+                $(tabId+" .modal-info[name='companyId']").find("option[value='"+info['companyId']+"']").prop("selected",true)
+                $(tabId+" .modal-info[name='companyId']").trigger("chosen:updated");
+            }
+            
 
             $(tabId+" .modal-status .status-btn").removeClass("active");
             $(tabId+" .modal-status .status-btn[name='"+info['status']+"']").addClass("active");

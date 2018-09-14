@@ -260,7 +260,7 @@ function approve_btn($tableName,$id=0,$place=false,$level=0,$status=0){
     if($place===false || $place > 0){
         $disabled = "";
         // if(($place !== false && $level >= $place) || $status == 3){
-        if(( $level > $place) || $status == 3){
+        if(( $level > $place) || $status == 3 || $status == 1){
             $disabled = "disabled";
         }
         echo '<button type="button" '.$disabled.' data-url="'.U('Tools/approveEdit').'" class="btn btn-xs bg-orange approve-con '.$disabled.'">操作</button>';

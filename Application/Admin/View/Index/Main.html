@@ -41,7 +41,8 @@
 
   <header class="main-header">
     <!-- Logo -->
-    <a href="__ADMINT__/index2.html" class="logo">
+    <!-- <a href="__ADMINT__/index2.html" class="logo"> -->
+    <a class="nodeOn logo" data-level="1" data-nodeid="10000" href="{:U('Index/home')}" data-title="后台首页">
       <!-- mini logo for sidebar mini 50x50 pixels -->
       <span class="logo-mini">
         <img src="__ADMINT__/dist/img/minlogo.png" />
@@ -74,18 +75,24 @@
               <li>
                 <!-- inner menu: contains the actual data -->
                 <ul class="menu">
-                  <li><!-- start message -->
-                    <a href="#">
-                      <div class="pull-left">
-                        <img src="__ADMINT__/dist/img/minlogo.png" class="img-circle" alt="User Image">
-                      </div>
-                      <h4>
-                        系统消息
-                        <small><i class="fa fa-clock-o"></i> 5 分钟前</small>
-                      </h4>
-                      <p>欢迎访问TWSH后台管理系统!</p>
-                    </a>
-                  </li>
+                  <if condition="$new_mesg">
+                      <li><!-- start message -->
+                        <a class="nodeOn" data-nodeid="10001" href="{:U('Public/messageControl')}" data-title="内部消息">
+                          <div class="pull-left">
+                            <if condition="$new_mesg.avatar neq ''">
+                              <img src="/{$new_mesg.avatar}" class="img-circle" alt="User Image">
+                            <else/>
+                              <img src="__ADMINT__/dist/img/minlogo.png" class="img-circle" alt="User Image">
+                            </if>
+                          </div>
+                          <h4>
+                            {$new_mesg.title}
+                            <small><i class="fa fa-clock-o"></i> {$new_mesg.add_time|disTime}</small>
+                          </h4>
+                          <p>{$new_mesg.content|utf8_substr=16}</p>
+                        </a>
+                      </li>
+                  </if>
                   <!-- end message -->
                 </ul>
               </li>
@@ -586,11 +593,7 @@
             var el=$(this)
             var nodeid=$(this).data("nodeid");
             breadcrumb(el,title,level);
-            if(call){
-              if(fun_is_exits(call)){
-                    eval(call+"(this)");//对不同的模块设置不同的响应数据
-                }
-            }
+            
             if(nodeid>0){
                 $(".sidebar-menu").find(".nodeOn").removeClass("node-action");
                 $(this).addClass("node-action");
@@ -598,15 +601,24 @@
                 var SUFFIX="{:C('TMPL_TEMPLATE_SUFFIX')}";
                 if(controller!='/Admin/Index/Main'+SUFFIX){
                     var cMatch=controller.match(/\/Admin\/([\S\/]*)\./)
+                    var param = controller.match(/\&[\S\/\&]*/)
                     if(cMatch!=null && cMatch[1]!=urlParam){
+                        if(param){
+                          cMatch[1]+=param[0];
+                        }
                         setUrlAction(cMatch[1],cMatch[1]);
                     }
-                    get(controller,{authNodeId:nodeid,id:id},function(result){
+                    get(controller.split('&')[0],{authNodeId:nodeid,id:id},function(result){
                         createTab(title,"vtabs"+nodeid,result.html);
-                    });
+                    },false);
                     
                 }else{
                   createTab(title,"vtabs"+nodeid,'');
+                }
+            }
+            if(call){
+              if(fun_is_exits(call)){
+                    eval(call+"(this)");//对不同的模块设置不同的响应数据
                 }
             }
         })
