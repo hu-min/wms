@@ -183,3 +183,6 @@ td > .approve-group > button{
 	top: -9px;
 	left: -2px;
 }
+.nodeOn{
+	cursor: pointer;
+}

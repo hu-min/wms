@@ -297,7 +297,7 @@ $(document).on("click",'.save-info',function(){
     	eval(con+"_getInfo()");//对不同的id设置不同的发送数据
     }else{
         datas["data"]={}
-        $(tabId+" .modal-info").each(function(){
+        $(tabId+".global-modal .modal-info").each(function(){
             var name =$(this).attr("name");
             var val =$(this).val();
             var required=$(this).attr("required");
@@ -554,7 +554,7 @@ $(function(){
                         });
                         // console.log(result.nextExamine)
                         $("#"+apl_id+" .modal-body .next-examine").text(result.nextExamine)
-                        if(result.nextExamine=="已完成"){
+                        if(result.nextExamine=="已完成" && current != allProcess){
                             current = current > 0 ? current : 1
                             allProcess = current;
                         }
@@ -1011,10 +1011,13 @@ function upload(option){
                     $(tabId+"-upload-modal .modal-body .products-list").html("")
                     $(tabId+"-upload-modal .upload-item-file").each(function(){
                         var uploadItem = ""
+                        var errorMes = "";
                         for (let index = 0; index < this.files.length; index++){
+                           
                             var element = this.files[index];
+                            // 限制文件不能大于10M
+                            var thisFile = element.name.split(".")
                             if(Math.floor(element.size/1024/1024)<=10){
-                                var thisFile = element.name.split(".")
                                 var src = window.URL.createObjectURL(element)
                                 var fileType = thisFile[thisFile.length-1].toLowerCase()
                                 if(in_array(fileType,["jpeg","jpg","png","gif"])){
@@ -1036,6 +1039,11 @@ function upload(option){
                                 }
                                 tempFiles["file"+index] = element
                                 $(tabId+"-upload-modal .upload-item").val(uploadItem)
+                            }else{
+                                errorMes+="<p>"+thisFile[0]+"文件超过10M;</p>"
+                            }
+                            if(errorMes!=""){
+                                notice(110,errorMes,'文件超大',5);
                             }
                         }
                     })

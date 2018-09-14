@@ -1,9 +1,9 @@
 
 <volist name="list" id="item">
-    <tr>
+    <tr class="nodeOn node-action" data-nodeid="{$item['nodeId']}" href="{:U($item['controller'])}" data-title="{$item.moudle_name}">
         <td style="width: 10px">{$key+1}</td>
         <td>{$item.user_name}</td>
-        <td><a class="nodeOn node-action" data-nodeid="{$item['nodeId']}" href="{:U($item['controller'])}"><span>{$item.moudle_name}</span></a></td>
+        <td><span>{$item.moudle_name}</span></td>
         <td>{$item.project_name}</td>
         <td>{$item.add_time}</td>
         <td>

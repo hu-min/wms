@@ -20,7 +20,7 @@
         </select>
     </td>
     <td>
-        <select class="form-control modal-info chosen-select" required="required" title="供应商联系人" data-value="contactId" data-req="getSuprContList" data-pname="supplier_com" data-text="contact" name="supplier_cont">
+        <select class="form-control modal-info chosen-select"  title="供应商联系人" data-value="contactId" data-req="getSuprContList" data-pname="supplier_com" data-text="contact" name="supplier_cont">
             <option value="">选择供应商联系人</option>
             <volist name="suprcontArr" id="item">
                 <option value="{$item['contactId']}">{$item['contact']}</option>
@@ -29,7 +29,7 @@
     </td>
     <td ><input class="form-control modal-info"  readonly="readonly" name="region" type="text"></td>
     <td>
-        <select class="form-control modal-info chosen-select" required="required" title="承接模块" data-value="basicId" data-req="getModuleList" data-pname="supplier_com" data-text="name" name="module">
+        <select class="form-control modal-info chosen-select" title="承接模块" data-value="basicId" data-req="getModuleList" data-pname="supplier_com" data-text="name" name="module">
             <option value="">选择承接模块</option>
             <volist name="moduleArr" id="item">
                 <option value="{$item['basicId']}">{$item['name']}</option>

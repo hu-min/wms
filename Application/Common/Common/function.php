@@ -228,7 +228,9 @@ function modal_btn($defind_vars,$status=false){
     if($nodeAuth >= 7){
         echo "<button  type='button' name='0' class='btn btn-default btn-sm active status-btn'><i class='fa fa-square text-default'></i> 未启用 </button>";
     }
+    
     if($status){
+        
         if($processAuth['level'] > 1 && !in_array($userId,explode(',',$item['examine'])) || $item['status'] == 1 || $nodeAuth>= 7){
             echo "<button type='button' name='1' class='btn btn-success btn-sm status-btn'><i class='fa fa-square text-default'> $statusType[1] </i></button>";
         }

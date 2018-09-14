@@ -138,7 +138,7 @@ class ProjectController extends BaseController{
 
             $resultData["project_time"] = date("Y-m-d",$resultData["project_time"]);
             $resultData["create_time"] = date("Y-m-d",$resultData["create_time"]);
-            // $resultData["bid_date"] = date("Y-m-d",$resultData["bid_date"]);
+            $resultData["bid_date"] = date("Y-m-d",$resultData["bid_date"]);
             $resultData["bid_time"] = date("H:i:s",$resultData["bid_time"]);
             $resultData["end_date"] = date("Y-m-d",strtotime($resultData["project_time"]." +".$resultData["days"]."day"));
             $resultData["citys"] = $this->basicCom->get_citys($resultData["province"]);
@@ -474,23 +474,24 @@ class ProjectController extends BaseController{
     function manageProjectInfo(){
         $reqType=I("reqType");
         $datas=I("data");
-
-        $datas['project_id'] = $datas['project_id'] ? $datas['project_id'] : 0;
+        $datas['project_id'] = $datas['project_id'] > 0? $datas['project_id'] : 0;
         if(isset($datas['earlier_user'])){
             $datas['earlier_user']=implode(",",$datas['earlier_user']);
         }
         if(isset($datas['scene_user'])){
             $datas['scene_user']=implode(",",$datas['scene_user']);
         }
-        // if(isset($datas['bid_date'])){
-        //     $datas['bid_date']=date("Ymd",strtotime($datas['bid_date']));
-        // }
+        if(isset($datas['bid_date'])){
+            $datas['bid_date']=strtotime($datas['bid_date']);
+        }
         if(isset($datas['create_time'])){
             $datas['create_time']=strtotime($datas['create_time']);
         }
         if(isset($datas['project_time'])){
-            $datas['project_time']=strtotime($datas['project_time']);
+            $datas['project_time']= $datas['project_time'] !="" ? strtotime($datas['project_time']) : time();
         }
+        $datas['days'] = $datas['days'] > 0 ? $datas['days'] : 1;
+        // print_r($datas);exit;
         if($reqType=="projectAdd"){
             $datas['addTime']=time();
             $datas['time']=strtotime($datas['time']);
@@ -876,7 +877,7 @@ class ProjectController extends BaseController{
 
             $resultData["project_time"] = date("Y-m-d",$resultData["project_time"]);
             $resultData["create_time"] = date("Y-m-d",$resultData["create_time"]);
-            // $resultData["bid_date"] = date("Y-m-d",strtotime($resultData["bid_date"]));
+            $resultData["bid_date"] = date("Y-m-d",strtotime($resultData["bid_date"]));
             $resultData["bid_time"] = date("H:i:s",$resultData["bid_time"]);
             $resultData["end_date"] = date("Y-m-d",strtotime($resultData["project_time"]." +".$resultData["days"]."day"));
             $resultData["citys"] = $this->basicCom->get_citys($resultData["province"]);
