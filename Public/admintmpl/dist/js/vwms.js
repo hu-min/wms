@@ -541,6 +541,7 @@ $(function(){
             $("#"+apl_id+" .modal-body").html(body);
             if($(this).hasClass("approve-log")){
                 get(url,indata,function(result){
+                    // console.log(result)
                     var current = 0;
                     var allProcess = result.allProcess > 0 ? (Number(result.allProcess)) : 0;
                     if(result.errCode == 0){
@@ -553,6 +554,10 @@ $(function(){
                         });
                         // console.log(result.nextExamine)
                         $("#"+apl_id+" .modal-body .next-examine").text(result.nextExamine)
+                        if(result.nextExamine=="已完成"){
+                            current = current > 0 ? current : 1
+                            allProcess = current;
+                        }
                         var progress = float(current/allProcess)*100;
                         var final = " 未完成";
                         if(progress>=100){
@@ -560,6 +565,7 @@ $(function(){
                             $("#"+apl_id+" .modal-body .progress").removeClass("active");
                             final = " 已完成";
                         }
+                        
                         $("#"+apl_id+" .modal-body tbody").html(trHtml);
                         $("#"+apl_id+" .modal-body .progress .progress-bar").css("width",progress+"%");
                         if(current>0){
