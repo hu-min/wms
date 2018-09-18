@@ -41,7 +41,11 @@ class BaseController extends \Common\Controller\BaseController{
         $groupBy=$parameter['groupBy']?$parameter['groupBy']:null;
         $joins=$parameter['joins']?$parameter['joins']:"";
         $having=$parameter['having']?$parameter['having']:"";
-        $count=$this->selfDB->countList($where,$joins,$groupBy,$having);
+        $isCount=$parameter['isCount']?$parameter['isCount']:true;
+        $count = 0;
+        if($isCount){
+            $count=$this->selfDB->countList($where,$joins,$groupBy,$having);
+        }
         $classList=$this->selfDB->getList($where , $fields, $orderStr, $page, $pageNum, $groupBy,$joins,$having);
         // $this->log($this->selfDB->_sql());
         

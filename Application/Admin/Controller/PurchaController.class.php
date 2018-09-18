@@ -110,6 +110,9 @@ class PurchaController extends BaseController{
             $btnTitle = "保存数据";
             $redisName="cost_insertList";
             $where = ["project_id"=>$id];
+            if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+                $where['user_id'] = session('userId');
+            }
             $parameter=[
                 'where'=>$where,
                 'fields'=>"*,FROM_UNIXTIME(sign_date,'%Y-%m-%d') sign_date,FROM_UNIXTIME(advance_date,'%Y-%m-%d') advance_date,FIND_IN_SET({$roleId},examine) place",
@@ -118,15 +121,16 @@ class PurchaController extends BaseController{
                 'orderStr'=>"id DESC",
                 "joins"=>[
                     "LEFT JOIN(SELECT projectId, name,code,business,leader FROM v_project) p ON p.projectId = project_id",
-                    "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = p.business",
-                    "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
-                    "LEFT JOIN (SELECT companyId cid,company supplier_com_name,type,provinceId,cityId FROM v_supplier_company WHERE status=1) c ON c.cid=supplier_com",
+                    "LEFT JOIN (SELECT userId buser_id,userName business_name FROM v_user) bu ON bu.buser_id = p.business",
+                    "LEFT JOIN (SELECT userId luser_id,userName leader_name FROM v_user) lu ON lu.luser_id = p.leader",
+                    "LEFT JOIN (SELECT companyId cid,company supplier_com_name,type mtype,provinceId,cityId FROM v_supplier_company WHERE status=1) c ON c.cid=supplier_com",
                     "LEFT JOIN (SELECT contactId cid,contact supplier_cont_name FROM v_supplier_contact WHERE status=1) ct ON ct.cid=supplier_cont",
                     "LEFT JOIN (SELECT pid ,province province_name FROM v_province) pr ON pr.pid=c.provinceId",
                     "LEFT JOIN (SELECT cid,city city_name,pid FROM v_city) ci ON ci.cid=c.cityId",
-                    "LEFT JOIN (SELECT basicId,name module_name FROM v_basic WHERE class='module') m ON m.basicId=module",
-                    "LEFT JOIN (SELECT basicId,name type_name FROM v_basic WHERE class='supType') st ON st.basicId=c.type",
+                    // "LEFT JOIN (SELECT basicId,name module_name FROM v_basic WHERE class='module') m ON m.basicId=module",
+                    "LEFT JOIN (SELECT basicId,name module_name FROM v_basic WHERE class='module') st ON st.basicId=c.mtype",
                 ],
+                'isCount' => false,
             ];
             $resultData=$this->purchaCom->getList($parameter);
             // echo $this->purchaCom->M()->_sql();exit;
@@ -151,7 +155,7 @@ class PurchaController extends BaseController{
         }
         $parameter=[
             'where'=>$where,
-            'fields'=>"id,project_id,state status,user_id,COUNT(supplier_com) supr_num,SUM(contract_amount) amount, name,code,business_name,leader_name,FIND_IN_SET({$roleId},examine) place",
+            'fields'=>"id,type,project_id,state status,user_id,COUNT(supplier_com) supr_num,SUM(contract_amount) amount, name,code,business_name,leader_name,FIND_IN_SET({$roleId},examine) place",
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"id DESC",
@@ -165,7 +169,7 @@ class PurchaController extends BaseController{
         ];
         
         $listResult=$this->purchaCom->getList($parameter);
-        echo $this->purchaCom->M()->_sql();exit;
+        // echo $this->purchaCom->M()->_sql();exit;
         $this->tablePage($listResult,'Purcha/purchaTable/costInsertList',"cost_insertList");
     }
     function manageCostInsertInfo($datas,$reqType=false){
@@ -211,13 +215,29 @@ class PurchaController extends BaseController{
         }else{
             $examine = $process["examine"];
         }
-        $process_level=$process["place"];
+        // $process_level=$process["place"];
+        //如果是审批者自己提交的执行下列代码
+        $roleId = session("roleId");
+        $examineArr = explode(",",$examine);
+        $rolePlace = array_search($roleId,$examineArr);
+        $status = 0;
+        if($rolePlace!==false){
+            $process_level=$rolePlace+2;
+            if(count($examineArr) <= ($rolePlace+1)){
+                $status = 1;
+            }else{
+                $status = 2;
+            }
+        }else{
+            $process_level=$process["place"];
+        }
+
         foreach ($datas as $suprInfo) {
             $dataInfo = $this->manageCostInsertInfo($suprInfo);
             $dataInfo["process_id"] = $process_id;
             $dataInfo["examine"] = $examine;
             $dataInfo['process_level'] = $process_level;
-            // print_r($dataInfo);
+            $dataInfo['status'] = $status;
             unset($dataInfo['leader']);
             if($dataInfo){
                 $insertResult=$this->purchaCom->insert($dataInfo);

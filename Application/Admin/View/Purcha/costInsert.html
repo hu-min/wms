@@ -97,12 +97,14 @@
                 init_chosen("{$url}","getProjectOne",".create-rece");
                 init_chosen("{$url}","getProjectOne",$(tabId).find(".supr-list tbody tr"));
                 init_date();
+                $(tabId).find(" .approve-group").remove();
             }
             // init_chosen("{$url}","getProjectOne",".global-modal");
             // init_date();
             upload({url:"{:U('Project/upload_filesAdd')}"})
         }
         function cost_insert_setInfo(info){
+            var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
             if(info["list"] == undefined){
                 ["code","leader_name","business_name","leader"].forEach(element => {
                     $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
@@ -118,7 +120,8 @@
                 });
                 var status = 0
                 var user_id = 0
-                var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
+                
+                var statusType = JSON.parse('{$statusTypeJ}');
                 info.list.forEach(function(supritem,rows){
                     
                     if( supritem["status"] > status){
@@ -129,14 +132,21 @@
                     $(tabId+" .global-modal .supr-list tbody").append(info.template);
                     var $current = $(tabId+" .global-modal .supr-list tbody tr").eq(rows);
                     $current.find(".serial").text(Number(rows+1));
-
-                    ["id","type","supplier_com","supplier_cont","module","contract_amount","sign_date","advance_date","offer_file","contract_file","remark","region"].forEach(element => {
+                    ["id","type","supplier_com","supplier_cont","module","contract_amount","sign_date","advance_date","offer_file","contract_file","remark","region",'status'].forEach(element => {
                         if(!$current.find(".modal-info[name='"+element+"']").hasClass("chosen-select")){
                             if(element=="region"){
                                 if(supritem["province_name"] && supritem["city_name"]){
                                     $current.find(".modal-info[name='"+element+"']").val(supritem["province_name"]+"-"+supritem["city_name"]);
                                 }
-                                
+                            }else if(element == "id"){
+                                $current.find(".approve-group").data("id",supritem[element])
+                            }else if(element == "status"){
+                                var status = supritem[element]
+                                if(Number(supritem["last_status"])>1){
+                                    status= supritem["last_status"]
+                                }
+                                $current.find("td[name='"+element+"']").text(statusType[status]);
+                                $current.find(".modal-info[name='"+element+"']").val(supritem[element]);
                             }else{
                                 $current.find(".modal-info[name='"+element+"']").val(supritem[element]);
                             }
@@ -144,8 +154,8 @@
                         }else{
                             
                             if(element == 'supplier_cont'){
-                                console.log(element)
-                                console.log(supritem[element])
+                                // console.log(element)
+                                // console.log(supritem[element])
                             }
                             if(supritem[element]>0){
                                 if($current.find(".modal-info[name='"+element+"']").find("option[value='"+supritem[element]+"']").length==0 && supritem[element] && supritem[element+"_name"] ){
@@ -157,7 +167,7 @@
 
                         // $(tabId+" .global-modal .modal-info[name='"+element+"']").val(supritem[element]);
                     });
-
+                    
                     
                     
                     if(( status > 0 || user_id != "{$Think.session.userId}") && "{$nodeAuth}"<7 && status !=3 && gettype !="Add"){
@@ -236,6 +246,7 @@
                     $(tabId+" .global-modal .supr-list").append(result.html);
                     init_chosen("{$url}","getProjectOne",$(tabId+" .global-modal .supr-list tr").eq(rows));
                     init_date(false,$(tabId+" .global-modal .supr-list tr").eq(rows));
+                    $(tabId+" .global-modal .supr-list tr").eq(rows).find(" .approve-group").remove();
                 })
             })
             $(tabId).offon("click",".supr-remove",function(){

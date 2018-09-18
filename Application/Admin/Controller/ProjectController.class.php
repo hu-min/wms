@@ -507,7 +507,7 @@ class ProjectController extends BaseController{
             $datas['examine'] = $examines['examine'];
             $datas['process_id'] = $examines['process_id'];
             //如果是审批者自己提交的执行下列代码
-            $roleId = I("roleId");
+            $roleId = session("roleId");
             $examineArr = explode(",",$expInfo['examine']);
             $rolePlace = array_search($roleId,$examineArr);
             $datas['status'] = 0;

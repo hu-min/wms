@@ -74,6 +74,8 @@
                             <th>报价文件</th>
                             <th>合同文件</th>
                             <th>备注</th>
+                            <th>状态</th>
+                            <th>审批记录</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -145,6 +147,11 @@
                             </td>
                             <td>
                                 <input class="form-control modal-info"  name="remark" title="备注"  value="" placeholder="备注" type="text">
+                            </td>
+                            <td name="status">
+                            </td>
+                            <td>
+                                {:approve_btn($tableName)}
                             </td>
                         </tr>
                     </tbody>
@@ -344,5 +351,5 @@
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-    {:save_btn(get_defined_vars())}
+    {:save_btn(get_defined_vars(),true)}
 </div>

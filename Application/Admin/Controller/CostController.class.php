@@ -427,7 +427,7 @@ class CostController extends BaseController{
             $expInfo['examine'] = $process["examine"];
         }
         //如果是审批者自己提交的执行下列代码
-        $roleId = I("roleId");
+        $roleId = session("roleId");
         $examineArr = explode(",",$expInfo['examine']);
         $rolePlace = array_search($roleId,$examineArr);
         $expInfo['status'] = 0;
