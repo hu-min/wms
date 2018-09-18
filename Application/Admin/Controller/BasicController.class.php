@@ -911,6 +911,7 @@ class BasicController extends BaseController{
     function moduleControl(){
         $reqType=I('reqType');
         $this->assign("controlName","basic_module");
+        $this->assign("supTypeList",A('Supplier')->getSupType());
         if($reqType){
             $this->$reqType();
         }else{
@@ -964,6 +965,9 @@ class BasicController extends BaseController{
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"basicId DESC",
+            'joins' => [
+                'LEFT JOIN (SELECT basicId stId ,name supType_name FROM v_basic WHERE class="supType") st ON st.stId = pId'
+            ],
         ];
         $basicResult=$this->basicCom->getBasicList($parameter);
         $this->tablePage($basicResult,'Basic/basicTable/moduleList',"moduleList");
@@ -978,17 +982,10 @@ class BasicController extends BaseController{
         }else if($reqType=="basic_moduleEdit"){
             $where=["basicId"=>$datas['basicId']];
             $data=[];
-            if(isset($datas['name'])){
-                $data['name']=$datas['name'];
-            }
-            if(isset($datas['alias'])){
-                $data['alias']=$datas['alias'];
-            }
-            if(isset($datas['remark'])){
-                $data['remark']=$datas['remark'];
-            }
-            if(isset($datas['status'])){
-                $data['status']=$datas['status'];
+            foreach (['name','alias','pId','remark','status'] as $key ) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
             }
             return ["where"=>$where,"data"=>$data];
         }

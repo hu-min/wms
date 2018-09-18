@@ -161,3 +161,5 @@ Uploads/User/20180913/6159252dd42a2834b1c7cf5b59b5c9ea15cebf79.jpg
 
 2018-09-14
 1，项目新增成本预算字段
+
+修复global_modal

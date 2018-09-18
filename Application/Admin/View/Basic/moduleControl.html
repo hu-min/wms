@@ -57,6 +57,7 @@
                 <table id="" class="table table-bordered table-hover">
                     <thead>
                         <tr>
+                            <th>供应商类型</th>
                             <th>承接模块名称</th>
                             <th>承接模块别名</th>
                             <th>承接模块备注</th>
@@ -82,15 +83,18 @@
         </div>
     </div>
     <script>
+        var basic_module_initInfo = function(){
+            init_chosen("{$url}","getOptionList",'.global-modal');
+        }
         $(function(){
+            init_chosen("{$url}","getOptionList",tabId);
             $(tabId+" .search-list").trigger("click");
         })
         /*设置编辑信息*/
         function basic_module_setInfo(info){
-            $(tabId+" .modal-info[name='basicId']").val(info['basicId']);
-            $(tabId+" .modal-info[name='name']").val(info['name']);
-            $(tabId+" .modal-info[name='alias']").val(info['alias']);
-            $(tabId+" .modal-info[name='remark']").val(info['remark']);
+            ['basicId','name','alias','pId','remark'].forEach(element => {
+                $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
+            });
             set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
         }
     </script>

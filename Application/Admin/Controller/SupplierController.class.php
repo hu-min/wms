@@ -324,7 +324,10 @@ class SupplierController extends BaseController{
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"companyId DESC",
-            "joins"=>["LEFT JOIN v_province p ON p.pid=provinceId","LEFT JOIN v_city c ON c.pid=p.pid AND c.cid=cityId","LEFT JOIN (SELECT basicId,name typeName FROM v_basic WHERE class='supType') b ON b.basicId=type"],
+            "joins"=>[
+                "LEFT JOIN v_province p ON p.pid=provinceId","LEFT JOIN v_city c ON c.pid=p.pid AND c.cid=cityId",
+                "LEFT JOIN (SELECT basicId,name typeName FROM v_basic WHERE class='module') b ON b.basicId=type"
+            ],
         ];
         
         $listResult=$this->supplierCom->getCompanyList($parameter);
@@ -631,10 +634,13 @@ class SupplierController extends BaseController{
         $supplierResult = $this->supplierCom->getSuprContList($parameter);
         return $supplierResult['list'] ? $supplierResult['list'] : [];
     }
-    function getModule($key){
+    function getModule($pid="",$key=""){
         $where=["class"=>"module"];
         if ($key!=""){
             $where["name"]=["LIKE","%{$key}%"];
+        }
+        if ($pid!=""){
+            $where["pId"] = $pid;
         }
         $parameter=[
             'where'=>$where,
@@ -645,5 +651,10 @@ class SupplierController extends BaseController{
         ];
         $basicResult=$this->basicCom->getBasicList($parameter);
         return $basicResult['list'] ? $basicResult['list'] : [];
+    }
+    function getModuleList(){
+        $key=I("key");
+        $pid=I("pid");
+        $this->ajaxReturn(["data"=>$this->getModule($pid,$key)]);
     }
 }

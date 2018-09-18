@@ -84,7 +84,7 @@
                     <thead>
                         <tr>
                             <th>供应商名称</th>
-                            <th>供应商类型</th>
+                            <th>供应商承接模块</th>
                             <th>供应商别名</th>
                             <th>省份</th>
                             <th>城市</th>
@@ -196,7 +196,7 @@
             $(tabId+" .modal-info[name='remarks']").val(info['remarks']);
 
             if(info['type']>0){
-                if($(tabId+" .modal-info[name='type']").find("option[value='"+info['type']+"']").length==0){
+                if($(tabId+" .modal-info[name='type']").find("option[value='"+info['type']+"']").length==0 && info['type'] && info['typeName']){
                     $(tabId+" .modal-info[name='type']").append('<option value="'+info['type']+'">'+info['typeName']+'</option>');
                 }
                 $(tabId+" .modal-info[name='type']").find("option[value='"+info['type']+"']").prop("selected",true)

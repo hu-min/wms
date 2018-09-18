@@ -94,7 +94,8 @@
     <script>
         function cost_insert_initInfo(gettype){
             if(gettype=="Add"){
-                init_chosen("{$url}","getProjectOne",".global-modal");
+                init_chosen("{$url}","getProjectOne",".create-rece");
+                init_chosen("{$url}","getProjectOne",$(tabId).find(".supr-list tbody tr"));
                 init_date();
             }
             // init_chosen("{$url}","getProjectOne",".global-modal");
@@ -130,8 +131,6 @@
                     $current.find(".serial").text(Number(rows+1));
 
                     ["id","type","supplier_com","supplier_cont","module","contract_amount","sign_date","advance_date","offer_file","contract_file","remark","region"].forEach(element => {
-
-                        
                         if(!$current.find(".modal-info[name='"+element+"']").hasClass("chosen-select")){
                             if(element=="region"){
                                 if(supritem["province_name"] && supritem["city_name"]){
@@ -143,10 +142,17 @@
                             }
                             
                         }else{
-                            if($current.find(".modal-info[name='"+element+"']").find("option[value='"+supritem[element]+"']").length==0){
-                                $current.find(".modal-info[name='"+element+"']").append("<option value='"+supritem[element]+"'>"+supritem[element+"_name"]+"</option>")
+                            
+                            if(element == 'supplier_cont'){
+                                console.log(element)
+                                console.log(supritem[element])
                             }
-                            $current.find(".modal-info[name='"+element+"']").find("option[value='"+supritem[element]+"']").prop("selected",true);
+                            if(supritem[element]>0){
+                                if($current.find(".modal-info[name='"+element+"']").find("option[value='"+supritem[element]+"']").length==0 && supritem[element] && supritem[element+"_name"] ){
+                                    $current.find(".modal-info[name='"+element+"']").append("<option value='"+supritem[element]+"'>"+supritem[element+"_name"]+"</option>")
+                                }
+                                $current.find(".modal-info[name='"+element+"']").find("option[value='"+supritem[element]+"']").prop("selected",true);
+                            }
                         }
 
                         // $(tabId+" .global-modal .modal-info[name='"+element+"']").val(supritem[element]);
@@ -216,7 +222,11 @@
             $(tabId).offon("change"," .modal-info[name='supplier_com']",function(){
                 var province_name = $(this).find("option:selected").data("province_name");
                 var city_name = $(this).find("option:selected").data("city_name");
-                $(this).parents("tr").find(".modal-info[name='region']").val(province_name+"-"+city_name);
+                if(province_name && city_name){
+                    $(this).parents("tr").find(".modal-info[name='region']").val(province_name+"-"+city_name);
+                }
+                
+                
             });
             $(tabId).offon("click",".add-suprcompany",function(){
                 datas["reqType"]='getSuprLiOne';

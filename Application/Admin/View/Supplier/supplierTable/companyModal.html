@@ -14,11 +14,17 @@
             </div>
             <div class="form-group"> 
                 <label class="control-label">供应商类型：</label>
-                <select class="form-control modal-info chosen-suptype chosen-select" title="供应商类型" name="type" data-value="basicId"  data-text="name" data-req="getSupTypeList">
+                <select class="form-control chosen-suptype chosen-select" title="供应商类型" name="suprtype" data-value="basicId"  data-text="name" data-req="getSupTypeList" data-cname="type">
                     <option value="">全部</option>
                     <volist name="supTypeList" id="item">
                         <option value="{$item.basicId}">{$item.name}</option>
                     </volist>
+                </select>
+            </div>
+            <div class="form-group"> 
+                <label class="control-label">承接模块：</label>
+                <select class="form-control modal-info  chosen-select" data-pname="suprtype" title="承接模块" name="type" data-value="basicId"  data-text="name" data-req="getModuleList">
+                    <option value="">全部</option>
                 </select>
             </div>
             <div class="form-group">

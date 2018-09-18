@@ -496,7 +496,7 @@ class ProjectController extends BaseController{
             $datas['addTime']=time();
             $datas['time']=strtotime($datas['time']);
             $datas['author']=session('userId');
-            $datas['process_level']=$this->processAuth["level"];
+            // $datas['process_level']=$this->processAuth["level"];
             //添加时必备数据
             // $process = $this->nodeCom->getProcess(I("vtabId"));
 

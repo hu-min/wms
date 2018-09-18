@@ -297,7 +297,11 @@ $(document).on("click",'.save-info',function(){
     	eval(con+"_getInfo()");//对不同的id设置不同的发送数据
     }else{
         datas["data"]={}
-        $(tabId+" .global-modal .modal-info").each(function(){
+        var global_modal = ""
+        if($(tabId+" .global-modal").html()!=undefined){
+            global_modal = " .global-modal"
+        }
+        $(tabId+global_modal+" .modal-info").each(function(){
             var name =$(this).attr("name");
             var val =$(this).val();
             var required=$(this).attr("required");
@@ -349,9 +353,13 @@ $(document).on("click",'.save-info',function(){
                 // console.log(isModal);
                 searchFun(url,datas,table,page,count)
             }
+            // console.log($('body').hasClass('modal-open'))
+            // console.log($(self).parents(".modal"))
             if($('body').hasClass('modal-open')){
+                // console.log($(tabId+" .modal"))
+                $(tabId+" .modal").modal('hide')
                 // $(tabId+" .modal").modal('toggle')
-                $(self).parents(".modal").modal('toggle')
+                // $(self).parents(".modal").modal('toggle')
             }
         }else{
             notice(100,result.error);
@@ -873,6 +881,7 @@ function init_chosen(url,reqType,parental){
                 ajax_json["pelement"] = $this.find(".chosen-select[name='"+pname+"']").eq($this.find(".chosen-select[name='"+type+"']").index(this))
                 
             }
+            // console.log($this)
             var noupdate = $(this).data('noupdate')
             if(noupdate!=undefined){
                 ajax_json["noupdate"] = true

@@ -35,8 +35,8 @@ class PurchaController extends BaseController{
         $this->assign('tableName',$this->purchaCom->tableName());//删除数据的时候需要
         $this->assign('projectArr',$this->project->_getOption("project_id"));
         $this->assign('supplierArr',$this->supplier->getSupType());
-        $this->assign('companyArr',$this->supplier->getSupplier());
-        $this->assign('moduleArr',$this->supplier->getModule());
+        // $this->assign('companyArr',$this->supplier->getSupplier());
+        // $this->assign('moduleArr',$this->supplier->getModule());
         if($reqType){
             $this->$reqType();
         }else{
@@ -77,8 +77,9 @@ class PurchaController extends BaseController{
         $this->ajaxReturn(["data"=>$resultData]);
     }
     function getModuleList(){
+        $pid = I("pid",'');
         $key = I("key",'');
-        $resultData = $this->supplier->getModule($key);
+        $resultData = $this->supplier->getModule($pid,$key);
         $this->ajaxReturn(["data"=>$resultData]);
     }
     function getSuprLiOne(){
@@ -128,6 +129,7 @@ class PurchaController extends BaseController{
                 ],
             ];
             $resultData=$this->purchaCom->getList($parameter);
+            // echo $this->purchaCom->M()->_sql();exit;
             // print_r($resultData);
             $resultData["template"] = $this->fetch('Purcha/purchaTable/suprLi');
         }
@@ -163,7 +165,7 @@ class PurchaController extends BaseController{
         ];
         
         $listResult=$this->purchaCom->getList($parameter);
-        // echo $this->purchaCom->M()->_sql();
+        echo $this->purchaCom->M()->_sql();exit;
         $this->tablePage($listResult,'Purcha/purchaTable/costInsertList',"cost_insertList");
     }
     function manageCostInsertInfo($datas,$reqType=false){
@@ -204,7 +206,7 @@ class PurchaController extends BaseController{
         if($datas[0]["project_id"]>0){ 
             //存在项目，则第一个审批的人是项目主管,examine需要
             $userRole = $this->userCom->getUserInfo($datas[0]["leader"]);
-            $examine = $userRole['roleId'].",".$process["examine"];
+            $examine = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"])));
             unset($expInfo['leader']);
         }else{
             $examine = $process["examine"];
