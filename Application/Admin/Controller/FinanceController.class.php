@@ -381,7 +381,7 @@ class FinanceController extends BaseController{
             $data=[];
 
             $data['updateUser']=session('userId');
-            foreach (['advance_date','advance','contract_date','id','next_date','pay_amount','pay_date','project_id','remark','status','surplus_date','surplus'] as  $key) {
+            foreach (['advance_date','advance','contract_date','id','next_date','pay_amount','pay_date','project_id','remark','status','surplus_date','surplus','invoice'] as  $key) {
                 if(isset($datas[$key])){
                     $data[$key]=$datas[$key];
                 }
