@@ -129,6 +129,8 @@ class PurchaController extends BaseController{
                     "LEFT JOIN (SELECT cid,city city_name,pid FROM v_city) ci ON ci.cid=c.cityId",
                     // "LEFT JOIN (SELECT basicId,name module_name FROM v_basic WHERE class='module') m ON m.basicId=module",
                     "LEFT JOIN (SELECT basicId,name module_name FROM v_basic WHERE class='module') st ON st.basicId=c.mtype",
+                    "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE table_name ='v_purcha' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id",
+                    "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
                 ],
                 'isCount' => false,
             ];
@@ -219,7 +221,7 @@ class PurchaController extends BaseController{
         //如果是审批者自己提交的执行下列代码
         $roleId = session("roleId");
         $examineArr = explode(",",$examine);
-        $rolePlace = array_search($roleId,$examineArr);
+        $rolePlace = search_last_key($roleId,explode(",",$userRole['roleId'].",".$process["examine"]));
         $status = 0;
         if($rolePlace!==false){
             $process_level=$rolePlace+2;
@@ -231,13 +233,15 @@ class PurchaController extends BaseController{
         }else{
             $process_level=$process["place"];
         }
-
+        
         foreach ($datas as $suprInfo) {
             $dataInfo = $this->manageCostInsertInfo($suprInfo);
             $dataInfo["process_id"] = $process_id;
             $dataInfo["examine"] = $examine;
             $dataInfo['process_level'] = $process_level;
             $dataInfo['status'] = $status;
+            // print_r($process);
+            // print_r($dataInfo);exit;
             unset($dataInfo['leader']);
             if($dataInfo){
                 $insertResult=$this->purchaCom->insert($dataInfo);
@@ -321,8 +325,9 @@ class PurchaController extends BaseController{
             'orderStr'=>"id DESC",
             "joins"=>[
                 "LEFT JOIN (SELECT projectId, name project_name,code,business,leader,brand ,project_time project_date,days FROM v_project) p ON p.projectId = project_id",
-                "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = p.business",
-                "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
+                "LEFT JOIN (SELECT userId uuser_id,userName user_name FROM v_user) u ON u.uuser_id = user_id",
+                "LEFT JOIN (SELECT userId buser_id,userName business_name FROM v_user) bu ON bu.buser_id = p.business",
+                "LEFT JOIN (SELECT userId luser_id,userName leader_name FROM v_user) lu ON lu.luser_id = p.leader",
                 "LEFT JOIN (SELECT companyId cid,company supplier_com_name,type,provinceId,cityId FROM v_supplier_company WHERE status=1) c ON c.cid=supplier_com",
                 "LEFT JOIN (SELECT contactId cid,contact supplier_cont_name,phone supplier_cont_phone,email supplier_cont_email FROM v_supplier_contact WHERE status=1) ct ON ct.cid=supplier_cont",
                 "LEFT JOIN (SELECT basicId,name type_name FROM v_basic WHERE class='supType') st ON st.basicId=c.type",
@@ -330,6 +335,8 @@ class PurchaController extends BaseController{
                 "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = p.brand",
                 "LEFT JOIN (SELECT pid ,province province_name FROM v_province) pr ON pr.pid=c.provinceId",
                 "LEFT JOIN (SELECT cid,city city_name,pid FROM v_city) ci ON ci.cid=c.cityId",
+                "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE table_name ='v_purcha' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id",
+                "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
             ],
         ];
         

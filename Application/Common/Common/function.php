@@ -348,3 +348,12 @@ function disTime($timeStamp){
         }
     }
 }
+function search_last_key($search,$array){
+    $return = false;
+    foreach ($array as $key => $value) {
+        if($value == $search){
+            $return = $key;
+        }
+    }
+    return $return;
+}

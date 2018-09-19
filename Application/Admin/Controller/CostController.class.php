@@ -144,7 +144,7 @@ class CostController extends BaseController{
                 $datas['examine'] = $process["examine"];
             }
             $examineArr = explode(",",$datas['examine']);
-            $rolePlace = array_search($roleId,$examineArr);
+            $rolePlace = search_last_key($roleId,$examineArr);
             if($rolePlace!==false){
                 $datas['process_level']=$rolePlace+2;
                 if(count($examineArr) == ($rolePlace+1)){
@@ -429,7 +429,7 @@ class CostController extends BaseController{
         //如果是审批者自己提交的执行下列代码
         $roleId = session("roleId");
         $examineArr = explode(",",$expInfo['examine']);
-        $rolePlace = array_search($roleId,$examineArr);
+        $rolePlace = search_last_key($roleId,$examineArr);
         $expInfo['status'] = 0;
         if($rolePlace!==false){
             $expInfo['process_level']=$rolePlace+2;

@@ -936,7 +936,7 @@ class FinanceController extends BaseController{
             //如果是审批者自己提交的执行下列代码
             $roleId = session("roleId");
             $examineArr = explode(",",$datas['examine']);
-            $rolePlace = array_search($roleId,$examineArr);
+            $rolePlace = search_last_key($roleId,$examineArr);
             $datas['status'] = 0;
             if($rolePlace!==false){
                 $datas['process_level']=$rolePlace+2;

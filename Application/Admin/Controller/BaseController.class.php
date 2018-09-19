@@ -15,7 +15,7 @@ class BaseController extends \Common\Controller\BaseController{
     protected $authority;
     protected $nodeAuth;
     protected $exemption;
-    protected $pageSize=15;
+    protected $pageSize=10;
     // protected $statusType=[0=>"提交申请",1=>"批准",2=>"审核中",3=>"无效",4=>"删除"];
     protected $statusType=[0=>"提交申请",1=>"批准",2=>"审核中",3=>"驳回",4=>"删除",5=>"拒绝"];
 

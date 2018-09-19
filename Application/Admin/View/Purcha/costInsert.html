@@ -132,7 +132,7 @@
                     $(tabId+" .global-modal .supr-list tbody").append(info.template);
                     var $current = $(tabId+" .global-modal .supr-list tbody tr").eq(rows);
                     $current.find(".serial").text(Number(rows+1));
-                    ["id","type","supplier_com","supplier_cont","module","contract_amount","sign_date","advance_date","offer_file","contract_file","remark","region",'status'].forEach(element => {
+                    ["id","type","supplier_com","supplier_cont","module","contract_amount","sign_date","advance_date","offer_file","contract_file","remark","region",'status','aremark'].forEach(element => {
                         if(!$current.find(".modal-info[name='"+element+"']").hasClass("chosen-select")){
                             if(element=="region"){
                                 if(supritem["province_name"] && supritem["city_name"]){
@@ -147,6 +147,12 @@
                                 }
                                 $current.find("td[name='"+element+"']").text(statusType[status]);
                                 $current.find(".modal-info[name='"+element+"']").val(supritem[element]);
+                            }else if(element == "aremark" ){
+                                if(supritem[element]!=""){
+                                    $current.find("td[name='"+element+"']").text(supritem["approve_name"]+"："+supritem["aremark"]);
+                                }else{
+                                    $current.find("td[name='"+element+"']").text(supritem["approve_name"]);
+                                }
                             }else{
                                 $current.find(".modal-info[name='"+element+"']").val(supritem[element]);
                             }

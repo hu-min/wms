@@ -75,6 +75,7 @@
                             <th>合同文件</th>
                             <th>备注</th>
                             <th>状态</th>
+                            <th>审批备注</th>
                             <th>审批记录</th>
                         </tr>
                     </thead>
@@ -135,13 +136,13 @@
                             </td>
                             <td>
                                 <div class="input-group">
-                                    <input class="form-control modal-info upload-file" name="offer_file" type="text">
+                                    <input class="form-control modal-info upload-file" name="offer_file" type="text" style="max-width: 80px;">
                                     <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
                                 </div>
                             </td>
                             <td>
                                 <div class="input-group">
-                                    <input class="form-control modal-info upload-file" name="contract_file" type="text">
+                                    <input class="form-control modal-info upload-file" name="contract_file" type="text" style="max-width: 80px;">
                                     <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
                                 </div>
                             </td>
@@ -149,6 +150,8 @@
                                 <input class="form-control modal-info"  name="remark" title="备注"  value="" placeholder="备注" type="text">
                             </td>
                             <td name="status">
+                            </td>
+                            <td name="aremark" style="min-width: 100px;">
                             </td>
                             <td>
                                 {:approve_btn($tableName)}

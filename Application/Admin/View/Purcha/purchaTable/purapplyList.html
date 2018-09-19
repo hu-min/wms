@@ -1,5 +1,6 @@
 <volist name="list" id="item">
     <tr>
+        <td>{$item['user_name']}</td>
         <td>{$item['project_name']}</td>
         <td>{$item['code']}</td>
         <td>{$item['leader_name']}</td>
@@ -20,9 +21,14 @@
         </td>
         <td>{$item['remark']}</td>
         <td>
-            <div class="approve-group" data-table="{$tableName}" data-id="{$item['id']}" >
+            {:approve_btn($tableName,$item['id'],$item['place'],$item['process_level'],$item['status'])}
+            <!-- {:approve_btn($tableName,$item['id'])} -->
+            <!-- <div class="approve-group" data-table="{$tableName}" data-id="{$item['id']}" >
                 <button type="button" data-url="{:U('Tools/getApproveList')}" class="btn btn-sm bg-purple approve-log">记录</button>
-            </div>
+            </div> -->
+        </td>
+        <td>
+            {$item.approve_name}<if condition="$item['aremark']"> ：{$item.aremark} </if>
         </td>
         {:list_btn(get_defined_vars(),"id")}
     </tr>
