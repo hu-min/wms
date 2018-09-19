@@ -367,7 +367,6 @@ class ProjectController extends BaseController{
         $data=I("data");
         $p=I("p")?I("p"):1;
  
-
         $userId = session("userId");
         $nodeAuth = $this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME];
         $nodeId = getTabId(I("vtabId"));
@@ -396,7 +395,7 @@ class ProjectController extends BaseController{
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
             $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (author = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 )";
             $whites = $this->whiteCom->getWhites();
-            if($whites){
+            if($whites && $search==""){
                 $whiteWhere = " AND user_id NOT IN (".implode(',',$whites).")";
             }
         }
@@ -862,7 +861,7 @@ class ProjectController extends BaseController{
      * @Desc: 营业数据 
      */    
     function businessList(){
-        $this->projectList("business");
+        $this->projectList("finance");
     }
     function business_modalOne(){
         $title = "立项/添加场次";
