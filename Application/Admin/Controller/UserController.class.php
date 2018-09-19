@@ -10,6 +10,7 @@ class UserController extends BaseController{
         $this->roleCom=getComponent('Role');
         $this->rNodeCom=getComponent('RoleNode');
         $this->processCom=getComponent('Process');
+        $this->AProject=A("Project");
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
         $this->pageSize=10;
@@ -805,7 +806,7 @@ class UserController extends BaseController{
         $reqType=I('reqType');
         $this->assign("controlName","white_user");
         $this->assign('tableName',"VWhite");//删除数据的时候需要
-        $this->assign('userArr',A("Project")->_getOption("create_user"));
+        $this->assign('userArr',$this->AProject->_getOption("create_user"));
         if($reqType){
             $this->$reqType();
         }else{         

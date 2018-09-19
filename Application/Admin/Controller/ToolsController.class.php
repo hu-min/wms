@@ -78,6 +78,11 @@ class ToolsController extends BaseController{
         $this->ajaxReturn(['errCode'=>115,'error'=>getError(115),"allProcess"=>$allProcess]);
         
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-09-19 14:48:17 
+     * @Desc: 审核 
+     */    
     function approveEdit(){
         
         extract($_REQUEST);
@@ -181,6 +186,9 @@ class ToolsController extends BaseController{
                 if($table=="v_expense_sub"){
                     $mainDb = M("v_expense",NULL);
                     $mainDb->where([$mainDb->getPk()=>$tableId])->save(["status"=>$state,"process_level"=>$place]);
+                }else if($table=="v_project" && $state==1){
+                    $this->ReceCom=getComponent('Receivable');
+                    $this->ReceCom->createOrder($tableId,session('userId'));
                 }
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }else{

@@ -174,7 +174,7 @@ function status_label($defind_vars){
  * @Date: 2018-06-09 23:01:13 
  * @Desc: list列表中的按钮状态 
  */
-function list_btn($defind_vars,$id,$inlink=[],$onlycat=false,$onlyState=false){
+function list_btn($defind_vars,$idStr,$inlink=[],$onlycat=false,$onlyState=false,$hasState=true){
     $statusLabel = $defind_vars["statusLabel"];
     $statusType = $defind_vars["statusType"];
     $item = $defind_vars["item"];
@@ -184,9 +184,11 @@ function list_btn($defind_vars,$id,$inlink=[],$onlycat=false,$onlyState=false){
     $userId = $defind_vars["userId"];
     $nodeAuth = $defind_vars["nodeAuth"];
     $processAuth = $defind_vars["processAuth"];
-    echo "<td><span class='label bg-{$statusLabel[$item['status']]}'>{$statusType[$item['status']]}</span></td>";
+    if($hasState){
+        echo "<td><span class='label bg-{$statusLabel[$item['status']]}'>{$statusType[$item['status']]}</span></td>";
+    }
     if(!$onlyState){
-        echo "<td class='status-con' data-db='{$tableName}' data-con='{$controlName}' data-id='".$item[$id]."' data-url='{$url}' >";
+        echo "<td class='status-con' data-db='{$tableName}' data-con='{$controlName}' data-id='".$item[$idStr]."' data-url='{$url}' >";
     }
     
     if($nodeAuth >= 1 && !$onlyState){
@@ -197,7 +199,7 @@ function list_btn($defind_vars,$id,$inlink=[],$onlycat=false,$onlyState=false){
                 $title = 'data-title="'.$inlink["title"].'"';
             }
 
-            echo '<a class="btn btn-xs btn-primary nodeOn" role="button" data-id="'.$item[$id].'" '.$title.' data-nodeid="'.$inlink["nodeid"].'" href="'.$inlink["href"].'"><span>查看</span></a>';
+            echo '<a class="btn btn-xs btn-primary nodeOn" role="button" data-id="'.$item[$idStr].'" '.$title.' data-nodeid="'.$inlink["nodeid"].'" href="'.$inlink["href"].'"><span>查看</span></a>';
         }
         
     }
@@ -348,6 +350,11 @@ function disTime($timeStamp){
         }
     }
 }
+/** 
+ * @Author: vition 
+ * @Date: 2018-09-19 17:35:13 
+ * @Desc: 查看字符串在数组中最后一个key 
+ */
 function search_last_key($search,$array){
     $return = false;
     foreach ($array as $key => $value) {
@@ -356,4 +363,10 @@ function search_last_key($search,$array){
         }
     }
     return $return;
+}
+function time_format($dateStr){
+    if(in_array($dateStr ,['1970-01-01','1970-1-1'])){
+        return '';
+    }
+    return $dateStr;
 }

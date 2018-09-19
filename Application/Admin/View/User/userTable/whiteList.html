@@ -5,7 +5,7 @@
         <td>{$item['login_name']}</td>
         <td>{$item['user_name']}</td>
         <td>{$item['role_name']}</td>
-        <td data-avatar="{$item['avatar']}" class="users-avatar-td"><if condition="$item['avatar'] neq ''"><img src="__UPLOADS__/{$item['avatar']}"></if></td>
+        <td data-avatar="{$item['avatar']}" class="users-avatar-td"><if condition="$item['avatar'] neq ''"><img src="/{$item['avatar']}"></if></td>
         <td>{$item['remark']}</td>
         <td>{$item['add_time']}</td>
         <td><span class="label bg-{$statusLabel[$item['status']]}">{$statusType[$item['status']]}</span></td>

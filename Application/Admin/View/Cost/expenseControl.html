@@ -158,7 +158,7 @@
                         $current.find(".chosen-select[name='city']").html(city_optoin);
                         $current.find(".chosen-select[name='city']").find("option[value='"+listData['city']+"']").prop("selected",true);
                     }else if(key == "aremark" ){
-                        if(listData[key]!=""){
+                        if(listData[key]){
                             $current.find("td[name='"+key+"']").text(listData["approve_name"]+"："+listData["aremark"]);
                         }else{
                             $current.find("td[name='"+key+"']").text(listData["approve_name"]);

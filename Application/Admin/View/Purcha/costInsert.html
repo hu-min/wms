@@ -148,7 +148,7 @@
                                 $current.find("td[name='"+element+"']").text(statusType[status]);
                                 $current.find(".modal-info[name='"+element+"']").val(supritem[element]);
                             }else if(element == "aremark" ){
-                                if(supritem[element]!=""){
+                                if(supritem[element]){
                                     $current.find("td[name='"+element+"']").text(supritem["approve_name"]+"："+supritem["aremark"]);
                                 }else{
                                     $current.find("td[name='"+element+"']").text(supritem["approve_name"]);

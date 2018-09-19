@@ -202,6 +202,11 @@ $(document).on("click",".v-showmodal",function(){
     datas.title = title
     datas.con = con
     datas.reqType = con+"_modalOne"
+    var hasData = $(tabId+" "+vtarget+" .modal-content").find(".modal-footer .save-info").data("gettype");
+    if(hasData !== undefined && datas.gettype  == 'Add'){
+        $(tabId+" "+vtarget).modal('toggle');
+        return false;
+    }
     get(url,datas,function(result){
         // console.log(result)
         if(result.errCode==0){
@@ -223,7 +228,7 @@ $(document).on("click",".v-showmodal",function(){
                 eval(con+"_initInfo(gettype)");//
             }
         }
-    })
+    },false)
 })
 /** 
  * javascript comment 

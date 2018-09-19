@@ -17,6 +17,8 @@ class ProjectController extends BaseController{
         $this->purchaCom=getComponent('Purcha');
         $this->fieldCom=getComponent('Field');
         $this->filesCom=getComponent('ProjectFiles');
+        $this->ReceCom=getComponent('Receivable');
+        $this->whiteCom=getComponent('White');
         $this->processArr=["0"=>"沟通","1"=>"完结","2"=>"裁决","3"=>"提案","4"=>"签约","5"=>"LOST","6"=>"筹备","7"=>"执行","8"=>"完成"];
         $this->dateArr=["0"=>"立项日期","1"=>"提案日期","2"=>"项目日期","3"=>"结束日期"];
 
@@ -253,7 +255,7 @@ class ProjectController extends BaseController{
                     return $result;
                 }
                 break;
-            case 'create_user': case 'business': case 'leader': case 'earlier_user': case 'scene_user':
+            case 'create_user': case 'business': case 'leader': case 'earlier_user': case 'scene_user': case 'author' :
                 if($key!=""){
                     $where["userName"]=["LIKE","%{$key}%"];
                 }
@@ -361,7 +363,7 @@ class ProjectController extends BaseController{
      * @Date: 2018-05-06 11:00:23 
      * @Desc: 项目列表 
      */    
-    function projectList(){
+    function projectList($search=""){
         $data=I("data");
         $p=I("p")?I("p"):1;
  
@@ -389,11 +391,17 @@ class ProjectController extends BaseController{
             $where["project_time"]  = array('between',array(strtotime($dateArr[0]." 00:00:00"),strtotime($dateArr[1]." 23:59:59")));
         }
         // print_r($where);
+        $whiteWhere = "";
         $roleId = session('roleId');
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
-            $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (create_user = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 )";
-
+            $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (author = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 )";
+            $whites = $this->whiteCom->getWhites();
+            if($whites){
+                $whiteWhere = " AND user_id NOT IN (".implode(',',$whites).")";
+            }
         }
+        // $whites = $this->whiteCom->getWhites();
+        // print_r($whites);exit;
         // if($nodeAuth<7){
         //     $where['_string'] = " ((create_user = {$userId})  OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) AND status =1) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}) OR ((process_level = ".($this->processAuth["level"]-1)." OR process_level >= ".$this->processAuth["level"].") AND process_level <>0) OR FIND_IN_SET({$userId},examine) OR (author = {$userId})";
             // $where['user_id'] = session('userId');
@@ -421,7 +429,7 @@ class ProjectController extends BaseController{
             'fields'=>"*,FIND_IN_SET({$roleId},examine) place",
             'page'=>$p,
             'pageSize'=>$this->pageSize,
-            'orderStr'=>"project_time DESC",
+            'orderStr'=>"addTime DESC",
             "joins"=>[
                 "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = brand",
                 "LEFT JOIN (SELECT companyId company_id,company customer_com_name FROM v_customer_company ) c ON c.company_id = customer_com",
@@ -431,11 +439,15 @@ class ProjectController extends BaseController{
                 "LEFT JOIN (SELECT basicId stage_id,name stage_name FROM v_basic WHERE class = 'stage' ) s ON s.stage_id = stage",
                 "LEFT JOIN (SELECT basicId type_id,name type_name FROM v_basic WHERE class = 'projectType' ) t ON t.type_id = type",
                 "LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct ON ct.ctid = city AND ct.cpid = province",
-                "LEFT JOIN (SELECT project_id fproject_id , count(id) file_num FROM v_project_files WHERE file_type IN ({$file_type})) f ON f.fproject_id = projectId "
+                "LEFT JOIN (SELECT project_id fproject_id , count(id) file_num FROM v_project_files WHERE file_type IN ({$file_type})) f ON f.fproject_id = projectId ",
+                "LEFT JOIN (SELECT project_id rproject_id ,advance radvance,surplus rsurplus FROM v_receivable ) r ON r.rproject_id = projectId",
+                "LEFT JOIN (SELECT project_id pproject_id,SUM(contract_amount) pcontract_amount FROM v_purcha  WHERE status = 1 GROUP BY pproject_id) pu ON pu.pproject_id = projectId",
+                "LEFT JOIN (SELECT project_id dproject_id,SUM(debit_money) ddebit_money FROM v_debit WHERE status = 1 {$whiteWhere} GROUP BY dproject_id ) de ON de.dproject_id = projectId",
+                "LEFT JOIN (SELECT project_id eproject_id,SUM(money) emoney  FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id FROM v_expense WHERE `status`=1 {$whiteWhere} ) m1 ON m1.exId=parent_id WHERE clear_status = 1) ex ON ex.eproject_id = projectId",
             ],
         ];
         $listResult=$this->projectCom->getProjectList($parameter);
-        // echo $this->projectCom->M()->_sql();
+        // echo $this->projectCom->M()->_sql();exit;
         if( isset($data['template'])){
             $listRedis = $data['template'].'List';
             $template = 'Project/projectTable/'.$listRedis;
@@ -508,12 +520,12 @@ class ProjectController extends BaseController{
             $datas['process_id'] = $examines['process_id'];
             //如果是审批者自己提交的执行下列代码
             $roleId = session("roleId");
-            $examineArr = explode(",",$expInfo['examine']);
+            $examineArr = explode(",",$datas['examine']);
             $rolePlace = search_last_key($roleId,$examineArr);
             $datas['status'] = 0;
             if($rolePlace!==false){
                 $datas['process_level']=$rolePlace+2;
-                if(count($examineArr) == ($rolePlace+1)){
+                if(count($examineArr) <= ($rolePlace+1)){
                     $datas['status'] = 1;
                 }else{
                     $datas['status'] = 2;
@@ -529,7 +541,7 @@ class ProjectController extends BaseController{
             $data=[];
 
             $data['updateUser']=session('userId');
-            foreach (['project_id','amount','bid_date','contract','bid_time','bidding','brand','city','code','create_time','create_user','customer_com','customer_cont','customer_other','days','earlier_user','execute_sub','execute','field','is_bid','business','leader','name','project_time','project_id','projectType','province','scene_user','session_all','type','session_cur','stage','status'] as  $key) {
+            foreach (['project_id','amount','bid_date','contract','bid_time','bidding','brand','city','code','create_time','author','customer_com','customer_cont','customer_other','days','earlier_user','execute_sub','execute','field','is_bid','business','leader','name','project_time','project_id','projectType','province','scene_user','session_all','type','session_cur','stage','status'] as  $key) {
                 if(isset($datas[$key])){
                     $data[$key]=$datas[$key];
                 }
@@ -560,6 +572,9 @@ class ProjectController extends BaseController{
             $insertResult=$this->projectCom->insertProject($projectInfo);
             if($insertResult && $insertResult->errCode==0){
                 $this->ApprLogCom->createApp($this->projectCom->tableName(),$insertResult->data,session("userId"),"");
+                if($projectInfo['status']==1){
+                    $this->ReceCom->createOrder($insertResult->data,session('userId'));
+                }
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
         }
@@ -841,8 +856,13 @@ class ProjectController extends BaseController{
             $this->returnHtml();
         }
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-09-19 19:45:46 
+     * @Desc: 营业数据 
+     */    
     function businessList(){
-        $this->projectList();
+        $this->projectList("business");
     }
     function business_modalOne(){
         $title = "立项/添加场次";
@@ -864,7 +884,7 @@ class ProjectController extends BaseController{
                     "LEFT JOIN (SELECT companyId company_id,company customer_com_name FROM v_customer_company ) c ON c.company_id = customer_com",
                     "LEFT JOIN (SELECT contactId contact_id,contact customer_cont_name FROM v_customer_contact ) c2 ON c2.contact_id = customer_cont",
                     "LEFT JOIN (SELECT id field_id,name field_name,city f_city FROM v_field ) f ON f.field_id = field AND f.f_city=city",
-                    "LEFT JOIN (SELECT userId user_id,userName create_user_name FROM v_user) cu ON cu.user_id = create_user",
+                    "LEFT JOIN (SELECT userId user_id,userName create_user_name FROM v_user) cu ON cu.user_id = author",
                     "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = business",
                     "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = leader",
                     "LEFT JOIN (SELECT basicId execute_sub_id,name execute_sub_name FROM v_basic WHERE class = 'execute' ) e ON e.execute_sub_id = execute_sub",
@@ -985,6 +1005,6 @@ class ProjectController extends BaseController{
      * @Desc: 创建应收列表 
      */    
     function createRec(){
-        
+
     }
 }

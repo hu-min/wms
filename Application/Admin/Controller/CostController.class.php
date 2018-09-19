@@ -149,7 +149,7 @@ class CostController extends BaseController{
             $rolePlace = search_last_key($roleId,$examineArr);
             if($rolePlace!==false){
                 $datas['process_level']=$rolePlace+2;
-                if(count($examineArr) == ($rolePlace+1)){
+                if(count($examineArr) <= ($rolePlace+1)){
                     $datas['status'] = 1;
                 }else{
                     $datas['status'] = 2;
@@ -436,7 +436,7 @@ class CostController extends BaseController{
         $expInfo['status'] = 0;
         if($rolePlace!==false){
             $expInfo['process_level']=$rolePlace+2;
-            if(count($examineArr) == ($rolePlace+1)){
+            if(count($examineArr) <= ($rolePlace+1)){
                 $expInfo['status'] = 1;
             }else{
                 $expInfo['status'] = 2;

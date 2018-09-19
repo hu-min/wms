@@ -11,12 +11,12 @@
         <td>{$item['contract_amount']}</td>
         <td>
             <if condition="$item['sign_date'] gt 0">
-                {$item['sign_date']|date="Y-m-d",###}
+                {$item['sign_date']|date="Y-m-d",###|time_format}
             </if>
         </td>
         <td>
             <if condition="$item['advance_date'] gt 0">
-                {$item['advance_date']|date="Y-m-d",###}
+                {$item['advance_date']|date="Y-m-d",###|time_format}
             </if>
         </td>
         <td>{$item['remark']}</td>

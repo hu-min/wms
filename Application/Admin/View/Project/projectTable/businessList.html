@@ -12,12 +12,12 @@
         <td>{$item['session_all']}</td>
         <td>{$item['session_cur']}</td>
         <td>{$item['amount']}</td>
-        <td>{$item['advance']}</td>
-        <td>{$item['surplus']}</td>
-        <td>{$item['cost']}</td>
-        <td>{$item['profit']}</td>
-        <td>{$item['profitRate']}</td>
-        <td>{$item['stage']}</td>
+        <td>{$item['radvance']}</td>
+        <td>{$item['rsurplus']}</td>
+        <td>{$cost = $item['pcontract_amount']+$item['ddebit_money']+$item['emoney']}</td>
+        <td>{$profit=$item['amount']-$cost}</td>
+        <td>{:round($profit/$item['amount']*100,2)}%</td>
+        <td>{$item['stage_name']}</td>
         {:list_btn(get_defined_vars(),"projectId",[],true)}
     </tr>
 </volist>
