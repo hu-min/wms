@@ -9,7 +9,9 @@
         <td class="modal-info" name="expense_money" >{$item.expense_money|default=0}</td>
         <td class="modal-info" name="invoice_money" >{$item["invoice_money"]}</td>
         <td class="modal-info" name="all_money" >{$item["all_money"]}</td>
-
+        <td>
+            {$item.approve_name}<if condition="$item['aremark']"> ：{$item.aremark} </if>
+        </td>
         <td>
             {:approve_btn($tableName,$item['id'],$item['place'],$item['process_level'],$item['status'])}
         </td>

@@ -12,7 +12,6 @@
         <td>{$item['debit_money']}</td>
         <td>{$accountType[$item['account_type']]}</td>
         <td>{$item['loan_date']}</td>
-        <td>审批记录</td>
         <td>
             <if condition="$item['voucher_file'] neq ''">
                 <input class="upload-file" value="{$item['voucher_file']}" type="hidden">
@@ -20,6 +19,9 @@
             </if>
         </td>
         <td>{$item['remark']}</td>
+        <td>
+            {$item.approve_name}<if condition="$item['aremark']"> ：{$item.aremark} </if>
+        </td>
         <td>
             {:approve_btn($tableName,$item['id'],0,0)}
         </td>

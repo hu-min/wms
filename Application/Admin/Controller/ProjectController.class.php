@@ -979,4 +979,12 @@ class ProjectController extends BaseController{
         }
         // $this->filesCom->insert($insertData);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-09-19 09:03:06 
+     * @Desc: 创建应收列表 
+     */    
+    function createRec(){
+        
+    }
 }

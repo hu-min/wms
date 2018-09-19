@@ -157,6 +157,12 @@
                         });
                         $current.find(".chosen-select[name='city']").html(city_optoin);
                         $current.find(".chosen-select[name='city']").find("option[value='"+listData['city']+"']").prop("selected",true);
+                    }else if(key == "aremark" ){
+                        if(listData[key]!=""){
+                            $current.find("td[name='"+key+"']").text(listData["approve_name"]+"："+listData["aremark"]);
+                        }else{
+                            $current.find("td[name='"+key+"']").text(listData["approve_name"]);
+                        }
                     }else{
                         if(key == "id"){
                             $current.find(".approve-group").data("id",listData[key])
@@ -164,6 +170,7 @@
                         $current.find(".modal-info[name='"+key+"']").val(listData[key]);
                         if(!in_array(listData["status"],[0,3])){
                             $current.find(".modal-info[name='"+key+"']").prop("disabled",true);
+                            $current.find(".chosen-select").prop("disabled",true);
                             $current.find(".clear-media").remove();
                         }
                     }

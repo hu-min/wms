@@ -82,6 +82,8 @@ class CostController extends BaseController{
                 "LEFT JOIN (SELECT userId,userName business_name FROM v_user) bu ON bu.userId = p.business",
                 "LEFT JOIN (SELECT userId,userName leader_name FROM v_user) lu ON lu.userId = p.leader",
                 "LEFT JOIN (SELECT basicId,name free_name FROM v_basic WHERE class='feeType') f ON f.basicId=free_type",
+                "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='".$this->debitCom->tableName()."' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id",
+                "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
             ]
         ];
         $listResult=$this->debitCom->getList($parameter);
@@ -332,7 +334,8 @@ class CostController extends BaseController{
         }
         if($resultData){
             $resultData["tableData"] = [];
-            $subExpRes = $this->expenseSubCom->getList(["where"=>["parent_id"=>$id],"fields"=>"*,FROM_UNIXTIME(happen_date,'%Y-%m-%d') happen_date",'joins'=>["LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct ON ct.ctid = city",]])["list"];
+            $subExpRes = $this->expenseSubCom->getList(["where"=>["parent_id"=>$id],"fields"=>"*,FROM_UNIXTIME(happen_date,'%Y-%m-%d') happen_date",'joins'=>["LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct ON ct.ctid = city","LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='".$this->expenseSubCom->tableName()."' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id","LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",]])["list"];
+            // echo $this->expenseSubCom->M()->_sql();exit;
             foreach ($subExpRes as $key => $subInfo) {
                 $subExpRes[$key]["citys"] = $this->basicCom->get_citys($subInfo["cpid"]);
             }

@@ -156,15 +156,19 @@
             if(( info['status'] > 0 || info['author'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 ){
                 $(tabId+" .modal-info").prop("disabled",true) 
                 $(tabId+" .global-modal").find(".purpay-box .add-purpay").hide()
+
             }
-            if("{$Think.session.userInfo.roleName}".match(/财务/)===null){
-                $(tabId+" .global-modal").find(".finance-box").hide()
-            }else{
-                $(tabId+" .global-modal").find(".invoice-box .add-invoice").hide()
+            if("{$nodeAuth}"<7 ){
+                if("{$Think.session.userInfo.roleName}".match(/财务/)===null){
+                    $(tabId+" .global-modal").find(".finance-box").hide()
+                }else{
+                    $(tabId+" .global-modal").find(".invoice-box .add-invoice").hide()
+                }
+                if(info['status']==0){
+                    $(tabId+" .global-modal").find(".invoice-box").hide()
+                }
             }
-            if(info['status']==0){
-                $(tabId+" .global-modal").find(".invoice-box").hide()
-            }
+            
             //控制按钮权限
             $(tabId+" .global-modal").find(".approve-group").data("id",info['id'])
             if(info['process_level'] > info['place'] || in_array(Number(info['status']),[3])){
