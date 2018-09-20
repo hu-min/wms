@@ -11,9 +11,11 @@ class CostController extends BaseController{
     protected $accountType = ["1"=>"现金","2"=>"微信支付","3"=>"支付宝","4"=>"银行卡","5"=>"支票","6"=>"其它"];
     protected $expVouchType = ["无","收据","签收单+身份证","发票","其他"];
     public function _initialize() {
+        $this->ABasic=A("Basic");
+        $this->project=A('Project');
         parent::_initialize();
         $this->projectCom=getComponent('Project');
-        $this->project=A('Project');
+        
         $this->configCom=getComponent('Config');
         $this->customerCom=getComponent('Customer');
         $this->costCom=getComponent('Cost');
@@ -21,7 +23,7 @@ class CostController extends BaseController{
         $this->expenseCom=getComponent('Expense');
         $this->expenseSubCom=getComponent('ExpenseSub');
         $this->whiteCom=getComponent('White');
-        $this->ABasic=A("Basic");
+        
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
         $this->accounts = ["2"=>session("userInfo.wechat"),"3"=>session("userInfo.alipay"),"4"=>session("userInfo.bank_card")];

@@ -50,6 +50,7 @@ class ToolsController extends BaseController{
             "orderStr" => "add_time DESC",
         ];
         $resultData = $this->approveCom->getList($parameter);
+
         $db = M($table,NULL);
         $examineRes = $db ->field("process_level,examine,status")->where([$db->getPk()=>$id])->find();
         $examine = explode(",",$examineRes["examine"]);
@@ -60,7 +61,12 @@ class ToolsController extends BaseController{
             if(($examineRes["process_level"]-1)==$allProcess || $examineRes["status"] ==1 ){
                 $nextExamine = "已完成";
             }else{
-                $nextRoleId = $examine[$examineRes["process_level"]-1];
+                if($examineRes["process_level"]>0){
+                    $nextRoleId = $examine[$examineRes["process_level"]-1];
+                }else{
+                    $nextRoleId = $examine[0];
+                }
+                
                 if($nextRoleId==session("roleId")){
                     $nextExamine = "说的就是你啊！";
                 }else{
