@@ -151,7 +151,7 @@ class CostController extends BaseController{
             $process = $this->nodeCom->getProcess(I("vtabId"));
             $datas['process_id'] = $process["processId"];
             if($datas["project_id"]>0){
-                print_r($datas);exit;
+                // print_r($datas);exit;
                 //存在项目，则第一个审批的人是项目主管,examine需要
                 $userRole = $this->userCom->getUserInfo($datas['leader']);
                 $datas['examine'] = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"]))) ;
