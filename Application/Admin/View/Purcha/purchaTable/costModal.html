@@ -83,7 +83,7 @@
                         <tr>
                             <td><button type="button" class="close supr-remove"><span>×</span></button>1</td>
                             <td>
-                                <select class="form-control modal-info chosen-select" required="required" title="供应商类型" data-value="basicId"  data-text="name" name="type" data-req="getSuprtype" data-cname="module">
+                                <select class="form-control modal-info chosen-select" required="required" title="供应商类型" data-value="basicId"  data-text="name" name="type" data-req="getSuprtype" data-cname="module" data-gdson="supplier_com">
                                     <option value="">选择供应商类型</option>
                                     <volist name="supplierArr" id="item">
                                         <option value="{$item['basicId']}">{$item['name']}</option>
@@ -91,15 +91,15 @@
                                 </select>
                             </td>
                             <td>
-                                <select class="form-control modal-info chosen-select" title="承接模块" data-value="basicId" data-req="getModuleList" data-text="name" name="module" data-cname="supplier_com" data-pname="type">
-                                    <option value="">选择承接模块</option>
+                                <select class="form-control modal-info chosen-select" title="承接模块" data-value="basicId" data-req="getModuleList" data-text="name" name="module" data-cname="supplier_com" data-pname="type" >
+                                    <option value="999999999">全部承接模块</option>
                                     <volist name="moduleArr" id="item">
                                         <option value="{$item['basicId']}">{$item['name']}</option>
                                     </volist>
                                 </select>
                             </td>
                             <td>
-                                <select class="form-control modal-info chosen-select" required="required" title="供应商名称" data-value="companyId" data-pname="module" data-text="company" name="supplier_com" data-req="getSuprComList" data-extra="province_name,city_name" data-cname="supplier_cont">
+                                <select class="form-control modal-info chosen-select" required="required" title="供应商名称" data-value="companyId" data-pname="module" data-text="company" data-gpname="type" name="supplier_com" data-req="getSuprComList" data-extra="province_name,city_name" data-cname="supplier_cont">
                                     <option value="">选择供应商名称</option>
                                     <!-- <volist name="companyArr" id="item">
                                         <option value="{$item['companyId']}">{$item['company']}</option>

@@ -41,13 +41,18 @@ class SupplierController extends BaseController{
      * @Date: 2018-05-27 15:14:05 
      * @Desc: 内部获取供应商列表 
      */    
-    function getSupplier($key="",$type=0){
+    function getSupplier($key="",$type="",$gpid=""){
         $where=["status"=>"1"];
         if ($key!=""){
             $where["company"]=["LIKE","%{$key}%"];
         }
-        if($type>0){
-            $where["type"]=$type;
+        if($type!=""){
+            if($type!="999999999"){
+                $where["_string"]="FIND_IN_SET({$type},module)";
+            }elseif($gpid!=""){
+                $where["supr_type"]=$gpid;
+            }
+            
         }
         $parameter=[
             'where'=>$where,
@@ -255,6 +260,18 @@ class SupplierController extends BaseController{
             $redisName="sup_companyList";
             $resultData=$this->supplierCom->redis_one($redisName,"companyId",$id,"companyDB");
         }
+        // print_r($resultData);exit;
+        if($resultData['module']){
+            $parameter=[
+                'where'=>["class"=>"module",'basicId'=>["IN",explode(",",$resultData['module'])]],
+                'fields'=>'basicId,name',
+                'page'=>1,
+                'pageSize'=>9999,
+                'orderStr'=>"basicId DESC",
+            ];
+            $basicResult=$this->basicCom->getList($parameter);
+            $resultData['modules']=$basicResult['list'];
+        }
         $modalPara=[
             "data"=>$resultData,
             "title"=>$title,
@@ -315,22 +332,24 @@ class SupplierController extends BaseController{
         if(isset($data['status'])){
             $where['status']=$data['status'];
         }
-        if($data['type']){
-            $where['type']=$data['type'];;
+        if($data['supr_type']){
+            $where['supr_type']=$data['supr_type'];;
         }
         $parameter=[
             'where'=>$where,
-            'fields'=>"`companyId`,`type`,`company`,`alias`,`provinceId`,`cityId`,`province`,`city`,`address`,`remarks`,`addTime`,`updateTime`,`status`,`typeName`",
+            'fields'=>"`companyId`,`supr_type`,`module`,`company`,`alias`,`provinceId`,`cityId`,`province`,`city`,`address`,`remarks`,`addTime`,`updateTime`,`status`,`typeName`,moule_name",
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"companyId DESC",
             "joins"=>[
                 "LEFT JOIN v_province p ON p.pid=provinceId","LEFT JOIN v_city c ON c.pid=p.pid AND c.cid=cityId",
-                "LEFT JOIN (SELECT basicId,name typeName FROM v_basic WHERE class='module') b ON b.basicId=type"
+                "LEFT JOIN (SELECT basicId,name typeName FROM v_basic WHERE class='supType') b ON b.basicId=supr_type",
+                "LEFT JOIN (SELECT s.module mid,GROUP_CONCAT(name) moule_name FROM v_basic LEFT JOIN (SELECT module FROM `v_supplier_company`) s ON  FIND_IN_SET(basicId,s.module) WHERE class='module' AND !ISNULL(s.module) GROUP BY s.module) m ON m.mid = module",
             ],
         ];
         
         $listResult=$this->supplierCom->getCompanyList($parameter);
+        // echo $this->supplierCom->M()->_sql();exit;
         $this->tablePage($listResult,'Supplier/supplierTable/companyList',"sup_companyList");
     }
     /** 
@@ -341,6 +360,9 @@ class SupplierController extends BaseController{
     function manageCompanyInfo(){
         $reqType=I("reqType");
         $datas=I("data");
+        if(isset($datas['module'])){
+            $datas['module']=implode(",",$datas['module']);
+        }
         if($reqType=="sup_companyAdd"){
             $datas['addTime']=time();
             $datas['process_level']=$this->processAuth["level"];
@@ -368,8 +390,11 @@ class SupplierController extends BaseController{
             if(isset($datas['remarks'])){
                 $data['remarks']=$datas['remarks'];
             }
-            if(isset($datas['type'])){
-                $data['type']=$datas['type'];
+            if(isset($datas['supr_type'])){
+                $data['supr_type']=$datas['supr_type'];
+            }
+            if(isset($datas['module'])){
+                $data['module']=$datas['module'];
             }
             if(isset($datas['status'])){
                 $parameter=[

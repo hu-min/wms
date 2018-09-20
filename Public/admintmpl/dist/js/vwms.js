@@ -885,9 +885,13 @@ function init_chosen(url,reqType,parental){
         if(text!=undefined && value!=undefined && reqType!=undefined){
             var ajax_json = {url:url,data:{reqType:reqType,type:type},value:value,text:text}
             var pname = $(this).data('pname')
+            var gpname = $(this).data('gpname')
+            // var pname = $(this).data('pname')
             if(pname!=undefined){
                 ajax_json["pelement"] = $this.find(".chosen-select[name='"+pname+"']").eq($this.find(".chosen-select[name='"+type+"']").index(this))
-                
+            }
+            if(gpname!=undefined){
+                ajax_json["gpelement"] = $this.find(".chosen-select[name='"+gpname+"']").eq($this.find(".chosen-select[name='"+type+"']").index(this))
             }
             // console.log($this)
             var noupdate = $(this).data('noupdate')
@@ -903,6 +907,10 @@ function init_chosen(url,reqType,parental){
         var cname = $(this).data('cname')
         if(cname!=undefined){
             option["child"] = $this.find(".chosen-select[name='"+cname+"']")
+        }
+        var gdson = $(this).data('gdson')
+        if(gdson!=undefined){
+            option["gdson"] = $this.find(".chosen-select[name='"+gdson+"']")
         }
         var disSearch = $(this).data('dis-search')
         if(disSearch!=undefined){

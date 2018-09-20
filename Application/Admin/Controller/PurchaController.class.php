@@ -68,7 +68,8 @@ class PurchaController extends BaseController{
     function getSuprComList(){
         $key = I("key",'');
         $type = I("pid",0);
-        $resultData = $this->supplier->getSupplier($key,$type);
+        $gpid = I("gpid",0);
+        $resultData = $this->supplier->getSupplier($key,$type,$gpid);
         $this->ajaxReturn(["data"=>$resultData]);
     }
     function getSuprContList(){
