@@ -13,6 +13,7 @@ class PurchaController extends BaseController{
         $this->supplier=A("Supplier");
         parent::_initialize();
         $this->basicCom=getComponent('Basic');
+        $this->projectCom=getComponent('Project');
         $this->fixExpenCom=getComponent('FixldExpense');
         $this->receivableCom=getComponent('Receivable');
         $this->wouldpayCom=getComponent('Wouldpay');
@@ -210,6 +211,17 @@ class PurchaController extends BaseController{
         $process = $this->nodeCom->getProcess(I("vtabId"));
         $process_id = $process["processId"];
         if($datas[0]["project_id"]>0){ 
+            //检查成本预算是否超支
+            $this->projectCom->checkCost($datas[0]["project_id"],array_sum(array_column($datas,'contract_amount')));
+            // $costBudget = $this->projectCom->getCostBudget($datas[0]["project_id"]);
+            // $allCost = $this->projectCom->getCosts($datas[0]["project_id"]);
+            // // print_r($allCost);
+            // $array_column = array_sum(array_column($datas,'contract_amount'));
+            // if(($array_column+$allCost['allCost']) > $costBudget){
+            //     //<p>其中已批准成本：【'.$allCost['active'].'】</p><p>其中其他状态成本：【'.$allCost['waiting'].'】</p>
+            //     $html='<p>成本预算超支:</p><p>该项目立项成本预算【'.$costBudget.'】</p><p>当前使用已使用成本：【'.$allCost['allCost'].'】</p><p>请联系管理员修改成本预算</p>';
+            //     $this->ajaxReturn(['errCode'=>77,'error'=>$html]);
+            // }
             //存在项目，则第一个审批的人是项目主管,examine需要
             $userRole = $this->userCom->getUserInfo($datas[0]["leader"]);
             $examine = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"])));
@@ -233,7 +245,6 @@ class PurchaController extends BaseController{
         }else{
             $process_level=$process["place"];
         }
-        
         foreach ($datas as $suprInfo) {
             $dataInfo = $this->manageCostInsertInfo($suprInfo);
             $dataInfo["process_id"] = $process_id;
@@ -260,6 +271,19 @@ class PurchaController extends BaseController{
     }
     function cost_insertEdit(){
         $datas=I("data");
+        if($datas[0]["project_id"]>0){
+            $this->projectCom->checkCost($datas[0]["project_id"],array_sum(array_column($datas,'contract_amount')));
+            // $costBudget = $this->projectCom->getCostBudget($datas[0]["project_id"]);
+            // $allCost = $this->projectCom->getCosts($datas[0]["project_id"]);
+            // // print_r($allCost);
+            // $array_column = array_sum(array_column($datas,'contract_amount'));
+            // if(($array_column+$allCost['allCost']) > $costBudget){
+            //     //<p>其中已批准成本：【'.$allCost['active'].'】</p><p>其中其他状态成本：【'.$allCost['waiting'].'】</p>
+            //     $html='<p>成本预算超支:</p><p>该项目立项成本预算【'.$costBudget.'】</p><p>当前使用已使用成本：【'.$allCost['allCost'].'】</p><p>请联系管理员修改成本预算</p>';
+            //     $this->ajaxReturn(['errCode'=>77,'error'=>$html]);
+            // }
+        }
+        
         $isUpdate =false;
         foreach ($datas as $suprInfo) {
             

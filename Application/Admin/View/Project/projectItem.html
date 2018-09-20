@@ -231,7 +231,7 @@
                 projectChosen.find("option[value='"+projectId+"']").prop("selected",true);
                 projectChosen.trigger("chosen:updated");
             }
-            ["projectId","session_all","session_cur","contract","amount","code","project_time","days","name","customer_other","create_time","bid_date","bid_time","status"].forEach(element => {
+            ["projectId","session_all","session_cur","contract","amount","code","project_time","days","name","customer_other",'cost_budget',"create_time","bid_date","bid_time","status"].forEach(element => {
                 if(info[element]!=null){
                     $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
                 }

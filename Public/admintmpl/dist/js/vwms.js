@@ -367,7 +367,7 @@ $(document).on("click",'.save-info',function(){
                 // $(self).parents(".modal").modal('toggle')
             }
         }else{
-            notice(100,result.error);
+            notice(result.errCode,result.error);
         }
         
     });
@@ -801,6 +801,9 @@ function notice(status){
     }else{
         content = arguments[1] ? arguments[1] : "出现异常了，联系下管理员吧！"
         title = arguments[2] ? arguments[2] : "异常提示！"
+    }
+    if(status==77){
+        seconds = arguments[3] >= 0 ? arguments[3] : 0
     }
     $("#v-notice-window .box-solid").addClass(color);
     $("#v-notice-window .box-solid .box-header .box-title").text(title);

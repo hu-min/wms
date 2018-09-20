@@ -540,7 +540,7 @@ class ProjectController extends BaseController{
             $data=[];
 
             $data['updateUser']=session('userId');
-            foreach (['project_id','amount','bid_date','contract','bid_time','bidding','brand','city','code','create_time','author','customer_com','customer_cont','customer_other','days','earlier_user','execute_sub','execute','field','is_bid','business','leader','name','project_time','project_id','projectType','province','scene_user','session_all','type','session_cur','stage','status'] as  $key) {
+            foreach (['project_id','amount','bid_date','contract','bid_time','bidding','brand','city','code','create_time','author','customer_com','customer_cont','customer_other','days','earlier_user','execute_sub','execute','field','is_bid','business','leader','name','project_time','project_id','projectType','province','scene_user','session_all','type','session_cur','stage','status','cost_budget'] as  $key) {
                 if(isset($datas[$key])){
                     $data[$key]=$datas[$key];
                 }

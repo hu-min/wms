@@ -21,6 +21,7 @@ class CostController extends BaseController{
         $this->expenseCom=getComponent('Expense');
         $this->expenseSubCom=getComponent('ExpenseSub');
         $this->whiteCom=getComponent('White');
+        $this->ABasic=A("Basic");
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
         $this->accounts = ["2"=>session("userInfo.wechat"),"3"=>session("userInfo.alipay"),"4"=>session("userInfo.bank_card")];
@@ -110,8 +111,8 @@ class CostController extends BaseController{
             "template"=>"debitModal",
         ];
         $option='<option value="0">费用类别</option>';
-        foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
-            $option.=A("Basic")->getfeeType($value,0);
+        foreach ($this->ABasic->getFeeTypeTree() as $key => $value) {
+            $option.=$this->ABasic->getfeeType($value,0);
         }
         $this->assign("pidoption",$option);
         $this->modalOne($modalPara);
@@ -119,6 +120,18 @@ class CostController extends BaseController{
     function manageDebitInfo(){
         $reqType=I("reqType");
         $datas=I("data");
+        if($datas["project_id"]>0){
+            $this->projectCom->checkCost($datas["project_id"],array_sum(array_column($datas,'debit_money')));
+            // $costBudget = $this->projectCom->getCostBudget($datas["project_id"]);
+            // $allCost = $this->projectCom->getCosts($datas["project_id"]);
+            // // print_r($allCost);
+            // $array_column = array_sum(array_column($datas,'contract_amount'));
+            // if(($array_column+$allCost['allCost']) > $costBudget){
+            //     //<p>其中已批准成本：【'.$allCost['active'].'】</p><p>其中其他状态成本：【'.$allCost['waiting'].'】</p>
+            //     $html='<p>成本预算超支:</p><p>该项目立项成本预算【'.$costBudget.'】</p><p>当前使用已使用成本：【'.$allCost['allCost'].'】</p><p>请联系管理员修改成本预算</p>';
+            //     $this->ajaxReturn(['errCode'=>77,'error'=>$html]);
+            // }
+        }
         $roleId = session("roleId");
         if($datas["debit_date"] == 0){
             unset($datas["debit_date"] );
@@ -137,7 +150,8 @@ class CostController extends BaseController{
             //添加时必备数据
             $process = $this->nodeCom->getProcess(I("vtabId"));
             $datas['process_id'] = $process["processId"];
-            if($datas["project_id"]>0){ 
+            if($datas["project_id"]>0){
+                print_r($datas);exit;
                 //存在项目，则第一个审批的人是项目主管,examine需要
                 $userRole = $this->userCom->getUserInfo($datas['leader']);
                 $datas['examine'] = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"]))) ;
@@ -321,8 +335,8 @@ class CostController extends BaseController{
         $id = I("id");
         $this->assign("provinceArr",$this->basicCom->get_provinces());
         $option='<option value="0">费用类别</option>';
-        foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
-            $option.=A("Basic")->getfeeType($value,0);
+        foreach ($this->ABasic->getFeeTypeTree() as $key => $value) {
+            $option.=$this->ABasic->getfeeType($value,0);
         }
         $this->assign("pidoption",$option);
 
@@ -422,6 +436,8 @@ class CostController extends BaseController{
         $process = $this->nodeCom->getProcess(I("vtabId"));
         $expInfo['process_id'] = $process["processId"];
         if($expInfo["project_id"]>0){ 
+            //检查成本预算是否超支
+            $this->projectCom->checkCost($expInfo["project_id"],array_sum(array_column($datas["expense-list"],'money')));
             //存在项目，则第一个审批的人是项目主管,examine需要
             $userRole = $this->userCom->getUserInfo($leader);
             $expInfo['examine'] = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"]))) ;
@@ -471,6 +487,9 @@ class CostController extends BaseController{
     function expenseEdit(){
         $datas=I("data");
         $project_id=I("project_id");
+        if($project_id>0){
+            $this->projectCom->checkCost($project_id,array_sum(array_column($datas["expense-list"],'money')));
+        }
         $expense_id=I("expense_id");
         $this->expenseCom->update(["where"=>["id"=>$project_id],"data"=>["update"=>time()]]);
         $isUpdate =false;
@@ -630,8 +649,8 @@ class CostController extends BaseController{
         $rows = I("rows");
         $this->assign("provinceArr",$this->basicCom->get_provinces());
         $option='<option value="0">费用类别</option>';
-        foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
-            $option.=A("Basic")->getfeeType($value,0);
+        foreach ($this->ABasic->getFeeTypeTree() as $key => $value) {
+            $option.=$this->ABasic->getfeeType($value,0);
         }
         $this->assign("pidoption",$option);
         $this->assign('rows',$rows);
