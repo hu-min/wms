@@ -116,7 +116,7 @@
             <div class="col-md-4">
                 <div class="box box-warning box-solid">
                     <div class="box-header with-border">
-                        <h3 class="box-title">虚位以待</h3>
+                        <h3 class="box-title">费用【借支/报销】饼图 目前数据仅模拟</h3>
                         <div class="box-tools">
                         <button type="button" name="" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
                         </button>
@@ -124,14 +124,7 @@
                     </div>
                     <!-- /.box-header -->
                     <div class="box-body">
-                        <table class="table table-bordered">
-                        <thead>
-                        <tr>
-                            <th>更多功能开发中</th>
-                        </tr>
-                    </thead>
-                        <tbody class="-table"></tbody>
-                    </table>
+                        <div id="container" style="width: 100%;height:300px;" ></div>
                     </div>
                     <!-- /.box-body -->
                     <div class="box-footer clearfix">
@@ -213,6 +206,40 @@
             $(tabId+" .refresh").offon("click",function(){
 				updateList($(this).attr("name"))
             })
+            var myChart = echarts.init(document.getElementById("container"));
+        
+            option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b}: {c} ({d}%)"
+                },
+                legend: {
+                    orient: 'vertical',
+                    x: 'left',
+                    data:['借支成功','借支等待','报销成功','报销等待']
+                },
+                series: [
+                    {
+                        name:'访问来源',
+                        type:'pie',
+                        radius: ['50%', '80%'],
+                        avoidLabelOverlap: true,
+                        labelLine: {
+                            normal: {
+                                show: true
+                            }
+                        },
+                        data:[
+                            {value:335, name:'借支成功'},
+                            {value:310, name:'借支等待'},
+                            {value:234, name:'报销成功'},
+                            {value:135, name:'报销等待'},
+                        ]
+                    }
+                ]
+            };
+            myChart.setOption(option);
+
         })
         var updateList = function(req){
 			var self =  $(tabId+" .box-header").find(".refresh[name='"+req+"']").parents(".box");
