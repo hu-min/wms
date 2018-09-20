@@ -47,12 +47,13 @@ class SupplierController extends BaseController{
             $where["company"]=["LIKE","%{$key}%"];
         }
         if($type!=""){
-            if($type!="999999999"){
+            if($type!=999999999){
                 $where["_string"]="FIND_IN_SET({$type},module)";
             }elseif($gpid!=""){
                 $where["supr_type"]=$gpid;
             }
-            
+        }elseif($gpid!=""){
+            $where["supr_type"]=$gpid;
         }
         $parameter=[
             'where'=>$where,

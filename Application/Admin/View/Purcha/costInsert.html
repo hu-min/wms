@@ -134,12 +134,13 @@
                     $current.find(".serial").text(Number(rows+1));
                     ["id","type","supplier_com","supplier_cont","module","contract_amount","sign_date","advance_date","offer_file","contract_file","remark","region",'status','aremark'].forEach(element => {
                         if(!$current.find(".modal-info[name='"+element+"']").hasClass("chosen-select")){
+                            if(element == "id"){
+                                $current.find(".approve-group").data("id",supritem[element])
+                            }
                             if(element=="region"){
                                 if(supritem["province_name"] && supritem["city_name"]){
                                     $current.find(".modal-info[name='"+element+"']").val(supritem["province_name"]+"-"+supritem["city_name"]);
                                 }
-                            }else if(element == "id"){
-                                $current.find(".approve-group").data("id",supritem[element])
                             }else if(element == "status"){
                                 var status = supritem[element]
                                 if(Number(supritem["last_status"])>1){
@@ -154,6 +155,9 @@
                                     $current.find("td[name='"+element+"']").text(supritem["approve_name"]);
                                 }
                             }else{
+                                if(in_array(element,["sign_date","advance_date"]) && in_array(supritem[element],["1970-01-01"])){
+                                    supritem[element]=""
+                                }
                                 $current.find(".modal-info[name='"+element+"']").val(supritem[element]);
                             }
                             

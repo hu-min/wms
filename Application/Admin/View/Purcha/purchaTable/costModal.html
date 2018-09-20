@@ -14,7 +14,7 @@
                     <div class="form-group">
                         <label >选择项目：</label>
                         <select class="form-control modal-info chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
-                            <option value="0">其他</option>
+                            <!-- <option value="0">其他</option> -->
                             <volist name="projectArr" id="item">
                                 <option value="{$item['projectId']}">{$item['name']}</option>
                             </volist>
