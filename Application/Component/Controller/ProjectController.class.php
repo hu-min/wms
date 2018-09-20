@@ -94,7 +94,7 @@ class ProjectController extends BaseController{
         $allCost = $this->getCosts($project_id);
         // print_r($allCost);
         // $array_column = array_sum(array_column($datas,'contract_amount'));
-        if(($current+$allCost['allCost']) > $costBudget && $allCost['allCost']>0){
+        if($allCost['allCost']>0 && ($current+$allCost['allCost']) > $costBudget){
             //<p>其中已批准成本：【'.$allCost['active'].'】</p><p>其中其他状态成本：【'.$allCost['waiting'].'】</p>
             $html='<p>成本预算超支:</p><p>该项目立项成本预算【'.$costBudget.'】</p><p>当前使用已使用成本：【'.$allCost['allCost'].'】</p><p>请联系管理员修改成本预算</p>';
             $this->ajaxReturn(['errCode'=>77,'error'=>$html]);
