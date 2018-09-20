@@ -203,7 +203,7 @@ $(document).on("click",".v-showmodal",function(){
     datas.con = con
     datas.reqType = con+"_modalOne"
     var hasData = $(tabId+" "+vtarget+" .modal-content").find(".modal-footer .save-info").data("gettype");
-    if(hasData !== undefined && datas.gettype  == 'Add'){
+    if(hasData !== undefined && datas.gettype  == 'Add' && hasData == "Add"){
         $(tabId+" "+vtarget).modal('toggle');
         return false;
     }
