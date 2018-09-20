@@ -285,7 +285,13 @@ $(document).on("click",'.search-refresh',function(){
  * @Desc: 保存数据、新增或修改 new
  */
 $(document).on("click",'.save-info',function(){
-    datas={}
+    if(datas[tabId]!=undefined){
+        var temp = datas[tabId]
+        datas=datas[tabId]
+    }else{
+        datas={}
+    }
+    
     var self = this
     var url=$(this).data("url");
     var gettype=$(this).data("gettype");

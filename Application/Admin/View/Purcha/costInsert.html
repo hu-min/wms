@@ -93,6 +93,7 @@
     </div>
     <script>
         function cost_insert_initInfo(gettype){
+            datas[tabId] = {del:[]}
             if(gettype=="Add"){
                 init_chosen("{$url}","getProjectOne",".create-rece");
                 init_chosen("{$url}","getProjectOne",$(tabId).find(".supr-list tbody tr"));
@@ -260,7 +261,16 @@
                 })
             })
             $(tabId).offon("click",".supr-remove",function(){
+                // console.log(typeof(datas[tabId]['del']))
+                if(datas[tabId]==undefined){
+                    datas[tabId] = {del:[]}
+                }
+                var id = $(this).parents("tr").find(".modal-info[name='id']").val()
+                if(id>0){
+                    datas[tabId]['del'].push($(this).parents("tr").find(".modal-info[name='id']").val());
+                }
                 $(this).parents("tr").remove();
+                // console.log(datas[tabId])
             })
             // $(tabId).off("change"," .modal-info[name='project_id']").on("change"," .modal-info[name='project_id']",function(){
             //     console.log(this)

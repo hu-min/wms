@@ -135,7 +135,7 @@ class ToolsController extends BaseController{
             if(array_search($roleId,$examine)!==false){
                 $place = array_search($roleId,$examine)+1;
             }else{
-                $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+                $this->ajaxReturn(['errCode'=>100,'error'=>'当前用户不能执行审核']);
             }
             // //2，根据$vtabId获取当前应用的权限
             // $nodeId = getTabId($vtabId);

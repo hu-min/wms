@@ -165,3 +165,11 @@ Uploads/User/20180913/6159252dd42a2834b1c7cf5b59b5c9ea15cebf79.jpg
 1，修复global_modal
 2，修改供应商类型和承接模块对接
 3，修改成本录入
+
+module
+supr_type
+
+1，成本录入删除出错
+2，供应商管理
+3，成本关联供应商
+4，删除成本单项

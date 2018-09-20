@@ -174,8 +174,8 @@
             if(info['process_level'] > info['place'] || in_array(Number(info['status']),[3])){
                 $(tabId+" .global-modal").find(".approve-group .approve-con").addClass("disabled")
                 $(tabId+" .global-modal").find(".approve-group .approve-con").prop("disabled",true)
-            }else{
-               
+            }else if(info['place']==0){
+                $(tabId+" .global-modal").find(".approve-group .approve-con").remove();
             }
         }
         function purcha_apply_getInfo(){

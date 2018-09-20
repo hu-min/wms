@@ -146,8 +146,10 @@
                 $(tabId+" .global-modal").find(".approve-group .approve-con").prop("disabled",true)
                 $(tabId+" .modal-info[name='voucher_file']").parent(".input-group").find(".clear-media").remove();
             }else{
+                if(info['place']==0){
+                    $(tabId+" .global-modal").find(".approve-group .approve-con").remove();
+                }
                 $(tabId+" .modal-info[name='voucher_file']").prop("disabled",false)
-               
             }
         }
         $(function(){
