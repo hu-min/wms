@@ -19,7 +19,8 @@ class PublicController extends BaseController{
         }
     }
     function getMessageList(){
-        $type = I("type");
+        $type = I("type") ? I("type") : I("param")['type'];
+        // print_r($type);exit;
         $p=I("p")?I("p"):1;
         $where=["to_user"=>session("userId")];
         $userKey = "from_user";
@@ -54,7 +55,7 @@ class PublicController extends BaseController{
             'page'=>$p,
             'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') date_time",
             'pageSize'=>$this->pageSize,
-            'orderStr'=>"add_time DESC",
+            'orderStr'=>"`status` ASC,add_time DESC",
             'groupBy'=>$groupBy,
             "joins"=>[
                 'LEFT JOIN (SELECT userId,userName user_name FROM v_user) u ON u.userId='.$userKey,

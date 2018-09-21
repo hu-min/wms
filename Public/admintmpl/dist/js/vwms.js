@@ -73,14 +73,24 @@ $(document).on("click",".search-list,.vpage",function(){
         var url=$(this).parents('.page-div').data("url");
         var con=$(this).parents('.page-div').data("con");
         var reqtype=$(this).parents('.page-div').data("reqtype");
+        var param=$(this).parents('.page-div').data("param");
     }else{
         var url=$(this).data("url");
         var con=$(this).data("con");
         var reqtype=$(this).data("reqtype");
+        var param=$(this).data("param");
     }
     var table=con+"-table";
     var page=con+"-page";
     var count=con+"-count";
+    if(param){
+        datas.param={};
+        param.split(",").forEach(function(para){
+            paraInfo = para.split(":")
+            datas.param[paraInfo[0]] = paraInfo[1]
+        });
+        // datas.param=param
+    }
     datas.reqType=reqtype;
     if(fun_is_exits(con+"_searchInfo")){
         eval(con+"_searchInfo()")//对不同的id设置不同的发送数据
