@@ -289,6 +289,12 @@ class PurchaController extends BaseController{
     function cost_insertEdit(){
         $datas=I("data");
         $dels=I("del");
+        if($dels && !empty($dels)){
+            $delResult=$this->purchaCom->del(["id"=>["IN",$dels]]);
+            if(isset($delResult->errCode) && $delResult->errCode==0){
+                $isUpdate =true;
+            }
+        }
         if($datas[0]["project_id"]>0){
             $this->projectCom->checkCost($datas[0]["project_id"],array_sum(array_column($datas,'contract_amount')));
             // $costBudget = $this->projectCom->getCostBudget($datas[0]["project_id"]);
@@ -325,12 +331,7 @@ class PurchaController extends BaseController{
                 }
             }
         }
-        if($dels && !empty($dels)){
-            $delResult=$this->purchaCom->del(["id"=>["IN",$dels]]);
-            if(isset($delResult->errCode) && $delResult->errCode==0){
-                $isUpdate =true;
-            }
-        }
+        
         if($isUpdate){
             $this->ajaxReturn(['errCode'=>0,'error'=>"修改成功"]);
         }
