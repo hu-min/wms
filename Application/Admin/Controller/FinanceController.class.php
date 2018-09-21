@@ -926,30 +926,37 @@ class FinanceController extends BaseController{
             $datas['user_id']=session('userId');
 
             //添加时必备数据
-            $process = $this->nodeCom->getProcess(I("vtabId"));
-            $datas['process_id'] = $process["processId"];
+            $examines = getComponent('Process')->getExamine(I("vtabId"),$datas['leader']);
+            // $process = $this->nodeCom->getProcess(I("vtabId"));
+            $datas['process_id'] = $examines["process_id"];
+            $datas['examine'] = $examines["examine"];
             if($datas["project_id"]>0){ 
-                //存在项目，则第一个审批的人是项目主管,examine需要
-                $userRole = $this->userCom->getUserInfo($datas['leader']);
-                $datas['examine'] = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"])));
                 unset($datas['leader']);
-            }else{
-                $datas['examine'] = $process["examine"];
             }
+            // $datas['process_id'] = $process["processId"];
+            // if($datas["project_id"]>0){ 
+            //     //存在项目，则第一个审批的人是项目主管,examine需要
+            //     $userRole = $this->userCom->getUserInfo($datas['leader']);
+            //     $datas['examine'] = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"])));
+            //     unset($datas['leader']);
+            // }else{
+            //     $datas['examine'] = $process["examine"];
+            // }
             //如果是审批者自己提交的执行下列代码
             $roleId = session("roleId");
-            $examineArr = explode(",",$datas['examine']);
-            $rolePlace = search_last_key($roleId,$examineArr);
+            $rolePlace = $examines['place'];
+            // $examineArr = explode(",",$datas['examine']);
+            // $rolePlace = search_last_key($roleId,$examineArr);
             $datas['status'] = 0;
             if($rolePlace!==false){
                 $datas['process_level']=$rolePlace+2;
-                if(count($examineArr) <= ($rolePlace+1)){
+                if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
                     $datas['status'] = 1;
                 }else{
                     $datas['status'] = 2;
                 }
             }else{
-                $datas['process_level']=$process["place"];
+                $datas['process_level']=$process["place"] > 0 ? $process["place"] : 1;
             }
 
             // $datas['process_level']=$process["place"];

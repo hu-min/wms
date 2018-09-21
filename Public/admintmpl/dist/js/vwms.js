@@ -979,7 +979,7 @@ function upload(option){
         $fileInput = $(this)
         var onlyread = $(this).attr("onlyread")
         if($(tabId+"-upload-modal").html() == undefined && onlyread ==undefined){
-            var html='<div class="modal fade in" id="'+tabId.replace("#","")+'-upload-modal" style="display: block; padding-right: 17px;"><div class="modal-dialog" style="top: 10%;"><div class="modal-content"><div class="modal-header"><button type="button" class="close modal-close" data-dismiss="modal" aria-label="关闭"><span aria-hidden="true"> × </span></button><h4 class="modal-title">文件上传</h4></div><div class="modal-body"><div class="input-group"><input readonly="readonly" class="form-control upload-item" type="text"><div class="input-file none"><input class="upload-item-file" name="upload-file-name" multiple="multiple" type="file"></div><span class="input-group-btn"><button type="button" class="btn btn-info btn-flat load-files-btn"><i class="fa  fa-file"></i> 选择文件 </button></span></div></div><div class="modal-footer"><button type="button" class="btn btn-default pull-left modal-close" data-dismiss="modal">关闭</button><button type="button" class="btn btn-primary upload-file-btn"><i class="fa fa-upload" ></i> 全部上传</button></div></div></div></div>'
+            var html='<div class="modal fade in" id="'+tabId.replace("#","")+'-upload-modal" style="display: block; padding-right: 17px;"><div class="modal-dialog" style="top: 10%;"><div class="modal-content"><div class="modal-header"><button type="button" class="close modal-close" data-dismiss="modal" aria-label="关闭"><span aria-hidden="true"> × </span></button><h4 class="modal-title">文件上传</h4></div><div class="modal-body"><div class="input-group"><input readonly="readonly" class="form-control upload-item" type="text"><div class="input-file none"><input class="upload-item-file" name="upload-file-name" multiple="multiple" type="file"></div><span class="input-group-btn"><button type="button" class="btn btn-info btn-flat load-files-btn"><i class="fa  fa-file"></i> 选择文件 </button></span></div></div><div class="modal-footer"><button type="button" class="btn btn-default pull-left modal-close" data-dismiss="modal">关闭</button><button type="button" class="btn btn-primary upload-file-btn"><i class="fa fa-upload" ></i> 全部上传</button><button type="button" class="btn btn-danger del-file-btn"><i class="fa fa-bomb" ></i> 全部删除</button></div></div></div></div>'
             $(document).find("body").append(html);
             
             $(document).on("click",tabId+"-upload-modal .modal-close",function(){
@@ -989,7 +989,7 @@ function upload(option){
             })
             $(document).offon("click",tabId+"-upload-modal .load-files-btn",function(){
                 $(this).parent().prev().find("input").trigger("click")
-                var ulHtml ='<ul class="products-list product-list-in-box"></ul>'
+                var ulHtml ='<ul class="products-list product-list-in-box" style="padding: 5px 10px;max-height: 460px;overflow: auto;"></ul>'
                 if($(tabId+"-upload-modal .modal-body .products-list").html() == undefined){
                     $(tabId+"-upload-modal .modal-body").append(ulHtml);
                     
@@ -1007,39 +1007,49 @@ function upload(option){
                         }
                     })
                     $(tabId+"-upload-modal").offon("click",".modal-footer .upload-file-btn",function(){
-                        for (const fileName in tempFiles) {
-                            uploadData = new FormData();
-                            uploadData.append("file",tempFiles[fileName])
-                            $.ajax({
-                                url:urlArr[tabId+el],
-                                type:"post",
-                                data:uploadData,
-                                processData:false,
-                                contentType:false,
-                                xhr:function(){
-                                    var xhr = $.ajaxSettings.xhr();
-                                    if(xhr.upload){
-                                        xhr.upload.addEventListener("progress",function(evt){
-                                            var loaded = evt.loaded;
-                                            var tot = evt.total;
-                                            var per = Math.floor(100*loaded/tot);
-                                            $(tabId+"-upload-modal .modal-body .products-list li[name='"+fileName+"']").find(".progress .progress-bar").css("width",per+"%")
-                                        },false);
-                                        return xhr;
+                        if(Object.getOwnPropertyNames(tempFiles).length>0){
+                            for (const fileName in tempFiles) {
+                                uploadData = new FormData();
+                                uploadData.append("file",tempFiles[fileName])
+                                $.ajax({
+                                    url:urlArr[tabId+el],
+                                    type:"post",
+                                    data:uploadData,
+                                    processData:false,
+                                    contentType:false,
+                                    xhr:function(){
+                                        var xhr = $.ajaxSettings.xhr();
+                                        if(xhr.upload){
+                                            xhr.upload.addEventListener("progress",function(evt){
+                                                var loaded = evt.loaded;
+                                                var tot = evt.total;
+                                                var per = Math.floor(100*loaded/tot);
+                                                $(tabId+"-upload-modal .modal-body .products-list li[name='"+fileName+"']").find(".progress .progress-bar").css("width",per+"%")
+                                            },false);
+                                            return xhr;
+                                        }
                                     }
-                                }
-                            }).done(function(result){
-                                if(result.errCode==0){
-                                    $(tabId+"-upload-modal .modal-body .products-list li[name='"+fileName+"']").find(".progress").removeClass("active")
-                                    $(tabId+"-upload-modal .modal-body .products-list li[name='"+fileName+"'] .insert-file-btn").attr("name",result.url2)
-                                    $(tabId+"-upload-modal .modal-body .products-list li[name='"+fileName+"'] .insert-file-btn").removeClass("none")
-                                }
-                            })
+                                }).done(function(result){
+                                    if(result.errCode==0){
+                                        $(tabId+"-upload-modal .modal-body .products-list li[name='"+fileName+"']").find(".progress").removeClass("active")
+                                        $(tabId+"-upload-modal .modal-body .products-list li[name='"+fileName+"'] .insert-file-btn").attr("name",result.url2)
+                                        $(tabId+"-upload-modal .modal-body .products-list li[name='"+fileName+"'] .insert-file-btn").removeClass("none")
+                                    }
+                                })
+                            }
+                        }else{
+                            notice(110,'当前没有文件','文件输入',3);
                         }
+                        
+                    })
+                    $(tabId+"-upload-modal").offon("click",".modal-footer .del-file-btn",function(){
+                        $(tabId+"-upload-modal .modal-body .products-list").html("")
+                        $(tabId+"-upload-modal .upload-item").val("")
+                        tempFiles = {};
                     })
                 }
                 $(document).offon("change",tabId+"-upload-modal .upload-item-file",function(){
-                    $(tabId+"-upload-modal .modal-body .products-list").html("")
+                    // $(tabId+"-upload-modal .modal-body .products-list").html("")
                     $(tabId+"-upload-modal .upload-item-file").each(function(){
                         var uploadItem = ""
                         var errorMes = "";
@@ -1048,28 +1058,39 @@ function upload(option){
                             var element = this.files[index];
                             // 限制文件不能大于10M
                             var thisFile = element.name.split(".")
+                            
                             if(Math.floor(element.size/1024/1024)<=10){
                                 var src = window.URL.createObjectURL(element)
                                 var fileType = thisFile[thisFile.length-1].toLowerCase()
-                                if(in_array(fileType,["jpeg","jpg","png","gif"])){
+                                var fname = $.md5(thisFile[thisFile.length-2].toLowerCase())
+                                var hasMedia = $(tabId+"-upload-modal .modal-body .products-list").find("li[name="+fname+"]").html();
+                                if(hasMedia==undefined && Object.getOwnPropertyNames(tempFiles).length<20){
+                                    if(in_array(fileType,["jpeg","jpg","png","gif"])){
                                     
-                                }else if (in_array(fileType,["doc","docx","xls","xlsx","ppt","pptx"])){
-                                    src = "/Public/admintmpl/dist/img/office.jpg" 
-                                }else if(in_array(fileType,["pdf"])){
-                                    src = "/Public/admintmpl/dist/img/pdf.jpg"
-                                }else{
-                                    src = "/Public/admintmpl/dist/img/files.jpg" 
+                                    }else if (in_array(fileType,["doc","docx","xls","xlsx","ppt","pptx"])){
+                                        src = "/Public/admintmpl/dist/img/office.jpg" 
+                                    }else if(in_array(fileType,["pdf"])){
+                                        src = "/Public/admintmpl/dist/img/pdf.jpg"
+                                    }else{
+                                        src = "/Public/admintmpl/dist/img/files.jpg" 
+                                    }
+                                    if(float(element.size/1024/1024) < 1){
+                                        var fileSize = float(element.size/1024)+"K"
+                                    }else{
+                                        var fileSize = float(element.size/1024/1024)+"M"
+                                    }
+                                    var liHtml = '<li class="item" name="'+fname+'"><div class="product-img"><img src="'+src+'" alt="Product Image"></div><div class="product-info"><a href="javascript:void(0)" name="'+element.name+'" lass="product-title">'+element.name+'<span class="btn btn-warning btn-flat pull-right insert-file-btn none"><i class="fa fa-link" ></i> 插入 </span><span class="btn btn-danger btn-flat pull-right delete-file-btn"><i class="fa fa-close"></i> 删除 </span></a><span class="product-description">文件大小：'+fileSize+' 文件类型：'+fileType+'</span><div class="progress progress-sm active"><div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">0% Complete</span></div></div></div></li>';
+                                    $(tabId+"-upload-modal .modal-body .products-list").append(liHtml);
+                                    if(uploadItem!=""){
+                                        uploadItem+=","+element.name
+                                    }else{
+                                        uploadItem+=element.name
+                                    }
+                                    tempFiles[fname] = element
+                                    $(tabId+"-upload-modal .upload-item").val(uploadItem)
+                                }else if(Object.getOwnPropertyNames(tempFiles).length>=20){
+                                    errorMes+="<p>最多同时只能上传20个文件，"+thisFile[0]+"文件未能上传;</p>"
                                 }
-                                
-                                var liHtml = '<li class="item" name="'+"file"+index+'"><div class="product-img"><img src="'+src+'" alt="Product Image"></div><div class="product-info"><a href="javascript:void(0)" name="'+element.name+'" lass="product-title">'+element.name+'<span class="btn btn-warning btn-flat pull-right insert-file-btn none"><i class="fa fa-link" ></i> 插入 </span><span class="btn btn-danger btn-flat pull-right delete-file-btn"><i class="fa fa-close"></i> 删除 </span></a><span class="product-description">文件大小：'+float(element.size/1024/1024)+'M 文件类型：'+fileType+'</span><div class="progress progress-sm active"><div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">0% Complete</span></div></div></div></li>';
-                                $(tabId+"-upload-modal .modal-body .products-list").append(liHtml);
-                                if(uploadItem!=""){
-                                    uploadItem+=","+element.name
-                                }else{
-                                    uploadItem+=element.name
-                                }
-                                tempFiles["file"+index] = element
-                                $(tabId+"-upload-modal .upload-item").val(uploadItem)
                             }else{
                                 errorMes+="<p>"+thisFile[0]+"文件超过10M;</p>"
                             }

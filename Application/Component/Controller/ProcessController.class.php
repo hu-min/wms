@@ -65,22 +65,26 @@ class ProcessController extends BaseController{
         print_r($processAppList);
         // print_r($nodeProce);
     }
-    function getExamine($vtabId=false,$leader=0){
+    function getExamine($vtabId=false,$leader=0,$roleId=0){
         $vtabId = $vtabId ? $vtabId : I("vtabId");
+        $roleId = $roleId ? $roleId : session("roleId");
         $returnData = ["examine"=>'',"place"=>0,'process_id'];
         if(!$vtabId){
             return $returnData;
         }
         $process = A("Component/Node")->getProcess($vtabId);
-        $roleId = '';
+        // $roleId = '';
         if($leader>0){
             $userRole = A("Component/User")->getUserInfo($leader);
-            $roleId = $userRole['roleId'];
+            // $roleId = $userRole['roleId'];
+            $examines = $userRole['roleId'].",".$process["examine"];
+        }else{
+            $examines = $process["examine"];
         }
-        $examines = $roleId.",".$process["examine"];
-        
-        $returnData['examine'] = implode(",",array_unique(explode(",",$examines)));
-        $returnData['place'] = $process["place"];
+        $process["place"] = search_last_key($roleId,array_unique(explode(",",$examines)));
+
+        $returnData['examine'] = trim(implode(",",array_unique(explode(",",$examines))),",");
+        $returnData['place'] = $process["place"] ;
         $returnData['process_id'] = $process["processId"];
         return $returnData;
     }

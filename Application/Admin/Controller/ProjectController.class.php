@@ -519,19 +519,30 @@ class ProjectController extends BaseController{
             $datas['process_id'] = $examines['process_id'];
             //如果是审批者自己提交的执行下列代码
             $roleId = session("roleId");
-            $examineArr = explode(",",$datas['examine']);
-            $rolePlace = search_last_key($roleId,$examineArr);
+            // $examineArr = explode(",",$datas['examine']);
+            // $rolePlace = search_last_key($roleId,$examineArr);
+            $rolePlace = $examines['place'];
             $datas['status'] = 0;
             if($rolePlace!==false){
                 $datas['process_level']=$rolePlace+2;
-                if(count($examineArr) <= ($rolePlace+1)){
-                    $datas['status'] = 1;
+                if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
+                    $status = 1;
                 }else{
-                    $datas['status'] = 2;
+                    $status = 2;
                 }
             }else{
-                $datas['process_level']=$examines["place"];
+                $datas['process_level'] = $examines["place"] > 0 ? $examines["place"] : 1;
             }
+            // if($rolePlace!==false){
+            //     $datas['process_level']=$rolePlace+2;
+            //     if(count($examineArr) <= ($rolePlace+1)){
+            //         $datas['status'] = 1;
+            //     }else{
+            //         $datas['status'] = 2;
+            //     }
+            // }else{
+            //     $datas['process_level']=$examines["place"] > 0 ? $examines["place"] : 1;
+            // }
 
             unset($datas['projectId']);
             return $datas;

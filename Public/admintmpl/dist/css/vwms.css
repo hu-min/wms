@@ -186,3 +186,7 @@ td > .approve-group > button{
 .nodeOn{
 	cursor: pointer;
 }
+.mailbox-messages td a{
+	display: inline-block;
+	width: 100%;
+}

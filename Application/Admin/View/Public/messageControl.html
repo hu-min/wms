@@ -12,7 +12,8 @@
     <link rel="stylesheet" href="__ADMINT__/dist/css/skins/_all-skins.min.css">
     <!-- iCheck -->
     <link rel="stylesheet" href="__ADMINT__/plugins/iCheck/flat/blue.css">
-    <link rel="stylesheet" href="__ADMINT__/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
+
+    <!-- <link rel="stylesheet" href="__ADMINT__/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css"> -->
 </head>
     <body>
         <section class="content">
@@ -166,7 +167,9 @@
         <!-- <script src="__ADMINT__/dist/js/adminlte.min.js"></script> -->
         <!-- iCheck -->
         <script src="__ADMINT__/plugins/iCheck/icheck.min.js"></script>
-        <script src="__ADMINT__/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
+        <!-- <script src="__ADMINT__/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script> -->
+
+        <script src="__ADMINT__/bower_components/ckeditor/ckeditor.js"></script>
         <script>
             var mesList = {};
             var getMessageList = function(type){
@@ -187,7 +190,8 @@
             }
             $(function () {
                 getMessageList(1);
-                var abcd = $("#compose-textarea").wysihtml5();
+                // $("#compose-textarea").wysihtml5();
+                CKEDITOR.replace('compose-textarea')
                 init_chosen("{$url}","getOptionList",".message-compose-box");
                 //Enable iCheck plugin for checkboxes
                 //Enable check and uncheck all functionality
@@ -283,7 +287,7 @@
                             throw title
                         }else{
                             if(name=="content"){
-                                datas["data"][name]=encodeURI(val);
+                                datas["data"][name]=encodeURI(CKEDITOR.instances['compose-textarea'].getData(''));
                                 
                             }else{
                                 datas["data"][name]=val;
@@ -295,6 +299,10 @@
                     post("{$url}",datas,function(result){
                         notice(result.errCode,result.error);
                         if(result.errCode==0){
+                            $(tabId+" .message-box .message-compose-box").find(".modal-info[name='to_user']").val("");
+                            $(tabId+" .message-box .message-compose-box").find(".modal-info[name='title']").val("");
+                            $(tabId+" .message-box .message-compose-box").find(".modal-info[name='to_user']").trigger("chosen:updated");
+                            CKEDITOR.instances['compose-textarea'].setData('')
                             $(tabId+" .message-box .mes-folder ul").find("li.send-box a").click()
                         }else{
 

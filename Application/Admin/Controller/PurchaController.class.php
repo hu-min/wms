@@ -113,7 +113,10 @@ class PurchaController extends BaseController{
             $redisName="cost_insertList";
             $where = ["project_id"=>$id];
             if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
-                $where['user_id'] = session('userId');
+                $whereSub['user_id'] = session('userId');
+                $whereSub['_string'] = "FIND_IN_SET({$roleId},examine)>0";
+                $where['_logic'] = 'or';
+                $where['_complex'] = $whereSub;
             }
             $parameter=[
                 'where'=>$where,
@@ -215,8 +218,10 @@ class PurchaController extends BaseController{
     function cost_insertAdd(){
         $datas=I("data");
         $isInsert =false;
-        $process = $this->nodeCom->getProcess(I("vtabId"));
-        $process_id = $process["processId"];
+        $examines = getComponent('Process')->getExamine(I("vtabId"),$datas[0]["leader"]);
+        // $process = $this->nodeCom->getProcess(I("vtabId"));
+
+        // $process_id = $process["processId"];
         if($datas[0]["project_id"]>0){ 
             //检查成本预算是否超支
             $this->projectCom->checkCost($datas[0]["project_id"],array_sum(array_column($datas,'contract_amount')));
@@ -230,36 +235,41 @@ class PurchaController extends BaseController{
             //     $this->ajaxReturn(['errCode'=>77,'error'=>$html]);
             // }
             //存在项目，则第一个审批的人是项目主管,examine需要
-            $userRole = $this->userCom->getUserInfo($datas[0]["leader"]);
-            $examine = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"])));
-            unset($expInfo['leader']);
+            
+            // if($datas[0]["leader"]>0){
+            //     $userRole = $this->userCom->getUserInfo($datas[0]["leader"]);
+            // }
+            // $examine = trim(implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"]))),",");
         }else{
-            $examine = $process["examine"];
+            // $examine = $process["examine"];
         }
         // $process_level=$process["place"];
         //如果是审批者自己提交的执行下列代码
-        $roleId = session("roleId");
-        $examineArr = explode(",",$examine);
-        $rolePlace = search_last_key($roleId,explode(",",$userRole['roleId'].",".$process["examine"]));
+        // $roleId = session("roleId");
+        // $examineArr = explode(",",$examine);
+        // $rolePlace = search_last_key($roleId,explode(",",$userRole['roleId'].",".$process["examine"]));
+        $rolePlace = $examines['place'];
         $status = 0;
         if($rolePlace!==false){
             $process_level=$rolePlace+2;
-            if(count($examineArr) <= ($rolePlace+1)){
+            if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
                 $status = 1;
             }else{
                 $status = 2;
             }
         }else{
-            $process_level=$process["place"];
+            $process_level=$rolePlace > 0 ? $rolePlace : 1;
         }
         foreach ($datas as $suprInfo) {
             $dataInfo = $this->manageCostInsertInfo($suprInfo);
-            $dataInfo["process_id"] = $process_id;
-            $dataInfo["examine"] = $examine;
+            $dataInfo["process_id"] = $examines['process_id'];
+            // $dataInfo["process_id"] = $process_id;
+            // $dataInfo["examine"] = $examine;
+            $dataInfo["examine"] = $examines['examine'];;
             $dataInfo['process_level'] = $process_level;
             $dataInfo['status'] = $status;
             // print_r($process);
-            // print_r($dataInfo);exit;
+            print_r($dataInfo);exit;
             unset($dataInfo['leader']);
             if($dataInfo){
                 $insertResult=$this->purchaCom->insert($dataInfo);
@@ -357,7 +367,12 @@ class PurchaController extends BaseController{
         }
         $roleId = session('roleId');
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
-            $where["_string"] = "FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0";
+            // $whereSub['user_id'] = session('userId');
+            // $whereSub['_string'] = "FIND_IN_SET({$roleId},examine)>0";
+            // $where['_logic'] = 'or';
+            // $where['_complex'] = $whereSub;
+
+            $where["_string"] = "FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0 OR user_id = ".session('userId');
         }
         $parameter=[
             'where'=>$where,
@@ -383,7 +398,7 @@ class PurchaController extends BaseController{
         ];
         
         $listResult=$this->purchaCom->getList($parameter);
-        // echo $this->purchaCom->M()->_sql();
+        // echo $this->purchaCom->M()->_sql();exit;
         $this->tablePage($listResult,'Purcha/purchaTable/purapplyList',"purapplyList");
     }
 

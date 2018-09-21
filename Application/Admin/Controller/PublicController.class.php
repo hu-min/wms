@@ -82,11 +82,11 @@ class PublicController extends BaseController{
         if($newMesg[0]){
             $html .='<li><a class="nodeOn" data-nodeid="10001" href="'.U("Public/messageControl").'" data-title="内部消息"><div class="pull-left">';
             if($newMesg[0]['avatar'] !=""){
-                $html .='<img src="/'.$newMesg[0]["avatar"].'" class="img-circle" alt="User Image">';
+                $html .='<img src="/'.$newMesg[0]["avatar"].'" class="img-circle" alt="用户头像">';
             }else{
-                $html .='<img src="'.__ROOT__.'/Public'.'/admintmpl'.'/dist/img/minlogo.png" class="img-circle" alt="User Image">';
+                $html .='<img src="'.__ROOT__.'/Public'.'/admintmpl'.'/dist/img/minlogo.png" class="img-circle" alt="用户头像">';
             }
-            $html .='</div><h4>'.$newMesg[0]['title'].'<small><i class="fa fa-clock-o"></i> '.disTime($newMesg[0]['add_time']).' </small></h4><p>'.utf8_substr($newMesg[0]['content'],16).'</p></a></li>';
+            $html .='</div><h4>'.utf8_substr($newMesg[0]['title'],8).'<small><i class="fa fa-clock-o"></i> '.disTime($newMesg[0]['add_time']).' </small></h4><p>'.utf8_substr($newMesg[0]['content'],16).'</p></a></li>';
            $data = $newMesg[0];
         }
         $this->ajaxReturn(['errCode'=>$result->errCode,'error'=>getError($result->errCode),'data'=>$html]);

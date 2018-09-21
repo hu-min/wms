@@ -150,28 +150,32 @@ class CostController extends BaseController{
             $datas['author']=session('userId');
 
             //添加时必备数据
-            $process = $this->nodeCom->getProcess(I("vtabId"));
-            $datas['process_id'] = $process["processId"];
+            $examines = getComponent('Process')->getExamine(I("vtabId"),$datas['leader']);
+            // $process = $this->nodeCom->getProcess(I("vtabId"));
+            $datas['process_id'] = $examines["process_id"];
+            $datas['examine'] = $examines["examine"];
+            // $datas['process_id'] = $process["processId"];
             if($datas["project_id"]>0){
                 // print_r($datas);exit;
                 //存在项目，则第一个审批的人是项目主管,examine需要
-                $userRole = $this->userCom->getUserInfo($datas['leader']);
-                $datas['examine'] = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"]))) ;
+                // $userRole = $this->userCom->getUserInfo($datas['leader']);
+                // $datas['examine'] = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"]))) ;
                 unset($datas['leader']);
             }else{
-                $datas['examine'] = $process["examine"];
+                // $datas['examine'] = $process["examine"];
             }
-            $examineArr = explode(",",$datas['examine']);
-            $rolePlace = search_last_key($roleId,$examineArr);
+            // $examineArr = explode(",",$datas['examine']);
+            // $rolePlace = search_last_key($roleId,$examineArr);
+            $rolePlace = $examines['place'];
             if($rolePlace!==false){
                 $datas['process_level']=$rolePlace+2;
-                if(count($examineArr) <= ($rolePlace+1)){
+                if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
                     $datas['status'] = 1;
                 }else{
                     $datas['status'] = 2;
                 }
             }else{
-                $datas['process_level']=$process["place"];
+                $datas['process_level']=$process["place"] > 0 ? $process["place"] : 1;
             }
             //如果自己处于某个申请阶段，直接跳过下级;
             // $datas['process_level']=$this->processAuth["level"];
@@ -435,32 +439,36 @@ class CostController extends BaseController{
             "add_time"=>time(),
         ];
         //添加时必备数据
-        $process = $this->nodeCom->getProcess(I("vtabId"));
-        $expInfo['process_id'] = $process["processId"];
+        $examines = getComponent('Process')->getExamine(I("vtabId"),$leader);
+        // $process = $this->nodeCom->getProcess(I("vtabId"));
+        // $expInfo['process_id'] = $process["processId"];
+        $expInfo['process_id'] = $examines["process_id"];
+        $expInfo['examine'] = $examines["examine"];
         if($expInfo["project_id"]>0){ 
             //检查成本预算是否超支
             $this->projectCom->checkCost($expInfo["project_id"],array_sum(array_column($datas["expense-list"],'money')));
             //存在项目，则第一个审批的人是项目主管,examine需要
-            $userRole = $this->userCom->getUserInfo($leader);
-            $expInfo['examine'] = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"]))) ;
+            // $userRole = $this->userCom->getUserInfo($leader);
+            // $expInfo['examine'] = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"]))) ;
             // unset($expInfo['leader']);
         }else{
-            $expInfo['examine'] = $process["examine"];
+            // $expInfo['examine'] = $process["examine"];
         }
         //如果是审批者自己提交的执行下列代码
         $roleId = session("roleId");
-        $examineArr = explode(",",$expInfo['examine']);
-        $rolePlace = search_last_key($roleId,$examineArr);
+        // $examineArr = explode(",",$expInfo['examine']);
+        // $rolePlace = search_last_key($roleId,$examineArr);
+        $rolePlace = $examines['place'];
         $expInfo['status'] = 0;
         if($rolePlace!==false){
             $expInfo['process_level']=$rolePlace+2;
-            if(count($examineArr) <= ($rolePlace+1)){
+            if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
                 $expInfo['status'] = 1;
             }else{
                 $expInfo['status'] = 2;
             }
         }else{
-            $expInfo['process_level']=$process["place"];
+            $expInfo['process_level']=$process["place"] > 0 ? $process["place"] : 1;
         }
         
         // $expInfo['process_level']=$process["place"];
