@@ -155,6 +155,11 @@ class PurchaController extends BaseController{
         $p=I("p")?I("p"):1;
         $roleId = session("roleId");
         $where=[];
+        foreach (['name','code','business_name','leader_name'] as $key) {
+            if(isset($data[$key])){
+                $where[$key]=['LIKE','%'.$data[$key].'%'];
+            }
+        }
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
             $where['user_id'] = session('userId');
         }
@@ -345,6 +350,11 @@ class PurchaController extends BaseController{
         $data=I("data");
         $p=I("p")?I("p"):1;
         $where=[];
+        foreach (['project_name','code','supplier_cont_name','supplier_com_name','business_name','leader_name'] as $key) {
+            if(isset($data[$key])){
+                $where[$key]=['LIKE','%'.$data[$key].'%'];
+            }
+        }
         $roleId = session('roleId');
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
             $where["_string"] = "FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0";
@@ -360,9 +370,9 @@ class PurchaController extends BaseController{
                 "LEFT JOIN (SELECT userId uuser_id,userName user_name FROM v_user) u ON u.uuser_id = user_id",
                 "LEFT JOIN (SELECT userId buser_id,userName business_name FROM v_user) bu ON bu.buser_id = p.business",
                 "LEFT JOIN (SELECT userId luser_id,userName leader_name FROM v_user) lu ON lu.luser_id = p.leader",
-                "LEFT JOIN (SELECT companyId cid,company supplier_com_name,type,provinceId,cityId FROM v_supplier_company WHERE status=1) c ON c.cid=supplier_com",
+                "LEFT JOIN (SELECT companyId cid,company supplier_com_name,supr_type,provinceId,cityId FROM v_supplier_company WHERE status=1) c ON c.cid=supplier_com",
                 "LEFT JOIN (SELECT contactId cid,contact supplier_cont_name,phone supplier_cont_phone,email supplier_cont_email FROM v_supplier_contact WHERE status=1) ct ON ct.cid=supplier_cont",
-                "LEFT JOIN (SELECT basicId,name type_name FROM v_basic WHERE class='supType') st ON st.basicId=c.type",
+                "LEFT JOIN (SELECT basicId,name type_name FROM v_basic WHERE class='supType') st ON st.basicId=c.supr_type",
                 "LEFT JOIN (SELECT basicId,name module_name FROM v_basic WHERE class='module') bm ON bm.basicId=module",
                 "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = p.brand",
                 "LEFT JOIN (SELECT pid ,province province_name FROM v_province) pr ON pr.pid=c.provinceId",

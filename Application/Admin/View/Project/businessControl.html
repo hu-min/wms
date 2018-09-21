@@ -20,34 +20,33 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">项目安排</h4>
                     </div>
-                    <div class="box-body search-body company-search-box">
+                    <div class="box-body search-body">
                         <div class="col-md-12">
                             <div class="form-inline">
-                                    <input class="search-info" name="template" type="hidden" value="business" />
                                 <div class="form-group">
-                                    <label class="control-label">公司名称：</label>
-                                    <input class="form-control search-info input-sm" name="company" placeholder="公司名称" type="text">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label class="control-label">公司别名：</label>
-                                    <input class="form-control search-info input-sm" name="alias" placeholder="公司别名" type="text">
-                                </div>
-                                <!-- <div class="form-group">
-                                    <label for="info-title">项目省份：</label>
-                                    <select class="form-control modal-info chosen-project chosen-select" title="项目省份" name="province" data-cname="city">
-                                        <option value="">省份</option>
-                                        <volist name="provinceArr" id="item">
-                                            <option value="{$item['pid']}">{$item['province']}</option>
-                                        </volist>
-                                    </select>
+                                    <label for="info-title">项目编号：</label>
+                                    <input class="form-control search-info input-sm" name="code" title="项目编号" required="required" value="" placeholder="项目编号" type="text">
                                 </div>
                                 <div class="form-group">
-                                    <label for="info-title">项目城市：</label>
-                                    <select class="form-control modal-info chosen-project chosen-select" data-value="cid"  data-text="city" data-noupdate="true" data-pname="province" title="城市" name="city">
-                                        <option value="">城市</option>
-                                    </select>
-                                </div> -->
+                                    <label class="control-label">项目名称：</label>
+                                    <input class="form-control search-info input-sm" name="name" placeholder="项目名称" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">签约公司：</label>
+                                    <input class="form-control search-info input-sm" name="customer_com_name" placeholder="签约公司" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">客户主担：</label>
+                                    <input class="form-control search-info input-sm" name="customer_cont_name" placeholder="客户主担" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">营业主担：</label>
+                                    <input class="form-control search-info input-sm" name="business_name" placeholder="营业主担" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">项目主担：</label>
+                                    <input class="form-control search-info input-sm" name="leader_name" placeholder="项目主担" type="text">
+                                </div>
                                 <div class="form-group">
                                     <label >状态：</label>
                                     <select class="form-control search-info input-sm" title="状态" name="status">
@@ -61,9 +60,8 @@
                                     <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
                                     <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 </div>
-                                
+                                <br>
                             </div>
-                            <br>
                         </div>
                     </div>
                 </div>
@@ -76,7 +74,7 @@
                 <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th>品牌</th>
+                            <!-- <th>品牌</th> -->
                             <th>项目编号</th>
                             <th>项目日期</th>
                             <th>项目名称</th>
@@ -86,7 +84,7 @@
                             <th>主担</th>
                             <th>项目类型</th>
                             <th>总场次</th>
-                            <th>目前场次</th>
+                            <!-- <th>目前场次</th> -->
                             <th>合同额</th>
                             <th>预付款</th>
                             <th>未付款</th>

@@ -438,7 +438,7 @@ class ProjectController extends BaseController{
                 "LEFT JOIN (SELECT basicId stage_id,name stage_name FROM v_basic WHERE class = 'stage' ) s ON s.stage_id = stage",
                 "LEFT JOIN (SELECT basicId type_id,name type_name FROM v_basic WHERE class = 'projectType' ) t ON t.type_id = type",
                 "LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct ON ct.ctid = city AND ct.cpid = province",
-                "LEFT JOIN (SELECT project_id fproject_id , count(id) file_num FROM v_project_files WHERE file_type IN ({$file_type})) f ON f.fproject_id = projectId ",
+                "LEFT JOIN (SELECT project_id fproject_id , count(id) file_num FROM v_project_files WHERE file_type IN ({$file_type}) GROUP BY fproject_id) f ON f.fproject_id = projectId ",
                 "LEFT JOIN (SELECT project_id rproject_id ,advance radvance,surplus rsurplus FROM v_receivable ) r ON r.rproject_id = projectId",
                 "LEFT JOIN (SELECT project_id pproject_id,SUM(contract_amount) pcontract_amount FROM v_purcha  WHERE status = 1 GROUP BY pproject_id) pu ON pu.pproject_id = projectId",
                 "LEFT JOIN (SELECT project_id dproject_id,SUM(debit_money) ddebit_money FROM v_debit WHERE status = 1 {$whiteWhere} GROUP BY dproject_id ) de ON de.dproject_id = projectId",

@@ -27,28 +27,36 @@
                                 
                                 <div class="form-group">
                                     <label class="control-label">项目名称：</label>
-                                    <input class="form-control search-info input-sm" name="company" placeholder="项目名称" type="text">
+                                    <input class="form-control search-info input-sm" name="project_name" placeholder="项目名称" type="text">
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label">项目编号：</label>
-                                    <input class="form-control search-info input-sm" name="alias" placeholder="项目编号" type="text">
+                                    <input class="form-control search-info input-sm" name="code" placeholder="项目编号" type="text">
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label">供应商名称：</label>
-                                    <input class="form-control search-info input-sm" name="alias" placeholder="供应商名称" type="text">
+                                    <input class="form-control search-info input-sm" name="supplier_com_name" placeholder="供应商名称" type="text">
                                 </div>
                                 <div class="form-group">
+                                    <label class="control-label">营业主担：</label>
+                                    <input class="form-control search-info input-sm" name="business_name" placeholder="营业主担" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">项目主担：</label>
+                                    <input class="form-control search-info input-sm" name="leader_name" placeholder="项目主担" type="text">
+                                </div>
+                                <!-- <div class="form-group">
                                     <label >供应商类型：</label>
                                     <select class="form-control search-info input-sm" data-city="search-info" title="供应商类型" name="provinceId">
                                         <option value="">供应商类型</option>
                                     </select>
-                                </div>
-                                <div class="form-group">
+                                </div> -->
+                                <!-- <div class="form-group">
                                     <label >项目主担：</label>
                                     <select class="form-control search-info input-sm" data-city="search-info" title="项目主担" name="provinceId">
                                         <option value="">项目主担</option>
                                     </select>
-                                </div>
+                                </div> -->
                                 <div class="form-group">
                                     <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
                                     <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>

@@ -26,32 +26,40 @@
                         {:add_btn(get_defined_vars(),"成本录入")}
                         
                     </div>
-                    <div class="box-body search-body company-search-box">
+                    <div class="box-body search-body">
                         <div class="col-md-12">
                             <div class="form-inline">
-                                
+                                <div class="form-group">
+                                    <label for="info-title">项目编号：</label>
+                                    <input class="form-control search-info input-sm" name="code" title="项目编号" required="required" value="" placeholder="项目编号" type="text">
+                                </div>
                                 <div class="form-group">
                                     <label class="control-label">项目名称：</label>
-                                    <input class="form-control search-info input-sm" name="company" placeholder="项目名称" type="text">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label class="control-label">项目编号：</label>
-                                    <input class="form-control search-info input-sm" name="alias" placeholder="公司别名" type="text">
+                                    <input class="form-control search-info input-sm" name="name" placeholder="项目名称" type="text">
                                 </div>
                                 <div class="form-group">
-                                    <label >项目主担：</label>
-                                    <select class="form-control search-info input-sm" data-city="search-info" title="项目主担" name="provinceId">
-                                        <option value="">项目主担</option>
+                                    <label class="control-label">营业主担：</label>
+                                    <input class="form-control search-info input-sm" name="business_name" placeholder="营业主担" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">项目主担：</label>
+                                    <input class="form-control search-info input-sm" name="leader_name" placeholder="项目主担" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label >状态：</label>
+                                    <select class="form-control search-info input-sm" title="状态" name="status">
+                                        <option value="">全部</option>
+                                        <volist name="statusType" id="item">
+                                            <option value="{$key}">{$item}</option>
+                                        </volist>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
                                     <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 </div>
-                                
+                                <br>
                             </div>
-                            <br>
                         </div>
                     </div>
                 </div>

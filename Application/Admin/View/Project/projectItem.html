@@ -64,7 +64,8 @@
                                     <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
                                     <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 </div>
-                            <br>
+                                <br>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -320,6 +321,9 @@
                     $(tabId+" .modal-info[name='code']").val("")
                 }
             })
+        }
+        var project_file_searchInfo = function(){
+            $(tabId+" .search-list").trigger("click");
         }
         // var E = window.wangEditor
         // var editor = new E(tabId+' .art-editor')

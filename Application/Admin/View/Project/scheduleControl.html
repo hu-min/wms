@@ -143,6 +143,9 @@
                 throw "没有添加任何文件";
             }
         };
+        var project_file_searchInfo = function(){
+            $(tabId+" .search-list").trigger("click");
+        }
         $(function(){
             $(tabId+" .search-list").trigger("click");
             init_chosen("{$url}","getOptionList",".search-body");
