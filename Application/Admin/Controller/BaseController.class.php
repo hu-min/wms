@@ -339,6 +339,7 @@ class BaseController extends \Common\Controller\BaseController{
             if($db!='v_purcha'){
                 $conResult=$dbObject->where([$dbObject->getPk()=>$id])->delete();
             }else{
+                $id = $id ? $id : 0;
                 $conResult=$dbObject->where(['project_id'=>$id])->delete();
             }
             
