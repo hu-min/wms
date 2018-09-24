@@ -203,12 +203,14 @@
         /*设置编辑用户信息*/
         function sup_company_setInfo(info){
 
-
-            $(tabId+" .modal-info[name='companyId']").val(info['companyId']);
-            $(tabId+" .modal-info[name='company']").val(info['company']);
-            $(tabId+" .modal-info[name='alias']").val(info['alias']);
-            $(tabId+" .modal-info[name='address']").val(info['address']);
-            $(tabId+" .modal-info[name='remarks']").val(info['remarks']);
+            ['companyId','company','alias','address','remarks'].forEach(element => {
+                $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
+            });
+            // $(tabId+" .modal-info[name='companyId']").val(info['companyId']);
+            // $(tabId+" .modal-info[name='company']").val(info['company']);
+            // $(tabId+" .modal-info[name='alias']").val(info['alias']);
+            // $(tabId+" .modal-info[name='address']").val(info['address']);
+            // $(tabId+" .modal-info[name='remarks']").val(info['remarks']);
 
             if(info['supr_type']>0){
                 console.log(info['supr_type']);

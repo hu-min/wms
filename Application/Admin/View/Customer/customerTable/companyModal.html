@@ -18,17 +18,26 @@
             </div>
             <div class="form-group">
                 <label >省份：</label>
-                <select class="form-control modal-info input-sm" required="required" data-city="modal-info" title="请输选择省份" name="provinceId">
+                <select class="form-control modal-info chosen-select" title="项目省份" name="provinceId" data-cname="cityId">
+                    <option value="">省份</option>
+                    <volist name="province" id="item">
+                        <option value="{$item['pid']}">{$item['province']}</option>
+                    </volist>
+                </select>
+                <!-- <select class="form-control modal-info input-sm" required="required" data-city="modal-info" title="请输选择省份" name="provinceId">
                     <option value="">省份</option>
                     <volist name="province" id="item">
                         <option value="{$item.pid}">{$item.province}</option>
                     </volist>
-                </select>
+                </select> -->
             </div>
             <div class="form-group">
                 <label >城市：</label>
-                <select class="form-control modal-info input-sm" required="required" title="请选择城市" name="cityId">
+                <select class="form-control modal-info chosen-select" data-req="getCityList" data-value="cid"  data-text="city" data-noupdate="true" data-pname="provinceId" title="城市" name="cityId">
+                    <option value="">城市</option>
                 </select>
+                <!-- <select class="form-control modal-info input-sm" required="required" title="请选择城市" name="cityId">
+                </select> -->
             </div>
             <div class="form-group">
                 <label for="info-title">联系地址：</label>

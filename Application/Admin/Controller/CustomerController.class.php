@@ -9,6 +9,7 @@ namespace Admin\Controller;
 class CustomerController extends BaseController{
     protected $pageSize=10;
     public function _initialize() {
+        $this->statusType=[0=>"未启用",1=>"启用",3=>"无效",4=>"删除"];
         parent::_initialize();
         $this->basicCom=getComponent('Basic');
         $this->customerCom=getComponent('Customer');
@@ -64,7 +65,7 @@ class CustomerController extends BaseController{
         if($gettype=="Edit"){
             $title = "编辑客户公司";
             $btnTitle = "保存数据";
-            $redisName="sup_companyList";
+            $redisName="cust_companyList";
             $resultData=$this->customerCom->redis_one($redisName,"companyId",$id,"ccompanyDB");
         }
         $modalPara=[
@@ -83,7 +84,7 @@ class CustomerController extends BaseController{
     function getCityList(){
         $pid=I("pid");
         $cityList=$this->basicCom->get_citys($pid);
-        $this->ajaxReturn(['errCode'=>0,'citys'=>$cityList]);
+        $this->ajaxReturn(['errCode'=>0,'data'=>$cityList]);
     }
     /** 
      * @Author: vition 
@@ -95,17 +96,16 @@ class CustomerController extends BaseController{
         $p=I("p")?I("p"):1;
         // $where=["process_level"=>[($this->processAuth["level"]-1),0,"OR"]];
         $where['_string']=" (process_level = ".($this->processAuth["level"]-1)." OR process_level = 0 OR author = ".session("userId")." OR FIND_IN_SET(".session("userId").",examine))";
-        if($data['company']){
-            $where['company']=['LIKE','%'.$data['company'].'%'];
+
+        foreach (['company','alias'] as $key) {
+            if($data[$key]){
+                $where[$key]=['LIKE','%'.$data[$key].'%'];
+            }
         }
-        if($data['alias']){
-            $where['alias']=['LIKE','%'.$data['alias'].'%'];
-        }
-        if($data['provinceId']){
-            $where['provinceId']=$data['provinceId'];
-        }
-        if($data['cityId']){
-            $where['cityId']=$data['cityId'];
+        foreach (['provinceId','cityId'] as $key) {
+            if($data[$key]){
+                $where[$key]=$data[$key];
+            }
         }
         if(isset($data['status'])){
             $where['status']=$data['status'];
@@ -147,27 +147,32 @@ class CustomerController extends BaseController{
         }else if($reqType=="cust_companyEdit"){
             $where=["companyId"=>$datas['companyId']];
             $data=[];
-            if(isset($datas['company'])){
-                $data['company']=$datas['company'];
+            foreach (['company','alias','provinceId','cityId','address','status'] as $key ) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
             }
-            if(isset($datas['alias'])){
-                $data['alias']=$datas['alias'];
-            }
-            if(isset($datas['provinceId'])){
-                $data['provinceId']=$datas['provinceId'];
-            }
-            if(isset($datas['cityId'])){
-                $data['cityId']=$datas['cityId'];
-            }
-            if(isset($datas['address'])){
-                $data['address']=$datas['address'];
-            }
+            // if(isset($datas['company'])){
+            //     $data['company']=$datas['company'];
+            // }
+            // if(isset($datas['alias'])){
+            //     $data['alias']=$datas['alias'];
+            // }
+            // if(isset($datas['provinceId'])){
+            //     $data['provinceId']=$datas['provinceId'];
+            // }
+            // if(isset($datas['cityId'])){
+            //     $data['cityId']=$datas['cityId'];
+            // }
+            // if(isset($datas['address'])){
+            //     $data['address']=$datas['address'];
+            // }
             if(isset($datas['status'])){
-                $parameter=[
-                    'where'=>["companyId"=>$datas['companyId']],
-                ];
-                $result=$this->customerCom->getCompanyList($parameter,true);
-                $data = $this->status_update($result,$datas["status"],$data);
+                // $parameter=[
+                //     'where'=>["companyId"=>$datas['companyId']],
+                // ];
+                // $result=$this->customerCom->getCompanyList($parameter,true);
+                // $data = $this->status_update($result,$datas["status"],$data);
             }
             $data['upateTime']=time();
             if(isset($datas['remarks'])){

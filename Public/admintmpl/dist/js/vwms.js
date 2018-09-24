@@ -74,11 +74,13 @@ $(document).on("click",".search-list,.vpage",function(){
         var con=$(this).parents('.page-div').data("con");
         var reqtype=$(this).parents('.page-div').data("reqtype");
         var param=$(this).parents('.page-div').data("param");
+        var call=$(this).parents('.page-div').data("call");
     }else{
         var url=$(this).data("url");
         var con=$(this).data("con");
         var reqtype=$(this).data("reqtype");
         var param=$(this).data("param");
+        var call=$(this).data("call");
     }
     var table=con+"-table";
     var page=con+"-page";
@@ -104,7 +106,7 @@ $(document).on("click",".search-list,.vpage",function(){
             }
         })
     }
-    searchFun(url,datas,table,page,count);
+    searchFun(url,datas,table,page,count,call);
 })
 /** 
  * javascript comment 
@@ -112,7 +114,7 @@ $(document).on("click",".search-list,.vpage",function(){
  * @Date: 2018-06-02 23:08:58 
  * @Desc: 执行查询数据并插入到对应的表格中 
  */
-function searchFun(url,datas,table,page,count){
+function searchFun(url,datas,table,page,count,callfun){
     get(url,datas,function(result){
         if(result.errCode==0){
             if(result.table==""){
@@ -122,6 +124,9 @@ function searchFun(url,datas,table,page,count){
             $(tabId+" ."+table).html(result.table);
             $(tabId+" ."+page).html(result.page);
             $(tabId+" ."+count).html(result.count);
+            if(fun_is_exits(callfun+"")){
+                eval(callfun+"(result.data)")//
+            }
         }else{
             notice(result.errCode,result.error);
         }
@@ -283,6 +288,12 @@ function set_status_btn(this_btn,info,userId,nodeAuth){
  */
 $(document).on("click",'.search-refresh',function(){
     $(this).parents(".search-body").find(".search-info").val("");
+    $(this).parents(".search-body").find(".search-info").each(function(){
+        if($(this).hasClass("chosen-select")){
+            $(this).trigger("chosen:updated");
+        }
+       
+    })
     var con=$(this).data("con")
     if(fun_is_exits(con+"_resetInfo")){
 	    eval(con+"_resetInfo()");//弥补不足

@@ -117,7 +117,7 @@
                 set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"),info,"{$Think.session.userId}","{$nodeAuth}")
             })
             //供应商列表
-            $(tabId+" .chosen-cusCompany").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true,ajax_load:{url:"{$url}",data:{reqType:"getCusCompanyList"},value:"companyId",text:"company"}})
+            // $(tabId+" .chosen-cusCompany").chosen({inherit_select_classes:true,search_contains:true,allow_single_deselect:true,ajax_load:{url:"{$url}",data:{reqType:"getCusCompanyList"},value:"companyId",text:"company"}})
         })
         // function contactSearchFuns(){
         //     datas['data']={}
