@@ -550,41 +550,57 @@ class BasicController extends BaseController{
      * @Desc: 品牌列表 
      */    
     function basic_executeList(){
-        $data=I("data");
-        $p=I("p")?I("p"):1;
-        $where=["class"=>"execute"];
-        if($data['pId']){
-            $where['pId']=['EQ',$data['pId']];
-        }
-        if($data['name']){
-            $where['name']=['LIKE','%'.$data['name'].'%'];
-        }
-        if($data['alias']){
-            $where['alias']=['LIKE','%'.$data['alias'].'%'];
-        }
-        if(isset($data['status'])){
-            $where['status']=$data['status'];
-        }else{
-            $where['status']=["lt",3];
-        }
-        $parameter=[
-            'where'=>$where,
-            'page'=>$p,
-            'pageSize'=>$this->pageSize,
-            'orderStr'=>"basicId DESC",
-        ];
-        $basicResult=$this->basicCom->getBasicList($parameter);
-        $this->tablePage($basicResult,'Basic/basicTable/executeList',"executeList");
-        // if($basicResult){
-        //     $basicRed="executeList";
-        //     $this->Redis->set($basicRed,json_encode($basicResult['list']),3600);
-        //     $page = new \Think\VPage($basicResult['count'], $this->pageSize);
-        //     $pageShow = $page->show();
-            
-        //     $this->assign('executeList',$basicResult['list']);
-        //     $this->ajaxReturn(['errCode'=>0,'table'=>$this->fetch('Basic/basicTable/executeList'),'page'=>$pageShow,"count"=>$count]);
+        $this->ajaxReturn(["tree"=>$this->getExecuteTree()]);
+        // $data=I("data");
+        // $p=I("p")?I("p"):1;
+        // $where=["class"=>"execute"];
+        // if($data['pId']){
+        //     $where['pId']=['EQ',$data['pId']];
         // }
-        // $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
+        // if($data['name']){
+        //     $where['name']=['LIKE','%'.$data['name'].'%'];
+        // }
+        // if($data['alias']){
+        //     $where['alias']=['LIKE','%'.$data['alias'].'%'];
+        // }
+        // if(isset($data['status'])){
+        //     $where['status']=$data['status'];
+        // }else{
+        //     $where['status']=["lt",3];
+        // }
+        // $parameter=[
+        //     'where'=>$where,
+        //     'page'=>$p,
+        //     'pageSize'=>$this->pageSize,
+        //     'orderStr'=>"basicId DESC",
+        // ];
+        // $basicResult=$this->basicCom->getBasicList($parameter);
+        // $this->tablePage($basicResult,'Basic/basicTable/executeList',"executeList");
+    }
+    function getExecuteTree(){
+        $parameter=[
+            'where'=>["class"=>"execute"],
+            'page'=>0,
+            'pageSize'=>9999,
+            'orderStr'=>'level DESC,sort ASC',
+        ];
+        $executeResult=$this->basicCom->getList($parameter);
+        $executeTree=[];
+        $level=[];
+        
+        $executeArray=$executeResult["list"];
+        foreach ($executeArray AS $key => $executeInfo) {
+            $level[$executeInfo["level"]][$executeInfo["Pid"]][]= $executeInfo;
+            unset($executeArray[$key]);
+        }
+        $this->Redis->set("executeArray",json_encode($executeResult["list"]),3600);
+        asort($level);
+        
+        $this->levelTree->setKeys(["idName"=>"basicId","pidName"=>"pId"]);
+        $this->levelTree->setReplace(["name"=>"text","basicId"=>"id"]);
+        $this->levelTree->switchOption(["beNode"=>false,"idAsKey"=>false]);
+        $executeTree=$this->levelTree->createTree($executeResult["list"]);
+        return $executeTree;
     }
 
     // function executeOne(){
@@ -617,6 +633,11 @@ class BasicController extends BaseController{
     function manageExecuteInfo(){
         $reqType=I("reqType");
         $datas=I("data");
+
+        if(isset($datas['pId'])){
+            $nodePInfo=$this->getPid('execute',$datas['pId']);
+            $datas['level']=$nodePInfo['level']+1;
+        }
         if($reqType=="basic_executeAdd"){
             $datas['class']="execute";
             unset($datas['basicId']);
@@ -624,21 +645,17 @@ class BasicController extends BaseController{
         }else if($reqType=="basic_executeEdit"){
             $where=["basicId"=>$datas['basicId']];
             $data=[];
-            if(isset($datas['name'])){
-                $data['name']=$datas['name'];
-            }
-            if(isset($datas['alias'])){
-                $data['alias']=$datas['alias'];
-            }
-            if(isset($datas['remark'])){
-                $data['remark']=$datas['remark'];
-            }
-            if(isset($datas['status'])){
-                $data['status']=$datas['status'];
+            foreach (['name','alias','remark','pId',"level",'sort'] as $key ) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
             }
             return ["where"=>$where,"data"=>$data];
         }
         return "";
+    }
+    function getPid($class,$pid){
+        return $this->basicCom->getOne(['where'=>['class'=>$class,'pId'=>$pid]])['list'];
     }
     function basic_executeAdd(){
         $executeInfo=$this->manageExecuteInfo();
@@ -652,6 +669,7 @@ class BasicController extends BaseController{
     } 
     function basic_executeEdit(){
         $executeInfo=$this->manageExecuteInfo();
+        // print_r($executeInfo);
         $updateResult=$this->basicCom->updateBasic($executeInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }

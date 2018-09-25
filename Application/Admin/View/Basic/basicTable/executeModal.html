@@ -7,8 +7,8 @@
     <form role="form">
         <div class="box-body">
             <div class=form-group>
-                <select class="form-control modal-info" title="线上线下" name="pId">
-                    <option value="">全部</option>
+                <select class="form-control modal-info chosen-select" title="执行父类型" name="pId">
+                    <option value="0">顶级</option>
                     <volist name="exe_root" id="item" >
                         <option value="{$item.basicId}">{$item.name}</option>
                     </volist>
@@ -24,15 +24,19 @@
                 <input class="form-control modal-info" name="alias" title="执行类型别名" placeholder="执行类型别名" type="text">
             </div>
             <div class="form-group">
+                <label >排序：</label>
+                <input class="form-control modal-info" title="排序" name="sort" placeholder="排序" type="text">
+            </div>
+            <div class="form-group">
                 <label >执行类型备注：</label>
                 <input class="form-control modal-info" name="remark" title="执行类型备注" placeholder="执行类型备注" type="text">
             </div>
             <div class="form-group">
                 <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
-                    <input class="modal-info"  value="0" name="status" type="hidden">
+                    <input class="modal-info"  value="1" name="status" type="hidden">
                     <if condition="$nodeAuth egt 3">
-                        <button  type="button" name="0" class="btn btn-default btn-sm active status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
-                        <button type="button" name="1" class="btn btn-success btn-sm status-btn"><i class="fa fa-square text-default"> 启用 </i></button>
+                        <button  type="button" name="0" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-default"></i> 未启用 </button>
+                        <button type="button" name="1" class="btn btn-success btn-sm active status-btn"><i class="fa fa-check-square text-default"> 启用 </i></button>
                     </if>
                     <if condition="$nodeAuth egt 4 ">
                         <button type="button" name="4" class="btn btn-danger btn-sm status-btn"><i class="fa fa-square text-default"> 删除 </i></button>

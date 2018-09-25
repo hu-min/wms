@@ -74,7 +74,7 @@
             init_chosen("{$url}","",$(tabId+" .global-modal .modal-info[name='pId']").parent());
         }
          //生成费用类别树和费用类别树选中的事件
-         function createfeeTypeTree(){
+        function createfeeTypeTree(){
             $(tabId+' #feeTypetree').treeview({showButton: true,highlightSelected:false,data: getfeeTypeTree(),levels:1,color: "#428bca",});
             //费用类别编辑
             $(tabId+' #feeTypetree').offon("click",'li button',function(){
