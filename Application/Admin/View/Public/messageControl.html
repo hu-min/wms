@@ -118,7 +118,8 @@
                             <button type="button" class="btn btn-default"><i class="fa fa-reply"></i> Reply</button>
                             <button type="button" class="btn btn-default"><i class="fa fa-share"></i> Forward</button>
                             </div> -->
-                            <button type="button" class="btn btn-default message-trash"><i class="fa fa-trash-o"></i> 删除</button>
+                            <button class="btn btn-primary reply-message" data-id=""><i class="fa fa-reply"></i> 回复 </button>
+                            <button type="button" class="btn btn-default message-trash"><i class="fa fa-trash-o"></i> 删除 </button>
                             <!-- <button type="button" class="btn btn-default"><i class="fa fa-print"></i> Print</button> -->
                         </div>
                         <!-- /.box-footer -->
@@ -233,13 +234,16 @@
 
                     }
                 })
+                /** 
+                 * @Author: vition 
+                 * @Date: 2018-09-25 13:50:10 
+                 * @Desc: 查看信息 
+                 */                
                 $(tabId+" .message-box .message-list-box").on("click",".read-message",function(e){
                     e.preventDefault();
                     var id = $(this).data("id");
                     var type = $(tabId+" .message-box .mes-folder ul").find("li.active a").data("type");
                                         // console.log(type);return;
-                    console.log(id);
-                    console.log(type);
                     mesList[type].forEach(message => {
                         if(message["id"] == id){
                             // box-primary message-read-box
@@ -258,8 +262,9 @@
                                 }else{
                                     $(tabId+" .message-box .message-read-box").find(".message-"+key).html(message[key])
                                 }
-                                
                             })
+                            $(tabId+" .message-box .message-read-box .box-footer").find(".reply-message").data("id",message["id"])
+                            // console.log($(tabId+" .message-box .message-read-box .box-footer").find(".reply-message").data(message["id"]))
                             if(message["status"]==0 && type == 1){
                                 datas["reqType"] = "statusEdit";
                                 datas["id"] = id;
@@ -282,6 +287,28 @@
                     });
                     // console.log(type)
                 })
+                $(tabId+" .message-box .message-list-box,"+tabId+" .message-box .message-read-box .box-footer").on("click",".reply-message",function(){
+                    var id = Number($(this).data("id"));
+                    // CKEDITOR.instances['compose-textarea'].setData('')
+                    mesList[1].forEach(message => {
+                        if(message["id"] == id){
+                            $(tabId+" .message-box .message-compose").trigger("click");
+                            $(tabId+" .message-box .message-compose-box").find(".modal-info[name='to_user']").val(message['']);
+                            if($(tabId+" .message-box .message-compose-box").find(".modal-info[name='to_user']").find("option[value='"+message['userId']+"']").length==0){
+                                var user_optoin = '<option value="'+message['userId']+'">'+message['user_name']+'</option>'
+                                $(tabId+" .message-box .message-compose-box").find(".modal-info[name='to_user']").append(user_optoin);
+                            }
+                            $(tabId+" .message-box .message-compose-box").find(".modal-info[name='to_user']").find("option[value='"+message['userId']+"']").prop("selected",true);
+                            $(tabId+" .message-box .message-compose-box").find(".modal-info[name='title']").val('回复：'+message['title']);
+                            $(tabId+" .message-box .message-compose-box").find(".modal-info[name='to_user']").trigger("chosen:updated");
+                            var html = '<br/><div style="color:red;" >-------- 以下是原信息内容 --------</div><div style="background:#eeeeee;border:1px solid #cccccc;padding:5px 10px;"><strong>原标题</strong>：'+message['title']+'<br><strong>发送者</strong>：'+message['user_name']+'<br><strong>发送时间</strong>：'+message['date_time']+'<br></div>';
+                            CKEDITOR.instances['compose-textarea'].setData(html+message['content'])
+                            // CKEDITOR.instances['compose-textarea'].trigger('focus');
+                            
+                        }
+                    })
+                })
+                
                 $(tabId+" .message-box .message-compose").on("click",function(e){
                     e.preventDefault();
                     $(tabId+" .message-box .message-compose-box .modal-info").val("")
