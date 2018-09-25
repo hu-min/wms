@@ -398,11 +398,12 @@ class SupplierController extends BaseController{
                 $data['module']=$datas['module'];
             }
             if(isset($datas['status'])){
-                $parameter=[
-                    'where'=>["companyId"=>$datas['companyId']],
-                ];
-                $result=$this->supplierCom->getCompanyList($parameter,true);
-                $data = $this->status_update($result,$datas["status"],$data);
+                $data['status']=$datas['status'];
+                // $parameter=[
+                //     'where'=>["companyId"=>$datas['companyId']],
+                // ];
+                // $result=$this->supplierCom->getCompanyList($parameter,true);
+                // $data = $this->status_update($result,$datas["status"],$data);
             }
             $data['upateTime']=time();
             if(isset($datas['remarks'])){

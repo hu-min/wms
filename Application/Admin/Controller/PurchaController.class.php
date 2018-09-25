@@ -199,7 +199,7 @@ class PurchaController extends BaseController{
             $where=["id"=>$datas['id']];
             $data=[];
             $data['updateTime']=time();
-            foreach (["project_id","supplier_com","supplier_cont","sign_date","contract_amount","contract_file","offer_file","advance_date","remark","module"] as $key) {
+            foreach (["project_id","supplier_com","supplier_cont","sign_date","contract_amount","contract_file","offer_file","advance_date","remark","module",'type'] as $key) {
                 if(isset($datas[$key])){
                     $data[$key] = $datas[$key];
                 } 
