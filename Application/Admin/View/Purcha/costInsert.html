@@ -111,6 +111,7 @@
             // init_chosen("{$url}","getProjectOne",".global-modal");
             // init_date();
             upload({url:"{:U('Project/upload_filesAdd')}"})
+            $(tabId+" .global-modal .modal-info[name='project_id']").trigger("change")
         }
         function cost_insert_setInfo(info){
             var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
@@ -231,6 +232,7 @@
                 datas["data"].push(tempSupr);
             })
         }
+
         $(function(){
             $(tabId+" .search-list").trigger("click");
             $(tabId).offon("change"," .modal-info[name='project_id']",function(){

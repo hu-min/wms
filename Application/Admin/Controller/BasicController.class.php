@@ -12,6 +12,7 @@ class BasicController extends BaseController{
         parent::_initialize();
         // $this->basicCom=getComponent('Basic');
         $this->fieldCom=getComponent('Field');
+        $this->assign('tableName',$this->basicCom->tableName());
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
     }
@@ -24,7 +25,7 @@ class BasicController extends BaseController{
     function brandControl(){
         $reqType=I('reqType');
         $this->assign("controlName","basic_brand");
-        $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
+        // $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
         if($reqType){
             $this->$reqType();
         }else{
@@ -253,7 +254,7 @@ class BasicController extends BaseController{
     function stageControl(){
         $reqType=I('reqType');
         $this->assign("controlName","basic_stage");
-        $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
+        // $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
         if($reqType){
             $this->$reqType();
         }else{
@@ -368,7 +369,7 @@ class BasicController extends BaseController{
     function projectTypeControl(){
         $reqType=I('reqType');
         $this->assign("controlName","basic_projectType");
-        $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
+        // $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
         if($reqType){
             $this->$reqType();
         }else{
@@ -511,7 +512,7 @@ class BasicController extends BaseController{
     function executeControl(){
         $reqType=I('reqType');
         $this->assign("controlName","basic_execute");
-        $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
+        // $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
         $exe_root=$this->basicCom->get_exe_root();
         $root_arr=array_combine(array_column($exe_root,"basicId"),array_column($exe_root,"name"));
         $this->assign("root_arr",$root_arr);
@@ -678,7 +679,7 @@ class BasicController extends BaseController{
     function feeTypeControl(){
         $reqType=I('reqType');
         $this->assign("controlName","basic_feeType");
-        $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
+        // $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
         $fee_t_main=$this->basicCom->get_class_data("FTMClass");//费用类型主类
         $main_array=array_combine(array_column($fee_t_main,"basicId"),array_column($fee_t_main,"name"));
         $this->assign("fee_main",$fee_t_main);
@@ -1033,7 +1034,7 @@ class BasicController extends BaseController{
     function expenClasControl(){
         $reqType=I('reqType');
         $this->assign("controlName","expenClas");
-        $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
+        // $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
         if($reqType){
             $this->$reqType();
         }else{
@@ -1144,7 +1145,7 @@ class BasicController extends BaseController{
     function expense_typeControl(){
         $reqType=I('reqType');
         $this->assign("controlName","basic_expense_type");
-        $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
+        // $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
         if($reqType){
             $this->$reqType();
         }else{

@@ -269,7 +269,7 @@ class PurchaController extends BaseController{
             $dataInfo['process_level'] = $process_level;
             $dataInfo['status'] = $status;
             // print_r($process);
-            print_r($dataInfo);exit;
+            // print_r($dataInfo);exit;
             unset($dataInfo['leader']);
             if($dataInfo){
                 $insertResult=$this->purchaCom->insert($dataInfo);

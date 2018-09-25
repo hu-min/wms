@@ -301,7 +301,7 @@
                             $(tabId+" .message-box .message-compose-box").find(".modal-info[name='to_user']").find("option[value='"+message['userId']+"']").prop("selected",true);
                             $(tabId+" .message-box .message-compose-box").find(".modal-info[name='title']").val('回复：'+message['title']);
                             $(tabId+" .message-box .message-compose-box").find(".modal-info[name='to_user']").trigger("chosen:updated");
-                            var html = '<br/><div style="color:red;" >-------- 以下是原信息内容 --------</div><div style="background:#eeeeee;border:1px solid #cccccc;padding:5px 10px;"><strong>原标题</strong>：'+message['title']+'<br><strong>发送者</strong>：'+message['user_name']+'<br><strong>发送时间</strong>：'+message['date_time']+'<br></div>';
+                            var html = '<br/><br/><div style="color:red;" >-------- 以下是原信息内容 --------</div><br/><div style="background:#eeeeee;border:1px solid #cccccc;padding:5px 10px;"><strong>原标题</strong>：'+message['title']+'<br><strong>发送者</strong>：'+message['user_name']+'<br><strong>发送时间</strong>：'+message['date_time']+'<br></div><br/>';
                             CKEDITOR.instances['compose-textarea'].setData(html+message['content'])
                             // CKEDITOR.instances['compose-textarea'].trigger('focus');
                             

@@ -492,6 +492,7 @@ $(function(){
      * Article/articleControl 表示Article控制器的articleControl方法
      */    
     paramMatch=getUrlAction()
+    
     // if(search!="" && search.search(/\?action\=\S/)>=0){
         // var paramMatch=search.match(/\=([\S\/]*)/);
         if(!paramMatch){
@@ -500,13 +501,14 @@ $(function(){
         var splitArr=paramMatch.split("/");
         
         var match= window.document.body.innerHTML.match(new RegExp("\/Admin\/"+splitArr[0]+"\/"+splitArr[1]+"[\.a-zA-Z]*","gim"))
+        
         if(match!=null && match[0]){
             $(document).find(".nodeOn").each(function(){
-                if($(this).attr("href")==match[0]){
+                if($(this).attr("href")==match[0] && $(this).data("nodeid")>0){
                     var result=$(this).parents(".treeview-menu").css("display","block");
                     var result=$(this).parents(".treeview-menu").prev(".nodeOn").parent(".treeview").addClass("menu-open");
                     var nodeOn=$(this);
-                    setTimeout(function(){nodeOn.click();},0);
+                    setTimeout(function(){nodeOn.trigger('click');},0);
                     return false
                 }
             })
@@ -1222,3 +1224,6 @@ var toAlias = function(url,string){
         // console.log(result)
     })
 }
+$(tabId+" input[class='all-checked']").on("click",function(){
+    console.log($(this))
+})
