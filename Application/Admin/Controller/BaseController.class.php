@@ -473,23 +473,43 @@ class BaseController extends \Common\Controller\BaseController{
         return $data;
     }
     function upload_filesAdd(){
-
+        $cb = 0;
+        if(isset($_FILES['file'])){
+            $uploadFile = $_FILES['file'];
+        }else if(isset($_FILES['upload'])){
+            $uploadFile = $_FILES['upload'];
+            $cb = $_GET['CKEditorFuncNum'];
+        }else{
+            $this->ajaxReturn(['errCode'=>100,'error'=>'文件上传参数有误！']);
+        }
         $url=ROOT_PATH.'Uploads/'.CONTROLLER_NAME.'/'.date('Ymd',time())."/";
         if(!file_exists($url)){
             mkdir($url, 0755,true);
         }
-        $viewName = $_FILES['file']['name'];
+        $viewName = $uploadFile['name'];
         $name = $viewName;
         if(PHP_OS=="WINNT"){
             $name = iconv("UTF-8","gb2312",$viewName);
         }
         $file=$url.$name;
         
-        $copyState =  copy($_FILES['file']['tmp_name'],$file);
-        if($copyState){
-            $this->ajaxReturn(['errCode'=>0,'fileName'=>$viewName,"url"=>$url,"url2"=>'Uploads/'.CONTROLLER_NAME.'/'.date('Ymd',time())."/".$viewName]);
+        $copyState =  copy($uploadFile['tmp_name'],$file);
+        if(isset($_FILES['upload'])){
+            if($copyState){
+                $url = '/Uploads/'.CONTROLLER_NAME.'/'.date('Ymd',time())."/".$viewName;
+                echo "<script>window.parent.CKEDITOR.tools.callFunction($cb, '$url', '');</script>";
+            }else{
+                echo "<script>window.parent.CKEDITOR.tools.callFunction($cb, '', '上传失败');</script>";
+            }
+            exit;
+            
         }else{
-            $this->ajaxReturn(['errCode'=>100,'error'=>'文件上传错误！']);
+            if($copyState){
+                $this->ajaxReturn(['errCode'=>0,'fileName'=>$viewName,"url"=>$url,"url2"=>'Uploads/'.CONTROLLER_NAME.'/'.date('Ymd',time())."/".$viewName]);
+            }else{
+                $this->ajaxReturn(['errCode'=>100,'error'=>'文件上传错误！']);
+            }
         }
+        
     }
 }

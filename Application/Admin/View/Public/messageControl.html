@@ -200,7 +200,7 @@
             $(function () {
                 getMessageList(1);
                 // $("#compose-textarea").wysihtml5();
-                CKEDITOR.replace('compose-textarea')
+                CKEDITOR.replace('compose-textarea',{filebrowserImageUploadUrl : "{:U('Public/upload_filesAdd')}"})
                 init_chosen("{$url}","getOptionList",".message-compose-box");
                 //Enable iCheck plugin for checkboxes
                 //Enable check and uncheck all functionality
