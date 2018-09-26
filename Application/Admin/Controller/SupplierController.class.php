@@ -128,14 +128,15 @@ class SupplierController extends BaseController{
         }else{
             $where['status']=["lt",3];
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"sort ASC,basicId DESC",
         ];
         $basicResult=$this->basicCom->getBasicList($parameter);
-        $this->tablePage($basicResult,'Supplier/supplierTable/supTypeList',"supTypeList");
+        $this->tablePage($basicResult,'Supplier/supplierTable/supTypeList',"supTypeList",$pageSize);
 
     }
     /** 
@@ -336,11 +337,12 @@ class SupplierController extends BaseController{
         if($data['supr_type']){
             $where['supr_type']=$data['supr_type'];;
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'fields'=>"`companyId`,`supr_type`,`module`,`company`,`alias`,`provinceId`,`cityId`,`province`,`city`,`address`,`remarks`,`addTime`,`updateTime`,`status`,`typeName`,moule_name",
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"companyId DESC",
             "joins"=>[
                 "LEFT JOIN v_province p ON p.pid=provinceId","LEFT JOIN v_city c ON c.pid=p.pid AND c.cid=cityId",
@@ -351,7 +353,7 @@ class SupplierController extends BaseController{
         
         $listResult=$this->supplierCom->getCompanyList($parameter);
         // echo $this->supplierCom->M()->_sql();exit;
-        $this->tablePage($listResult,'Supplier/supplierTable/companyList',"sup_companyList");
+        $this->tablePage($listResult,'Supplier/supplierTable/companyList',"sup_companyList",$pageSize);
     }
     /** 
      * @Author: vition 
@@ -525,17 +527,18 @@ class SupplierController extends BaseController{
         if($data['contact']){
             $where['contact']=['LIKE','%'.$data['contact'].'%'];
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'fields'=>"`contactId`,`companyId`,`contact`,`phone`,`email`,`address`,`remarks`,`addTime`,`updateTime`,`status`,company",
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"contactId DESC",
             "joins"=>"LEFT JOIN (SELECT companyId cid,company FROM v_supplier_company WHERE status=1) c ON c.cid=companyId",
         ];
         
         $listResult=$this->supplierCom->getSuprContList($parameter);
-        $this->tablePage($listResult,'Supplier/supplierTable/contactList',"sup_contactList");
+        $this->tablePage($listResult,'Supplier/supplierTable/contactList',"sup_contactList",$pageSize);
     }
     /** 
      * @Author: vition 

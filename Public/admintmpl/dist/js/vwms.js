@@ -394,6 +394,7 @@ $(document).on("click",'.save-info',function(){
                 // $(tabId+" .modal").modal('toggle')
                 // $(self).parents(".modal").modal('toggle')
             }
+            $(tabId+" .global-modal .modal-content").html("");
         }else{
             notice(result.errCode,result.error);
         }

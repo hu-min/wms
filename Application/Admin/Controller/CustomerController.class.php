@@ -112,15 +112,16 @@ class CustomerController extends BaseController{
         }else{
             $where['_string'].=" AND status < 3";
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"companyId DESC",
         ];
         
         $listResult=$this->customerCom->getCompanyList($parameter);
-        $this->tablePage($listResult,'Customer/customerTable/companyList',"cust_companyList");
+        $this->tablePage($listResult,'Customer/customerTable/companyList',"cust_companyList",$pageSize);
         // if($listResult){
         //     $page = new \Think\VPage($listResult['count'], $this->pageSize);
         //     $pageShow = $page->show();
@@ -295,15 +296,16 @@ class CustomerController extends BaseController{
         }else{
             $where['_string'].=" AND status < 3";
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"contactId DESC",
         ];
         
         $listResult=$this->customerCom->getCustomerList($parameter);
-        $this->tablePage($listResult,'Customer/customerTable/contactList',"cust_contactList");
+        $this->tablePage($listResult,'Customer/customerTable/contactList',"cust_contactList",$pageSize);
     }
     /** 
      * @Author: vition 
