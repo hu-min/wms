@@ -142,7 +142,20 @@ class PurchaController extends BaseController{
             ];
             $resultData=$this->purchaCom->getList($parameter);
             // echo $this->purchaCom->M()->_sql();exit;
-            // print_r($resultData);
+            foreach ($resultData['list'] as $key => $purcha) {
+                if($purcha['module']){
+                    $parameter=[
+                        'where'=>["class"=>"module",'basicId'=>["IN",explode(",",$purcha['module'])]],
+                        'fields'=>'basicId,name',
+                        'page'=>1,
+                        'pageSize'=>9999,
+                        'orderStr'=>"basicId DESC",
+                    ];
+                    $basicResult=$this->basicCom->getList($parameter);
+                    $resultData['list'][$key]["modules"]=$basicResult['list'];
+                }
+            }
+            // print_r($resultData);exit;
             $resultData["template"] = $this->fetch('Purcha/purchaTable/suprLi');
         }
         $modalPara=[
@@ -189,6 +202,9 @@ class PurchaController extends BaseController{
         $reqType = $reqType ? $reqType : I("reqType");
         foreach (["sign_date","advance_date"] as $date) {
             $datas[$date] = strtotime($datas[$date]);
+        }
+        if(isset($datas['module'])){
+            $datas['module']=implode(",",$datas['module']);
         }
         if($reqType=="cost_insertAdd"){
             $datas['add_time']=time();

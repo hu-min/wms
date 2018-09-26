@@ -42,6 +42,14 @@
                 </div>
             </div>
             <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="info-title">项目时间：</label>
+                        <input class="form-control project-info" required="required" readonly="readonly" name="project_date" title="项目时间"  value="" placeholder="项目时间" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-md-12"> <h5 class="box-title">点击右边"+"添加供应商<i class="fa fa-fw fa-plus-square text-aqua add-suprcompany" title="新增供应商" data-target=".bankstock-tab" style="cursor: pointer;"></i></h5></div>
             </div>
             <div class="row">
@@ -91,7 +99,7 @@
                                 </select>
                             </td>
                             <td>
-                                <select class="form-control modal-info chosen-select" title="承接模块" data-value="basicId" data-req="getModuleList" data-text="name" name="module" data-cname="supplier_com" data-pname="type" >
+                                <select class="form-control modal-info chosen-select" title="承接模块" data-value="basicId" data-req="getModuleList" data-text="name" name="module" multiple="multiple" data-cname="supplier_com" data-pname="type" >
                                     <option value="999999999">全部承接模块</option>
                                     <volist name="moduleArr" id="item">
                                         <option value="{$item['basicId']}">{$item['name']}</option>

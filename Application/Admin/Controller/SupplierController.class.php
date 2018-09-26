@@ -46,15 +46,25 @@ class SupplierController extends BaseController{
         if ($key!=""){
             $where["company"]=["LIKE","%{$key}%"];
         }
-        if($type!=""){
-            if($type!=999999999){
-                $where["_string"]="FIND_IN_SET({$type},module)";
+        if(is_array($type)){
+            $where["_string"]="";
+            foreach ($type as $moduleId) {
+                $where["_string"].=" FIND_IN_SET({$moduleId},module) OR";
+            }
+            $where["_string"] = rtrim($where["_string"],"OR");
+            // echo $where["_string"];exit;
+        }else{
+            if($type!=""){
+                if($type!=999999999){
+                    $where["_string"]="FIND_IN_SET({$type},module)";
+                }elseif($gpid!=""){
+                    $where["supr_type"]=$gpid;
+                }
             }elseif($gpid!=""){
                 $where["supr_type"]=$gpid;
             }
-        }elseif($gpid!=""){
-            $where["supr_type"]=$gpid;
         }
+        
         $parameter=[
             'where'=>$where,
             'fields'=>'companyId,company,provinceId,cityId,province_name,city_name',
@@ -65,6 +75,7 @@ class SupplierController extends BaseController{
                 "LEFT JOIN (SELECT pid ,province province_name FROM v_province) p ON p.pid=provinceId",
                 "LEFT JOIN (SELECT cid,city city_name,pid FROM v_city) c ON c.cid=cityId",
             ],
+            "isCount" =>false,
         ];
         $supplierResult = $this->supplierCom->getCompanyList($parameter);
         return $supplierResult['list'] ? $supplierResult['list'] : [];
@@ -375,42 +386,12 @@ class SupplierController extends BaseController{
         }else if($reqType=="sup_companyEdit"){
             $where=["companyId"=>$datas['companyId']];
             $data=[];
-            if(isset($datas['company'])){
-                $data['company']=$datas['company'];
-            }
-            if(isset($datas['alias'])){
-                $data['alias']=$datas['alias'];
-            }
-            if(isset($datas['provinceId'])){
-                $data['provinceId']=$datas['provinceId'];
-            }
-            if(isset($datas['cityId'])){
-                $data['cityId']=$datas['cityId'];
-            }
-            if(isset($datas['address'])){
-                $data['address']=$datas['address'];
-            }
-            if(isset($datas['remarks'])){
-                $data['remarks']=$datas['remarks'];
-            }
-            if(isset($datas['supr_type'])){
-                $data['supr_type']=$datas['supr_type'];
-            }
-            if(isset($datas['module'])){
-                $data['module']=$datas['module'];
-            }
-            if(isset($datas['status'])){
-                $data['status']=$datas['status'];
-                // $parameter=[
-                //     'where'=>["companyId"=>$datas['companyId']],
-                // ];
-                // $result=$this->supplierCom->getCompanyList($parameter,true);
-                // $data = $this->status_update($result,$datas["status"],$data);
+            foreach (['company','alias','provinceId','cityId','address','remarks','supr_type','module','status'] as $key ) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
             }
             $data['upateTime']=time();
-            if(isset($datas['remarks'])){
-                $data['remarks']=$datas['remarks'];
-            }
             return ["where"=>$where,"data"=>$data];
         }
         return "";

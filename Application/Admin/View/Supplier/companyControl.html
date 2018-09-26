@@ -219,7 +219,6 @@
             // $(tabId+" .modal-info[name='remarks']").val(info['remarks']);
 
             if(info['supr_type']>0){
-                console.log(info['supr_type']);
                 if($(tabId+" .modal-info[name='supr_type']").find("option[value='"+info['supr_type']+"']").length==0 && info['supr_type'] && info['typeName']){
                     $(tabId+" .modal-info[name='supr_type']").append('<option value="'+info['supr_type']+'">'+info['typeName']+'</option>');
                 }

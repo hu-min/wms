@@ -121,7 +121,7 @@
         function cost_insert_setInfo(info){
             var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
             if(info["list"] == undefined){
-                ["code","leader_name","business_name","leader"].forEach(element => {
+                ["code","leader_name","business_name","leader","project_date"].forEach(element => {
                     $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
                 });
             }else{
@@ -147,7 +147,7 @@
                     $(tabId+" .global-modal .supr-list tbody").append(info.template);
                     var $current = $(tabId+" .global-modal .supr-list tbody tr").eq(rows);
                     $current.find(".serial").text(Number(rows+1));
-                    ["id","type","supplier_com","supplier_cont","module","contract_amount","sign_date","advance_date","offer_file","contract_file","remark","region",'status','aremark'].forEach(element => {
+                    ["id","type","supplier_com","supplier_cont","modules","contract_amount","sign_date","advance_date","offer_file","contract_file","remark","region",'status','aremark'].forEach(element => {
                         if(!$current.find(".modal-info[name='"+element+"']").hasClass("chosen-select")){
                             if(element == "id"){
                                 $current.find(".approve-group").data("id",supritem[element])
@@ -169,13 +169,24 @@
                                 }else{
                                     $current.find("td[name='"+element+"']").text(supritem["approve_name"]);
                                 }
+                            }else if(element == "modules"){
+                                if(supritem['modules']){
+                                    supritem['modules'].forEach(function(tmodule){
+                                        if($(tabId+" .modal-info[name='module']").find("option[value='"+tmodule['basicId']+"']").length==0 && tmodule['basicId'] && tmodule['name']){
+                                            $(tabId+" .modal-info[name='module']").append('<option value="'+tmodule['basicId']+'">'+tmodule['name']+'</option>');
+                                        }
+                                        $(tabId+" .modal-info[name='module']").find("option[value='"+tmodule['basicId']+"']").prop("selected",true)
+                                    })
+                                }else if(supritem['module']=="999999999"){
+                                    $(tabId+" .modal-info[name='module']").find("option[value='999999999']").prop("selected",true)
+                                }
+                                $current.find(".modal-info[name='module']").trigger("chosen:updated");
                             }else{
                                 if(in_array(element,["sign_date","advance_date"]) && in_array(supritem[element],["1970-01-01"])){
                                     supritem[element]=""
                                 }
                                 $current.find(".modal-info[name='"+element+"']").val(supritem[element]);
                             }
-                            
                         }else{
                             
                             if(element == 'supplier_cont'){
@@ -286,6 +297,12 @@
                 }
                 $(this).parents("tr").remove();
                 // console.log(datas[tabId])
+            })
+            $(tabId).offon("change",".global-modal .modal-info[name='module']",function(){
+                if($(this).val().length > 1 && in_array("999999999",$(this).val())){
+                    $(this).find("option[value='999999999']").prop("selected",false);
+                    $(this).trigger("chosen:updated");
+                }
             })
             // $(tabId).off("change"," .modal-info[name='project_id']").on("change"," .modal-info[name='project_id']",function(){
             //     console.log(this)
