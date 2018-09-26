@@ -614,14 +614,18 @@
 			}
 			// Add edit button
 			if (_this.options.showButton) {
-				if(_this.options.butTitle){
-					var butTitle=_this.options.butTitle
+				if(_this.options.showButtonCall && !_this.options.showButtonCall(this)){
+
 				}else{
-					var butTitle="编辑"
+					if(_this.options.butTitle){
+						var butTitle=_this.options.butTitle
+					}else{
+						var butTitle="编辑"
+					}
+					treeItem
+						.append($(_this.template.button).text(butTitle)
+						);
 				}
-				treeItem
-					.append($(_this.template.button).text(butTitle)
-					);
 			}
 
 			// Add item to the tree

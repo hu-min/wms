@@ -12,70 +12,39 @@
 </head>
 <body>
     <section class="content">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="box box-info">
-                    <div class="box-body search-body" >
-                        <div class="col-md-12">
-                            <div class="form-inline">
+            <div class="row">
+                <div class="box box-success">
+                    <div class="box-header">
+                        <i class="fa fa-plus-square"></i>
+                        <h4 class="box-title">承接模块列表</h4>
+                        <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 2">
+                            <!-- <div class="form-group"> -->
+                                <button type="button" data-gettype="Add" data-toggle="modal" data-url="{$url}"  data-vtarget=".global-modal" data-con="{$controlName}" class="btn margin  btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 新建承接模块</button>
+                            <!-- </div> -->
+                        </if>
+                    </div>
+                    <div class='box-body'>
+                        <div class="row">
+                            <div class="col-sm-2">
                                 <div class="form-group">
-                                    <label class="control-label">承接模块名称：</label>
-                                    <input class="form-control search-info" name="name" placeholder="承接模块名称" type="text">
+                                    <input class="form-control input-expand-module" placeholder="搜索承接模块" value="" type="input">
                                 </div>
-                                <div class="form-group">
-                                    <label class="control-label">承接模块别名：</label>
-                                    <input class="form-control search-info" name="alias" placeholder="承接模块别名" type="text">
-                                </div>
-                                <div class="form-group">
-                                    <label >状态：</label>
-                                    <select class="form-control search-info input-sm" title="状态" name="status">
-                                        <option value="">全部</option>
-                                        <volist name="statusType" id="item">
-                                            <option value="{$key}">{$item}</option>
-                                        </volist>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
-                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
-                                </div>
-                                <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 2">
-                                    <div class="form-group">
-                                        <button type="button" data-gettype="Add" data-toggle="modal" data-url="{$url}"  data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 添加承接模块</button>
-                                    </div>
-                                </if>
                             </div>
-                            <br>
+                            <div class="col-sm-2">
+                                <span class="tree-plus handle" data-id="#basic_moduletree"><i class="fa fa-fw fa-plus-square"></i>收起</span>
+                                <span class="tree-minus handle" data-id="#basic_moduletree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
+                            </div>
                         </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div id="basic_moduletree"></div>
+                            </div>
+                        </div>
+                        <!-- <div class="box-footer">
+                        </div> -->
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;"></div>
-                <table id="" class="table table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <th>供应商类型</th>
-                            <th>承接模块名称</th>
-                            <th>承接模块别名</th>
-                            <th>承接模块备注</th>
-                            <th>状态</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody class="{$controlName}-table">
-                        {$tables}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="dataTables_wrapper">
-            <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
-                {$pages}
-            </div>
-        </div>
     </section>
     <div class="modal fade global-modal" aria-hidden="true" data-backdrop="static" >
         <div class="modal-dialog modal-lg">
@@ -86,17 +55,97 @@
         var basic_module_initInfo = function(){
             init_chosen("{$url}","getOptionList",'.global-modal');
         }
+        var basic_module_searchInfo = function(){
+            createBModuleTree()
+        }
+        /** 
+         * @Author: vition 
+         * @Date: 2018-09-26 15:18:55 
+         * @Desc: ajax获取数据 
+         */        
+         var  getBModuleTree = function() {
+            var tree=[]
+            datas["reqType"]="{$controlName}List";
+            get("{$url}",datas,function(result){
+                tree=result.tree
+            },false)
+            return tree;
+        }
+        /** 
+         * @Author: vition 
+         * @Date: 2018-09-26 15:19:42 
+         * @Desc: 生成树节点 
+         */        
+         function createBModuleTree(){
+            $(tabId+' #basic_moduletree').treeview({showButton: true,highlightSelected:false,data: getBModuleTree(),levels:1,color: "#428bca",showButtonCall:function($this){
+                if($this.level==1){
+                    return false
+                }else{
+                    return true
+                }
+            }});
+            //费用类别编辑
+            $(tabId+' #basic_moduletree').offon("click",'li button',function(){
+                datas={}
+                var feeTypeData= $(tabId+' #basic_moduletree').treeview('getNode', $(this).parent(".node-basic_moduletree").data("nodeid"));
+                datas.id = feeTypeData.id;
+                var gettype = "Edit"
+                datas.gettype = gettype
+                var con = "{$controlName}"
+                datas.con = con
+                datas.reqType = datas.con+"_modalOne"
+                get("{$url}",datas,function(result){
+                    if(result.errCode==0){
+                        $(tabId+" .global-modal .modal-content").html(result.html);
+                        $(tabId+" .global-modal").modal('toggle');
+                        ['name','alias','remark','pId','basicId',"level",'sort'].forEach(element => {
+                            $(tabId+" .global-modal .modal-info[name='"+element+"']").val(result.data[element]);
+                        });
+                        $(tabId+" .modal-info[name='pId']").trigger('chosen:updated');
+                        init_chosen("{$url}","",$(tabId+" .global-modal .modal-info[name='pId']").parent());
+                        set_status_btn($(tabId+" .modal-status .status-btn[name='"+result.data['status']+"']"))
+                    }
+                })
+            })
+            var node_sort = 0;
+            $(tabId+' #basic_moduletree').offon("focus",'li .node-input',function(){
+                node_sort = $(this).val()
+            })
+            $(tabId+' #basic_moduletree').offon("blur",'li .node-input',function(){
+                var new_sort = $(this).val()
+                if(node_sort !== new_sort){
+                    var nodeData= $(tabId+' #basic_moduletree').treeview('getNode', $(this).parents(".node-basic_moduletree").data("nodeid"));
+                    datas={}
+                    datas["reqType"] = 'basic_executeEdit';
+                    datas["data"] = {basicId:nodeData.id,sort:new_sort};
+                    post("{$url}",datas,function(result){
+                        if(result.errCode==0){
+                            createBModuleTree()
+                        }
+                    })
+                }
+            })
+        }
         $(function(){
+            createBModuleTree();
+            $(tabId+' .input-expand-module').on("input",function(){
+                $(tabId+' #basic_moduletree').treeview('collapseAll', { silent: true });
+                var prveNode=$('#basic_moduletree').treeview('search', [$(tabId+' .input-expand-module').val(), {
+                    ignoreCase: false,     // case insensitive
+                    exactMatch: false,    // like or equals
+                    revealResults: true,  // reveal matching nodes
+                }]);
+            })
             init_chosen("{$url}","getOptionList",tabId);
-            $(tabId+" .search-list").trigger("click");
+            // $(tabId+" .search-list").trigger("click");
         })
         /*设置编辑信息*/
-        function basic_module_setInfo(info){
-            ['basicId','name','alias','pId','remark'].forEach(element => {
-                $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
-            });
-            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
-        }
+        // function basic_module_setInfo(info){
+        //     ['basicId','name','alias','pId','remark'].forEach(element => {
+        //         $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
+        //     });
+        //     set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
+        // }
     </script>
 </body>
 </html>

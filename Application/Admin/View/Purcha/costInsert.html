@@ -89,8 +89,13 @@
             </div>
         </div>
         <div class="dataTables_wrapper">
-            <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
-                {$pages}
+            <div class="row">
+                <div class="col-sm-2"><div class="dataTables_length" id="example1_length"><label>显示 <select name="example1_length" aria-controls="example1" class="form-control input-sm">
+                    <volist name="entries" id="item"><option value="{$item}">{$item}</option></volist>
+                </select> 条</label></div></div>
+                <div  class="{$controlName}-page row page-div col-sm-10" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+                    {$pages}
+                </div>
             </div>
         </div>
     </section>

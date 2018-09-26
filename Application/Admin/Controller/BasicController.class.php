@@ -968,44 +968,72 @@ class BasicController extends BaseController{
      * @Desc: 承接模块列表 
      */    
     function basic_moduleList(){
-        $data=I("data");
-        $p=I("p")?I("p"):1;
-        $where=["class"=>"module"];
+        $this->ajaxReturn(["tree"=>$this->getModuleTree()]);
+        // $data=I("data");
+        // $p=I("p")?I("p"):1;
+        // $where=["class"=>"module"];
 
-        if($data['name']){
-            $where['name']=['LIKE','%'.$data['name'].'%'];
-        }
-        if($data['alias']){
-            $where['alias']=['LIKE','%'.$data['alias'].'%'];
-        }
-        if(isset($data['status'])){
-            $where['status']=$data['status'];
-        }else{
-            $where['status']=["lt",3];
-        }
+        // if($data['name']){
+        //     $where['name']=['LIKE','%'.$data['name'].'%'];
+        // }
+        // if($data['alias']){
+        //     $where['alias']=['LIKE','%'.$data['alias'].'%'];
+        // }
+        // if(isset($data['status'])){
+        //     $where['status']=$data['status'];
+        // }else{
+        //     $where['status']=["lt",3];
+        // }
+        // $parameter=[
+        //     'where'=>$where,
+        //     'page'=>$p,
+        //     'pageSize'=>$this->pageSize,
+        //     'orderStr'=>"basicId DESC",
+        //     'joins' => [
+        //         'LEFT JOIN (SELECT basicId stId ,name supType_name FROM v_basic WHERE class="supType") st ON st.stId = pId'
+        //     ],
+        // ];
+        // $basicResult=$this->basicCom->getBasicList($parameter);
+        // $this->tablePage($basicResult,'Basic/basicTable/moduleList',"moduleList");
+    }
+    function getModuleTree(){
         $parameter=[
-            'where'=>$where,
-            'page'=>$p,
-            'pageSize'=>$this->pageSize,
-            'orderStr'=>"basicId DESC",
-            'joins' => [
-                'LEFT JOIN (SELECT basicId stId ,name supType_name FROM v_basic WHERE class="supType") st ON st.stId = pId'
-            ],
+            'where'=>["class"=>["IN",["module",'supType']]],
+            'page'=>0,
+            'pageSize'=>9999,
+            'orderStr'=>'level DESC,sort ASC',
         ];
-        $basicResult=$this->basicCom->getBasicList($parameter);
-        $this->tablePage($basicResult,'Basic/basicTable/moduleList',"moduleList");
+        $moduleResult=$this->basicCom->getList($parameter);
+        $moduleTree=[];
+        $level=[];
+        
+        $moduleArray=$moduleResult["list"];
+        foreach ($moduleArray AS $key => $moduleInfo) {
+            $level[$moduleInfo["level"]][$moduleInfo["Pid"]][]= $moduleInfo;
+            unset($moduleArray[$key]);
+        }
+        $this->Redis->set("moduleArray",json_encode($moduleResult["list"]),3600);
+        asort($level);
+        
+        $this->levelTree->setKeys(["idName"=>"basicId","pidName"=>"pId"]);
+        $this->levelTree->setReplace(["name"=>"text","basicId"=>"id"]);
+        $this->levelTree->switchOption(["beNode"=>false,"idAsKey"=>false]);
+        $moduleTree=$this->levelTree->createTree($moduleResult["list"]);
+        return $moduleTree;
     }
     function manageModuleInfo(){
         $reqType=I("reqType");
         $datas=I("data");
+        $datas['level'] = 2;
         if($reqType=="basic_moduleAdd"){
-            $datas['class']="module";
+            $datas['class'] = "module";
+            $datas['status'] = 1;
             unset($datas['basicId']);
             return $datas;
         }else if($reqType=="basic_moduleEdit"){
             $where=["basicId"=>$datas['basicId']];
             $data=[];
-            foreach (['name','alias','pId','remark','status'] as $key ) {
+            foreach (['name','alias','pId','remark','status','sort'] as $key ) {
                 if(isset($datas[$key])){
                     $data[$key]=$datas[$key];
                 }

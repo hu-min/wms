@@ -27,7 +27,7 @@
                     <div class="row">
                         <div class="col-sm-2">
                             <div class="form-group">
-                                <input class="form-control input-expand-feeType" placeholder="搜索执行类型" value="" type="input">
+                                <input class="form-control input-expand-execute" placeholder="搜索执行类型" value="" type="input">
                             </div>
                         </div>
                         <div class="col-sm-2">
@@ -104,10 +104,8 @@
             var node_sort = 0;
             $(tabId+' #executetree').offon("focus",'li .node-input',function(){
                 node_sort = $(this).val()
-                console.log(node_sort)
             })
             $(tabId+' #executetree').offon("blur",'li .node-input',function(){
-                console.log(node_sort)
                 var new_sort = $(this).val()
                 if(node_sort !== new_sort){
                     var nodeData= $(tabId+' #executetree').treeview('getNode', $(this).parents(".node-executetree").data("nodeid"));
@@ -124,7 +122,15 @@
         }
         $(function(){
             createExecuteTree()
-            $(tabId+" .search-list").trigger("click");
+            $(tabId+' .input-expand-execute').on("input",function(){
+                $(tabId+' #executetree').treeview('collapseAll', { silent: true });
+                var prveNode=$('#executetree').treeview('search', [$(tabId+' .input-expand-execute').val(), {
+                    ignoreCase: false,     // case insensitive
+                    exactMatch: false,    // like or equals
+                    revealResults: true,  // reveal matching nodes
+                }]);
+            })
+            // $(tabId+" .search-list").trigger("click");
         })
         /*设置编辑信息*/
         // function basic_execute_setInfo(info){

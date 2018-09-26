@@ -31,7 +31,7 @@ class SupplierController extends BaseController{
             'fields'=>'basicId,name',
             'page'=>1,
             'pageSize'=>20,
-            'orderStr'=>"basicId DESC",
+            'orderStr'=>"sort ASC , basicId DESC",
         ];
         $basicResult=$this->basicCom->getBasicList($parameter);
         return $basicResult['list'] ? $basicResult['list'] : [];
@@ -131,7 +131,7 @@ class SupplierController extends BaseController{
         $parameter=[
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize,
             'orderStr'=>"sort ASC,basicId DESC",
         ];
         $basicResult=$this->basicCom->getBasicList($parameter);
