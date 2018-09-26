@@ -48,13 +48,17 @@ class PurchaController extends BaseController{
         $id = I("id");
         $parameter=[
             "where"=>["projectId"=>$id],
-            "fields" => "projectId,name project_name,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,code,leader,leader_name,business,business_name",
+            "fields" => "projectId,name project_name,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,code,leader,leader_name,business,business_name,cost_budget,amount",
             "joins"=>[
                 "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = leader",
                 "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = business",
             ]
         ];
         $resultData = $this->project->projectCom->getOne($parameter)["list"];
+        $costs = $this->projectCom->getCosts($id);
+        $resultData['current_cost'] = $costs['allCost'];
+        $resultData['rate'] = round((($resultData['amount']-$costs['allCost'])/$resultData['amount'])*100,2);
+
         if($return){
             return $resultData;
         }
@@ -240,7 +244,7 @@ class PurchaController extends BaseController{
         // $process_id = $process["processId"];
         if($datas[0]["project_id"]>0){ 
             //检查成本预算是否超支
-            $this->projectCom->checkCost($datas[0]["project_id"],array_sum(array_column($datas,'contract_amount')));
+            $this->projectCom->checkCost($datas[0]["project_id"],array_sum(array_column($datas,'contract_amount')),"add");
             // $costBudget = $this->projectCom->getCostBudget($datas[0]["project_id"]);
             // $allCost = $this->projectCom->getCosts($datas[0]["project_id"]);
             // // print_r($allCost);

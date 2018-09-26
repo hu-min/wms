@@ -121,7 +121,7 @@
         function cost_insert_setInfo(info){
             var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
             if(info["list"] == undefined){
-                ["code","leader_name","business_name","leader","project_date"].forEach(element => {
+                ["code","leader_name","business_name","leader","project_date","cost_budget","amount","current_cost","rate"].forEach(element => {
                     $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
                 });
             }else{
