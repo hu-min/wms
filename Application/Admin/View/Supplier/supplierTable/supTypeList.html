@@ -1,6 +1,7 @@
 <volist name="list" id="item">
     <tr>
-        <td><input type="checkbox"></td>
+        <td><div class="tsort-control" data-id="{$item['basicId']}"><div class="tsort-change"><input type="text" class="tsort-input" value="{$item['sort']}"></div><div class="tsort-move"><div class="tsort-up"><i class="glyphicon glyphicon-chevron-up"></i></div><div class="tsort-down"><i class="glyphicon glyphicon-chevron-down"></i></div></div></div></td>
+        <td><input type="checkbox" class="item-checked" data-id="{$item['basicId']}"></td>
         <td>{$item['name']}</td>
         <td>{$item['alias']}</td>
         <td>{$item['remark']}</td>

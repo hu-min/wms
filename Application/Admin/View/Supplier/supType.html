@@ -57,6 +57,7 @@
                 <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
+                            <th>排序</th>
                             <th> 选择  <input type="checkbox" class="all-checked"></th>
                             <th>供应商类型名称</th>
                             <th>供应商类型别名</th>
@@ -65,14 +66,14 @@
                             <th>操作</th>
                         </tr>
                     </thead>
-                    <tbody class="{$controlName}-table">
+                    <tbody class="{$controlName}-table" data-url="{$url}" data-db="{$tableName}" >
                         {$tables}
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="dataTables_wrapper">
-            <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+            <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" >
                 {$pages}
             </div>
         </div>
@@ -81,10 +82,18 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content"></div>
         </div>
-    </div>
+    </div> 
+    <script src="__ADMINT__/bower_components/jquery-tableSort/js/tableSort.js"></script>
     <script>
         $(function(){
             $(tabId+" .search-list").trigger("click");
+            tableMove($(tabId+" .{$controlName}-table"),function(result){
+                if(result.errCode==0){
+
+                }else{
+                    notice(110,result.error,"系统异常");
+                }
+            })
         })
         /*查询列表函数*/
         // function supTypeSearchFuns(){

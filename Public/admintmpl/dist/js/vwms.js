@@ -3,6 +3,7 @@ var filesData={};
 var uploadData = {}
 var tempFiles = {};
 var tabId="";//定义当前tab指定的id
+var delList = null;//定义要删除的列表位置
 $.fn.extend({offon:function(){
     var event =  arguments[0]
     var select =  typeof(arguments[1]) == 'string' ? arguments[1] : false
@@ -425,13 +426,19 @@ $(document).on("click",'.tree-minus',function(){
     $(treeId).treeview('expandAll', { silent: true });
 })
 $(document).on("click",".status-info",function(){
+    delList = $(this)
     var url = $(this).parent(".status-con").data("url");
     var id = $(this).parent(".status-con").data("id");
     var db = $(this).parent(".status-con").data("db");
     var con = $(this).parent(".status-con").data("con");
     var status = $(this).data("status");
+    var ids = $(this).parents("table").find("tbody input[class='item-checked']:checked").length
+    var title = "删除当前行数据"
+    if(ids>1){
+        var title ="批量删除，已选中 "+ids+" 条数据"
+    }
     var html = '<div class="v-status-box" style="text-align: center;" data-status="'+status+'"  data-db="'+db+'" data-con="'+con+'" data-url="'+url+'" data-id="'+id+'"><div class="col-sm-3"><button type="button" name="del"  class="btn btn-xs bg-orange submit-status">删除</button></div><div class="col-sm-5"><input type="password" placeholder="输入二级密码" class="form-control input-sm senior-password" /></div><div class="col-sm-3"><button type="button" name="deepDel" class="btn bg-navy btn-xs submit-status">彻底删除</button></div></div>'
-    notice(100,html,"删除提示",0)
+    notice(100,html,title,0)
 })
 $(document).on("click",".submit-status",function(){
     var statusType = $(this).attr("name")
@@ -448,6 +455,14 @@ $(document).on("click",".submit-status",function(){
     con = con ? con : $(this).parent(".status-con").data("con");
     var status = $(this).parents(".v-status-box").data("status");
     status = status ? status : $(this).data("status");
+    
+    var checkes = delList.parents("table").find("tbody input[class='item-checked']:checked")
+    var ids = [];
+    if(checkes.length>0){
+        checkes.each(function(){
+            ids.push($(this).data("id"))
+        })
+    }
     if(statusType=="deepDel" && senior_pwd == ""){
         notice(100,"彻底删除必须输入二级密码","删除提示",0)
         setTimeout(() => {
@@ -456,7 +471,7 @@ $(document).on("click",".submit-status",function(){
         
         return false;
     }
-    var data={reqType:"globalStatusEdit",statusType:statusType,id:id,status:status,db:db,seniorPwd:senior_pwd}
+    var data={reqType:"globalStatusEdit",statusType:statusType,id:id,status:status,db:db,seniorPwd:senior_pwd,ids:ids}
     // console.log(data);
     // return;
     post(url,data,function(result){
@@ -673,6 +688,10 @@ $(function(){
         if($("#approve-log-modal").find(".approve-btn").length==0){
             $("#approve-log-modal .modal-close").click();
         }
+    })
+    $(document).on("click",tabId+" input[class='all-checked']",function(){
+        var checked = $(this).is(":checked");
+        $(this).parents("table").find("tbody input[class='item-checked']").prop("checked",checked)
     })
 })
 /** 
@@ -1224,6 +1243,71 @@ var toAlias = function(url,string){
         // console.log(result)
     })
 }
-$(tabId+" input[class='all-checked']").on("click",function(){
-    console.log($(this))
-})
+var tableMove = function($box,callback){
+    var sort = 0;
+    var url = $box.data("url");
+    var db = $box.data("db");
+    $box.on("click",'.tsort-up',function(){
+        var tr = $(this).parents('tr')
+        var id = tr.find('.tsort-control').data("id")
+        if(tr.prev().length>0){
+            var data = {}
+            var psort = tr.prev().find('.tsort-input').val();
+            var prid = tr.prev().find('.tsort-control').data("id")
+            if(sort<=0 && psort<=0){
+                data[id] = 1
+                data[prid] = 2
+            }else{
+                data[id] = psort
+                data[prid] = sort
+            }
+            tr.find('.tsort-input').val(data[id])
+            tr.prev().find('.tsort-input').val(data[prid])
+            tr.insertBefore(tr.prev());
+            changeSort(url,db,data,callback)
+            // tr.insertBefore(tr.prev());
+        }
+    });
+    $box.on("click",'.tsort-down',function(){
+        var tr = $(this).parents('tr')
+        var sort = tr.find('.tsort-input').val();
+        var id = tr.find('.tsort-control').data("id")
+        if(tr.next().length>0){
+            var data = {}
+            var nsort = tr.next().find('.tsort-input').val();
+            var nid = tr.next().find('.tsort-control').data("id")
+            
+            if(sort<=0 && nsort<=0){
+                data[id] = 2
+                data[nid] = 1
+            }else{
+                data[id] = nsort
+                data[nid] = sort
+            }
+            tr.find('.tsort-input').val(data[id])
+            tr.next().find('.tsort-input').val(data[nid])
+            tr.insertAfter(tr.next());
+            changeSort(url,db,data,callback)
+        }
+    });
+    $box.on("focus",'.tsort-input',function(){
+        sort = $(this).val();
+    });
+    $box.on("blur",'.tsort-input',function(){
+        var newSort = $(this).val();
+        var tr = $(this).parents('tr')
+        var id = tr.find('.tsort-control').data("id")
+        var data = {};
+        data[id] = newSort
+        if(newSort!==sort && newSort >=0 ){
+            changeSort(url,db,data,callback)
+        }
+    });
+}
+var changeSort = function($url,$db,$data,callback){
+    datas = {}
+    datas.reqType = "change_sort"
+    datas.data = $data
+    datas.db = $db
+    post($url,datas,callback)
+}

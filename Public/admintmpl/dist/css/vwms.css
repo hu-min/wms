@@ -190,3 +190,27 @@ td > .approve-group > button{
 	display: inline-block;
 	width: 100%;
 }
+table .tsort-up,table .tsort-down{
+	height: 40%;
+	cursor: pointer;
+}
+table .tsort-up i,table .tsort-down i{
+	position: relative;
+	font-size:13px;;
+}
+table .tsort-up:hover,table .tsort-down:hover{
+	background-color: rgba(86, 61, 124, .1);
+}
+.tsort-control{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.tsort-control .tsort-input{
+	width: 20px;
+	height: 20px;
+	text-align: center;
+}
+.tsort-control .tsort-move{
+	width: 30px;
+}

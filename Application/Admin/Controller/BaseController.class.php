@@ -324,6 +324,9 @@ class BaseController extends \Common\Controller\BaseController{
         if(!$db){
             $this->ajaxReturn(['errCode'=>110,'error'=>'数据表名称异常']);
         }
+        if(is_array($ids) && !empty($ids)){
+            $id = ["IN",$ids];
+        }
         if($statusType=="del"){
             if($db!='v_purcha'){
                 $conResult=$dbObject->save([$dbObject->getPk()=>$id,"status"=>$status]);
@@ -511,5 +514,28 @@ class BaseController extends \Common\Controller\BaseController{
             }
         }
         
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-09-26 11:16:36 
+     * @Desc: 统一修改排序 
+     */    
+    function change_sort(){
+        extract($_REQUEST);
+        $dbObject=M($db,NULL);
+        $allNum = count($data);
+        $num = 0;
+        foreach ($data as $id => $sort) {
+            // echo $id ,"=>", $sort,';';
+            $sortResult = $dbObject->where([$dbObject->getPk()=>$id])->save(["sort"=>$sort]);
+            if($sortResult){
+                $num ++ ;
+            }
+        }
+        if($allNum>0 && $allNum == $num){
+            $this->ajaxReturn(['errCode'=>0,'error'=>'成功']);
+        }else{
+            $this->ajaxReturn(['errCode'=>100,'error'=>'排序出错']);
+        }
     }
 }

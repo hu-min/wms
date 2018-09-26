@@ -77,7 +77,7 @@
                             <th>项目主担</th>
                             <th>营业主担</th>
                             <th>供应商数量</th>
-                            <th>合同总额</th>
+                            <th>成本总额</th>
                             <th>状态</th>
                             <th>操作</th>
                         </tr>
@@ -148,9 +148,9 @@
                                 $current.find(".approve-group").data("id",supritem[element])
                             }
                             if(element=="region"){
-                                if(supritem["province_name"] && supritem["city_name"]){
-                                    $current.find(".modal-info[name='"+element+"']").val(supritem["province_name"]+"-"+supritem["city_name"]);
-                                }
+                                // if(supritem["province_name"] && supritem["city_name"]){
+                                //     $current.find(".modal-info[name='"+element+"']").val(supritem["province_name"]+"-"+supritem["city_name"]);
+                                // }
                             }else if(element == "status"){
                                 var status = supritem[element]
                                 if(Number(supritem["last_status"])>1){

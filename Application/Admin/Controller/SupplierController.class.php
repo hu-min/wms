@@ -132,7 +132,7 @@ class SupplierController extends BaseController{
             'where'=>$where,
             'page'=>$p,
             'pageSize'=>$this->pageSize,
-            'orderStr'=>"basicId DESC",
+            'orderStr'=>"sort ASC,basicId DESC",
         ];
         $basicResult=$this->basicCom->getBasicList($parameter);
         $this->tablePage($basicResult,'Supplier/supplierTable/supTypeList',"supTypeList");
