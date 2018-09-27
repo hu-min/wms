@@ -331,9 +331,10 @@ $(document).on("click",'.save-info',function(){
     }else{
         datas["data"]={}
         var global_modal = ""
-        if($(tabId+" .global-modal").html()!=undefined){
+        if($(this).parents(".global-modal").html()!=undefined){
             global_modal = " .global-modal"
         }
+        // console.log(global_modal)
         $(tabId+global_modal+" .modal-info").each(function(){
             var name =$(this).attr("name");
             var val =$(this).val();
@@ -394,7 +395,8 @@ $(document).on("click",'.save-info',function(){
                 // $(tabId+" .modal").modal('toggle')
                 // $(self).parents(".modal").modal('toggle')
             }
-            $(tabId+" .global-modal .modal-content").html("");
+            $(self).data("gettype","");
+            // $(self).parents(".global-modal").find(".modal-content").html("");
         }else{
             notice(result.errCode,result.error);
         }
@@ -838,7 +840,7 @@ function notice(status){
     var color="box-warning"
     var title = "";
     var content = "";
-    var seconds = arguments[3] >= 0 ? arguments[3] : 2
+    var seconds = arguments[3] >= 0 ? arguments[3] : 3
     if(status==100){
         color = "box-danger"
         title = arguments[2] ? arguments[2] : "错误提示！"

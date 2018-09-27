@@ -20,7 +20,7 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">收款【应收客户】</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        {:add_btn(get_defined_vars(),"新增收款")}
+                        <!-- {:add_btn(get_defined_vars(),"新增收款")} -->
                         
                     </div>
                     <div class="box-body search-body company-search-box">
@@ -143,9 +143,13 @@
                 $(tabId+" .create-rece").hide();
             }
 
-            if((info['process_level'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7 && "{$gettype}" == "Edit"){
+            if("{$nodeAuth}" < 3){
                 $(tabId+" .modal-info").prop("disabled",true)
+                $(tabId+" .modal-dialog .modal-footer").find(".save-info").remove(); 
             }
+            // if((info['process_level'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7 && "{$gettype}" == "Edit"){
+            //     $(tabId+" .modal-info").prop("disabled",true)
+            // }
             // var projectChosen= $(tabId+" .chosen-select[name='project_id']")
             // ["brand_name","project_time","code","name","customer_com_name","business_name","type","session_all","amount"].forEach(element => {
 

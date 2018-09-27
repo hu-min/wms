@@ -403,7 +403,11 @@ class FinanceController extends BaseController{
         $data=I("data");
         $p=I("p")?I("p"):1;
         $where=[];
-
+        if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+            if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<3){
+                $where['_string'] = "leader=".session('userId')." OR business=".session('userId');
+            }
+        }
         $parameter=[
             'fields'=>"*,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_time,FROM_UNIXTIME(contract_date,'%Y-%m-%d') contract_date",
             'where'=>$where,
@@ -411,7 +415,7 @@ class FinanceController extends BaseController{
             'pageSize'=>$this->pageSize,
             'orderStr'=>"add_time DESC",
             "joins"=>[
-                "LEFT JOIN (SELECT projectId,session_all,code,name,project_time,brand,customer_com,business,type,amount FROM v_project ) p ON p.projectId = project_id ",
+                "LEFT JOIN (SELECT projectId,session_all,code,name,project_time,brand,customer_com,leader,business,type,amount FROM v_project ) p ON p.projectId = project_id ",
                 // "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = p.brand",
                 "LEFT JOIN (SELECT companyId company_id,company customer_com_name FROM v_customer_company ) c ON c.company_id = p.customer_com",
                 "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = p.business",
@@ -420,6 +424,7 @@ class FinanceController extends BaseController{
         ];
         
         $listResult=$this->receivableCom->getList($parameter);
+        // echo $this->receivableCom->M()->_sql();exit;
         $this->tablePage($listResult,'Finance/financeTable/receivableList',"receivableList");
     }
     function receivableAdd(){
@@ -492,6 +497,11 @@ class FinanceController extends BaseController{
         $resultData["tableData"]["suprfina-list"] = ["list"=>$payList,"template"=>$this->fetch('Purcha/purchaTable/suprfinapayLi')];
 
         $resultData["end_date"] = date("Y-m-d",strtotime($resultData["project_date"]." +".$resultData["days"]."day"));
+        if(($resultData['business'] == session('userId') || $resultData['leader'] == session('userId')) || $nodeAuth >= 7 ){
+
+        }else{
+            $resultData['contract_file'] = "";
+        }
         $modalPara=[
             "data"=>$resultData,
             "title"=>$title,
@@ -544,7 +554,11 @@ class FinanceController extends BaseController{
         $data=I("data");
         $p=I("p")?I("p"):1;
         $where=["status"=>1];
-
+        if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+            if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<3){
+                $where['_string'] = "leader=".session('userId')." OR business=".session('userId');
+            }
+        }
         // $parameter=[
         //     'fields'=>"*",
         //     'where'=>$where,
@@ -565,7 +579,7 @@ class FinanceController extends BaseController{
         // ];
         
         // $listResult=$this->wouldpayCom->getList($parameter);
-        // print_r( $listResult);
+        // print_r( $listResult); type
         $parameter=[
             'where'=>$where,
             'fields'=>"*",
@@ -576,9 +590,9 @@ class FinanceController extends BaseController{
                 "LEFT JOIN (SELECT projectId, name project_name,code,business,leader,brand ,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,days FROM v_project) p ON p.projectId = project_id",
                 "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = p.business",
                 "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
-                "LEFT JOIN (SELECT companyId cid,company supplier_com_name,type,provinceId,cityId FROM v_supplier_company WHERE status=1) c ON c.cid=supplier_com",
+                "LEFT JOIN (SELECT companyId cid,company supplier_com_name,supr_type,provinceId,cityId FROM v_supplier_company WHERE status=1) c ON c.cid=supplier_com",
                 "LEFT JOIN (SELECT contactId cid,contact supplier_cont_name,phone supplier_cont_phone,email supplier_cont_email FROM v_supplier_contact WHERE status=1) ct ON ct.cid=supplier_cont",
-                "LEFT JOIN (SELECT basicId,name type_name FROM v_basic WHERE class='supType') st ON st.basicId=c.type",
+                "LEFT JOIN (SELECT basicId,name type_name FROM v_basic WHERE class='supType') st ON st.basicId=c.supr_type",
                 "LEFT JOIN (SELECT basicId,name module_name FROM v_basic WHERE class='module') bm ON bm.basicId=module",
                 "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = p.brand",
                 "LEFT JOIN (SELECT pid ,province province_name FROM v_province) pr ON pr.pid=c.provinceId",

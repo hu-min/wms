@@ -14,7 +14,8 @@ class UserController extends BaseController{
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
         $this->pageSize=10;
-        $this->statusType=[0=>"未激活",1=>"激活",2=>"冻结",3=>"删除"];
+        $this->statusType=[0=>"未激活",1=>"激活",2=>"冻结",4=>"删除"];
+        // [0=>"未启用",1=>"启用",3=>"无效",4=>"删除"];
         parent::_initialize();
     }
     /*用户管理*/
@@ -354,6 +355,10 @@ class UserController extends BaseController{
     function manageRoleInfo(){
         $reqType=I("reqType");
         $datas=I("data");
+        $hasRole = $this->roleCom->getOne(["where"=>["roleName"=>$datas['roleName'],"rolePid"=>$datas['rolePid']]]);
+        if($hasRole && $datas['roleId'] != $hasRole['list']['roleId']){
+            $this->ajaxReturn(['errCode'=>100,'error'=>'相同的分组下不允许有相同的角色名']);
+        }
         if($reqType=="roleAdd"){
             unset($datas['roleId']);
             return $datas;
@@ -549,6 +554,7 @@ class UserController extends BaseController{
     function processControl(){
         $reqType=I('reqType');
         $this->assign("controlName","user_process");
+        $this->assign('tableName',$this->processCom->tableName());//删除数据的时候需要
         $this->assign("groupData",$this->getRoles(1));
 	    $this->assign("roleData",$this->getRoles(2));
         if($reqType){
@@ -597,6 +603,7 @@ class UserController extends BaseController{
             'where'=>$where,
             'page'=>$p,
             'pageSize'=>$this->pageSize,
+            'orderStr' => 'addTime DESC',
         ];
         
         $processResult=$this->processCom->getProcessList($parameter);
@@ -658,13 +665,40 @@ class UserController extends BaseController{
     function manageProcessInfo(){
         $reqType=I("reqType");
         $datas=I("data");
+        if(empty($datas['Option'][0]['type']) || empty($datas['Option'][0]['type'])){
+            $this->ajaxReturn(['errCode'=>100,'error'=>getError(100).";请认真填写！"]);
+        }
+        // if(!in_array(2,array_column($datas['Option'],"type"))){
+        if(count($datas['Option'])<2){
+            $this->ajaxReturn(['errCode'=>100,'error'=>getError(100).";最少要有一个审批者！"]);
+        }
         $datas["Depict"][0]["role"] = array_values(array_filter($datas["Depict"][0]["role"],function($var){if($var!="") return $var;}));
         $datas["processDepict"]=json_encode($datas["Depict"],JSON_UNESCAPED_UNICODE);
         unset($datas["Depict"]);
         
         $datas["Option"][0]["role"] = array_values(array_filter($datas["Option"][0]["role"],function($var){if($var!="") return $var;}));
         $datas["processOption"]=json_encode($datas["Option"],JSON_UNESCAPED_UNICODE);
+        // print_r($datas);
+        foreach ($datas["Option"] as $key => $value) {
 
+            if($value["type"]==1){
+                $where = ['rolePid'=>["IN",$value['role']]];
+            }else{
+                $where = ['roleId'=>["IN",$value['role']]];
+            }
+            $param = [
+                'where' => $where,
+                'fields' => 'userId,roleId,rolePid',
+                'joins' => [
+                    "LEFT JOIN (SELECT roleId role_id, rolePid FROM v_role) r ON r.role_id=roleId"
+                ],
+            ];
+            $hasRole = $this->userCom->getOne($param);
+            if(!$hasRole && $value["type"]==2){
+                $error = json_decode($datas['processDepict'],true)[$key]['role'][0]."没有分配人员，无法添加流程审核！";
+                $this->ajaxReturn(['errCode'=>100,'error'=>getError(100).";".$error]);
+            }
+        }
         unset($datas["Option"]);
         if($reqType=="user_processAdd"){
 	    $datas["addTime"]=time();

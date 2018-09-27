@@ -244,7 +244,7 @@ class PurchaController extends BaseController{
         // $process_id = $process["processId"];
         if($datas[0]["project_id"]>0){ 
             //检查成本预算是否超支
-            $this->projectCom->checkCost($datas[0]["project_id"],array_sum(array_column($datas,'contract_amount')),"add");
+            $this->projectCom->checkCost($datas[0]["project_id"],array_sum(array_column($datas,'contract_amount')));
             // $costBudget = $this->projectCom->getCostBudget($datas[0]["project_id"]);
             // $allCost = $this->projectCom->getCosts($datas[0]["project_id"]);
             // // print_r($allCost);
@@ -316,7 +316,10 @@ class PurchaController extends BaseController{
             }
         }
         if($datas[0]["project_id"]>0){
-            $this->projectCom->checkCost($datas[0]["project_id"],array_sum(array_column($datas,'contract_amount')));
+            $ids = array_column($datas,'id');
+            $dbCom = "purcha";
+            // print_r($ids);exit;
+            $this->projectCom->checkCost($datas[0]["project_id"],array_sum(array_column($datas,'contract_amount')),$dbCom,$ids);
             // $costBudget = $this->projectCom->getCostBudget($datas[0]["project_id"]);
             // $allCost = $this->projectCom->getCosts($datas[0]["project_id"]);
             // // print_r($allCost);

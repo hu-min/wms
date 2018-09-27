@@ -9,7 +9,12 @@
         <td>{$item['finance_name']}</td>
         <td>{$item['supplier_com_name']}</td>
         <td>{$item['type_name']}</td>
-        <td><input type="hidden" class="upload-file" value="{$item['contract_file']}"> <span class="show-media-btn show-media"><i class="fa fa-eye"></i></span></td>
+        <td>
+            <?php if(($item['contract_file'] !='') && ($item['business'] == session('userId') || $item['leader'] == session('userId')) || $nodeAuth >= 7 ){?>
+                <input type="hidden" class="upload-file" value="<?php echo $item['contract_file']?>"> <span class="show-media-btn show-media"><i class="fa fa-eye"></i></span>
+            <?php } ?>
+
+        </td>
         <td>{$item['supplier_cont_name']}</td>
         <!-- <td>{$payType[$item['pay_type']]}</td> -->
         <!-- <td>{$item['pay_amount']}</td> -->

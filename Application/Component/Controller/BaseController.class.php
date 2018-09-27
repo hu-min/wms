@@ -186,4 +186,7 @@ class BaseController extends \Common\Controller\BaseController{
     function rollback(){
         $this->selfDB->rollback();
     }
+    function getActionName(){
+        return CONTROLLER_NAME;
+    }
 }

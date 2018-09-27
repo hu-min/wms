@@ -123,7 +123,14 @@ class CostController extends BaseController{
         $reqType=I("reqType");
         $datas=I("data");
         if($datas["project_id"]>0){
-            $this->projectCom->checkCost($datas["project_id"],array_sum(array_column($datas,'debit_money')));
+            if($reqType=="debitEdit"){
+                $ids = [$datas["id"]];
+                $dbCom = "debit";
+            }else{
+                $dbCom="";
+                $ids=[];
+            }
+            $this->projectCom->checkCost($datas["project_id"],$datas["debit_money"],$dbCom,$ids);
             // $costBudget = $this->projectCom->getCostBudget($datas["project_id"]);
             // $allCost = $this->projectCom->getCosts($datas["project_id"]);
             // // print_r($allCost);
@@ -498,7 +505,9 @@ class CostController extends BaseController{
         $datas=I("data");
         $project_id=I("project_id");
         if($project_id>0){
-            $this->projectCom->checkCost($project_id,array_sum(array_column($datas["expense-list"],'money')));
+            $ids = array_column($datas["expense-list"],'id');
+            $dbCom = "expense";
+            $this->projectCom->checkCost($project_id,array_sum(array_column($datas["expense-list"],'money')),$dbCom,$ids);
         }
         $expense_id=I("expense_id");
         $this->expenseCom->update(["where"=>["id"=>$project_id],"data"=>["update"=>time()]]);

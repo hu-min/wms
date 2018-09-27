@@ -88,7 +88,7 @@
             $(tabId+" .search-list").trigger("click");
         
             //新增审核流程
-            $(tabId).on("click",".box-header button",function(){
+            $(tabId).offon("click",".box-header button",function(){
                 $(tabId+" .modal-info").val("");
                 $(tabId+" .process-tab").children("tr").remove()
 		        $(tabId+" .modal-info[name='status']").val(0);
@@ -96,11 +96,11 @@
                 $(tabId+" .status-btn[name='0']").addClass("active");
             })
             //新增审核流程输入框
-            $(tabId).on("click",".add-processnode",function(){
-                createProcess()
+            $(tabId).offon("click",".add-processnode",function(){
+                createProcess("add")
             })
             //切换角色类型            
-            $(tabId).on("change",".role-type",function(){
+            $(tabId).offon("change",".role-type",function(){
                 var chosen_roles=$(this).parent("td").next("td").find(".chosen-roles");
                 var roleType = $(this).val()
                 chosen_roles.eq(0).find("option").remove()
@@ -122,7 +122,7 @@
                 
             })
             //删除审批流程
-            $(tabId).on("click",".minus-processnode",function(){
+            $(tabId).offon("click",".minus-processnode",function(){
                 $(this).parents("tr").remove()	
             })
         })
@@ -204,9 +204,20 @@
             // // setCityOption(info['provinceId'],"modal-info")
             // $(tabId+" .modal-info[name='cityId']").find("option[value='"+info['cityId']+"']").prop("selected",true);
         }
-        function createProcess(){
-            var tr=$('<tr><td style="width:30%;padding: 3px;vertical-align: middle;"><select class="form-control input-sm role-type" title="角色类型" name="roleType"><option value="">选择角色类型</option><option value="1">分组</option><option value="2">角色</option></select></td><td style="width:65%;padding: 3px;vertical-align: middle;"><select class="form-control input-sm chosen-roles chosen-select" title="角色" name="roles"><option value=""></option></select></td><td sytle="width:5%;padding: 3px;vertical-align: middle;"><i class="fa fa-minus minus-processnode" style="padding: 10px;cursor:pointer;"></i></td></tr>');
+        function createProcess(type){
+            var role_type = $(tabId+" .process-tab").find("tr select[name='roleType']").length;
+            // console.log(role_type)
+            var option = '<option value="1">分组</option><option value="2">角色</option>'
+            if(role_type>0){
+                var option = '<option value="2">角色</option>'
+            }
+            // <option value="">选择角色类型</option>
+            var tr=$('<tr><td style="width:30%;padding: 3px;vertical-align: middle;"><select class="form-control input-sm role-type" title="角色类型" name="roleType">'+option+'</select></td><td style="width:65%;padding: 3px;vertical-align: middle;"><select class="form-control input-sm chosen-roles chosen-select" title="角色" name="roles"><option value=""></option></select></td><td sytle="width:5%;padding: 3px;vertical-align: middle;"><i class="fa fa-minus minus-processnode" style="padding: 10px;cursor:pointer;"></i></td></tr>');
             $(tabId+" .process-tab").append(tr)
+            if(type=="add"){
+                $(tabId+" .process-tab").find("tr select[name='roleType']").eq(-1).trigger("change");
+            }
+            
         }
     </script>
 </body>

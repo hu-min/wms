@@ -14,7 +14,7 @@
         <td>{$item['amount']}</td>
         <td>{$item['radvance']}</td>
         <td>{$item['rsurplus']}</td>
-        <td>{$cost = $item['pcontract_amount']+$item['ddebit_money']+$item['emoney']}</td>
+        <td>{$cost = ($item['pcontract_amount']+$item['ddebit_money']+$item['emoney']) > 0 ? ($item['pcontract_amount']+$item['ddebit_money']+$item['emoney']) : $item['cost_budget']}</td>
         <td>{$profit=$item['amount']-$cost}</td>
         <td>{:round($profit/$item['amount']*100,2)}%</td>
         <td>{$item['stage_name']}</td>

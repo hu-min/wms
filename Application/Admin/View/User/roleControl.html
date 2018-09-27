@@ -41,16 +41,16 @@
                 </div>
             </div>
             <div class="col-md-4">
-                    <div class="box box-info"  data-url="{$url}" id="role-search" data-reqtype="roleList" data-con="role">
+                    <div class="box box-info role-info-edit"  data-url="{$url}" data-reqtype="roleList" data-con="role">
                         <div class="box-header">
                             <i class="fa fa-cog"></i>
             
                             <h4 class="box-title">角色管理</h4>
-            
+<!--             
                             <div class="box-tools pull-right" data-toggle="tooltip" title="" data-original-title="Status">
                                 <span class="tree-plus handle" data-id="#roletree"><i class="fa fa-fw fa-plus-square"></i>收起</span>
                                 <span class="tree-minus handle" data-id="#roletree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
-                            </div>
+                            </div> -->
                         </div>
                         <form class="form-horizontal" >
                             <div class="box-body">
@@ -233,6 +233,7 @@
             }});
             //权限编辑按钮事件
             $(tabId+' #roletree').on("click",'li button',function(){
+                console.log($(this))
                 var roleData= $(tabId+' #roletree').treeview('getNode', $(this).parent(".node-roletree").data("nodeid"));
                 datas["roleId"]=roleData.id;
                 roleId=roleData.id;
@@ -249,7 +250,7 @@
         }
         //清空角色数据
         function clearRoleInfo(){
-            $(tabId+" input").val("")
+            $(tabId+" .role-info-edit .modal-info").val("")
         }
     </script>
 </body>

@@ -10,9 +10,27 @@
         <td>{$item['type_name']}</td>
         <td>{$item['session_all']}</td>
         <td>{$item['amount']|number_format}</td>
-        <td>{$cost = $item['pcontract_amount']+$item['ddebit_money']+$item['emoney']}</td>
-        <td>{$profit=$item['amount']-$cost}</td>
-        <td>{:round($profit/$item['amount']*100,2)}%</td>
+        <td>
+            <if condition="$item.business eq $Think.session.userId  or $nodeAuth egt 7">
+                {$cost = ($item['pcontract_amount']+$item['ddebit_money']+$item['emoney']) > 0 ? ($item['pcontract_amount']+$item['ddebit_money']+$item['emoney']) : $item['cost_budget']}
+            <else/>
+                ****
+            </if>
+        </td>
+        <td>
+            <if condition="$item.business eq $Think.session.userId  or $nodeAuth egt 7">
+                {$profit=$item['amount']-$cost}
+            <else/>
+                ****
+            </if>
+        </td>
+        <td>
+            <if condition="$item.business eq $Think.session.userId  or $nodeAuth egt 7">
+                {:round($profit/$item['amount']*100,2)}%
+            <else/>
+                ****
+            </if>
+        </td>
         <td>{$item['stage_name']}</td>
         <td  class="status-con"  data-con="project_file" data-id="{$item['projectId']}" data-url="{$url}" style="min-width: 80px;">
             <button type="button" data-gettype="business"" data-toggle="modal" data-vtarget=".files-modal" class="btn btn-xs btn-info v-showmodal">查看</button><if condition="$item['file_num'] gt 0"><span class="label label-success files-num-label">{$item.file_num|default=0}</span><else/><span class="label bg-gray files-num-label">0</span></if>

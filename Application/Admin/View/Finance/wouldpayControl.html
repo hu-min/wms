@@ -172,11 +172,14 @@
                     $(tabId+" .project-info[name='surplus']").val(float(info["contract_amount"])-float(allMoney));
                 }
             });
-
             
-            if((info['process_level'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7 && "{$gettype}" == "Edit"){
-                $(tabId+" .modal-info").prop("disabled",true)
+            if("{$nodeAuth}" < 3){
+                // $(tabId+" .modal-info").prop("disabled",true)
+                // $(tabId+" .modal-dialog .modal-footer").find(".save-info").remove(); 
             }
+            // if((info['process_level'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7 && "{$gettype}" == "Edit"){
+            //     $(tabId+" .modal-info").prop("disabled",true)
+            // }
         }
         function wouldpay_getInfo(){
             // var purcha_id = $(tabId+" .purcha-id[name='id']").val()
