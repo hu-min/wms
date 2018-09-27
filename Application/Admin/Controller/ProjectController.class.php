@@ -161,6 +161,11 @@ class ProjectController extends BaseController{
             $result=$this->userCom->getUserList($parameter);
             $resultData["user_ids"]=$result["list"];
         }
+        if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME] >= 7 || ($resultData['business'] == session('userId')) || ($resultData['author'] == session('userId')) ){
+            
+        }else{
+            $resultData['contract'] = '';
+        }
         if($onlydata){
             $this->ajaxReturn(["data"=>$resultData]);
         }
