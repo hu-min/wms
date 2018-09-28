@@ -1295,24 +1295,9 @@ var tableMove = function($box,callback){
         var id = tr.find('.tsort-control').data("id")
         if(tr.prev().length>0){
             var data = {}
-            var psort = tr.prev().find('.tsort-input').val();
-            var prid = tr.prev().find('.tsort-control').data("id")
-            if(sort<=0 && psort<=0){
-                data[id] = 1
-                data[prid] = 2
-            }else{
-                data[id] = psort
-                if(psort==sort){
-                    data[prid] = Number(sort)+1
-                }else{
-                    data[prid] = sort
-                }
-            }
-            tr.find('.tsort-input').val(data[id])
-            tr.prev().find('.tsort-input').val(data[prid])
             tr.insertBefore(tr.prev());
+            data = getSortData($(this))    
             changeSort(url,db,data,callback)
-            // tr.insertBefore(tr.prev());
         }
     });
     $box.on("click",'.tsort-down',function(){
@@ -1321,23 +1306,8 @@ var tableMove = function($box,callback){
         var id = tr.find('.tsort-control').data("id")
         if(tr.next().length>0){
             var data = {}
-            var nsort = tr.next().find('.tsort-input').val();
-            var nid = tr.next().find('.tsort-control').data("id")
-            
-            if(sort<=0 && nsort<=0){
-                data[id] = 2
-                data[nid] = 1
-            }else{
-                data[id] = nsort == 0 ? Number(nsort) - 1 : nsort; 
-                if(nsort==sort){
-                    data[nid] = nsort == 0 ? nsort : nsort -1
-                }else{
-                    data[nid] = sort
-                }
-            }
-            tr.find('.tsort-input').val(data[id])
-            tr.next().find('.tsort-input').val(data[nid])
             tr.insertAfter(tr.next());
+            data = getSortData($(this))
             changeSort(url,db,data,callback)
         }
     });
@@ -1352,14 +1322,29 @@ var tableMove = function($box,callback){
         data[id] = newSort
         if(newSort!==sort && newSort >=0 ){
             changeSort(url,db,data,callback)
-            $(tabId+" .search-list").trigger("click");
         }
     });
 }
+var getSortData = function($this){
+    var temp = {}
+    $this.parents(".table").find(".tsort-control").each(function(index){
+        temp[$(this).data("id")] = index
+    })
+    return temp;
+}
 var changeSort = function($url,$db,$data,callback){
     datas = {}
+    var pageSize = $(tabId+" .search-info[name='pageSize']").val();
+    var page = $(tabId+" .dataTables_paginate ul .active a").data("page")
+    page = page ? page : 1;
     datas.reqType = "change_sort"
+    var s_index = (page - 1 ) * Number(pageSize)
+    for (var key in $data) {
+        $data[key] = Number($data[key]) + s_index
+    }
     datas.data = $data
     datas.db = $db
+
     post($url,datas,callback)
+    $(tabId+" .search-list").trigger("click");
 }
