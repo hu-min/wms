@@ -1291,6 +1291,7 @@ var tableMove = function($box,callback){
     var db = $box.data("db");
     $box.on("click",'.tsort-up',function(){
         var tr = $(this).parents('tr')
+        var sort = tr.find('.tsort-input').val();
         var id = tr.find('.tsort-control').data("id")
         if(tr.prev().length>0){
             var data = {}
@@ -1301,7 +1302,11 @@ var tableMove = function($box,callback){
                 data[prid] = 2
             }else{
                 data[id] = psort
-                data[prid] = sort
+                if(psort==sort){
+                    data[prid] = Number(sort)+1
+                }else{
+                    data[prid] = sort
+                }
             }
             tr.find('.tsort-input').val(data[id])
             tr.prev().find('.tsort-input').val(data[prid])
@@ -1323,8 +1328,12 @@ var tableMove = function($box,callback){
                 data[id] = 2
                 data[nid] = 1
             }else{
-                data[id] = nsort
-                data[nid] = sort
+                data[id] = nsort == 0 ? Number(nsort) - 1 : nsort; 
+                if(nsort==sort){
+                    data[nid] = nsort == 0 ? nsort : nsort -1
+                }else{
+                    data[nid] = sort
+                }
             }
             tr.find('.tsort-input').val(data[id])
             tr.next().find('.tsort-input').val(data[nid])
