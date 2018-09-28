@@ -533,10 +533,11 @@ class BaseController extends \Common\Controller\BaseController{
                 $num ++ ;
             }
         }
-        if($allNum>0 && $allNum == $num){
-            $this->ajaxReturn(['errCode'=>0,'error'=>'成功']);
-        }else{
-            $this->ajaxReturn(['errCode'=>100,'error'=>'排序出错']);
-        }
+        $this->ajaxReturn(['errCode'=>0,'error'=>'成功']);
+        // if($allNum>0 && $allNum == $num){
+        //     $this->ajaxReturn(['errCode'=>0,'error'=>'成功']);
+        // }else{
+        //     $this->ajaxReturn(['errCode'=>100,'error'=>'排序出错']);
+        // }
     }
 }
