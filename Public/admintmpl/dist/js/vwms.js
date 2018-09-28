@@ -698,6 +698,9 @@ $(function(){
         var checked = $(this).is(":checked");
         $(this).parents("table").find("tbody input[class='item-checked']").prop("checked",checked)
     })
+    $(document).on("change",tabId+" .search-info[name='pageSize']",function(){
+        $(tabId+" .search-list").trigger("click");
+    })
     /** 
      * javascript comment 
      * @Author: vition 
