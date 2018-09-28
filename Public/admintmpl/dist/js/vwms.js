@@ -4,6 +4,8 @@ var uploadData = {}
 var tempFiles = {};
 var tabId="";//定义当前tab指定的id
 var delList = null;//定义要删除的列表位置
+var sourceData = {};
+var resetData = {};
 $.fn.extend({offon:function(){
     var event =  arguments[0]
     var select =  typeof(arguments[1]) == 'string' ? arguments[1] : false
@@ -696,6 +698,40 @@ $(function(){
         var checked = $(this).is(":checked");
         $(this).parents("table").find("tbody input[class='item-checked']").prop("checked",checked)
     })
+    /** 
+     * javascript comment 
+     * @Author: vition 
+     * @Date: 2018-09-28 15:30:15 
+     * @Desc: 激活重新提审 
+     */    
+    $(document).on("click",tabId+" .reset-info-active",function(){
+        var title = $(this).text()
+        if(title=="重新提审"){
+            $(this).parents(".modal").find(".modal-info").each(function(){
+                var val = $(this).val()
+                var name = $(this).attr("name")
+                sourceData[name] = val
+                $(this).prop("disabled",false);
+                if($(this).hasClass("chosen-select")){
+                    $(this).trigger("chosen:updated");
+                }
+            })
+            $(this).text("确认重审");
+        }else if(title=="确认重审"){
+            $(this).parents(".modal").find(".modal-info").each(function(){
+                var val = $(this).val()
+                var name = $(this).attr("name")
+                if(sourceData[name]!==val && !in_array(val,["00:00:00"]) && JSON.stringify(val) != "[]" ){
+                    resetData[name] = val
+                }
+            })
+            if(JSON.stringify(resetData) === "{}"){
+                notice(101,"没修改任何数据","输入异常");
+            }else{
+                
+            }
+        }
+    })
 })
 /** 
  * javascript comment 
@@ -1304,6 +1340,7 @@ var tableMove = function($box,callback){
         data[id] = newSort
         if(newSort!==sort && newSort >=0 ){
             changeSort(url,db,data,callback)
+            $(tabId+" .search-list").trigger("click");
         }
     });
 }
