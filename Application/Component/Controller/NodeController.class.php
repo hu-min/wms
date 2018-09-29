@@ -12,13 +12,21 @@ class NodeController extends BaseController{
      * @Date: 2018-09-05 00:00:41 
      * @Desc: 根据节点或者角色获取对应的流程信息 
      */    
-    function getProcess($nodeId,$roleId=null,$rolePid=null){
+    function getProcess($nodeId,$roleId=null,$rolePid=null,$processId=null){
         $nodeId = getTabId($nodeId);
         $roleId = $roleId ? $roleId : session('roleId');
         $rolePid = $rolePid ? $rolePid : session('rolePid');
-        $processResult = $this->getList(["fields"=>"processId,processIds,processOption","where"=>["nodeId"=> $nodeId],"joins"=>["LEFT JOIN (SELECT processId,processOption FROM v_process WHERE status = 1) p ON FIND_IN_SET(p.processId,processIds)"] ]);
+        if($processId){
+            $processResult =  A("Component/Process")->getList(['where'=>['processId'=>$processId],"fields"=>"processId, {$processId} processIds,processOption"]);
+            // print_r($processResult);
+            // exit;
+        }else{
+            $processResult = $this->getList(["fields"=>"processId,processIds,processOption","where"=>["nodeId"=> $nodeId],"joins"=>["LEFT JOIN (SELECT processId,processOption FROM v_process WHERE status = 1) p ON FIND_IN_SET(p.processId,processIds)"] ]);
+        }
+        
         $processInfo = ["process"=>[],"allProcess"=>1,"place"=>0,"processId"=>0,"examine"=>''];
         $processList = [];
+        // print_r($processResult);exit;
         // $this->log($processResult);
         if(is_array($processResult["list"])){
             $processIds = explode(",",$processResult["list"][0]["processIds"]);
@@ -66,9 +74,15 @@ class NodeController extends BaseController{
      * @Date: 2018-09-05 00:00:11 
      * @Desc: 查询节点对应的流程 
      */    
-    function nodeProcess(){
+    function nodeProcess($nodeType=2){
+        $where = [
+            "status"=>1,
+            "processIds"=>['neq',""],
+            "db_table"=>['neq',""],
+            "nodeType"=>$nodeType,
+        ];
         $parameter=[
-            "where"=>["status"=>1,"processIds"=>['neq',""],"db_table"=>['neq',""]],
+            "where"=>$where,
             "fields"=>'nodeId,db_table,controller,nodeTitle,processIds',
         ];
         $nodeRes = $this->getList($parameter);

@@ -150,6 +150,10 @@
                             debit_setInfo(result.data)
                         }
                     })
+                }else{
+                    ["code","project_name","project_date","business_name","leader_name","leader"].forEach(element=>{
+                        $(tabId+" .global-modal .project-info[name='"+element+"']").val("");
+                    })
                 }
             });
             $(tabId+" .global-modal").on("change",".modal-info[name='account_type']",function(){

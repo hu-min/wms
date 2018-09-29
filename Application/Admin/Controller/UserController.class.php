@@ -801,7 +801,7 @@ class UserController extends BaseController{
         ];
         $result=$this->processCom->getProcessList($parameter);
         if($option){
-            $optionStr='<option value=""></option>';
+            $optionStr='<option value="">选择流程</option>';
             foreach($result['list'] as $opt){
                 $optionStr.='<option value="'.$opt["processId"].'">'.$opt["processName"].'</option>';
             }

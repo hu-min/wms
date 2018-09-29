@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>{:C('admintitle')}</title>
+        <eq name="load" value="true">
+            <include file="Index/Heads" /> 
+        </eq>       
+    </head>
+<body>
+    <section class="content">
+        <div class="">
+            <a class="btn btn-app v-showmodal" data-gettype="Edit" data-toggle="modal" data-url="{$url}" data-vtarget=".global-modal" data-con="index_process">
+                <i class="fa fa-edit"></i> 特殊流程配置
+            </a>
+            <!-- <a class="btn btn-app">
+                <i class="fa fa-play"></i> Play
+            </a>
+            <a class="btn btn-app">
+                <i class="fa fa-repeat"></i> Repeat
+            </a>
+            <a class="btn btn-app">
+                <i class="fa fa-pause"></i> Pause
+            </a>
+            <a class="btn btn-app">
+                <i class="fa fa-save"></i> Save
+            </a>
+            <a class="btn btn-app">
+                <i class="fa fa-bullhorn"></i> Notifications
+            </a>
+            <a class="btn btn-app">
+                <i class="fa fa-barcode"></i> Products
+            </a>
+            <a class="btn btn-app">
+                <i class="fa fa-users"></i> Users
+            </a>
+            <a class="btn btn-app">
+                <i class="fa fa-inbox"></i> Orders
+            </a>
+            <a class="btn btn-app">
+                <i class="fa fa-envelope"></i> Inbox
+            </a>
+            <a class="btn btn-app">
+                <i class="fa fa-heart-o"></i> Likes
+            </a> -->
+        </div>
+    </section>
+    <div class="modal fade global-modal" aria-hidden="true" data-backdrop="static" >
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+    <script>
+        var index_process_initInfo = function(){
+            init_chosen("{$url}","getOptionList",".global-modal");
+        }
+        var index_process_setInfo = function(result){
+            $(tabId+" .global-modal .modal-info[name='processIds']").val(result['processIds']);
+            if(result.name){
+                $(tabId+" .global-modal .modal-info[name='process_type']").find("option[value='"+result.name+"']").prop("selected",true)
+            }
+            if(result.db_name){
+                result.db_name.forEach(element => {
+                    $(tabId+" .global-modal .modal-info[name='db_name']").find("option[value='"+element+"']").prop("selected",true)
+                });
+            }
+            $(tabId+" .global-modal .chosen-select").trigger("chosen:updated");
+        }
+        $(function(){
+            $(tabId).on("change",".global-modal .modal-info[name='process_type']",function(){
+                datas.reqType = 'get_index_processList';
+                datas.process_type = $(this).val()
+                if(datas.process_type=="execu_process"){
+                    $(tabId+" .global-modal .modal-info[name='db_name']").parents(".form-group").removeClass("none")
+                }else{
+                    $(tabId+" .global-modal .modal-info[name='db_name']").parents(".form-group").addClass("none")
+                }
+                
+                get("{$url}",datas,function(result){
+                    index_process_setInfo(result.data)
+                })
+            })
+        }) 
+    </script>
+</body>
+</html>

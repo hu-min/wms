@@ -159,7 +159,7 @@ class PublicController extends BaseController{
     }
     function work_order_modalOne(){
         $title = "新建工单";
-        $btnTitle = "添加数据";
+        $btnTitle = "提交工单";
         $gettype = I("gettype");
         $resultData=[];
         $id = I("id");
@@ -170,5 +170,70 @@ class PublicController extends BaseController{
             "template"=>"workOrderModal",
         ];
         $this->modalOne($modalPara);
+    }
+    function manageWorderInfo(){
+        $reqType=I("reqType");
+        $datas=I("data");
+        $roleId = session("roleId");
+  
+        if($reqType=="work_orderAdd"){
+            $datas['add_time']=time();
+            $datas['user_id']=session('userId');
+            $this->configCom=getComponent('Config');
+            switch ($datas['type']) {
+                case 1:
+                    $process_type = "wuser_process";
+                    break;
+                case 2:
+                    # code...
+                    break;
+                case 3: default:
+                    $process_type = "wother_process";
+                    # code...
+                    break;
+            }
+            $resultData = $this->configCom->get_val($process_type);
+            //添加时必备数据 ($vtabId=false,$leader=0,$roleId=0,$processIds=0)
+            $examines = getComponent('Process')->getExamine(I("vtabId"),0,0,$processId);
+            $datas['process_id'] = $examines["process_id"];
+            $datas['examine'] = $examines["examine"];
+            $rolePlace = $examines['place'];
+            if($rolePlace!==false){
+                $datas['process_level']=$rolePlace+2;
+                if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
+                    $datas['status'] = 1;
+                }else{
+                    $datas['status'] = 2;
+                }
+            }else{
+                $datas['process_level']=$process["place"] > 0 ? $process["place"] : 1;
+            }
+            unset($datas['id']);
+            return $datas;
+        }else if($reqType=="work_orderEdit"){
+            $where=["id"=>$datas['id']];
+            $data=[];
+            
+            foreach (['status'] as  $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
+            }
+            if(isset($datas['status'])){
+                $data['status'] = $datas['status'] == 3 ? 0 : $datas['status'];
+            }
+            $data['upate_time']=time();
+            
+            return ["where"=>$where,"data"=>$data];
+        }
+        return "";
+    }
+    function work_orderAdd(){
+        $datas = I("data");
+
+        // $this->ajaxReturn($this->workOrderCom->insert($datas));
+    }
+    function work_orderEdit(){
+        
     }
 }

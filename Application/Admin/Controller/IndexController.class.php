@@ -5,6 +5,7 @@ namespace Admin\Controller;
 class IndexController extends BaseController{
 
     public function _initialize() {
+        $this->AUser = A('Admin/User');
         parent::_initialize();
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
@@ -180,6 +181,79 @@ class IndexController extends BaseController{
         $listResult = $this->LogCom->getList($param);
         $listResult["count"] = $listResult["count"]>100 ? 100 : $listResult["count"];
         $this->tablePage($listResult,'Index/table/lastLoginList',"lastLoginList",5,"",["rollPage"=>5,"onlyPage"=>true,"bigSize"=>false]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-09-29 11:57:10 
+     * @Desc: 全局配置 
+     */    
+    function globalConf(){
+        $reqType=I('reqType');
+        $this->configCom=getComponent('Config');
+        
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-09-29 14:20:03 
+     * @Desc: 非项目审批流程 
+     */    
+    function index_process_modalOne(){
+        $title = "非项目流程配置";
+        $btnTitle = "修改配置";
+        extract($_REQUEST);
+        $resultData=[];
+        $this->assign("processData",$this->AUser->getProcess());
+        $this->assign("controlName","index_process");
+        $dbnames = [
+            "v_debit"=>"借支",
+            "v_expense"=>"报销",
+        ];
+        $this->assign("dbnames",$dbnames);
+        $processType = [
+            'execu_process' => '非项目流程',
+            'wuser_process' => '工单个人信息流程',
+            'wother_process' => '工单其他流程',
+        ];
+        $this->assign("processType",$processType);
+        $modalPara=[
+            "data"=> $this->_get_index_processList('execu_process'),
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "tpFolder"=>'Index',
+            "folder"=>'table',
+            "template"=>"processModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+
+    function get_index_processList(){
+        $process_type = I('process_type');
+        $this->ajaxReturn(['errCode'=>0,'data'=>$this->_get_index_processList($process_type)]);
+    }
+    function _get_index_processList($process_type){
+        $resultData = $this->configCom->get_val($process_type);
+        if(!$resultData){
+            $this->configCom->set_val($process_type,""); 
+        }else if(!empty($resultData['value'])){
+            return array_merge(json_decode($resultData['value'],true),['name'=>$process_type]);
+        }
+        return [];
+    }
+    function index_processEdit(){
+        $reqType=I("reqType");
+        $datas=I("data"); 
+        $process_type = $datas['process_type'];
+        unset($datas['process_type']);
+        if($process_type!="execu_process"){
+            unset($datas['db_name']);
+        }
+        $result = $this->configCom->set_val($process_type,json_encode($datas));
+        $this->ajaxReturn(['errCode'=>$result->errCode,'error'=>getError($result->errCode)]);
     }
 }
 

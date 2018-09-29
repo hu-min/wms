@@ -65,10 +65,10 @@ class ProcessController extends BaseController{
         print_r($processAppList);
         // print_r($nodeProce);
     }
-    function getExamine($vtabId=false,$leader=0,$roleId=0){
+    function getExamine($vtabId=false,$leader=0,$roleId=0,$processIds=0){
         $vtabId = $vtabId ? $vtabId : I("vtabId");
         $roleId = $roleId ? $roleId : session("roleId");
-        $returnData = ["examine"=>'',"place"=>0,'process_id'];
+        $returnData = ["examine"=>'',"place"=>0,'process_id'=>0];
         if(!$vtabId){
             return $returnData;
         }
@@ -78,14 +78,38 @@ class ProcessController extends BaseController{
             $userRole = A("Component/User")->getUserInfo($leader);
             // $roleId = $userRole['roleId'];
             $examines = $userRole['roleId'].",".$process["examine"];
+        }elseif($processIds>0){
+            $process = A("Component/Node")->getProcess($vtabId,null,null,$processIds);
+            $examines = $process["examine"];
         }else{
+            $execuProResult = A("Component/Config")->get_val("execu_process");
+            
+            if($execuProResult){
+                $execuProcess = json_decode($execuProResult['value'],true);
+                if(isset($execuProcess['db_name']) && !empty($execuProcess['db_name'])){
+                    $param = [
+                        'where' => ['db_table'=>['IN',$execuProcess['db_name']],"nodeType"=>3],
+                        'fields' => "nodeId",
+                    ];
+                    $nodeIdResult = A("Component/Node")->getList($param);
+                    
+                    if($nodeIdResult){
+                        $nodeId = getTabId($vtabId);
+            
+                        if(in_array($nodeId,array_column($nodeIdResult['list'],"nodeId"))){
+                            $process = A("Component/Node")->getProcess($vtabId,null,null,$execuProcess['processIds']);
+                        }
+                    }
+                }
+            }
             $examines = $process["examine"];
         }
         $process["place"] = search_last_key($roleId,array_unique(explode(",",$examines)));
 
         $returnData['examine'] = trim(implode(",",array_unique(explode(",",$examines))),",");
-        $returnData['place'] = $process["place"] ;
+        $returnData['place'] = $process["place"] ? $process["place"] : 0 ;
         $returnData['process_id'] = $process["processId"];
+        // print_r($returnData);exit;
         return $returnData;
     }
 }
