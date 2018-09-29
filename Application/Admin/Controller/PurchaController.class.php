@@ -48,7 +48,7 @@ class PurchaController extends BaseController{
         $id = I("id");
         $parameter=[
             "where"=>["projectId"=>$id],
-            "fields" => "projectId,name project_name,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,code,leader,leader_name,business,business_name,cost_budget,amount",
+            "fields" => "projectId,name project_name,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,date_sub(FROM_UNIXTIME(project_time,'%Y-%m-%d'),interval - days day) end_date,code,leader,leader_name,business,business_name,cost_budget,amount",
             "joins"=>[
                 "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = leader",
                 "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = business",
@@ -58,7 +58,7 @@ class PurchaController extends BaseController{
         $costs = $this->projectCom->getCosts($id);
         $resultData['current_cost'] = $costs['allCost'];
         $resultData['rate'] = round((($resultData['amount']-$costs['allCost'])/$resultData['amount'])*100,2);
-
+        $resultData['debit_expense'] = $costs['allCost'] - $costs['contract'];
         if($return){
             return $resultData;
         }
@@ -185,7 +185,7 @@ class PurchaController extends BaseController{
         }
         $parameter=[
             'where'=>$where,
-            'fields'=>"id,type,project_id,state status,user_id,COUNT(supplier_com) supr_num,SUM(contract_amount) amount, name,code,business_name,leader_name,FIND_IN_SET({$roleId},examine) place",
+            'fields'=>"id,type,project_id,state status,user_id,COUNT(supplier_com) supr_num,SUM(contract_amount) amount, name,code,business_name,leader_name,FIND_IN_SET({$roleId},examine) place,CASE WHEN expense_money>debit_money THEN expense_money ELSE debit_money END debit_expense",
             'page'=>$p,
             'pageSize'=>$this->pageSize,
             'orderStr'=>"id DESC",
@@ -195,6 +195,8 @@ class PurchaController extends BaseController{
                 "LEFT JOIN (SELECT userId buser_id,userName business_name FROM v_user) bu ON bu.buser_id = p.business",
                 "LEFT JOIN (SELECT userId luser_id,userName leader_name FROM v_user) lu ON lu.luser_id = p.leader",
                 "LEFT JOIN (SELECT project_id project_sid, CASE WHEN FIND_IN_SET(0,GROUP_CONCAT(status))>0 THEN 0 WHEN FIND_IN_SET(1,GROUP_CONCAT(status))>0 THEN 1 WHEN FIND_IN_SET(2,GROUP_CONCAT(status))>0 THEN 2  WHEN FIND_IN_SET(3,GROUP_CONCAT(status))>0 THEN 3  WHEN FIND_IN_SET(4,GROUP_CONCAT(status))>0 THEN 4 ELSE 0 END state FROM v_purcha GROUP BY project_id) s ON s.project_sid=project_id",
+                "LEFT JOIN (SELECT project_id eproject_id,SUM(expense_money) expense_money FROM `v_expense` LEFT JOIN (SELECT parent_id,SUM(money) expense_money,status state FROM v_expense_sub GROUP BY parent_id) es ON es.parent_id = id GROUP BY project_id) e ON e.eproject_id=project_id",
+                "LEFT JOIN (SELECT project_id dproject_id, SUM(debit_money) debit_money FROM v_debit GROUP BY project_id) d ON d.dproject_id=project_id",
             ],
         ];
         

@@ -5,7 +5,7 @@
         <td>{$item['leader_name']}</td>
         <td>{$item['business_name']}</td>
         <td>{$item['supr_num']}</td>
-        <td>{$item['amount']}</td>
+        <td>{$item['amount']+$item['debit_expense']}</td>
         {:list_btn(get_defined_vars(),"project_id")}
     </tr>
 </volist>

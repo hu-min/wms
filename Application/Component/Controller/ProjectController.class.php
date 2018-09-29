@@ -18,11 +18,11 @@ class ProjectController extends BaseController{
     }
     function getCosts($project_id,$dbCom="",$ids=[]){
         $allCost = 0;
-        $active = 0;
-        $waiting = 0;
+        $debit = 0;
+        $expense = 0;
         $purcha = A('Component/Purcha');
-        $debit = A('Component/Debit');
-        $expense = A('Component/Expense');
+        $debitCom = A('Component/Debit');
+        $expenseCom = A('Component/Expense');
         $purchaParam = [
             'where' => ['project_id'=>$project_id],
             'fields' => 'SUM(contract_amount) contract_amount,status',
@@ -35,13 +35,13 @@ class ProjectController extends BaseController{
         $purchaRes = $purcha->getList($purchaParam);
         if($purchaRes){
             $allCost += array_sum(array_column($purchaRes['list'],'contract_amount'));
-            foreach ($purchaRes['list'] as $cost) {
-                if($cost['status'] == 1){
-                    $active += $cost['contract_amount'];
-                }else{
-                    $waiting += $cost['contract_amount'];
-                }
-            }
+            // foreach ($purchaRes['list'] as $cost) {
+            //     if($cost['status'] == 1){
+            //         $debit += $cost['contract_amount'];
+            //     }else{
+            //         $expense += $cost['contract_amount'];
+            //     }
+            // }
         }
         $debitParam = [
             'where' => ['project_id'=>$project_id],
@@ -49,50 +49,60 @@ class ProjectController extends BaseController{
             'groupBy' => 'project_id,status',
             'isCount' => false,
         ];
+
         if(strtolower($dbCom)=="debit" && !empty($ids)){
             $debitParam['where']['id']=["NOT IN",$ids];
         }
-        $debitRes = $debit->getList($debitParam);
+        $debitRes = $debitCom->getList($debitParam);
         if($debitRes){
-            $allCost += array_sum(array_column($debitRes['list'],'debit_money'));
-            foreach ($debitRes['list'] as $cost) {
-                if($cost['status'] == 1){
-                    $active += $cost['debit_money'];
-                }else{
-                    $waiting += $cost['debit_money'];
-                }
-            }
+            $debit += array_sum(array_column($debitRes['list'],'debit_money'));
+            // foreach ($debitRes['list'] as $cost) {
+            //     if($cost['status'] == 1){
+            //         $debit += $cost['debit_money'];
+            //     }else{
+            //         $expense += $cost['debit_money'];
+            //     }
+            // }
         }
         $expenseParam = [
             'where' => ['project_id'=>$project_id],
             'fields' => 'SUM(expense_money) expense_money,state status',
             'groupBy' => 'project_id,status',
             'joins' =>[
-                'LEFT JOIN (SELECT parent_id,SUM(money) expense_money,status state FROM v_expense_sub) es ON es.parent_id = id'
+                'LEFT JOIN (SELECT parent_id,SUM(money) expense_money,status state FROM v_expense_sub GROUP BY parent_id) es ON es.parent_id = id'
             ],
             'isCount' => false,
         ];
         if(strtolower($dbCom)=="expense" && !empty($ids)){
             $expenseParam['where']['id']=["NOT IN",$ids];
         }
-        $expenseRes = $expense->getList($expenseParam);
+        $expenseRes = $expenseCom->getList($expenseParam);
+        // echo $expense->M()->_sql();
+        // print_r($expenseRes['list']);
         if($expenseRes){
-            $allCost += array_sum(array_column($expenseRes['list'],'expense_money'));
-            foreach ($expenseRes['list'] as $cost) {
-                if($cost['status'] == 1){
-                    $active += $cost['expense_money'];
-                }else{
-                    $waiting += $cost['expense_money'];
-                }
-            }
+            $expense += array_sum(array_column($expenseRes['list'],'expense_money'));
+            // foreach ($expenseRes['list'] as $cost) {
+            //     if($cost['status'] == 1){
+            //         $debit += $cost['expense_money'];
+            //     }else{
+            //         $expense += $cost['expense_money'];
+            //     }
+            // }
+        }
+        $contract = $allCost;
+        if($debit>$expense){
+            $allCost += $debit;
+        }else{
+            $allCost += $expense;
         }
         $costs = [
+            'contract' => $contract,
             'allCost' => $allCost,
-            'active' => $active,
-            'waiting' => $waiting,
+            'debit' => $debit,
+            'expense' => $expense,
         ];
         return $costs;
-        // print_r($costs);
+        // print_r($costs);exit;
         // exit;
         // SELECT project_id pproject_id,SUM(contract_amount) contract_amount,status FROM v_purcha  WHERE project_id = 1 GROUP BY pproject_id,status
         // SELECT project_id dproject_id,SUM(debit_money) debit_money,status FROM v_debit WHERE project_id = 3 GROUP BY dproject_id,status

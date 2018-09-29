@@ -121,7 +121,10 @@
         function cost_insert_setInfo(info){
             var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
             if(info["list"] == undefined){
-                ["code","leader_name","business_name","leader","project_date","cost_budget","amount","current_cost","rate"].forEach(element => {
+                ["code","leader_name","business_name","leader","project_date","cost_budget","amount","current_cost","rate","debit_expense"].forEach(element => {
+                    if(element=="project_date"){
+                        info[element] = info["project_date"]+" 至 "+ info["end_date"]
+                    }
                     $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
                 });
             }else{

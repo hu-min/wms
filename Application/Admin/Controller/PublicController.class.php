@@ -6,6 +6,7 @@ class PublicController extends BaseController{
     public function _initialize() {
         parent::_initialize();
         $this->MesCom=getComponent('Message');
+        $this->workOrderCom=getComponent('WorkOrder');
     }
 
     function messageControl(){
@@ -139,5 +140,35 @@ class PublicController extends BaseController{
             $this->ajaxReturn(['errCode'=>$updateRes->errCode,'error'=>getError($updateRes->errCode)]);
         }
         $this->ajaxReturn(['errCode'=>10006,'error'=>getError(10006)]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-09-28 10:28:33 
+     * @Desc: 工单 
+     */    
+    function workOrder(){
+        $reqType=I('reqType');
+        $this->assign("controlName","work_order");
+        $this->assign("orderType",["1"=>"个人信息","2"=>"项目相关","3"=>"其他"]);
+        $this->assign("tableName",$this->workOrderCom->tableName());
+        if($reqType){
+            $this->$reqType();
+        }else{         
+            $this->returnHtml();
+        }
+    }
+    function work_order_modalOne(){
+        $title = "新建工单";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "template"=>"workOrderModal",
+        ];
+        $this->modalOne($modalPara);
     }
 }

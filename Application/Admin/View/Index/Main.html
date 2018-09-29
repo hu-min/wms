@@ -235,7 +235,7 @@
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header">主菜单导航</li>
-        <li><a class="nodeOn" data-level="1" data-nodeid="10000" href="{:U('Index/home')}"><span class="glyphicon glyphicon-home"></span><span>后台首页</span></a></li>
+        <li><a class="nodeOn" data-level="1" data-nodeid="10000" href="{:U('Index/home')}"><span class="glyphicon glyphicon-home"></span><span> 后台首页</span></a></li>
         {$nodeHtml}
         <!-- <volist name="nodeList" id="node">
             <if condition="is_array($node['node']) neq true">
@@ -288,6 +288,7 @@
                 </li>
             </if>
         </volist> -->
+        <li><a class="nodeOn" data-level="1" data-nodeid="10003" href="{:U('Public/workOrder')}"><span class="fa fa-file-text-o"></span><span> 工单提交</span></a></li>
         <li class="header">LABELS</li>
         <li><a href="#"><i class="fa fa-circle-o text-red"></i> <span>Important</span></a></li>
         <li><a href="#"><i class="fa fa-circle-o text-yellow"></i> <span>Warning</span></a></li>

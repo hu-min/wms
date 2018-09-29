@@ -134,7 +134,7 @@ class VPage{
                 }
             }else{
                 if($page > 0 && $this->totalPages != 1){
-                    $link_page .= '<li class="paginate_button active"><a href="#" data-page="1">'. $page .'</a></li>';
+                    $link_page .= '<li class="paginate_button active"><a href="#" data-page="'. $page .'">'. $page .'</a></li>';
                 }
             }
         }
