@@ -190,7 +190,6 @@ function list_btn($defind_vars,$idStr,$inlink=[],$onlycat=false,$onlyState=false
     if(!$onlyState){
         echo "<td class='status-con' data-db='{$tableName}' data-con='{$controlName}' data-id='".$item[$idStr]."' data-url='{$url}' >";
     }
-    
     if($nodeAuth >= 1 && !$onlyState){
         if(empty($inlink)){
             echo "<button type='button' data-gettype='Edit' data-toggle='modal' data-vtarget='.global-modal' class='btn btn-xs btn-primary v-showmodal'>查看</button>";
@@ -286,6 +285,7 @@ function save_btn($defind_vars,$always=false,$hide=false){
     $userId = $defind_vars["userId"];
     $url = $defind_vars["url"];
     $noModal = $defind_vars["noModal"] ? "" : "data-modal='true'";
+    // echo $item["user_id"],$gettype,$processAuth['level'];
     if((($item["author"] == $userId || $item["user_id"] == $userId) && in_array($item['status'],[0,3])) || ($gettype == "Add" && $processAuth['level'] > 0) || $always || $nodeAuth >= 7){
         echo "<button type='button' class='btn btn-sm btn-primary save-info' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>{$btnTitle}</button>";
     }elseif($hide){

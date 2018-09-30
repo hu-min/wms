@@ -117,10 +117,7 @@ class PurchaController extends BaseController{
             $redisName="cost_insertList";
             $where = ["project_id"=>$id];
             if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
-                $whereSub['user_id'] = session('userId');
-                $whereSub['_string'] = "FIND_IN_SET({$roleId},examine)>0";
-                $where['_logic'] = 'or';
-                $where['_complex'] = $whereSub;
+                $where['_string'] = "user_id = ".session('userId')." OR FIND_IN_SET({$roleId},examine)>0";
             }
             $parameter=[
                 'where'=>$where,

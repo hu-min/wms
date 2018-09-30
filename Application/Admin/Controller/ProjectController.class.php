@@ -184,6 +184,8 @@ class ProjectController extends BaseController{
         $this->ajaxReturn(["data"=>$this->_getOption($type,$key)]);
     }
     function _getOption($type,$key=""){
+        $roleId = session("roleId");
+        $userId = session("userId");
         $where=["status"=>1];
         switch ($type) {
             case 'project_id':
@@ -201,6 +203,23 @@ class ProjectController extends BaseController{
                     return $result["list"];
                 }
                 break;
+            case 'relation_project':
+                $where["project_id"]=0;
+                $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (author = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 )";
+                if($key!=""){
+                    $where["name"]=["LIKE","%{$key}%"];
+                }
+                $parameter=[
+                    'where'=>$where,
+                    'fields'=>"projectId,name",
+                    'orderStr'=>"addTime DESC",
+                ];
+                $result=$this->projectCom->getProjectList($parameter);
+                // echo $this->projectCom->M()->_sql();exit;
+                if($result){
+                    return $result["list"];
+                }
+            break;
             case 'brand': case 'execute_sub':  case 'projectType': case 'stage': case 'finance_id': case 'expense_type':
                 if($type=="execute_sub"){
                     $type = "execute";

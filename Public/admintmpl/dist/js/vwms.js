@@ -329,7 +329,7 @@ $(document).on("click",'.save-info',function(){
     datas.reqType=con+gettype;
     
     if(fun_is_exits(con+"_getInfo")){
-    	eval(con+"_getInfo()");//对不同的id设置不同的发送数据
+    	eval(con+"_getInfo(this)");//对不同的id设置不同的发送数据
     }else{
         datas["data"]={}
         var global_modal = ""
@@ -397,7 +397,10 @@ $(document).on("click",'.save-info',function(){
                 // $(tabId+" .modal").modal('toggle')
                 // $(self).parents(".modal").modal('toggle')
             }
-            $(self).data("gettype","");
+            if(datas.reqType=="Add"){
+                $(self).data("gettype","");
+            }
+            
             // $(self).parents(".global-modal").find(".modal-content").html("");
         }else{
             notice(result.errCode,result.error);

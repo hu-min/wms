@@ -79,6 +79,7 @@ class ProcessController extends BaseController{
             // $roleId = $userRole['roleId'];
             $examines = $userRole['roleId'].",".$process["examine"];
         }elseif($processIds>0){
+            
             $process = A("Component/Node")->getProcess($vtabId,null,null,$processIds);
             $examines = $process["examine"];
         }else{
@@ -104,10 +105,11 @@ class ProcessController extends BaseController{
             }
             $examines = $process["examine"];
         }
+        
         $process["place"] = search_last_key($roleId,array_unique(explode(",",$examines)));
 
         $returnData['examine'] = trim(implode(",",array_unique(explode(",",$examines))),",");
-        $returnData['place'] = $process["place"] ? $process["place"] : 0 ;
+        $returnData['place'] = $process["place"];
         $returnData['process_id'] = $process["processId"];
         // print_r($returnData);exit;
         return $returnData;

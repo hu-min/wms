@@ -167,8 +167,10 @@
             })
         })
         //新增修改信息处理
-        function rolerNode_getInfo(){
+        function rolerNode_getInfo($this){
             datas.data={}
+            datas.reqType = $($this).data("con")+$($this).data("gettype");
+            // console.log($($this).data("gettype"))
             $(tabId+" #role-info .role-info").each(function(){
                 var name=$(this).attr("name");
                 var val=$(this).val();
@@ -194,7 +196,6 @@
                     datas.data[$(this).data("id")]=$(this).val()
                 })
             }
-            // console.log(datas)
         }
         function rolerNode_searchInfo(){
             createRoleTree()
@@ -233,7 +234,7 @@
             }});
             //权限编辑按钮事件
             $(tabId+' #roletree').on("click",'li button',function(){
-                console.log($(this))
+                // console.log($(this))
                 var roleData= $(tabId+' #roletree').treeview('getNode', $(this).parent(".node-roletree").data("nodeid"));
                 datas["roleId"]=roleData.id;
                 roleId=roleData.id;

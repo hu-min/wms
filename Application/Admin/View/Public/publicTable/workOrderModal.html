@@ -14,6 +14,14 @@
                     </volist>
                 </select>
             </div>
+            <div class="form-group none">
+                <label >选择项目：</label>
+                <select class="form-control modal-info chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="relation_project">
+                    <volist name="projectArr" id="item">
+                        <option value="{$item['projectId']}">{$item['name']}</option>
+                    </volist>
+                </select>
+            </div>
             <div class="form-group">
                 <label >标题：</label>
                 <input class="form-control modal-info" required="required" name="title" title="请输入标题" placeholder="标题" type="text">
@@ -27,9 +35,5 @@
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-    <button type="button" class="btn btn-primary save-info" data-con="{$controlName}" data-gettype="{$gettype}" data-url="{$url}" data-modal="true">{$btnTitle}</button>
+    {:save_btn(get_defined_vars())}
 </div>
-<script>
-    $(function(){
-    })
-</script>

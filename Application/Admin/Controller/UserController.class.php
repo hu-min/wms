@@ -560,8 +560,6 @@ class UserController extends BaseController{
         if($reqType){
             $this->$reqType();
         }else{
-	    
-            
             $this->returnHtml();
         }
     }
@@ -653,7 +651,7 @@ class UserController extends BaseController{
         ];
         $roleResult=$this->roleCom->getRoleList($parameter);
         if($option){
-            $optionStr='<option value=""></option>';
+            $optionStr= $roleType == 1 ? '<option value="99999999">所有分组</option>' : '<option value=""></option>';
             foreach($roleResult['list'] as $opt){
                 $optionStr.='<option value="'.$opt["roleId"].'">'.(isset($opt["pname"])?$opt["pname"]."——":"").$opt["roleName"].'</option>';
             }

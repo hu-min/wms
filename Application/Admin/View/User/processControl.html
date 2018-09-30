@@ -212,7 +212,7 @@
                 var option = '<option value="2">角色</option>'
             }
             // <option value="">选择角色类型</option>
-            var tr=$('<tr><td style="width:30%;padding: 3px;vertical-align: middle;"><select class="form-control input-sm role-type" title="角色类型" name="roleType">'+option+'</select></td><td style="width:65%;padding: 3px;vertical-align: middle;"><select class="form-control input-sm chosen-roles chosen-select" title="角色" name="roles"><option value=""></option></select></td><td sytle="width:5%;padding: 3px;vertical-align: middle;"><i class="fa fa-minus minus-processnode" style="padding: 10px;cursor:pointer;"></i></td></tr>');
+            var tr=$('<tr><td style="width:30%;padding: 3px;vertical-align: middle;"><select class="form-control input-sm role-type" title="角色类型" name="roleType">'+option+'</select></td><td style="width:65%;padding: 3px;vertical-align: middle;"><select class="form-control input-sm chosen-roles chosen-select" title="角色" name="roles"></select></td><td sytle="width:5%;padding: 3px;vertical-align: middle;"><i class="fa fa-minus minus-processnode" style="padding: 10px;cursor:pointer;"></i></td></tr>');
             $(tabId+" .process-tab").append(tr)
             if(type=="add"){
                 $(tabId+" .process-tab").find("tr select[name='roleType']").eq(-1).trigger("change");

@@ -1,0 +1,15 @@
+<volist name="list" id="item">
+    <tr>
+        <!-- <td>{$item['user_id']}</td> -->
+        <td>{$item['user_name']}</td>
+        <td>{$orderType[$item['type']]}</td>
+        <td>{$item['project_name']}</td>
+        <td>{$item['title']}</td>
+        <td>{$item['add_date']}</td>
+        <td>{$item['content']}</td>
+        <td>
+            {:approve_btn($tableName,$item['id'],$item['place'],$item['process_level'],$item['status'])}
+        </td>
+        {:list_btn(get_defined_vars(),"id")}
+    </tr>
+</volist>

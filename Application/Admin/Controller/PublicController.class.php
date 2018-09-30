@@ -7,6 +7,7 @@ class PublicController extends BaseController{
         parent::_initialize();
         $this->MesCom=getComponent('Message');
         $this->workOrderCom=getComponent('WorkOrder');
+        $this->AProject=A('Project');
     }
 
     function messageControl(){
@@ -151,6 +152,9 @@ class PublicController extends BaseController{
         $this->assign("controlName","work_order");
         $this->assign("orderType",["1"=>"个人信息","2"=>"项目相关","3"=>"其他"]);
         $this->assign("tableName",$this->workOrderCom->tableName());
+        $this->assign('projectArr',$this->AProject->_getOption("relation_project"));
+        $this->assign('processAuth',['level' => 1 ,'allLevel' => 0]);
+        $this->assign('nodeAuth',1);
         if($reqType){
             $this->$reqType();
         }else{         
@@ -163,6 +167,11 @@ class PublicController extends BaseController{
         $gettype = I("gettype");
         $resultData=[];
         $id = I("id");
+        if($gettype=="Edit"){
+            $redisName="workOrderList";
+            $resultData=$this->workOrderCom->redis_one($redisName,"id",$id);
+        }
+        
         $modalPara=[
             "data"=>$resultData,
             "title"=>$title,
@@ -181,20 +190,32 @@ class PublicController extends BaseController{
             $datas['user_id']=session('userId');
             $this->configCom=getComponent('Config');
             switch ($datas['type']) {
-                case 1:
-                    $process_type = "wuser_process";
+                case 1: case 3: default: //个人信息的流程
+                    if($datas['type']==1){
+                        $process_type = "wuser_process";
+                    }else{
+                        $process_type = "wother_process";
+                    }
+                    
+                    $resultData = $this->configCom->get_val($process_type);
+                    
+                    if(!empty($resultData['value'])){
+                        $processId = json_decode($resultData['value'],true)['processIds'];
+                    }else{
+                        $processId = 0;
+                    }
+                    unset($datas['relation_project']);
                     break;
                 case 2:
-                    # code...
-                    break;
-                case 3: default:
-                    $process_type = "wother_process";
+                    $projectResult = getComponent('Project')->getOne(['where'=>['projectId'=>$datas['relation_project']],'fields'=>'process_id']);
+                    $processId = $projectResult['list']['process_id'];
                     # code...
                     break;
             }
-            $resultData = $this->configCom->get_val($process_type);
+      
             //添加时必备数据 ($vtabId=false,$leader=0,$roleId=0,$processIds=0)
             $examines = getComponent('Process')->getExamine(I("vtabId"),0,0,$processId);
+            // print_r($examines);exit;
             $datas['process_id'] = $examines["process_id"];
             $datas['examine'] = $examines["examine"];
             $rolePlace = $examines['place'];
@@ -228,12 +249,55 @@ class PublicController extends BaseController{
         }
         return "";
     }
+    function work_orderList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $roleId = session("roleId");
+        $where=[];
+        if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+            $where['_string'] = "user_id = ".session('userId')." OR (FIND_IN_SET({$roleId},examine) >0 AND FIND_IN_SET({$roleId},examine) <= process_level)";
+   
+        }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
+        $parameter=[
+            'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_date,FIND_IN_SET({$roleId},examine) place",
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$pageSize,
+            'orderStr'=>"id DESC",
+            "joins"=>[
+                "LEFT JOIN (SELECT projectId,name project_name FROM v_project ) p ON p.projectId = relation_project ",
+                "LEFT JOIN (SELECT userId,userName user_name FROM v_user) u ON u.userId = user_id",
+                // "LEFT JOIN (SELECT userId,userName leader_name FROM v_user) lu ON lu.userId = p.leader",
+                // "LEFT JOIN (SELECT basicId,name free_name FROM v_basic WHERE class='feeType') f ON f.basicId=free_type",
+                // "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='".$this->debitCom->tableName()."' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id",
+                // "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
+            ]
+        ];
+        $listResult=$this->workOrderCom->getList($parameter);
+        // echo $this->workOrderCom->M()->_sql();exit;
+        $this->tablePage($listResult,'Public/publicTable/workOrderList',"workOrderList",$pageSize);
+    }
     function work_orderAdd(){
         $datas = I("data");
+        $info = $this->manageWorderInfo();
+        if($info){
+            $insertResult=$this->workOrderCom->insert($info);
+            if(isset($insertResult->errCode) && $insertResult->errCode==0){
+                $this->ApprLogCom->createApp($this->workOrderCom->tableName(),$insertResult->data,session("userId"),"");
+                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+            }
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    }
 
-        // $this->ajaxReturn($this->workOrderCom->insert($datas));
-    }
     function work_orderEdit(){
-        
+        $updateInfo=$this->manageWorderInfo();
+        $updateResult=$this->workOrderCom->update($updateInfo);
+        if(isset($updateResult->errCode) && $updateResult->errCode == 0){
+            $this->ApprLogCom->updateStatus($this->workOrderCom->tableName(),$updateInfo["where"]["id"]); 
+        }
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
+    
 }

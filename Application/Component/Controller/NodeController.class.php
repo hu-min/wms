@@ -43,7 +43,7 @@ class NodeController extends BaseController{
 
                 $process = json_decode($processData["processOption"],true);
                 $processId = $processData["processId"];
-                if(($process[0]["type"] ==1 && in_array($rolePid,$process[0]["role"])) || ($process[0]["type"] == 2) && $roleId==$process[0]["role"]){
+                if(($process[0]["type"] ==1 && in_array(99999999,$process[0]["role"])) || (($process[0]["type"] ==1 && in_array($rolePid,$process[0]["role"])) || ($process[0]["type"] == 2) && $roleId==$process[0]["role"])){
                     $processInfo["place"] =0;
                     $examine = [];
                     $processInfo["processId"] = $processId;
@@ -77,7 +77,7 @@ class NodeController extends BaseController{
     function nodeProcess($nodeType=2){
         $where = [
             "status"=>1,
-            "processIds"=>['neq',""],
+            // "processIds"=>['neq',""],
             "db_table"=>['neq',""],
             "nodeType"=>$nodeType,
         ];

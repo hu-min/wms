@@ -540,4 +540,10 @@ class BaseController extends \Common\Controller\BaseController{
         //     $this->ajaxReturn(['errCode'=>100,'error'=>'排序出错']);
         // }
     }
+    function getOptionList(){
+        $this->AProject=A("Project");
+        $key=I("key");
+        $type=I("type");
+        $this->ajaxReturn(["data"=>$this->AProject->_getOption($type,$key)]);
+    }
 }
