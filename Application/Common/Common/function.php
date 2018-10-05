@@ -314,6 +314,32 @@ function add_btn($defind_vars,$title="新增"){
         echo "<button type='button' data-gettype='Add' data-toggle='modal'  data-url='{$url}' data-vtarget='.global-modal' data-con='{$controlName}' class='btn btn-info info-edit v-showmodal'><i class='fa fa-fw fa-user-plus '></i> {$title} </button>";
     }
 }
+/** 
+ * @Author: vition 
+ * @Date: 2018-10-02 12:40:27 
+ * @Desc: 导入按钮 
+ */
+function import_btn($defind_vars){
+    $nodeAuth = $defind_vars["nodeAuth"];
+    $tableName = $defind_vars["tableName"];
+    $controlName = $defind_vars["controlName"];
+    if($nodeAuth >= 1){//6
+        echo "<button type='button' data-db='{$tableName}' data-con='{$controlName}' class='btn bg-navy excel-import'><i class='fa fa-fw fa-cloud-upload '></i> 导入 </button>";
+    }
+}
+/** 
+ * @Author: vition 
+ * @Date: 2018-10-02 12:40:27 
+ * @Desc: 导入按钮 
+ */
+function export_btn($defind_vars){
+    $nodeAuth = $defind_vars["nodeAuth"];
+    $tableName = $defind_vars["tableName"];
+    $controlName = $defind_vars["controlName"];
+    if($nodeAuth >= 1){//6
+        echo "<button type='button' data-url='".$defind_vars["url"]."' data-export='export' data-con='{$controlName}' data-reqtype='{$controlName}List'  class='btn bg-maroon excel-export'><i class='fa fa-fw fa-cloud-download'></i> 导出 </button>";
+    }
+}
 //各类权限按钮全局函数结束
 
 function domain($diagonal=true){
@@ -373,4 +399,150 @@ function time_format($dateStr){
         return '';
     }
     return $dateStr;
+}
+/** 
+ * @Author: vition 
+ * @Date: 2018-09-30 19:02:38 
+ * @Desc: 导出
+ *  
+ */
+function excelExport(array $param){
+    $data = $param['data'] ? $param['data'] : false;
+    $schema = $param['schema'] ? $param['schema'] : false;
+    $fileName = $param['fileName'] ? $param['fileName'] : 'excel';
+    $template = $param['template'] ? $param['template'] : false;
+    $callback = $param['callback'] ? $param['callback'] : false;
+    require(ROOT_PATH.'ThinkPHP/Library/Vendor/PHPExcel/PHPExcel.php');
+
+    if($template){
+        $objReader =  PHPExcel_IOFactory::createReader('Excel2007');
+        $objExcel = $objReader->load ($template);
+    }else{
+        $objExcel = new PHPExcel();
+    }
+    $objWriter =  PHPExcel_IOFactory::createWriter($objExcel, 'Excel2007');
+    $objExcel->setActiveSheetIndex(0);
+    $objActSheet = $objExcel->getActiveSheet();
+
+    if($template){
+        $control = A(CONTROLLER_NAME."122");
+        if($control && $callback && method_exists($control,$callback)){
+            $control->$callback();
+        }else{
+            echo '调用控制器失败';
+            exit;
+        }
+        // $objActSheet->setTitle ( '演示工作表' );
+        // $objActSheet->setCellValue ( 'A1', '这个是PHPExcel演示标题' );
+        // $objActSheet->setCellValue ( 'A2', '日期：' . date ( 'Y年m月d日', time () ));
+        // $objActSheet->setCellValue ( 'F2', '导出时间：' . date ( 'H:i:s' ) );
+        // //我现在就开始输出列头了
+        // $objActSheet->setCellValue ( 'A3', '序号' );
+        // $objActSheet->setCellValue ( 'B3', '姓名' );
+        // //具体有多少列 看你的数据走 会涉及到计算
+        // //现在就开始填充数据了 （从数据库中） $data
+        // $baseRow = 4; //数据从N-1行开始往下输出 这里是避免头信息被覆盖
+        // foreach ( $data as $r => $dataRow ) {
+        // $row = $baseRow + $r;
+        // //将数据填充到相对应的位置
+        // $objExcel->getActiveSheet ()->setCellValue ( 'A' . $row, $dataRow ['id'] ); //学员编号
+        // $objExcel->getActiveSheet ()->setCellValue ( 'B' . $row, $dataRow ['name'] ); //真实姓名
+        // }
+    }else{
+        $colA = ord('A');
+        $colLen = count($schema);
+        $i = 0;
+        foreach($schema AS $k=>$v){
+            $col = chr($colA+$i);
+            $objActSheet->setCellValueExplicit($col.'1', isset($v['name']) ? $v['name'] : $k);
+            $i++;
+        }
+        // 固定行
+        $objActSheet->freezePane('A2');
+    
+        foreach ($data AS $k => $v) {
+            $cols = $colA;
+            $thisRow = $k + 2;
+            foreach($schema AS $sk=>$sv){
+                if(isset($sv['func']) && is_callable($sv['func'])){
+                     $v[$sk] = $sv['func']($v[$sk]);
+                }
+                $objActSheet->setCellValueExplicit(chr($cols++) . $thisRow, $v[$sk]);
+            }
+        }
+    }
+    
+    $fileName = $fileName. date('YmdHis', time()) . '.xlsx';
+    header("Pragma: public");
+    header("Expires: 0");
+    header("Cache-Control:must-revalidate,post-check=0,pre-check=0");
+    header("Content-Type:application/force-download");
+    header("Content-Type:application/vnd.ms-execl");
+    header("Content-Type:application/octet-stream");
+    header("Content-Type:application/download");
+    header('Content-Disposition:attachment;filename="' . $fileName . '"');
+    header("Content-Transfer-Encoding:binary");
+    // ob_end_clean();
+    $objWriter->save("php://output");
+}
+/** 
+ * @Author: vition 
+ * @Date: 2018-09-30 22:38:32 
+ * @Desc: 导入数据 
+ */
+function excelImport($parameter=[]){
+    if(!isset($parameter['filename']) && !isset($parameter['file'])){
+        return [];
+    }else{
+        $filename = $parameter['file'] ? $parameter['file'] : ROOT_PATH.$parameter['filename'];
+        if(!file_exists($filename)){
+            return [];
+        }
+    }
+    require(ROOT_PATH.'ThinkPHP/Library/Vendor/PHPExcel/PHPExcel.php');
+    // $objExcel = new PHPExcel();
+    $objReader =  PHPExcel_IOFactory::createReader('Excel2007');
+    // $filename = ROOT_PATH."Uploads/Project/20180927/test.xlsx";
+    
+    $dataArray = [];
+    $objPHPExcel = $objReader->load($filename); //$filename可以是上传的文件，或者是指定的文件
+    $sheet = $objPHPExcel->getSheet(0);
+    $highestRow = $sheet->getHighestRow(); // 取得总行数
+    $highestColumn = $sheet->getHighestColumn(); // 取得总列数
+    for($row=1;$row<=$highestRow;$row++){
+        $rowData = [];
+        for ($col=1; $col <= alphaIndex($highestColumn); $col++) { 
+            array_push($rowData,$objPHPExcel->getActiveSheet()->getCell(alphaIndex(false,$col).$row)->getValue());
+        }
+        array_push($dataArray,$rowData);
+    }
+    return $dataArray;
+}
+/** 
+ * @Author: vition 
+ * @Date: 2018-09-30 22:19:22 
+ * @Desc: 字母和数字互转excel 最大ZZ 
+ */
+function alphaIndex($alpha=false,$index=false){
+    $alpha = strtoupper($alpha);
+    $alphaArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+    $alphaNew = $alphaArr;
+    if(strlen($alpha)>1 || $index>26){
+        $tempAlpha="";
+        foreach ($alphaArr as  $alpha1) {
+            foreach ($alphaArr as  $alpha2) {
+                array_push($alphaNew,$alpha1.$alpha2);
+            }
+        }
+    }
+    if($index!==false){
+        $return = $alphaNew[$index-1];
+        
+    }else{
+        $return = array_search($alpha,$alphaNew);
+        if($return!==false){
+            return ($return+1);
+        }
+    }
+    return $return;
 }

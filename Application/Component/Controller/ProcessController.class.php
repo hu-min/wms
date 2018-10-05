@@ -66,21 +66,23 @@ class ProcessController extends BaseController{
         // print_r($nodeProce);
     }
     function getExamine($vtabId=false,$leader=0,$roleId=0,$processIds=0){
+        // print_r($processIds);exit;
         $vtabId = $vtabId ? $vtabId : I("vtabId");
         $roleId = $roleId ? $roleId : session("roleId");
         $returnData = ["examine"=>'',"place"=>0,'process_id'=>0];
-        if(!$vtabId){
+        if(!$vtabId && !$processIds){
             return $returnData;
         }
         $process = A("Component/Node")->getProcess($vtabId);
         // $roleId = '';
+        
         if($leader>0){
             $userRole = A("Component/User")->getUserInfo($leader);
             // $roleId = $userRole['roleId'];
             $examines = $userRole['roleId'].",".$process["examine"];
         }elseif($processIds>0){
             
-            $process = A("Component/Node")->getProcess($vtabId,null,null,$processIds);
+            $process = A("Component/Node")->getProcess($vtabId,$roleId,null,$processIds);
             $examines = $process["examine"];
         }else{
             $execuProResult = A("Component/Config")->get_val("execu_process");

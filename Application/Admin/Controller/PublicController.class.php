@@ -8,6 +8,7 @@ class PublicController extends BaseController{
         $this->MesCom=getComponent('Message');
         $this->workOrderCom=getComponent('WorkOrder');
         $this->AProject=A('Project');
+        $this->worderType = ["1"=>"个人信息","2"=>"项目相关","3"=>"其他"];
     }
 
     function messageControl(){
@@ -150,7 +151,7 @@ class PublicController extends BaseController{
     function workOrder(){
         $reqType=I('reqType');
         $this->assign("controlName","work_order");
-        $this->assign("orderType",["1"=>"个人信息","2"=>"项目相关","3"=>"其他"]);
+        $this->assign("orderType",$this->worderType);
         $this->assign("tableName",$this->workOrderCom->tableName());
         $this->assign('projectArr',$this->AProject->_getOption("relation_project"));
         $this->assign('processAuth',['level' => 1 ,'allLevel' => 0]);
@@ -180,14 +181,14 @@ class PublicController extends BaseController{
         ];
         $this->modalOne($modalPara);
     }
-    function manageWorderInfo(){
-        $reqType=I("reqType");
-        $datas=I("data");
-        $roleId = session("roleId");
+    function manageWorderInfo($param=[]){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
+        $roleId = $param['roleId'] ? $param['roleId'] : session("roleId");
   
         if($reqType=="work_orderAdd"){
             $datas['add_time']=time();
-            $datas['user_id']=session('userId');
+            $datas['user_id']=$datas['user_id'] ? $datas['user_id'] : session('userId');
             $this->configCom=getComponent('Config');
             switch ($datas['type']) {
                 case 1: case 3: default: //个人信息的流程
@@ -212,9 +213,8 @@ class PublicController extends BaseController{
                     # code...
                     break;
             }
-      
             //添加时必备数据 ($vtabId=false,$leader=0,$roleId=0,$processIds=0)
-            $examines = getComponent('Process')->getExamine(I("vtabId"),0,0,$processId);
+            $examines = getComponent('Process')->getExamine(I("vtabId"),0,$roleId,$processId);
             // print_r($examines);exit;
             $datas['process_id'] = $examines["process_id"];
             $datas['examine'] = $examines["examine"];
@@ -250,9 +250,13 @@ class PublicController extends BaseController{
         return "";
     }
     function work_orderList(){
+        // $excelData = excelImport(['filename'=>"Uploads/Project/20180927/test.xlsx"]);
+        // print_r($excelData);
+        // exit;
         $data=I("data");
         $p=I("p")?I("p"):1;
         $roleId = session("roleId");
+        $export = I('export');
         $where=[];
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
             $where['_string'] = "user_id = ".session('userId')." OR (FIND_IN_SET({$roleId},examine) >0 AND FIND_IN_SET({$roleId},examine) <= process_level)";
@@ -268,15 +272,17 @@ class PublicController extends BaseController{
             "joins"=>[
                 "LEFT JOIN (SELECT projectId,name project_name FROM v_project ) p ON p.projectId = relation_project ",
                 "LEFT JOIN (SELECT userId,userName user_name FROM v_user) u ON u.userId = user_id",
-                // "LEFT JOIN (SELECT userId,userName leader_name FROM v_user) lu ON lu.userId = p.leader",
-                // "LEFT JOIN (SELECT basicId,name free_name FROM v_basic WHERE class='feeType') f ON f.basicId=free_type",
-                // "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='".$this->debitCom->tableName()."' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id",
-                // "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
             ]
         ];
         $listResult=$this->workOrderCom->getList($parameter);
-        // echo $this->workOrderCom->M()->_sql();exit;
-        $this->tablePage($listResult,'Public/publicTable/workOrderList',"workOrderList",$pageSize);
+        
+        // excelExport($listResult['list'],$schema);exit;
+        // echo M()->_sql();"--";
+        $config=[];
+        if($export){
+            $config = ['control'=>CONTROLLER_NAME];
+        }
+        $this->tablePage($listResult,'Public/publicTable/workOrderList',"workOrderList",$pageSize,'',$config);
     }
     function work_orderAdd(){
         $datas = I("data");
@@ -299,5 +305,59 @@ class PublicController extends BaseController{
         }
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
-    
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-02 09:06:56 
+     * @Desc: 工单导入处理 
+     */    
+    function work_order_import($excelData){
+        $insertData = [];
+        foreach ($excelData as $index => $excelRow) {
+            if($index>0){
+                $temp = [];
+                foreach ($excelData[0] as $i=>$key) {
+                    if($key=="type"){
+                        $temp[$key] = array_search($excelRow[$i],["1"=>"个人信息","2"=>"项目相关","3"=>"其他"]);
+                    }elseif($key=="user_id"){
+                        $temp[$key] = $excelRow[$i];
+                        $temp['roleId'] = $this->userCom->getOne(['where'=>['userId'=>$excelRow[$i]],'fields'=>'roleId'])['list']['roleId'];
+                    }elseif($key=="relation_project" && $excelRow[$i]!=""){
+                        $temp[$key] = $this->AProject->_getOption("relation_project",$excelRow[$i],['key_type'=>'code'])[0]['projectId'];
+                    }else{
+                        $temp[$key] = $excelRow[$i];
+                    }
+                }
+                $temp = $this->manageWorderInfo(["data"=>$temp,"reqType"=>"work_orderAdd","roleId"=>0]);
+                array_push($insertData,$temp);
+            }
+        }
+        return $insertData;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-02 22:44:00 
+     * @Desc: 工单数据导出处理 
+     */    
+    function work_order_export($excelData){
+        $schema=[
+            'user_name' => ['name'=>'用户名'],
+            'type' => ['name'=>'工单类型'],
+            'project_name' => ['name'=>'关联项目'],
+            'title' => ['name'=>'工单标题'],
+            'add_date' => ['name'=>'申请时间'],
+            'content' => ['name'=>'工单内容'],
+            'status' => ['name'=>'状态'],
+        ];
+        foreach ($excelData as $index => $val) {
+            foreach ($val as $key => $value) {
+                if($key=="type"){
+                    $excelData[$index][$key] = $this->worderType[$value];
+                }else if($key=="status"){
+                    $excelData[$index][$key] = $this->statusType[$value];
+                }
+            }
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'工单数据'];
+        return $exportData ;
+    }
 }

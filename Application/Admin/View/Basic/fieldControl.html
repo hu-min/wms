@@ -15,6 +15,16 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="box box-info">
+                    <div class="box-header">
+                        <i class="fa fa-plus-square"></i>
+                        <h4 class="box-title">供应商列表</h4>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 2">
+                            <button type="button" data-gettype="Add" data-toggle="modal" data-url="{$url}"  data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 添加场地</button>
+                        </if>
+                        {:import_btn(get_defined_vars())}
+                        {:export_btn(get_defined_vars())}              
+                    </div>
                     <div class="box-body search-body">
                         <div class="col-md-12">
                             <div class="form-inline">                              
@@ -54,11 +64,7 @@
                                     <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
                                     <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 </div>
-                                <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 2">
-                                    <div class="form-group">
-                                        <button type="button" data-gettype="Add" data-toggle="modal" data-url="{$url}"  data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 添加场地</button>
-                                    </div>
-                                </if>
+                                
                             </div>
                             <br>
                         </div>
@@ -87,9 +93,14 @@
             </div>
         </div>
         <div class="dataTables_wrapper">
-                <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+            <div class="row">
+                <div class="col-sm-2"><div class="dataTables_length" ><label>显示 <select name="pageSize"  class="form-control input-sm search-info">
+                    <volist name="entries" id="item"><option value="{$item}">{$item}</option></volist>
+                </select> 条</label></div></div>
+                <div  class="{$controlName}-page row page-div col-sm-10" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
                     {$pages}
                 </div>
+            </div>
         </div>
     </section>
     <div class="modal fade global-modal" aria-hidden="true" data-backdrop="static" >
@@ -99,6 +110,7 @@
     </div>
     <script>
         $(function(){
+            excel_import({url:"{:U('Basic/excel_import')}"})
             init_chosen("{$url}","",".search-body");
             $(tabId+" .search-list").trigger("click");
         })

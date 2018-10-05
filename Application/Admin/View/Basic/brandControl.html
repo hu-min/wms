@@ -44,6 +44,10 @@
                                         <button type="button" data-gettype="Add" data-toggle="modal" data-url="{$url}"  data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 添加品牌</button>
                                     </div>
                                 </if>
+                                <div class="form-group">
+                                    {:import_btn(get_defined_vars())}
+                                    {:export_btn(get_defined_vars())} 
+                                </div>
                             </div>
                             <br>
                         </div>
@@ -71,8 +75,13 @@
             </div>
         </div>
         <div class="dataTables_wrapper">
-            <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
-                {$pages}
+            <div class="row">
+                <div class="col-sm-2"><div class="dataTables_length" ><label>显示 <select name="pageSize"  class="form-control input-sm search-info">
+                    <volist name="entries" id="item"><option value="{$item}">{$item}</option></volist>
+                </select> 条</label></div></div>
+                <div  class="{$controlName}-page row page-div col-sm-10" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+                    {$pages}
+                </div>
             </div>
         </div>
     </section>
@@ -83,6 +92,7 @@
     </div>
     <script>
         $(function(){
+            excel_import({url:"{:U('Basic/excel_import')}"})
             $(tabId+" .search-list").trigger("click");
         })
         /*设置编辑信息*/

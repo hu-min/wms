@@ -18,8 +18,7 @@ class NodeController extends BaseController{
         $rolePid = $rolePid ? $rolePid : session('rolePid');
         if($processId){
             $processResult =  A("Component/Process")->getList(['where'=>['processId'=>$processId],"fields"=>"processId, {$processId} processIds,processOption"]);
-            // print_r($processResult);
-            // exit;
+            // print_r($processResult);exit;
         }else{
             $processResult = $this->getList(["fields"=>"processId,processIds,processOption","where"=>["nodeId"=> $nodeId],"joins"=>["LEFT JOIN (SELECT processId,processOption FROM v_process WHERE status = 1) p ON FIND_IN_SET(p.processId,processIds)"] ]);
         }

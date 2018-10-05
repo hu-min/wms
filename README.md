@@ -193,3 +193,21 @@ Uploads/User/20180913/6159252dd42a2834b1c7cf5b59b5c9ea15cebf79.jpg
 修复 承接模块 无法删除
 
 合同总额，改成：成本总额
+
+导入主要修改内容
+1，添加
+<div class="form-group">
+    {:import_btn(get_defined_vars())}
+    {:export_btn(get_defined_vars())}
+</div>
+manger方法 $param=[]
+2，excel_import({url:"{:U('Supplier/excel_import')}"})
+3，控制器文件需要有对应的$con_import 方法处理对应的导入
+4，*List中添加 
+$export = I('export');
+if($export){
+    $config = ['control'=>CONTROLLER_NAME];
+}
+'',$config
+
+修复供应商查询列表'供应商承接模块'重复

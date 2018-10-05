@@ -31,6 +31,10 @@
                                     <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
                                     <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 </div>
+                                <div class="form-group">
+                                    {:import_btn(get_defined_vars())}
+                                    {:export_btn(get_defined_vars())}
+                                </div>
                             </div>
                             <!-- <div class="form-inline">
                                 <div class="form-group">
@@ -145,7 +149,7 @@
         }
         $(function(){
             $(tabId+" .search-list").trigger("click");
-            
+            excel_import({url:"{:U('Public/excel_import')}"})
             //工单类型切换
             $(tabId).on("change",".global-modal .modal-info[name='type']",function(){
                 if($(this).val()==2){

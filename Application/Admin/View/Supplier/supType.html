@@ -45,6 +45,10 @@
                                         <button type="button" data-gettype="Add" data-toggle="modal" data-url="{$url}"  data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 添加供应商类型</button>
                                     </div>
                                 </if>
+                                <div class="form-group">
+                                    {:import_btn(get_defined_vars())}
+                                    {:export_btn(get_defined_vars())}
+                                </div>
                             </div>
                             <br>
                         </div>
@@ -92,6 +96,7 @@
     <script>
         $(function(){
             $(tabId+" .search-list").trigger("click");
+            excel_import({url:"{:U('Supplier/excel_import')}"})
             tableMove($(tabId+" .{$controlName}-table"),function(result){
                 if(result.errCode==0){
 

@@ -22,6 +22,8 @@
                                 <button type="button" data-gettype="Add" data-toggle="modal" data-url="{$url}"  data-vtarget=".global-modal" data-con="{$controlName}" class="btn margin  btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 新建承接模块</button>
                             <!-- </div> -->
                         </if>
+                        {:import_btn(get_defined_vars())}
+                        {:export_btn(get_defined_vars())}
                     </div>
                     <div class='box-body'>
                         <div class="row">
@@ -55,9 +57,9 @@
         var basic_module_initInfo = function(){
             init_chosen("{$url}","getOptionList",'.global-modal');
         }
-        var basic_module_searchInfo = function(){
-            createBModuleTree()
-        }
+        // var basic_module_searchInfo = function(){
+        //     // createBModuleTree()
+        // }
         /** 
          * @Author: vition 
          * @Date: 2018-09-26 15:18:55 
@@ -127,6 +129,7 @@
             })
         }
         $(function(){
+            excel_import({url:"{:U('Basic/excel_import')}"})
             createBModuleTree();
             $(tabId+' .input-expand-module').on("input",function(){
                 $(tabId+' #basic_moduletree').treeview('collapseAll', { silent: true });

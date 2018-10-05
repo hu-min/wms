@@ -45,7 +45,7 @@ class BaseController extends \Common\Controller\BaseController{
         // print_r($this->nodeAuth);
         // $this->setLogin();
         $nowConAct=MODULE_NAME."/".CONTROLLER_NAME.'/'.ACTION_NAME;
-        if(in_array($nowConAct,$this->exemption) || (ACTION_NAME == 'upload_filesAdd' && $this->isLogin())){
+        if(in_array($nowConAct,$this->exemption) || ( in_array(ACTION_NAME,['excel_import','upload_filesAdd','excel_export']) && $this->isLogin())){
             if(!$this->isLogin() && !in_array(ACTION_NAME,['checkLogin','Login']) ){
                 session("history",domain(false).__SELF__);
                 $this->redirect('Index/Login');
@@ -75,7 +75,7 @@ class BaseController extends \Common\Controller\BaseController{
             $this->assign('statusType',$this->statusType);
             $this->assign('statusTypeJ',json_encode($this->statusType));
             $this->assign('statusLabel',$this->statusLabel);
-            $this->assign('entries',[30,35,40,45,50]);
+            $this->assign('entries',[2,5,8,30,35,40,45,50]);
             // $nodeId = getTabId(I("vtabId"));
             $this->nodeId = getTabId(I("vtabId"));
             // $this->assign('processType',$this->processType);
@@ -413,6 +413,12 @@ class BaseController extends \Common\Controller\BaseController{
     function tablePage($data,$templet,$redisName="",$pageSize=false,$countStr="",$config=[]){
         $returnData=['errCode'=>0];
         if($data){
+            //导出数据
+            if(isset($config['control'])){
+                $sql = $config['sql'] ? $config['sql'] : explode("LIMIT",M()->_sql())[0];
+                $this->Redis->set(md5($sql),$sql,300);
+                $this->ajaxReturn(['sql'=>md5($sql),'url'=>U($config['control'].'/excel_export')."?sql=".md5($sql)]);
+            }
             if($redisName){
                 $this->Redis->set($redisName,json_encode($data['list']),7200);
             }
@@ -545,5 +551,89 @@ class BaseController extends \Common\Controller\BaseController{
         $key=I("key");
         $type=I("type");
         $this->ajaxReturn(["data"=>$this->AProject->_getOption($type,$key)]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-09-30 23:21:33 
+     * @Desc: excel 导入基础 
+     */    
+    function excel_import(){
+        $table = I("db");
+        $con = I("con");
+        if(isset($_FILES["excel"])){
+            $excelData = excelImport(["file"=>$_FILES["excel"]["tmp_name"]]);
+            if($excelData){
+                $db = M($table,NULL);
+                $dbFileds = $db->getDbFields();
+
+                //验证上传字段是否存在数据表中
+                foreach ($excelData[0] as $key ) {
+                    if(!in_array($key,$dbFileds)){
+                        $this->ajaxReturn(['errCode'=>116,'error'=>getError(116).":".$key]);
+                    }
+                }
+                if(method_exists($this,$con."_import")){
+                    $method = $con."_import";
+                    $insertData = $this->$method($excelData);
+                }else{
+                    $insertData = [];
+                    foreach ($excelData as $index => $excelRow) {
+                        if($index>0){
+                            $temp = [];
+                            foreach ($excelData[0] as $i=>$key) {
+                                $temp[$key] = $excelRow[$i];
+                            }
+                            array_push($insertData,$temp);
+                        }
+                    }
+                }
+                // 
+                if($insertData && is_array($insertData)){
+                    //验证上传字段是否存在数据表中
+                    // print_r($insertData[0]);
+                    foreach ($insertData[0] as $key => $val ) {
+                        // dump(in_array($key,$dbFileds));
+                        if(!in_array($key,$dbFileds)){
+                            $this->ajaxReturn(['errCode'=>116,'error'=>getError(116).":".$key]);
+                        }
+                    }
+                    
+                    // print_r($dbFileds);exit;
+                    $db->startTrans();
+                    $this->ApprLogCom->startTrans();
+                    foreach ($insertData as $row => $data) {
+                        $result = $db->add($data);
+                        if(!$result){
+                            $db->rollback();
+                            $this->ajaxReturn(['errCode'=>116,'error'=>getError(116)."；错误行数：".$row]);
+                        }
+                        $this->ApprLogCom->createApp($table,$result,session("userId"),"");
+                    }
+                    
+                    $db->commit();
+                    $this->ApprLogCom->commit();
+                    $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+                }else{
+                    $this->ajaxReturn(['errCode'=>116,'error'=>getError(116)."；错误：".$insertData]);
+                }
+            }
+        }
+    }
+    function excel_export(){
+        $sqlmd5 = I("sql");
+        $con = I("con");
+        $sql = $this->Redis->get($sqlmd5);
+        $resultData = M()->query($sql);
+        if(method_exists($this,$con."_export")){
+            $method = $con."_export";
+            //返回必须为数据格式['data'=>[],'schema'=>[],'fileName'=>'','template'=>false,'callback'=>false] 数据和表头
+            $excelData = $this->$method($resultData);
+        }else{
+            $excelData = ['data'=>$resultData,'schema'=>$resultData[0],'fileName'=>'excel','template'=>false,'callback'=>false];
+        }
+        extract($excelData);
+        if(isset($excelData['data']) && isset($excelData['schema']) && isset($excelData['fileName'])){
+            excelExport(["data"=>$data,'schema'=>$schema,'fileName'=>$fileName,'template'=>$template,'callback'=>$callback]);
+        }
     }
 }

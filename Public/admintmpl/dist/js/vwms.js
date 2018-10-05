@@ -68,7 +68,7 @@ $(document).on("keypress",".enter-input",function(e){
  * @Date: 2018-06-02 23:27:42 
  * @Desc:  所有搜索按钮触发事件
  */
-$(document).on("click",".search-list,.vpage",function(){
+$(document).on("click",".search-list,.vpage,.excel-export",function(){
     datas={}
     var page=$(this).data('page')
     if(page>0){
@@ -84,6 +84,10 @@ $(document).on("click",".search-list,.vpage",function(){
         var reqtype=$(this).data("reqtype");
         var param=$(this).data("param");
         var call=$(this).data("call");
+        var isexport=$(this).data("export");
+    }
+    if(isexport){
+        datas.export = isexport;
     }
     var table=con+"-table";
     var page=con+"-page";
@@ -97,6 +101,7 @@ $(document).on("click",".search-list,.vpage",function(){
         // datas.param=param
     }
     datas.reqType=reqtype;
+
     if(fun_is_exits(con+"_searchInfo")){
         eval(con+"_searchInfo()")//对不同的id设置不同的发送数据
     }else{
@@ -109,7 +114,7 @@ $(document).on("click",".search-list,.vpage",function(){
             }
         })
     }
-    searchFun(url,datas,table,page,count,call);
+    searchFun({url:url,datas:datas,table:table,page:page,count:count,call:call,con:con});
 })
 /** 
  * javascript comment 
@@ -117,7 +122,14 @@ $(document).on("click",".search-list,.vpage",function(){
  * @Date: 2018-06-02 23:08:58 
  * @Desc: 执行查询数据并插入到对应的表格中 
  */
-function searchFun(url,datas,table,page,count,callfun){
+function searchFun(option){
+    var url = option.url
+    var datas = option.datas
+    var table = option.table
+    var page = option.page
+    var count = option.count
+    var callfun = option.callfun
+    var con = option.con
     get(url,datas,function(result){
         if(result.errCode==0){
             if(result.table==""){
@@ -131,7 +143,11 @@ function searchFun(url,datas,table,page,count,callfun){
                 eval(callfun+"(result.data)")//
             }
         }else{
-            notice(result.errCode,result.error);
+            if(result.url){
+                window.location.href = result.url+"&con="+con; 
+            }else{
+                notice(result.errCode,result.error);
+            }
         }
     })
 }
@@ -387,7 +403,7 @@ $(document).on("click",'.save-info',function(){
             }
             if(isModal){
                 // console.log(isModal);
-                searchFun(url,datas,table,page,count)
+                searchFun({url:url,datas:datas,table:table,page:page,count:count})
             }
             // console.log($('body').hasClass('modal-open'))
             // console.log($(self).parents(".modal"))
@@ -501,7 +517,7 @@ $(document).on("click",".submit-status",function(){
             var page=con+"-page";
             var count=con+"-count";
             datas.reqType=con+"List";
-            searchFun(url,datas,table,page,count);
+            searchFun({url:url,datas:datas,table:table,page:page,count:count});
         }
     })
 })
@@ -737,7 +753,18 @@ $(function(){
                 
             }
         }
-    })
+    });
+    // $(document).on("click",tabId+" .excel-export",function(){
+    //     var url = $(this).data("url");
+    //     var param = {}
+    //     $(tabId+" .search-info").each(function(){
+    //         var name=$(this).attr("name");
+    //         var val=$(this).val();
+    //         if(val!=""){
+    //             param[name]=val
+    //         }
+    //     })
+    // })
 })
 /** 
  * javascript comment 
@@ -1350,4 +1377,74 @@ var changeSort = function($url,$db,$data,callback){
 
     post($url,datas,callback)
     $(tabId+" .search-list").trigger("click");
+}
+var excel_import = function(option){
+    var url = option.url
+    var urlArr = {}
+    if(!url == undefined){
+        throw '没有请求网址';
+    }
+    var el = option.el !=undefined ? option.el : ".excel-import";
+    var excel_modal = tabId+"-excel-import-modal";
+    var temp_excel = false;
+    var db = "";
+    urlArr[tabId+el] = url
+    $(document).offon("click",tabId+" "+el,function(){
+        db = $(this).data("db");
+        con = $(this).data("con");
+        if($(excel_modal).html() == undefined ){
+            var html='<div class="modal fade in" id="'+excel_modal.replace("#","")+'" style="display: block; padding-right: 17px;"><div class="modal-dialog" style="top: 10%;"><div class="modal-content"><div class="modal-header"><button type="button" class="close modal-close" data-dismiss="modal" aria-label="关闭"><span aria-hidden="true"> × </span></button><h4 class="modal-title">文件导入</h4></div><div class="modal-body"><div class="input-group"><input readonly="readonly" class="form-control excel-input" type="text"><div class="input-excel none"><input class="upload-excel" name="upload-excel-name" type="file"></div><span class="input-group-btn"><button type="button" class="btn btn-info btn-flat load-excel-btn"><i class="fa fa-file-excel-o"></i> 选择文件 </button></span></div></div><div class="modal-footer"><button type="button" class="btn btn-default pull-left modal-close" data-dismiss="modal">关闭</button><button type="button" class="btn btn-primary upload-excel-btn"><i class="fa fa-upload" ></i> 导入数据 </button></div></div></div></div>'
+            $(document).find("body").append(html);
+
+            $(document).on("click",excel_modal+" .modal-close",function(){
+                $(this).parents(excel_modal).toggleClass("modal fade in")
+                $(this).parents(excel_modal).prev(".modal-backdrop").toggleClass("none")
+                $(this).parents(excel_modal).css("display","none")
+            })
+            $(document).offon("click",excel_modal+" .load-excel-btn",function(){
+                $fileInput = $(this).parent().prev().find("input");
+                $fileInput.trigger("click")
+                $fileInput.offon("change",function(){
+                    if(this.files.length>0){
+                        var element = this.files[0];
+                        var thisFile = element.name.split(".")
+                        if(Math.floor(element.size/1024/1024)<=10){
+                            temp_excel = this.files[0]
+                            $(this).parents(excel_modal).find(".excel-input").val(element.name);
+                        }else{
+                            notice(110,"导入文件不能超过10M",'文件超大',5);
+                        }
+                    }
+                })
+            })
+            $(excel_modal).offon("click",".modal-footer .upload-excel-btn",function(){
+                if(temp_excel){
+                    var excelData = new FormData();
+                    excelData.append("excel",temp_excel);
+                    excelData.append("db",db);
+                    excelData.append("vtabId",tabId);
+                    excelData.append("con",con);
+                    $.ajax({
+                        url:urlArr[tabId+el],
+                        type:"post",
+                        data:excelData,
+                        processData:false,
+                        contentType:false,
+                    }).done(function(result){
+                        notice(result.errCode,result.error,'导入数据',3);
+                        if(result.errCode==0){
+                            $(excel_modal).find(".modal-close").trigger("click")
+                            $(tabId+" .search-list").trigger("click");
+                        }
+                    })
+                }else{
+                    notice(110,'当前没有文件','文件输入',3);
+                }
+            })
+        }else{
+            $(excel_modal).toggleClass("modal fade in")
+            $(excel_modal).prev(".modal-backdrop").toggleClass("none")
+            $(excel_modal).css("display","block")
+        }
+    })
 }

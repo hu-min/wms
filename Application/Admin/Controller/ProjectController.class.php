@@ -183,7 +183,7 @@ class ProjectController extends BaseController{
         $type=I("type");
         $this->ajaxReturn(["data"=>$this->_getOption($type,$key)]);
     }
-    function _getOption($type,$key=""){
+    function _getOption($type,$key="",$option=[]){
         $roleId = session("roleId");
         $userId = session("userId");
         $where=["status"=>1];
@@ -206,14 +206,19 @@ class ProjectController extends BaseController{
             case 'relation_project':
                 $where["project_id"]=0;
                 $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (author = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 )";
+                $key_type = "name";
+                if($option['key_type'] == "code"){
+                    $key_type = "code";
+                }
                 if($key!=""){
-                    $where["name"]=["LIKE","%{$key}%"];
+                    $where[$key_type]=["LIKE","%{$key}%"];
                 }
                 $parameter=[
                     'where'=>$where,
                     'fields'=>"projectId,name",
                     'orderStr'=>"addTime DESC",
                 ];
+                // print_r($key);exit;
                 $result=$this->projectCom->getProjectList($parameter);
                 // echo $this->projectCom->M()->_sql();exit;
                 if($result){

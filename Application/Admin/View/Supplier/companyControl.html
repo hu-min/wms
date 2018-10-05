@@ -20,7 +20,9 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">供应商列表</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        {:add_btn(get_defined_vars(),"新增供应商")}                     
+                        {:add_btn(get_defined_vars(),"新增供应商")}
+                        {:import_btn(get_defined_vars())}
+                        {:export_btn(get_defined_vars())}              
                     </div>
                     <div class="box-body search-body">
                         <div class="col-md-12">
@@ -128,7 +130,7 @@
         var prefix ="{$company['prefix']}";
 
         $(function(){
-
+            excel_import({url:"{:U('Supplier/excel_import')}"})
             $(tabId+" .search-list").trigger("click");
             init_chosen("{$url}","getSupTypeList",".search-body");
             //新增供应商

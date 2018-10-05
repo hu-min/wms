@@ -126,6 +126,7 @@ class SupplierController extends BaseController{
     function supTypeList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
+        $export = I('export');
         $where=["class"=>"supType"];
 
         if($data['name']){
@@ -146,8 +147,11 @@ class SupplierController extends BaseController{
             'pageSize'=>$pageSize,
             'orderStr'=>"sort ASC,basicId DESC",
         ];
+        if($export){
+            $config = ['control'=>CONTROLLER_NAME];
+        }
         $basicResult=$this->basicCom->getBasicList($parameter);
-        $this->tablePage($basicResult,'Supplier/supplierTable/supTypeList',"supTypeList",$pageSize);
+        $this->tablePage($basicResult,'Supplier/supplierTable/supTypeList',"supTypeList",$pageSize,'',$config);
 
     }
     /** 
@@ -187,27 +191,21 @@ class SupplierController extends BaseController{
      * @Date: 2018-05-27 15:12:20 
      * @Desc: 供应商类型数据管理 
      */    
-    function manageSupTypeInfo(){
-        $reqType=I("reqType");
-        $datas=I("data");
+    function manageSupTypeInfo($param=[]){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
         if($reqType=="supTypeAdd"){
             $datas['class']="supType";
+            $datas['status'] = 1;
             unset($datas['basicId']);
             return $datas;
         }else if($reqType=="supTypeEdit"){
             $where=["basicId"=>$datas['basicId']];
             $data=[];
-            if(isset($datas['name'])){
-                $data['name']=$datas['name'];
-            }
-            if(isset($datas['alias'])){
-                $data['alias']=$datas['alias'];
-            }
-            if(isset($datas['remark'])){
-                $data['remark']=$datas['remark'];
-            }
-            if(isset($datas['status'])){
-                $data['status']=$datas['status'];
+            foreach (['name','alias','remark','status'] as $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
             }
             return ["where"=>$where,"data"=>$data];
         }
@@ -238,6 +236,49 @@ class SupplierController extends BaseController{
         $updateResult=$this->basicCom->updateBasic($supTypeInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-03 00:29:05 
+     * @Desc: 供应商类别导入 
+     */    
+    function supType_import($excelData){
+        $insertData = [];
+        foreach ($excelData as $index => $excelRow) {
+            if($index>0){
+                $temp = [];
+                foreach ($excelData[0] as $i=>$key) {
+                    $temp[$key] = $excelRow[$i];
+                }
+                $temp = $this->manageSupTypeInfo(["data"=>$temp,"reqType"=>"supTypeAdd"]);
+                array_push($insertData,$temp);
+            }
+        }
+        return $insertData;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-03 07:37:08 
+     * @Desc: 供应商类别导出 
+     */    
+    function supType_export($excelData){
+        $schema=[
+            'basicId' => ['name'=>'供应商类别id'],
+            'name' => ['name'=>'供应商类别名称'],
+            'alias' => ['name'=>'供应商别名'],
+            'remark' => ['name'=>'备注'],
+            'sort' => ['name'=>'排序'],
+            'status' => ['name'=>'状态'],
+        ];
+        foreach ($excelData as $index => $val) {
+            foreach ($val as $key => $value) {
+                if($key=="status"){
+                    $excelData[$index][$key] = $this->statusType[$value];
+                }
+            }
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'供应商类别表'];
+        return $exportData ;
+    }
     //供应商配置结束
 
     //供应商公司管理开始
@@ -251,7 +292,7 @@ class SupplierController extends BaseController{
         $this->assign("controlName","sup_company");
         $this->assign("supTypeList",$this->getSupType());
         $this->assign("province",$this->basicCom->get_provinces());
-        $this->assign('tableName',"VSupplierCompany");//删除数据的时候需要
+        $this->assign('tableName',"v_supplier_company");//删除数据的时候需要
         if($reqType){
             $this->$reqType();
         }else{
@@ -329,6 +370,7 @@ class SupplierController extends BaseController{
     function sup_companyList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
+        $export = I('export');
         $where=[];
         if($data['company']){
             $where['company']=['LIKE','%'.$data['company'].'%'];
@@ -358,27 +400,31 @@ class SupplierController extends BaseController{
             "joins"=>[
                 "LEFT JOIN v_province p ON p.pid=provinceId","LEFT JOIN v_city c ON c.pid=p.pid AND c.cid=cityId",
                 "LEFT JOIN (SELECT basicId,name typeName FROM v_basic WHERE class='supType') b ON b.basicId=supr_type",
-                "LEFT JOIN (SELECT s.module mid,GROUP_CONCAT(name) moule_name FROM v_basic LEFT JOIN (SELECT module FROM `v_supplier_company`) s ON  FIND_IN_SET(basicId,s.module) WHERE class='module' AND !ISNULL(s.module) GROUP BY s.module) m ON m.mid = module",
+                "LEFT JOIN (SELECT s.module mid,GROUP_CONCAT(name) moule_name FROM v_basic LEFT JOIN (SELECT distinct module FROM `v_supplier_company`) s ON  FIND_IN_SET(basicId,s.module) WHERE class='module' AND !ISNULL(s.module) GROUP BY s.module) m ON m.mid = module",
             ],
         ];
+        if($export){
+            $config = ['control'=>CONTROLLER_NAME];
+        }
         
         $listResult=$this->supplierCom->getCompanyList($parameter);
         // echo $this->supplierCom->M()->_sql();exit;
-        $this->tablePage($listResult,'Supplier/supplierTable/companyList',"sup_companyList",$pageSize);
+        $this->tablePage($listResult,'Supplier/supplierTable/companyList',"sup_companyList",$pageSize,'',$config);
     }
     /** 
      * @Author: vition 
      * @Date: 2018-05-09 23:43:33 
      * @Desc: 添加和修改供应商数据管理 
      */    
-    function manageCompanyInfo(){
-        $reqType=I("reqType");
-        $datas=I("data");
+    function manageCompanyInfo($param=[]){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
         if(isset($datas['module'])){
             $datas['module']=implode(",",$datas['module']);
         }
         if($reqType=="sup_companyAdd"){
             $datas['addTime']=time();
+            $datas['status'] = 1;
             $datas['process_level']=$this->processAuth["level"];
             $datas['author']=session("userId");
             unset($datas['companyId']);
@@ -453,6 +499,65 @@ class SupplierController extends BaseController{
         $updateResult=$this->supplierCom->updateCompany($companyInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-04 09:47:34 
+     * @Desc: 供应商导入 
+     */    
+    function sup_company_import($excelData){
+        $insertData = [];
+        foreach ($excelData as $index => $excelRow) {
+            if($index>0){
+                $temp = [];
+                foreach ($excelData[0] as $i=>$key) {
+                    if($key=="supr_type"){
+                        $temp[$key] = $this->basicCom->getOne(['where'=>['class'=>'supType','name'=>$excelRow[$i]]])['list']['basicId'];
+                    }elseif($key=="module"){
+                        $temp[$key] = explode(',', $this->basicCom->getOne(['fields'=>'GROUP_CONCAT(basicId) basicIds','where'=>['class'=>'module','pId'=>$temp["supr_type"],'name'=>['IN',explode(',',str_replace('，',',',$excelRow[$i]))]]])['list']['basicIds']);
+                        // $module = $temp[$key] ;
+                        //SELECT GROUP_CONCAT(basicId) FROM v_basic WHERE class='module' AND `name` IN ('测试模块','技术模块','互动装置');
+                    }elseif($key=="provinceId"){
+                        $temp[$key] = M("province")->where(['province'=>$excelRow[$i]])->find()['pid'];
+                    }elseif($key=="cityId"){
+                        $temp[$key] = M("city")->where(["city"=>$excelRow[$i],'pid'=>$temp["provinceId"]])->find()['cid'];
+                    }else{
+                        $temp[$key] = $excelRow[$i];
+                    }
+                }
+                $temp = $this->manageCompanyInfo(["data"=>$temp,"reqType"=>"sup_companyAdd"]);
+                array_push($insertData,$temp);
+            }
+        }
+        return $insertData;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-03 07:37:08 
+     * @Desc: 供应商导出 
+     */    
+    function sup_company_export($excelData){
+        $schema=[
+            'companyId' => ['name'=>'供应商id'],
+            'company' => ['name'=>'供应商名称'],
+            'typeName' => ['name'=>'供应商类型'],
+            'moule_name' => ['name'=>'供应商承接模块'],
+            'alias' => ['name'=>'供应商别名'],
+            'province' => ['name'=>'省份'],
+            'city' => ['name'=>'城市'],
+            'address' => ['name'=>'地址'],
+            'remark' => ['name'=>'备注'],
+            'status' => ['name'=>'状态'],
+        ];
+        foreach ($excelData as $index => $val) {
+            foreach ($val as $key => $value) {
+                if($key=="status"){
+                    $excelData[$index][$key] = $this->statusType[$value];
+                }
+            }
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'供应商类别表'];
+        return $exportData ;
+    } 
     //供应商公司管理结束
 
     //供应商联系人管理开始
@@ -501,6 +606,7 @@ class SupplierController extends BaseController{
     function supcontactList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
+        $export = I('export');
         $where=[];
         if($data['companyId']){
             $where['companyId']=$data['companyId'];
@@ -517,46 +623,34 @@ class SupplierController extends BaseController{
             'orderStr'=>"contactId DESC",
             "joins"=>"LEFT JOIN (SELECT companyId cid,company FROM v_supplier_company WHERE status=1) c ON c.cid=companyId",
         ];
+        if($export){
+            $config = ['control'=>CONTROLLER_NAME];
+        }
         
         $listResult=$this->supplierCom->getSuprContList($parameter);
-        $this->tablePage($listResult,'Supplier/supplierTable/contactList',"sup_contactList",$pageSize);
+        $this->tablePage($listResult,'Supplier/supplierTable/contactList',"sup_contactList",$pageSize,'',$config);
     }
     /** 
      * @Author: vition 
      * @Date: 2018-05-09 23:43:33 
      * @Desc: 添加和修改供应商采购管理 
      */    
-    function manageContactInfo(){
-        $reqType=I("reqType");
-        $datas=I("data");
+    function manageContactInfo($param=[]){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
         if($reqType=="supcontactAdd"){
             $datas['addTime']=time();
+            $datas['status']=1;
             unset($datas['contactId']);
             return $datas;
         }else if($reqType=="supcontactEdit"){
             $where=["contactId"=>$datas['contactId']];
             $data=[];
             $data['updateTime']=time();
-            if(isset($datas['companyId'])){
-                $data['companyId']=$datas['companyId'];
-            }
-            if(isset($datas['contact'])){
-                $data['contact']=$datas['contact'];
-            }
-            if(isset($datas['phone'])){
-                $data['phone']=$datas['phone'];
-            }
-            if(isset($datas['email'])){
-                $data['email']=$datas['email'];
-            }
-            if(isset($datas['address'])){
-                $data['address']=$datas['address'];
-            }
-            if(isset($datas['remarks'])){
-                $data['remarks']=$datas['remarks'];
-            }
-            if(isset($datas['status'])){
-                $data['status']=$datas['status'];
+            foreach (['companyId','contact','phone','email','address','remarks','status'] as $key ) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
             }
             return ["where"=>$where,"data"=>$data];
         }
@@ -577,6 +671,55 @@ class SupplierController extends BaseController{
         }
         $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-04 09:47:34 
+     * @Desc: 供应商导入 
+     */    
+    function supcontact_import($excelData){
+        $insertData = [];
+        foreach ($excelData as $index => $excelRow) {
+            if($index>0){
+                $temp = [];
+                foreach ($excelData[0] as $i=>$key) {
+                    if($key=="companyId"){
+                        $temp[$key] = $this->supplierCom->getCompanyList(['where'=>['company'=>$excelRow[$i]]],true)['companyId'];
+                    }else{
+                        $temp[$key] = $excelRow[$i];
+                    }
+                }
+                $temp = $this->manageContactInfo(["data"=>$temp,"reqType"=>"supcontactAdd"]);
+                array_push($insertData,$temp);
+            }
+        }
+        return $insertData;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-03 07:37:08 
+     * @Desc: 供应商导出 
+     */    
+    function supcontact_export($excelData){
+        $schema=[
+            'contactId' => ['name'=>'供应商联系人id'],
+            'company' => ['name'=>'供应商名称'],
+            'contact' => ['name'=>'供应商联系人'],
+            'phone' => ['name'=>'联系电话'],
+            'email' => ['name'=>'电子邮箱'],
+            'address' => ['name'=>'地址'],
+            'remarks' => ['name'=>'备注'],
+            'status' => ['name'=>'状态'],
+        ];
+        foreach ($excelData as $index => $val) {
+            foreach ($val as $key => $value) {
+                if($key=="status"){
+                    $excelData[$index][$key] = $this->statusType[$value];
+                }
+            }
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'供应商联系人表'];
+        return $exportData ;
+    } 
     /** 
      * @Author: vition 
      * @Date: 2018-05-09 23:59:28 

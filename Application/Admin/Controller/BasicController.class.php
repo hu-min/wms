@@ -61,27 +61,31 @@ class BasicController extends BaseController{
     function basic_brandList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
+        $export = I('export');
         $where=["class"=>"brand"];
 
-        if($data['name']){
-            $where['name']=['LIKE','%'.$data['name'].'%'];
-        }
-        if($data['alias']){
-            $where['alias']=['LIKE','%'.$data['alias'].'%'];
+        foreach (['name','alias'] as $key) {
+            if($data[$key]){
+                $where[$key]=['LIKE','%'.$data[$key].'%'];
+            }
         }
         if(isset($data['status'])){
             $where['status']=$data['status'];
         }else{
             $where['status']=["lt",3];
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"basicId DESC",
         ];
+        if($export){
+            $config = ['control'=>CONTROLLER_NAME];
+        }
         $basicResult=$this->basicCom->getBasicList($parameter);
-        $this->tablePage($basicResult,'Basic/basicTable/brandList',"brandList");
+        $this->tablePage($basicResult,'Basic/basicTable/brandList',"brandList",$pageSize,'',$config);
         // if($basicResult){
         //     $basicRed="brandList";
         //     $this->Redis->set($basicRed,json_encode($basicResult['list']),3600);
@@ -93,27 +97,21 @@ class BasicController extends BaseController{
         // }
         // $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
     }
-    function manageBrandInfo(){
-        $reqType=I("reqType");
-        $datas=I("data");
+    function manageBrandInfo($param=[]){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
         if($reqType=="basic_brandAdd"){
             $datas['class']="brand";
+            $datas['status']=1;
             unset($datas['basicId']);
             return $datas;
         }else if($reqType=="basic_brandEdit"){
             $where=["basicId"=>$datas['basicId']];
             $data=[];
-            if(isset($datas['name'])){
-                $data['name']=$datas['name'];
-            }
-            if(isset($datas['alias'])){
-                $data['alias']=$datas['alias'];
-            }
-            if(isset($datas['remark'])){
-                $data['remark']=$datas['remark'];
-            }
-            if(isset($datas['status'])){
-                $data['status']=$datas['status'];
+            foreach (['name','alias','remark','status'] as $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
             }
             return ["where"=>$where,"data"=>$data];
         }
@@ -134,6 +132,49 @@ class BasicController extends BaseController{
         $updateResult=$this->basicCom->updateBasic($brandInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-03 08:58:30 
+     * @Desc: 品牌导入 
+     */    
+    function basic_brand_import($excelData){
+        $insertData = [];
+        foreach ($excelData as $index => $excelRow) {
+            if($index>0){
+                $temp = [];
+                foreach ($excelData[0] as $i=>$key) {
+                    $temp[$key] = $excelRow[$i];
+                }
+                $temp = $this->manageBrandInfo(["data"=>$temp,"reqType"=>"basic_brandAdd"]);
+                array_push($insertData,$temp);
+            }
+        }
+        return $insertData;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-04 08:48:49 
+     * @Desc: 品牌导出 
+     */    
+    function basic_brand_export($excelData){
+        $schema=[
+            'basicId' => ['name'=>'品牌id'],
+            'name' => ['name'=>'品牌名称'],
+            'alias' => ['name'=>'品牌别名'],
+            'remark' => ['name'=>'备注'],
+            'sort' => ['name'=>'排序'],
+            'status' => ['name'=>'状态'],
+        ];
+        foreach ($excelData as $index => $val) {
+            foreach ($val as $key => $value) {
+                if($key=="status"){
+                    $excelData[$index][$key] = $this->statusType[$value];
+                }
+            }
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'品牌数据表'];
+        return $exportData ;
+    } 
     //品牌管理结束
     //场地管理开始
     function fieldControl(){
@@ -177,6 +218,7 @@ class BasicController extends BaseController{
     function basic_fieldList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
+        $export = I('export');
         $where=[];
         foreach (['name','alias'] as $key) {
             if(isset($data[$key])){
@@ -193,18 +235,23 @@ class BasicController extends BaseController{
         }else{
             $where['status']=["lt",3];
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"id DESC",
             'joins'=>[
                 "LEFT JOIN (SELECT pid ,province province_name FROM v_province ) p ON p.pid = province",
                 "LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct ON ct.ctid = city AND ct.cpid = province",
             ]
         ];
+        if($export){
+            $config = ['control'=>CONTROLLER_NAME];
+        }
+        
         $basicResult=$this->fieldCom->getList($parameter);
-        $this->tablePage($basicResult,'Basic/basicTable/fieldList',"fieldList");
+        $this->tablePage($basicResult,'Basic/basicTable/fieldList',"fieldList",$pageSize,'',$config);
         // if($basicResult){
         //     $basicRed="fieldList";
         //     $this->Redis->set($basicRed,json_encode($basicResult['list']),3600);
@@ -216,10 +263,11 @@ class BasicController extends BaseController{
         // }
         // $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
     }
-    function manageFieldInfo(){
-        $reqType=I("reqType");
-        $datas=I("data");
+    function manageFieldInfo($param=[]){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
         if($reqType=="basic_fieldAdd"){
+            $datas['status'] = 1;
             unset($datas['id']);
             return $datas;
         }else if($reqType=="basic_fieldEdit"){
@@ -249,6 +297,56 @@ class BasicController extends BaseController{
         $updateResult=$this->fieldCom->update($fieldInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-03 08:58:30 
+     * @Desc: 场地导入 
+     */    
+    function basic_field_import($excelData){
+        $insertData = [];
+        foreach ($excelData as $index => $excelRow) {
+            if($index>0){
+                $temp = [];
+                foreach ($excelData[0] as $i=>$key) {
+                    if($key=="province"){
+                        $temp[$key] = M("province")->where(['province'=>$excelRow[$i]])->find()['pid'];
+                    }elseif($key=="city"){
+                        $temp[$key] = M("city")->where(["city"=>$excelRow[$i],'pid'=>$temp["province"]])->find()['cid'];
+                    }else{
+                        $temp[$key] = $excelRow[$i];
+                    }
+                }
+                $temp = $this->manageFieldInfo(["data"=>$temp,"reqType"=>"basic_fieldAdd"]);
+                array_push($insertData,$temp);
+            }
+        }
+        return $insertData;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-04 08:48:49 
+     * @Desc: 场地导出 
+     */    
+    function basic_field_export($excelData){
+        $schema=[
+            'id' => ['name'=>'场地id'],
+            'name' => ['name'=>'场地名称'],
+            'alias' => ['name'=>'场地别名'],
+            'province_name' => ['name'=>'场地所在省份'],
+            'city_name' => ['name'=>'场地所在城市'],
+            'remark' => ['name'=>'备注'],
+            'status' => ['name'=>'状态'],
+        ];
+        foreach ($excelData as $index => $val) {
+            foreach ($val as $key => $value) {
+                if($key=="status"){
+                    $excelData[$index][$key] = $this->statusType[$value];
+                }
+            }
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'场地数据表'];
+        return $exportData ;
+    } 
     //场地管理结束
     //项目阶段管理开始
     function stageControl(){
@@ -291,27 +389,31 @@ class BasicController extends BaseController{
     function basic_stageList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
+        $export = I('export');
         $where=["class"=>"stage"];
 
-        if($data['name']){
-            $where['name']=['LIKE','%'.$data['name'].'%'];
-        }
-        if($data['alias']){
-            $where['alias']=['LIKE','%'.$data['alias'].'%'];
+        foreach (['name','alias'] as $key) {
+            if(isset($data[$key])){
+                $where[$key]=['LIKE','%'.$data[$key].'%'];
+            }
         }
         if(isset($data['status'])){
             $where['status']=$data['status'];
         }else{
             $where['status']=["lt",3];
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"basicId DESC",
         ];
         $basicResult=$this->basicCom->getBasicList($parameter);
-        $this->tablePage($basicResult,'Basic/basicTable/stageList',"stageList");
+        if($export){
+            $config = ['control'=>CONTROLLER_NAME];
+        }
+        $this->tablePage($basicResult,'Basic/basicTable/stageList',"stageList",$pageSize,'',$config);
         // if($basicResult){
         //     $basicRed="stageList";
         //     $this->Redis->set($basicRed,json_encode($basicResult['list']),3600);
@@ -323,27 +425,21 @@ class BasicController extends BaseController{
         // }
         // $this->ajaxReturn(['errCode'=>0,'table'=>'无数据','page'=>'']);
     }
-    function manageStageInfo(){
-        $reqType=I("reqType");
-        $datas=I("data");
+    function manageStageInfo($param=[]){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
         if($reqType=="basic_stageAdd"){
             $datas['class']="stage";
+            $datas['status']=1;
             unset($datas['basicId']);
             return $datas;
         }else if($reqType=="basic_stageEdit"){
             $where=["basicId"=>$datas['basicId']];
             $data=[];
-            if(isset($datas['name'])){
-                $data['name']=$datas['name'];
-            }
-            if(isset($datas['alias'])){
-                $data['alias']=$datas['alias'];
-            }
-            if(isset($datas['remark'])){
-                $data['remark']=$datas['remark'];
-            }
-            if(isset($datas['status'])){
-                $data['status']=$datas['status'];
+            foreach (['name','alias','remark','status'] as $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
             }
             return ["where"=>$where,"data"=>$data];
         }
@@ -364,6 +460,49 @@ class BasicController extends BaseController{
         $updateResult=$this->basicCom->updateBasic($stageInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-03 08:58:30 
+     * @Desc: 项目导入 
+     */    
+    function basic_stage_import($excelData){
+        $insertData = [];
+        foreach ($excelData as $index => $excelRow) {
+            if($index>0){
+                $temp = [];
+                foreach ($excelData[0] as $i=>$key) {
+                    $temp[$key] = $excelRow[$i];
+                }
+                $temp = $this->manageStageInfo(["data"=>$temp,"reqType"=>"basic_stageAdd"]);
+                array_push($insertData,$temp);
+            }
+        }
+        return $insertData;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-04 08:48:49 
+     * @Desc: 项目阶段导出 
+     */    
+    function basic_stage_export($excelData){
+        $schema=[
+            'basicId' => ['name'=>'项目阶段id'],
+            'name' => ['name'=>'项目阶段名称'],
+            'alias' => ['name'=>'项目阶段别名'],
+            'remark' => ['name'=>'备注'],
+            'sort' => ['name'=>'排序'],
+            'status' => ['name'=>'状态'],
+        ];
+        foreach ($excelData as $index => $val) {
+            foreach ($val as $key => $value) {
+                if($key=="status"){
+                    $excelData[$index][$key] = $this->statusType[$value];
+                }
+            }
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'项目阶段数据表'];
+        return $exportData ;
+    } 
     //项目阶段管理结束
     //项目类型管理结束
     function projectTypeControl(){
@@ -406,19 +545,20 @@ class BasicController extends BaseController{
     function basic_projectTypeList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
+        $export = I('export');
         $where=["class"=>"projectType"];
 
-        if($data['name']){
-            $where['name']=['LIKE','%'.$data['name'].'%'];
-        }
-        if($data['alias']){
-            $where['alias']=['LIKE','%'.$data['alias'].'%'];
+        foreach (['name','alias'] as $key) {
+            if(isset($data[$key])){
+                $where[$key]=['LIKE','%'.$data[$key].'%'];
+            }
         }
         if(isset($data['status'])){
             $where['status']=$data['status'];
         }else{
             $where['status']=["lt",3];
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'page'=>$p,
@@ -426,7 +566,10 @@ class BasicController extends BaseController{
             'orderStr'=>"basicId DESC",
         ];
         $basicResult=$this->basicCom->getBasicList($parameter);
-        $this->tablePage($basicResult,'Basic/basicTable/projectTypeList',"projectTypeList");
+        if($export){
+            $config = ['control'=>CONTROLLER_NAME];
+        }
+        $this->tablePage($basicResult,'Basic/basicTable/projectTypeList',"projectTypeList",$pageSize,'',$config);
         // if($basicResult){
         //     $basicRed="projectTypeList";
         //     $this->Redis->set($basicRed,json_encode($basicResult['list']),3600);
@@ -466,27 +609,21 @@ class BasicController extends BaseController{
     //     }
     //     $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
     // }
-    function manageProjectTypeInfo(){
-        $reqType=I("reqType");
-        $datas=I("data");
+    function manageProjectTypeInfo($param=[]){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
         if($reqType=="basic_projectTypeAdd"){
             $datas['class']="projectType";
+            $datas['status']=1;
             unset($datas['basicId']);
             return $datas;
         }else if($reqType=="basic_projectTypeEdit"){
             $where=["basicId"=>$datas['basicId']];
             $data=[];
-            if(isset($datas['name'])){
-                $data['name']=$datas['name'];
-            }
-            if(isset($datas['alias'])){
-                $data['alias']=$datas['alias'];
-            }
-            if(isset($datas['remark'])){
-                $data['remark']=$datas['remark'];
-            }
-            if(isset($datas['status'])){
-                $data['status']=$datas['status'];
+            foreach (['name','alias','remark','status'] as $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
             }
             return ["where"=>$where,"data"=>$data];
         }
@@ -507,6 +644,49 @@ class BasicController extends BaseController{
         $updateResult=$this->basicCom->updateBasic($projectTypeInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-03 08:58:30 
+     * @Desc: 项目类型导入 
+     */    
+    function basic_projectType_import($excelData){
+        $insertData = [];
+        foreach ($excelData as $index => $excelRow) {
+            if($index>0){
+                $temp = [];
+                foreach ($excelData[0] as $i=>$key) {
+                    $temp[$key] = $excelRow[$i];
+                }
+                $temp = $this->manageProjectTypeInfo(["data"=>$temp,"reqType"=>"basic_projectTypeAdd"]);
+                array_push($insertData,$temp);
+            }
+        }
+        return $insertData;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-04 08:48:49 
+     * @Desc: 项目类型导出 
+     */    
+    function basic_projectType_export($excelData){
+        $schema=[
+            'basicId' => ['name'=>'项目类型id'],
+            'name' => ['name'=>'项目类型名称'],
+            'alias' => ['name'=>'项目类型别名'],
+            'remark' => ['name'=>'备注'],
+            'sort' => ['name'=>'排序'],
+            'status' => ['name'=>'状态'],
+        ];
+        foreach ($excelData as $index => $val) {
+            foreach ($val as $key => $value) {
+                if($key=="status"){
+                    $excelData[$index][$key] = $this->statusType[$value];
+                }
+            }
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'项目类型数据表'];
+        return $exportData ;
+    } 
     //项目类型管理结束
     //执行类型管理execute开始
     function executeControl(){
@@ -631,9 +811,9 @@ class BasicController extends BaseController{
     //     }
     //     $this->ajaxReturn(['errCode'=>110,'info'=>'无数据']);
     // }
-    function manageExecuteInfo(){
-        $reqType=I("reqType");
-        $datas=I("data");
+    function manageExecuteInfo($param=[]){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
 
         if(isset($datas['pId'])){
             $nodePInfo=$this->getPid('execute',$datas['pId']);
@@ -791,9 +971,9 @@ class BasicController extends BaseController{
         }
         return [];
     }
-    function manageFeeTypeInfo(){
-        $reqType=I("reqType");
-        $datas=I("data");
+    function manageFeeTypeInfo($param=[]){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
         $feeTypePInfo=$this->getFeeTypeOne($datas['pId']);
         $datas['level']=$feeTypePInfo['level']?($feeTypePInfo['level']+1):1;
         if($reqType=="basic_feeTypeAdd"){
@@ -968,7 +1148,38 @@ class BasicController extends BaseController{
      * @Desc: 承接模块列表 
      */    
     function basic_moduleList(){
-        $this->ajaxReturn(["tree"=>$this->getModuleTree()]);
+        $export = I('export');
+        if($export){
+            $p=I("p")?I("p"):1;
+            $data=I("data");
+            $where=["class"=>"module"];
+    
+            foreach (['name','alias'] as $key) {
+                if(isset($data[$key])){
+                    $where[$key]=['LIKE','%'.$data[$key].'%'];
+                }
+            }
+            if(isset($data['status'])){
+                $where['status']=$data['status'];
+            }else{
+                $where['status']=["lt",3];
+            }
+            $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
+            $parameter=[
+                'where'=>$where,
+                'page'=>$p,
+                'pageSize'=>$pageSize,
+                'orderStr'=>"sort ASC,basicId DESC",
+            ];
+            
+            $config = ['control'=>CONTROLLER_NAME];
+            
+            $basicResult=$this->basicCom->getBasicList($parameter);
+            $this->tablePage($basicResult,'Basic/basicTable/moduleList',"moduleList",$pageSize,'',$config);
+        }else{
+            $this->ajaxReturn(["tree"=>$this->getModuleTree()]);
+        }
+        
         // $data=I("data");
         // $p=I("p")?I("p"):1;
         // $where=["class"=>"module"];
@@ -1021,9 +1232,9 @@ class BasicController extends BaseController{
         $moduleTree=$this->levelTree->createTree($moduleResult["list"]);
         return $moduleTree;
     }
-    function manageModuleInfo(){
-        $reqType=I("reqType");
-        $datas=I("data");
+    function manageModuleInfo($param=[]){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
         $datas['level'] = 2;
         if($reqType=="basic_moduleAdd"){
             $datas['class'] = "module";
@@ -1057,6 +1268,52 @@ class BasicController extends BaseController{
         $updateResult=$this->basicCom->updateBasic($moduleInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-03 08:58:30 
+     * @Desc: 承接模块导入 
+     */    
+    function basic_module_import($excelData){
+        $insertData = [];
+        foreach ($excelData as $index => $excelRow) {
+            if($index>0){
+                $temp = [];
+                foreach ($excelData[0] as $i=>$key) {
+                    $temp[$key] = $excelRow[$i];
+                }
+                $temp = $this->manageModuleInfo(["data"=>$temp,"reqType"=>"basic_moduleAdd"]);
+                array_push($insertData,$temp);
+            }
+        }
+        return $insertData;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-04 08:48:49 
+     * @Desc: 承接模块导出 
+     */    
+    function basic_module_export($excelData){
+        $schema=[
+            'basicId' => ['name'=>'承接模块id'],
+            'name' => ['name'=>'承接模块名称'],
+            'alias' => ['name'=>'承接模块别名'],
+            'pId' => ['name'=>'供应商类别'],
+            'remark' => ['name'=>'备注'],
+            'sort' => ['name'=>'排序'],
+            'status' => ['name'=>'状态'],
+        ];
+        foreach ($excelData as $index => $val) {
+            foreach ($val as $key => $value) {
+                if($key=="pId"){
+                    $excelData[$index][$key] = $this->basicCom->getOne(['where'=>['basicId'=>$value]])['list']['name'];
+                }else if($key=="status"){
+                    $excelData[$index][$key] = $this->statusType[$value];
+                }
+            }
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'供应商承接模块表'];
+        return $exportData ;
+    } 
     //承接模块管理结束
     //固定支出分类开始
     function expenClasControl(){
@@ -1098,49 +1355,47 @@ class BasicController extends BaseController{
     function expenClasList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
+        $export = I('export');
         $where=["class"=>"expenClas"];
 
-        if($data['name']){
-            $where['name']=['LIKE','%'.$data['name'].'%'];
-        }
-        if($data['alias']){
-            $where['alias']=['LIKE','%'.$data['alias'].'%'];
+        foreach (['name','alias'] as $key) {
+            if(isset($data[$key])){
+                $where[$key]=['LIKE','%'.$data[$key].'%'];
+            }
         }
         if(isset($data['status'])){
             $where['status']=$data['status'];
         }else{
             $where['status']=["lt",3];
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"basicId DESC",
         ];
         $basicResult=$this->basicCom->getBasicList($parameter);
-        $this->tablePage($basicResult,'Basic/basicTable/expenClasList',"expenClasList");
+        if($export){
+            $config = ['control'=>CONTROLLER_NAME];
+        }
+        $this->tablePage($basicResult,'Basic/basicTable/expenClasList',"expenClasList",$pageSize,'',$config);
     }
-    function manageExpenClasInfo(){
-        $reqType=I("reqType");
-        $datas=I("data");
+    function manageExpenClasInfo($param=[]){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
         if($reqType=="expenClasAdd"){
             $datas['class']="expenClas";
+            $datas['status']=1;
             unset($datas['basicId']);
             return $datas;
         }else if($reqType=="expenClasEdit"){
             $where=["basicId"=>$datas['basicId']];
             $data=[];
-            if(isset($datas['name'])){
-                $data['name']=$datas['name'];
-            }
-            if(isset($datas['alias'])){
-                $data['alias']=$datas['alias'];
-            }
-            if(isset($datas['remark'])){
-                $data['remark']=$datas['remark'];
-            }
-            if(isset($datas['status'])){
-                $data['status']=$datas['status'];
+            foreach (['name','alias','remark','status'] as $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
             }
             return ["where"=>$where,"data"=>$data];
         }
@@ -1161,6 +1416,49 @@ class BasicController extends BaseController{
         $updateResult=$this->basicCom->updateBasic($Info);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-03 08:58:30 
+     * @Desc: 固定支出类别导入 
+     */    
+    function expenClas_import($excelData){
+        $insertData = [];
+        foreach ($excelData as $index => $excelRow) {
+            if($index>0){
+                $temp = [];
+                foreach ($excelData[0] as $i=>$key) {
+                    $temp[$key] = $excelRow[$i];
+                }
+                $temp = $this->manageExpenClasInfo(["data"=>$temp,"reqType"=>"expenClasAdd"]);
+                array_push($insertData,$temp);
+            }
+        }
+        return $insertData;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-04 08:48:49 
+     * @Desc: 固定支出类别导出 
+     */    
+    function expenClas_export($excelData){
+        $schema=[
+            'basicId' => ['name'=>'固定支出类别id'],
+            'name' => ['name'=>'固定支出类别名称'],
+            'alias' => ['name'=>'固定支出类别别名'],
+            'remark' => ['name'=>'备注'],
+            'sort' => ['name'=>'排序'],
+            'status' => ['name'=>'状态'],
+        ];
+        foreach ($excelData as $index => $val) {
+            foreach ($val as $key => $value) {
+                if($key=="status"){
+                    $excelData[$index][$key] = $this->statusType[$value];
+                }
+            }
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'固定支出类别数据表'];
+        return $exportData ;
+    } 
     //固定支出分类结束
 
     
@@ -1209,49 +1507,48 @@ class BasicController extends BaseController{
     function basic_expense_typeList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
+        $export = I('export');
         $where=["class"=>"expense_type"];
 
-        if($data['name']){
-            $where['name']=['LIKE','%'.$data['name'].'%'];
-        }
-        if($data['alias']){
-            $where['alias']=['LIKE','%'.$data['alias'].'%'];
+        foreach (['name','alias'] as $key) {
+            if(isset($data[$key])){
+                $where[$key]=['LIKE','%'.$data[$key].'%'];
+            }
         }
         if(isset($data['status'])){
             $where['status']=$data['status'];
         }else{
             $where['status']=["lt",3];
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"basicId DESC",
         ];
         $basicResult=$this->basicCom->getBasicList($parameter);
-        $this->tablePage($basicResult,'Basic/basicTable/expense_typeList',"expense_typeList");
+        if($export){
+            $config = ['control'=>CONTROLLER_NAME];
+        }
+        
+        $this->tablePage($basicResult,'Basic/basicTable/expense_typeList',"expense_typeList",$pageSize,'',$config);
     }
-    function manageExpenseTypeInfo(){
-        $reqType=I("reqType");
-        $datas=I("data");
+    function manageExpenseTypeInfo($param=[]){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
         if($reqType=="basic_expense_typeAdd"){
             $datas['class']="expense_type";
+            $datas['status']=1;
             unset($datas['basicId']);
             return $datas;
         }else if($reqType=="basic_expense_typeEdit"){
             $where=["basicId"=>$datas['basicId']];
             $data=[];
-            if(isset($datas['name'])){
-                $data['name']=$datas['name'];
-            }
-            if(isset($datas['alias'])){
-                $data['alias']=$datas['alias'];
-            }
-            if(isset($datas['remark'])){
-                $data['remark']=$datas['remark'];
-            }
-            if(isset($datas['status'])){
-                $data['status']=$datas['status'];
+            foreach (['name','alias','remark','status'] as $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
             }
             return ["where"=>$where,"data"=>$data];
         }
@@ -1272,5 +1569,48 @@ class BasicController extends BaseController{
         $updateResult=$this->basicCom->updateBasic($Info);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-03 08:58:30 
+     * @Desc: 报销类别导入 
+     */    
+    function basic_expense_type_import($excelData){
+        $insertData = [];
+        foreach ($excelData as $index => $excelRow) {
+            if($index>0){
+                $temp = [];
+                foreach ($excelData[0] as $i=>$key) {
+                    $temp[$key] = $excelRow[$i];
+                }
+                $temp = $this->manageExpenseTypeInfo(["data"=>$temp,"reqType"=>"basic_expense_typeAdd"]);
+                array_push($insertData,$temp);
+            }
+        }
+        return $insertData;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-04 08:48:49 
+     * @Desc: 报销类别导出 
+     */    
+    function basic_expense_type_export($excelData){
+        $schema=[
+            'basicId' => ['name'=>'报销类别id'],
+            'name' => ['name'=>'报销类别名称'],
+            'alias' => ['name'=>'报销类别别名'],
+            'remark' => ['name'=>'备注'],
+            'sort' => ['name'=>'排序'],
+            'status' => ['name'=>'状态'],
+        ];
+        foreach ($excelData as $index => $val) {
+            foreach ($val as $key => $value) {
+                if($key=="status"){
+                    $excelData[$index][$key] = $this->statusType[$value];
+                }
+            }
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'报销类别数据表'];
+        return $exportData ;
+    } 
     //报销类别结束
 }

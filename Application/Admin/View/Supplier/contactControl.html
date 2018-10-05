@@ -19,7 +19,9 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">联系人列表</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        {:add_btn(get_defined_vars(),"新增联系人")}                           
+                        {:add_btn(get_defined_vars(),"新增联系人")}        
+                        {:import_btn(get_defined_vars())}
+                        {:export_btn(get_defined_vars())}                    
                     </div>
                     <div class="box-body search-body" id="supcontact-search-box">
                         <div class="col-md-12">
@@ -107,6 +109,7 @@
         // var prefix ="{$contact['prefix']}";
 
         $(function(){
+            excel_import({url:"{:U('Supplier/excel_import')}"})
             init_chosen("{$url}","getSupplierList",".search-body");
             $(tabId+" .search-list").trigger("click");
         
