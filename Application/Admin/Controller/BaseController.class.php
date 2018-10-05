@@ -75,7 +75,7 @@ class BaseController extends \Common\Controller\BaseController{
             $this->assign('statusType',$this->statusType);
             $this->assign('statusTypeJ',json_encode($this->statusType));
             $this->assign('statusLabel',$this->statusLabel);
-            $this->assign('entries',[2,5,8,30,35,40,45,50]);
+            $this->assign('entries',[30,35,40,45,50]);
             // $nodeId = getTabId(I("vtabId"));
             $this->nodeId = getTabId(I("vtabId"));
             // $this->assign('processType',$this->processType);
