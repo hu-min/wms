@@ -55,6 +55,7 @@ class BaseController extends \Common\Controller\BaseController{
         }else{ 
             $conAct=CONTROLLER_NAME.'/'.ACTION_NAME;
             $auth=$this->authVerify($conAct);
+            // print_r($conAct);exit;
             if(!$auth){
                 // echo $conAct;
                 if($this->isLogin() && (in_array(ucfirst(CONTROLLER_NAME),["Tools","Public"]) || $conAct == "Index/home")){
@@ -92,11 +93,14 @@ class BaseController extends \Common\Controller\BaseController{
      * @Desc: 权限验证 
      */    
     private function authVerify($conAct){
+        
         $reqType=I("reqType");
+        // $statusType = I('statusType');
         if(!$reqType){
             $reqType="List";
                 I("reqType",$reqType);
         }
+        
         if(!in_array($reqType,C("authority.6"))){
             preg_match("/\S([A-Z]+[^[A-Z]*\S]*)$/",$reqType,$match);
             if(count($match)<1){
@@ -106,13 +110,15 @@ class BaseController extends \Common\Controller\BaseController{
                 $reqType=$match[1];
             }
         }
-        $logType=$this->LogCom->getType(strtolower($reqType));	
-        if($logType>2 && $logType<=8){
-            if(I("delType")=="deepDel"){
-                $logType=6;
-            }
-            $this->vlog($logType);
-        }
+        
+        // $logType=$this->LogCom->getType(strtolower($reqType));	
+        // print_r($logType);exit;
+        // if($logType>2 && $logType<=8){
+        //     if(I("delType")=="deepDel"){
+        //         $logType=6;
+        //     }
+        // }
+        // print_r($this->nodeAuth[$conAct]);exit;
         if($this->nodeAuth[$conAct]>=7){
             return true;
         }else if(in_array($reqType,$this->authority[$this->nodeAuth[$conAct]])){
@@ -319,6 +325,7 @@ class BaseController extends \Common\Controller\BaseController{
         extract($_REQUEST);
         $dbObject=M($db,NULL);
         $msg="删除成功！";
+        $logType = 5;
         if(!$id && $db!='v_purcha'){
             $this->ajaxReturn(['errCode'=>110,'error'=>'ID异常']);
         }
@@ -336,6 +343,7 @@ class BaseController extends \Common\Controller\BaseController{
             }
             // echo $dbObject->getPk();exit;
         }else if($statusType=="deepDel"){
+            $logType = 6;
             $seniorResult=$this->userCom->checkSeniorPwd(session("userId"),$seniorPwd);
             if($seniorResult->errCode!==0){
                 $this->ajaxReturn(['errCode'=>$seniorResult->errCode,'error'=>$seniorResult->error]);
@@ -360,6 +368,7 @@ class BaseController extends \Common\Controller\BaseController{
             $msg = "操作成功！";
         }
         if($conResult){
+            $this->LogCom->log($logType);
             $this->ajaxReturn(['errCode'=>0,'error'=>$msg]);
         }
         $msg = "操作异常！";
@@ -612,6 +621,7 @@ class BaseController extends \Common\Controller\BaseController{
                     
                     $db->commit();
                     $this->ApprLogCom->commit();
+                    $this->LogCom->log(8);
                     $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
                 }else{
                     $this->ajaxReturn(['errCode'=>116,'error'=>getError(116)."；错误：".$insertData]);
@@ -638,6 +648,7 @@ class BaseController extends \Common\Controller\BaseController{
         }
         extract($excelData);
         if(isset($excelData['data']) && isset($excelData['schema']) && isset($excelData['fileName'])){
+            $this->LogCom->log(7);
             excelExport(["data"=>$data,'schema'=>$schema,'fileName'=>$fileName,'template'=>$template,'callback'=>$callback]);
         }
     }

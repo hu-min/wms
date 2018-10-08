@@ -257,6 +257,85 @@ class IndexController extends BaseController{
         $result = $this->configCom->set_val($process_type,json_encode($datas));
         $this->ajaxReturn(['errCode'=>$result->errCode,'error'=>getError($result->errCode)]);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-08 19:40:02 
+     * @Desc: 日志查看控制 
+     */    
+    function logControl(){
+        $reqType=I('reqType');
+        $logType = [
+            'logout'=>'退出',
+            'login'=>'登录',
+            'insert'=>'添加',
+            'edit'=>'编辑',
+            'del'=>'浅删除',
+            'deepdel'=>'深度删除',
+            'export'=>'导出',
+            'import'=>'导入',
+        ];  
+        
+        $this->assign('logType',$logType);
+        $this->assign("controlName","logCon");
+        $this->assign("tableName",$this->LogCom->tableName());
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    function logConList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $export = I('export');
+        $where=[];
+        foreach (['userName','describe'] as $key) {
+            if(isset($data[$key])){
+                $where[$key]=['LIKE','%'.$data[$key].'%'];
+            }
+        }
+        if(isset($data['class'])){
+            $where['class']=$data['class'];
+        }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
+        $parameter=[
+            'where'=>$where,
+            'fields' => '*,FROM_UNIXTIME(addTime,"%Y-%m-%d %H:%i:%s") add_time',
+            'page'=>$p,
+            'pageSize'=>$pageSize,
+            'orderStr'=>"logId DESC",
+            'joins'=>[]
+        ];
+        if($export){
+            $config = ['control'=>CONTROLLER_NAME];
+        }
+        
+        $basicResult=$this->LogCom->getList($parameter);
+        $this->tablePage($basicResult,'Index/table/logList',"logList",$pageSize,'',$config);
+    }
+    function logCon_modalOne(){
+        $title = "查看日志";
+        $btnTitle = "查看日志";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "查看日志";
+            $btnTitle = "查看日志";
+            $redisName="logList";
+            $resultData=$this->LogCom->redis_one($redisName,"logId",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "tpFolder"=>'Index',
+            "folder"=>'table',
+            "template"=>"logModal",
+        ];
+        $this->modalOne($modalPara);
+    }
 }
 
 /** 

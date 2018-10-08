@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-body search-body">
+                        <div class="col-md-12">
+                            <div class="form-inline">
+                                <label  class="control-label">操作者：</label>
+                                <div class="form-group">
+                                    <input class="form-control search-info"  name="userName" placeholder="操作者" type="text">
+                                </div>
+                                <label class="control-label">内容：</label>
+                                <div class="form-group">
+                                    <input class="form-control search-info"  name="describe" placeholder="内容" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">日志类型：</label>
+                                    <select class="form-control search-info" name="class" >
+                                        <option value="">全部</option>
+                                        <volist name="logType" id="item">
+                                            <option value="{$key}">{$item}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <table id="" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>日志ID</th>
+                            <th>操作者</th>
+                            <th>日志类型</th>
+                            <th>日志描述</th>
+                            <th>操作时间</th>
+                            <th>查看</th>
+                        </tr>
+                    </thead>
+                    <tbody class="{$controlName}-table">
+                        {$tables}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="dataTables_wrapper">
+            <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+                {$pages}
+            </div>
+        </div>
+    </section>
+    <div class="modal fade global-modal" aria-hidden="true" data-backdrop="static" >
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+    <script>
+        var logCon_initInfo =function(){
+        }
+        $(function(){
+            $(tabId+" .search-list").trigger("click");
+        })
+        function logCon_setInfo(info){
+            ['userName','class','describe','add_time'].forEach(element => {
+                
+                if(element=='class'){
+                    info[element] = $(tabId+" .search-info[name='class']").find("option[value='"+info[element]+"']").text()
+                }
+                $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
+            });
+        }
+    
+    </script>
+</body>
+</html>

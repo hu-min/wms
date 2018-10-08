@@ -1,0 +1,10 @@
+<volist name="list" id="item">
+    <tr>
+        <td>{$item['logId']}</td>
+        <td>{$item['userName']}</td>
+        <td>{$logType[$item['class']]}</td>
+        <td>{$item['describe']|utf8_substr=100,true}</td>
+        <td>{$item['add_time']}</td>
+        {:list_btn(get_defined_vars(),'logId',[],true,false,false)}
+    </tr>
+</volist>

@@ -10,7 +10,18 @@ namespace Component\Controller;
  */
 
 class BaseController extends \Common\Controller\BaseController{
+
     protected $selfDB="";
+    public function _initialize() {
+        // echo get_class($this),';';
+        if(get_class($this)=='Component\Controller\LogController'){
+            $this->LogModel = $this;
+        }else{
+            $this->LogModel = A('Component/Log');
+        }
+        // $this->LogModel = A('Component/Log');
+        parent::_initialize();
+    }
     /** 
      * @Author: vition 
      * @Date: 2018-01-14 22:16:12 
@@ -90,6 +101,7 @@ class BaseController extends \Common\Controller\BaseController{
             $res->errCode=0;
             $res->error=getError(0);
             $res->data=$insertResult;
+            $this->LogModel->log(3);
             return $res;
         }
         $res->errCode=111;
@@ -113,6 +125,7 @@ class BaseController extends \Common\Controller\BaseController{
         if($insertResult){
             $res->errCode=0;
             $res->error=getError(0);
+            $this->LogModel->log(4);
             return $res;
         }
         $res->errCode=114;
@@ -131,6 +144,7 @@ class BaseController extends \Common\Controller\BaseController{
         if($modFlag){
             $res->errCode=0;
             $res->error=getError(0);
+            $this->LogModel->log(6);
             return $res;
         }
         $res->errCode=113;

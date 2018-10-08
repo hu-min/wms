@@ -35,8 +35,10 @@ class LogController extends BaseController{
 			return sprintf($this->desc[$type],$userName,$time,$moduleCon,$request);
     }
     function getType($class){
-		if($class=="list" || $class=="one"){
+		if(in_array(strtolower($class),["list","one"])){
 			$class="read";
+		}else if(in_array(strtolower($class),["add","insert"])){
+			$class="insert";
 		}
 		foreach($this->logType as $type => $tclass){
 			if($class==$tclass){
