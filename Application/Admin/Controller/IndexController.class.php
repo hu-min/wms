@@ -9,6 +9,16 @@ class IndexController extends BaseController{
         parent::_initialize();
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
+        $this->logType = [
+            'logout'=>'退出',
+            'login'=>'登录',
+            'insert'=>'添加',
+            'edit'=>'编辑',
+            'del'=>'浅删除',
+            'deepdel'=>'深度删除',
+            'export'=>'导出',
+            'import'=>'导入',
+        ]; 
     }
     
     /**
@@ -263,19 +273,9 @@ class IndexController extends BaseController{
      * @Desc: 日志查看控制 
      */    
     function logControl(){
-        $reqType=I('reqType');
-        $logType = [
-            'logout'=>'退出',
-            'login'=>'登录',
-            'insert'=>'添加',
-            'edit'=>'编辑',
-            'del'=>'浅删除',
-            'deepdel'=>'深度删除',
-            'export'=>'导出',
-            'import'=>'导入',
-        ];  
+        $reqType=I('reqType'); 
         
-        $this->assign('logType',$logType);
+        $this->assign('logType',$this->logType);
         $this->assign("controlName","logCon");
         $this->assign("tableName",$this->LogCom->tableName());
         if($reqType){
@@ -289,6 +289,7 @@ class IndexController extends BaseController{
         $p=I("p")?I("p"):1;
         $export = I('export');
         $where=[];
+        $where['class']=['IN',array_keys($this->logType)];
         foreach (['userName','describe'] as $key) {
             if(isset($data[$key])){
                 $where[$key]=['LIKE','%'.$data[$key].'%'];
