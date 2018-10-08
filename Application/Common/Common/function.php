@@ -325,6 +325,7 @@ function import_btn($defind_vars){
     $controlName = $defind_vars["controlName"];
     if($nodeAuth >= 1){//6
         echo "<button type='button' data-db='{$tableName}' data-con='{$controlName}' class='btn bg-navy excel-import'><i class='fa fa-fw fa-cloud-upload '></i> 导入 </button>";
+        echo '<a class="btn btn-social-icon bg-navy" href="'.U('Base/template_down').'?con='.CONTROLLER_NAME."_".$controlName.'" title="模板下载"><i class="fa fa-file-excel-o"></i><div></div></a>';
     }
 }
 /** 

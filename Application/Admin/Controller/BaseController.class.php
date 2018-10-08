@@ -45,7 +45,7 @@ class BaseController extends \Common\Controller\BaseController{
         // print_r($this->nodeAuth);
         // $this->setLogin();
         $nowConAct=MODULE_NAME."/".CONTROLLER_NAME.'/'.ACTION_NAME;
-        if(in_array($nowConAct,$this->exemption) || ( in_array(ACTION_NAME,['excel_import','upload_filesAdd','excel_export']) && $this->isLogin())){
+        if(in_array($nowConAct,$this->exemption) || ( in_array(ACTION_NAME,['excel_import','upload_filesAdd','excel_export','template_down']) && $this->isLogin())){
             if(!$this->isLogin() && !in_array(ACTION_NAME,['checkLogin','Login']) ){
                 session("history",domain(false).__SELF__);
                 $this->redirect('Index/Login');
@@ -619,6 +619,11 @@ class BaseController extends \Common\Controller\BaseController{
             }
         }
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-08 09:42:32 
+     * @Desc: excel 导出基础接口 
+     */    
     function excel_export(){
         $sqlmd5 = I("sql");
         $con = I("con");
@@ -635,5 +640,27 @@ class BaseController extends \Common\Controller\BaseController{
         if(isset($excelData['data']) && isset($excelData['schema']) && isset($excelData['fileName'])){
             excelExport(["data"=>$data,'schema'=>$schema,'fileName'=>$fileName,'template'=>$template,'callback'=>$callback]);
         }
+    }
+    function template_down(){
+        $con = I('con');
+        if(in_array($con,['Basic_basic_brand','Basic_basic_stage','Basic_basic_projectType','Basic_expenClas','Basic_basic_expense_type'])){
+            $con = 'Basic_bsme';
+        }
+        //模板中文名配置
+        $templates = [
+            'Supplier_supType'=>'供应商类别模板',
+            'Basic_basic_module'=>'供应商承接模块模板',
+            'Supplier_sup_company'=>'供应商模板',
+            'Supplier_supcontact'=>'供应商联系人模板',
+            'Public_work_order'=>'工单提交模板',
+            'Basic_bsme'=>'品牌、项目阶段、项目类型、固定支出类别、报销类别模板',
+            'Basic_basic_field'=>'场地模板',
+        ];
+        if(isset($templates[$con])){
+            $templateName = $templates[$con];
+        }else{
+            $templateName ='找不到模板';
+        }
+        header("Location:/Public/excel_template/{$templateName}.xlsx");
     }
 }
