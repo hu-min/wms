@@ -1262,8 +1262,8 @@ class FinanceController extends BaseController{
             $whereStr = " WHERE ".implode("AND",$where);
         }
         $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
-        $sql = "SELECT from_source,project_name,user_name,invoice,money,table_name,id FROM (SELECT '报销' from_source,project_id,user_id,vouch_file invoice,invoice_money money,'v_expense_sub' table_name,es.id id FROM v_expense_sub es LEFT JOIN v_expense e ON e.id=parent_id WHERE vouch_file <> '' AND invoice_money > 0 UNION ALL
-        SELECT '供应商成本' from_source,project_id,user_id,invoice_file invoice,invoice_money money,'v_invoice' table_name,i.id id FROM v_invoice  i LEFT JOIN v_purcha pu ON pu.id=relation_id WHERE relation_type=1) inv LEFT JOIN (SELECT projectId,name project_name FROM v_project ) p ON p.projectId = inv.project_id LEFT JOIN (SELECT userId user_id,userName user_name FROM v_user) bu ON bu.user_id = inv.user_id".$whereStr;
+        $sql = "SELECT from_source,project_name,user_name,invoice,money,table_name,id,add_time FROM (SELECT '报销' from_source,project_id,user_id,vouch_file invoice,invoice_money money,'v_expense_sub' table_name,es.id id,es.add_time add_time FROM v_expense_sub es LEFT JOIN v_expense e ON e.id=parent_id WHERE vouch_file <> '' AND invoice_money > 0 UNION ALL
+        SELECT '供应商成本' from_source,project_id,user_id,invoice_file invoice,invoice_money,add_time money,'v_invoice' table_name,i.id id FROM v_invoice  i LEFT JOIN v_purcha pu ON pu.id=relation_id WHERE relation_type=1) inv LEFT JOIN (SELECT projectId,name project_name FROM v_project ) p ON p.projectId = inv.project_id LEFT JOIN (SELECT userId user_id,userName user_name FROM v_user) bu ON bu.user_id = inv.user_id".$whereStr;
         // echo $sql,exit;
         $basicResult['list'] = M()->query($sql);
         if($export){
@@ -1281,7 +1281,7 @@ class FinanceController extends BaseController{
             $data = $this->Redis->get($request);
             if(count($data)<2){
                 preg_match_all("/([^\/]+)\.([\S]+)$/",basename($data[0]['url']),$match);
-                $fileName = preg_replace("/([^\/]+)\.[\S]+$/",$data[0]['from']."_".$data[0]['project']."_".$data[0]['user'].".".$match[2][0],basename($data[0]['url']));
+                $fileName = preg_replace("/([^\/]+)\.[\S]+$/",$data[0]['from']."_".$data[0]['project']."_".$data[0]['user']."_".$data[0]['time'].".".$match[2][0],basename($data[0]['url']));
                 header('Content-Disposition:attachment;filename=' . $fileName);
                 header('Content-Length:' . filesize($data[0]['url']));
                 readfile($data[0]['url']);
@@ -1294,7 +1294,7 @@ class FinanceController extends BaseController{
                 foreach ($data as $file) {
                     if(file_exists($file['url'])){
                         preg_match_all("/([^\/]+)\.([\S]+)$/",basename($file['url']),$match);
-                        $fileName = preg_replace("/([^\/]+)\.[\S]+$/",$file['from']."_".$file['project']."_".$file['user'].".".$match[2][0],basename($file['url']));
+                        $fileName = preg_replace("/([^\/]+)\.[\S]+$/",$file['from']."_".$file['project']."_".$file['user']."_".$file['time'].".".$match[2][0],basename($file['url']));
                         $zip->addFile( $file['url'],$fileName);
                     }
                 }

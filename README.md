@@ -211,3 +211,6 @@ if($export){
 '',$config
 
 修复供应商查询列表'供应商承接模块'重复
+sudo apt-get update
+sudo apt-get install php7.0-zip
+sudo apt-get install php7.0-gd
