@@ -3,7 +3,7 @@
         <td>{$item['userId']}</td>
         <td>{$item['loginName']}</td>
         <td>{$item['userName']}</td>
-        <td data-avatar="{$item['avatar']}" class="users-avatar-td"><if condition="$item['avatar'] neq ''"><img src="/{$item['avatar']}"></if></td>
+        <td data-avatar="{$item['avatar']}" class="users-avatar-td"><if condition="$item['avatar'] neq ''"><img src="/{$item['avatar']|imge2thumb}"></if></td>
         <td>{$item['phone']}</td>
         <td>{:C('userType.'.$item['userType'])}</td>
         <td>{:C('regFrom.'.$item['regFrom'])}</td>

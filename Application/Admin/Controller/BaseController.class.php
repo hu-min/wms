@@ -87,33 +87,33 @@ class BaseController extends \Common\Controller\BaseController{
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->assign("pageId",$this->createId());
             //临时处理程序，处理所有图片的缩图
-            $fileList=[];
-            getFiles('Uploads',$fileList);
-            $image = new Image();
-            foreach ($fileList as $file) {
-                preg_match("/[\S]+\_thumb\.[\S]+$/",$file,$match);
-                if(empty($match)){
-                    preg_match_all("/([^\/]+)\.([\S]+)$/",$file,$match2);
-                    if(in_array($match2[2][0],["jpeg","jpg","png","gif"])){
-                        $newAvatar = preg_replace("/([^\/]+)\.[\S]+$/",$match2[1][0]."_thumb.".$match2[2][0],$file);
-                        if(PHP_OS=="WINNT"){
-                            $file = iconv("utf-8","gbk",$file);
-                            $newAvatar = iconv("utf-8","gbk",$newAvatar);
-                        }
-                        if(!file_exists($newAvatar)){
-                            $image->open($file);
-                            $width = $image->width();
-                            $height = $image->height();
-                            if($width>250){
-                                $height = (250/$width)*$height;
-                                $width = 250;
-                            }
-                            $image->thumb( $width, $height);
-                            $image->save($newAvatar);
-                        }
-                    }
-                }
-            }
+            // $fileList=[];
+            // getFiles('Uploads',$fileList);
+            // $image = new Image();
+            // foreach ($fileList as $file) {
+            //     preg_match("/[\S]+\_thumb\.[\S]+$/",$file,$match);
+            //     if(empty($match)){
+            //         preg_match_all("/([^\/]+)\.([\S]+)$/",$file,$match2);
+            //         if(in_array($match2[2][0],["jpeg","jpg","png","gif"])){
+            //             $newAvatar = preg_replace("/([^\/]+)\.[\S]+$/",$match2[1][0]."_thumb.".$match2[2][0],$file);
+            //             if(PHP_OS=="WINNT"){
+            //                 $file = iconv("utf-8","gbk",$file);
+            //                 $newAvatar = iconv("utf-8","gbk",$newAvatar);
+            //             }
+            //             if(!file_exists($newAvatar)){
+            //                 $image->open($file);
+            //                 $width = $image->width();
+            //                 $height = $image->height();
+            //                 if($width>250){
+            //                     $height = (250/$width)*$height;
+            //                     $width = 250;
+            //                 }
+            //                 $image->thumb( $width, $height);
+            //                 $image->save($newAvatar);
+            //             }
+            //         }
+            //     }
+            // }
             //处理所有图片缩图结束            
         }
         // exit;
@@ -198,6 +198,8 @@ class BaseController extends \Common\Controller\BaseController{
             //登录设置
             if($userInfo['avatar']=="" || !file_exists($userInfo['avatar'])){
                 $userInfo['avatar']='Public'.'/admintmpl'."/dist/img/avatar/avatar".rand(1,5).".png";
+            }else{
+                $userInfo['avatar'] = imge2thumb($userInfo['avatar']);
             }
             foreach (['userId','loginName','userName','roleId','rolePid','avatar','usertype','roleId','rolePid'] as $key ) {
                 if(isset($userInfo[$key])){

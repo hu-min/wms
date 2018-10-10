@@ -573,3 +573,13 @@ function getFiles($dir,&$fileArr){
         }
     }
 }
+function imge2thumb($file){
+    if(!$file){
+        return '';
+    }
+    preg_match_all("/([^\/]+)\.([\S]+)$/",$file,$match);
+    if(isset($match[1][0])){
+        return preg_replace("/([^\/]+)\.[\S]+$/",$match[1][0]."_thumb.".$match[2][0],$file);
+    }
+    return "";
+}
