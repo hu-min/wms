@@ -1,5 +1,6 @@
 <?php
 namespace Admin\Controller;
+use Think\Image;
 
 /**
  * BaseController 控件基类
@@ -33,6 +34,7 @@ class BaseController extends \Common\Controller\BaseController{
         $this->authority=C('authority');
         $this->nodeAuth=session('nodeAuth');
         $this->basicCom=getComponent('Basic');
+        $this->resetCom=getComponent('ResetApply');
         $this->exemption=[//排除的控制器
             'Admin/Index/Login',
             'Admin/Index/Main',
@@ -45,7 +47,7 @@ class BaseController extends \Common\Controller\BaseController{
         // print_r($this->nodeAuth);
         // $this->setLogin();
         $nowConAct=MODULE_NAME."/".CONTROLLER_NAME.'/'.ACTION_NAME;
-        if(in_array($nowConAct,$this->exemption) || ( in_array(ACTION_NAME,['excel_import','upload_filesAdd','excel_export','template_down']) && $this->isLogin())){
+        if(in_array($nowConAct,$this->exemption) || ( in_array(ACTION_NAME,['excel_import','upload_filesAdd','excel_export','template_down','reset_apply']) && $this->isLogin())){
             if(!$this->isLogin() && !in_array(ACTION_NAME,['checkLogin','Login']) ){
                 session("history",domain(false).__SELF__);
                 $this->redirect('Index/Login');
@@ -84,6 +86,35 @@ class BaseController extends \Common\Controller\BaseController{
             
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->assign("pageId",$this->createId());
+            //临时处理程序，处理所有图片的缩图
+            $fileList=[];
+            getFiles('Uploads',$fileList);
+            $image = new Image();
+            foreach ($fileList as $file) {
+                preg_match("/[\S]+\_thumb\.[\S]+$/",$file,$match);
+                if(empty($match)){
+                    preg_match_all("/([^\/]+)\.([\S]+)$/",$file,$match2);
+                    if(in_array($match2[2][0],["jpeg","jpg","png","gif"])){
+                        $newAvatar = preg_replace("/([^\/]+)\.[\S]+$/",$match2[1][0]."_thumb.".$match2[2][0],$file);
+                        if(PHP_OS=="WINNT"){
+                            $file = iconv("utf-8","gbk",$file);
+                            $newAvatar = iconv("utf-8","gbk",$newAvatar);
+                        }
+                        if(!file_exists($newAvatar)){
+                            $image->open($file);
+                            $width = $image->width();
+                            $height = $image->height();
+                            if($width>250){
+                                $height = (250/$width)*$height;
+                                $width = 250;
+                            }
+                            $image->thumb( $width, $height);
+                            $image->save($newAvatar);
+                        }
+                    }
+                }
+            }
+            //处理所有图片缩图结束            
         }
         // exit;
     }
@@ -165,7 +196,7 @@ class BaseController extends \Common\Controller\BaseController{
             $this->redirect('Index/Login');
         }else{
             //登录设置
-            if($userInfo['avatar']==""){
+            if($userInfo['avatar']=="" || !file_exists($userInfo['avatar'])){
                 $userInfo['avatar']='Public'.'/admintmpl'."/dist/img/avatar/avatar".rand(1,5).".png";
             }
             foreach (['userId','loginName','userName','roleId','rolePid','avatar','usertype','roleId','rolePid'] as $key ) {
@@ -507,12 +538,25 @@ class BaseController extends \Common\Controller\BaseController{
         }
         $viewName = $uploadFile['name'];
         $name = $viewName;
+        $type =  explode('.',$name)[count(explode('.',$name))-1];
+       
         if(PHP_OS=="WINNT"){
             $name = iconv("UTF-8","gb2312",$viewName);
         }
         $file=$url.$name;
-        
         $copyState =  copy($uploadFile['tmp_name'],$file);
+        if(in_array($type,["jpeg","jpg","png","gif"])){
+            $image = new Image();
+            $image->open($file);
+            $width = $image->width();
+            $height = $image->height();
+            if($width>250){
+                $height = (250/$width)*$height;
+                $width = 250;
+            }
+            $image->thumb( $width,  $height);
+            $image->save(preg_replace("/\.".$type."$/","_thumb.".$type,$file));
+        }
         if(isset($_FILES['upload'])){
             if($copyState){
                 $url = '/Uploads/'.CONTROLLER_NAME.'/'.date('Ymd',time())."/".$viewName;
@@ -673,5 +717,24 @@ class BaseController extends \Common\Controller\BaseController{
             $templateName ='找不到模板';
         }
         header("Location:/Public/excel_template/{$templateName}.xlsx");
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-09 15:10:50 
+     * @Desc: 提交重审信息 
+     */    
+    function reset_apply(){
+        $data = I('data');
+        $param = [
+            'table_name' => $data['db'],
+            'table_id' => $data['id'],
+            'user_id' => session('userId'),
+            'add_time' => time(),
+            'datas' => json_encode($data['datas'],JSON_UNESCAPED_UNICODE),
+        ];
+        // $this->resetCom->insert();
+        // print_r($param);
+        $this->ajaxReturn(['errCode'=>0,'error'=>getError(0),'data'=>$param]);
+        // $this->resetCom->a();
     }
 }

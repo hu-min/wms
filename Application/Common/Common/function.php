@@ -279,6 +279,7 @@ function save_btn($defind_vars,$always=false,$hide=false){
     $processAuth = $defind_vars["processAuth"];
     $nodeAuth = $defind_vars["nodeAuth"];
     $controlName = $defind_vars["controlName"];
+    $tableName = $defind_vars["tableName"];
     $gettype = $defind_vars["gettype"];
     $btnTitle = $defind_vars["btnTitle"];
     $item = $defind_vars["data"];
@@ -293,7 +294,7 @@ function save_btn($defind_vars,$always=false,$hide=false){
     }
     
     if(($item["author"] == $userId || $item["user_id"] == $userId) && $item['status'] == 1){
-        echo "<button type='button' class='btn btn-sm btn-info reset-info-active' data-con='{$controlName}' data-url='{$url}' {$noModal}>重新提审</button>";
+        echo "<button type='button' class='btn btn-sm btn-info reset-info-active' data-gettyp='reset_apply' data-db='{$tableName}' data-url='{$url}' {$noModal}>重新提审</button>";
     }
     
     // if((($item["author"] == $userId && $item['status'] == 0) || ($gettype == "Add" && $processAuth['level'] > 0) || (($processAuth['level'] -1) == $item["process_level"] && $item["process_level"] > 0))  || $nodeAuth>= 7){
@@ -546,4 +547,29 @@ function alphaIndex($alpha=false,$index=false){
         }
     }
     return $return;
+}
+/** 
+ * @Author: vition 
+ * @Date: 2018-10-10 10:15:37 
+ * @Desc: 取文件夹下所有文件 
+ */
+function getFiles($dir,&$fileArr){
+    $uploadDir = scandir($dir);
+    foreach ($uploadDir as $file) {
+        if(!in_array($file,['.','..'])){
+            if(is_dir($dir."/".$file)){
+                getFiles($dir."/".$file,$fileArr);
+            }elseif(is_file($dir."/".$file)){
+                if(PHP_OS=="WINNT"){
+                    $file = iconv("gbk","utf-8",$file);
+                }
+                if($file=='_thumb'){
+                    @unlink($dir."/".$file);
+                }else{
+                    array_push($fileArr,$dir."/".$file);
+                }
+                
+            }
+        }
+    }
 }

@@ -1228,5 +1228,7 @@ class FinanceController extends BaseController{
         ];
         $this->modalOne($modalPara);
     }
-    
+    function invoiceControl(){
+        
+    }
 }

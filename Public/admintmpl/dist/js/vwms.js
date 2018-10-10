@@ -750,7 +750,19 @@ $(function(){
             if(JSON.stringify(resetData) === "{}"){
                 notice(101,"没修改任何数据","输入异常");
             }else{
-                
+                var url = $(this).data('url');
+                var gettyp = $(this).data('gettyp');
+                var db = $(this).data('db');
+                var id = $(this).parents('.modal').find(".table-id").val();
+                datas.reqType = gettyp
+                datas.data = {}
+                datas.data.datas = resetData
+                datas.data.db = db
+                datas.data.id = id
+                post(url,datas,function(result){
+                    console.log(result)
+                });
+                // console.log(resetData)
             }
         }
     });
