@@ -1228,7 +1228,92 @@ class FinanceController extends BaseController{
         ];
         $this->modalOne($modalPara);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-10 12:47:21 
+     * @Desc: 发票管理 
+     */    
     function invoiceControl(){
+        $reqType=I('reqType'); 
+        $this->assign("controlName","invoiceCon");
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-10 12:47:28 
+     * @Desc: 发票列表 
+     */    
+    function invoiceConList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $export = I('export');
+        $where=[];
+        $whereStr="";
+        foreach (['project_name','user_name','from_source'] as $key) {
+            if(isset($data[$key])){
+                array_push($where,$key.' LIKE "%'.$data[$key].'%" ');
+            }
+        }
+        if(!empty($where)){
+            $whereStr = " WHERE ".implode("AND",$where);
+        }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
+        $sql = "SELECT from_source,project_name,user_name,invoice,money,table_name,id FROM (SELECT '报销' from_source,project_id,user_id,vouch_file invoice,invoice_money money,'v_expense_sub' table_name,es.id id FROM v_expense_sub es LEFT JOIN v_expense e ON e.id=parent_id WHERE vouch_file <> '' AND invoice_money > 0 UNION ALL
+        SELECT '供应商成本' from_source,project_id,user_id,invoice_file invoice,invoice_money money,'v_invoice' table_name,i.id id FROM v_invoice  i LEFT JOIN v_purcha pu ON pu.id=relation_id WHERE relation_type=1) inv LEFT JOIN (SELECT projectId,name project_name FROM v_project ) p ON p.projectId = inv.project_id LEFT JOIN (SELECT userId user_id,userName user_name FROM v_user) bu ON bu.user_id = inv.user_id".$whereStr;
+        // echo $sql,exit;
+        $basicResult['list'] = M()->query($sql);
+        if($export){
+            $config = ['control'=>CONTROLLER_NAME];
+        }
         
+        // $basicResult=$this->LogCom->getList($parameter);
+        $this->tablePage($basicResult,'Finance/financeTable/invoiceConList',"invoiceConList",$pageSize,'',$config);
+    }
+    function invoiceEdit(){
+        $request = I('request');
+        $reqType = I('reqType');
+        $data = I('data');
+        if($request){
+            $data = $this->Redis->get($request);
+            if(count($data)<2){
+                preg_match_all("/([^\/]+)\.([\S]+)$/",basename($data[0]['url']),$match);
+                $fileName = preg_replace("/([^\/]+)\.[\S]+$/",$data[0]['from']."_".$data[0]['project']."_".$data[0]['user'].".".$match[2][0],basename($data[0]['url']));
+                header('Content-Disposition:attachment;filename=' . $fileName);
+                header('Content-Length:' . filesize($data[0]['url']));
+                readfile($data[0]['url']);
+            }else{
+                $zip = new \ZipArchive();
+                $filename = "Download/invoice".date("YmdHis").".zip";
+                if ($zip->open($filename, \ZIPARCHIVE::CREATE)!==TRUE) {  
+                    exit('无法打开文件，或者文件创建失败');
+                  }  
+                foreach ($data as $file) {
+                    if(file_exists($file['url'])){
+                        preg_match_all("/([^\/]+)\.([\S]+)$/",basename($file['url']),$match);
+                        $fileName = preg_replace("/([^\/]+)\.[\S]+$/",$file['from']."_".$file['project']."_".$file['user'].".".$match[2][0],basename($file['url']));
+                        $zip->addFile( $file['url'],$fileName);
+                    }
+                }
+                $zip->close();
+                if(!file_exists($filename)){  
+                    exit("无法找到文件"); //即使创建，仍有可能失败。。。。  
+                }
+                header("Cache-Control: public"); 
+                header("Content-Description: File Transfer"); 
+                header('Content-disposition: attachment; filename='.basename($filename)); //文件名  
+                header("Content-Type: application/zip"); //zip格式的  
+                header("Content-Transfer-Encoding: binary"); //告诉浏览器，这是二进制文件  
+                header('Content-Length: '. filesize($filename)); //告诉浏览器，文件大小  
+                @readfile($filename);
+            }
+        }else{
+            $request = md5(json_encode($data));
+            $this->Redis->set(md5(json_encode($data)),$data,3000);
+            $this->ajaxReturn(['errCode'=>0,'error'=>getError(0),'url'=>U(CONTROLLER_NAME."/".ACTION_NAME)."?reqType=invoiceEdit&request=".$request]);
+        }
     }
 }

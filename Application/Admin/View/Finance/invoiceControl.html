@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-body search-body">
+                        <div class="col-md-12">
+                            <div class="form-inline">
+                                <label  class="control-label">项目：</label>
+                                <div class="form-group">
+                                    <input class="form-control search-info"  name="project_name" placeholder="项目" type="text">
+                                </div>
+                                <label class="control-label">上传者：</label>
+                                <div class="form-group">
+                                    <input class="form-control search-info"  name="user_name" placeholder="上传者" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">发票来源：</label>
+                                    <select class="form-control search-info" name="from_source" >
+                                        <option value="">全部</option>
+                                        <option value="报销">报销</option>
+                                        <option value="供应商成本">供应商成本</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <table id="" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th style="max-width: 50px;"> 选择  <input type="checkbox" class="all-checked"> <button type="button" class="btn bg-maroon btn-xs zip-down" ><i class="fa fa-fw fa-file-zip-o"></i>打包下载</button> </th>
+                            <th>发票来源</th>
+                            <th>关联项目</th>
+                            <th>上传者</th>
+                            <th>发票金额</th>
+                            <th>发票查看</th>
+                            <!-- <th>操作</th> -->
+                        </tr>
+                    </thead>
+                    <tbody class="{$controlName}-table">
+                        {$tables}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="dataTables_wrapper">
+            <div class="row">
+                <div class="col-sm-2"><div class="dataTables_length" ><label>显示 <select name="pageSize"  class="form-control input-sm search-info">
+                    <volist name="entries" id="item"><option value="{$item}">{$item}</option></volist>
+                </select> 条</label></div></div>
+                <div  class="{$controlName}-page row page-div col-sm-10" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+                    {$pages}
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="modal fade global-modal" aria-hidden="true" data-backdrop="static" >
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+    <script>
+        var invoiceCon_initInfo =function(){
+        }
+        $(function(){
+            $(tabId+" .search-list").trigger("click");
+            $(tabId).offon("click",".zip-down",function(){
+                var checkes = $(this).parents("table").find("tbody input[class='item-checked']:checked")
+                var ids = [];
+                if(checkes.length>0){
+                    checkes.each(function(){
+                        var temp = {table:$(this).data("table"),id:$(this).data("id")};
+                        var tr = $(this).parents('tr')
+                        temp.url = tr.find('.upload-file').val();
+                        temp.from = tr.find('.from_source').text();
+                        temp.project = tr.find('.project_name').text();
+                        temp.user = tr.find('.user_name').text();
+                        temp.money = tr.find('.money').text();
+                        ids.push(temp)
+                    })
+                    datas.reqType = "invoiceEdit"
+                    datas.data = ids
+                    get("{$url}",datas,function(result){
+                        window.location.href = result.url
+                    })
+                }else{
+                    notice(100,'请选择文件','选择异常');
+                }
+            })
+        })
+        function invoiceCon_setInfo(info){
+            // ['userName','class','describe','add_time'].forEach(element => {
+                
+            //     if(element=='class'){
+            //         info[element] = $(tabId+" .search-info[name='class']").find("option[value='"+info[element]+"']").text()
+            //     }
+            //     $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
+            // });
+        }
+    
+    </script>
+</body>
+</html>

@@ -573,6 +573,11 @@ function getFiles($dir,&$fileArr){
         }
     }
 }
+/** 
+ * @Author: vition 
+ * @Date: 2018-10-10 12:27:52 
+ * @Desc: 获取图片的缩略图 
+ */
 function imge2thumb($file){
     if(!$file){
         return '';
