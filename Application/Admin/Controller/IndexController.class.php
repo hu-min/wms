@@ -37,6 +37,7 @@ class IndexController extends BaseController{
      * @Desc: 登录页面 
      */    
     function Login(){
+        //https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx650b23fa694c8ff7&redirect_uri=http://twsh.vitionst.top/Admin/Index/Login&response_type=code&scope=SCOPE&state=STATE#wechat_redirect
         $this->display();
     }
     function Main(){

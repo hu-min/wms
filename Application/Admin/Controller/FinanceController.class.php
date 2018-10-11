@@ -1239,6 +1239,17 @@ class FinanceController extends BaseController{
         if($reqType){
             $this->$reqType();
         }else{
+            if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+				fastcgi_finish_request();//linux下才有这个函数
+            }
+            $fileArr = [];
+            getFiles("Download",$fileArr);
+            foreach ($fileArr as $file) {
+                if((time()-filectime($file))>600){ 
+                    @unlink($file);
+                }
+            }
+            
             $this->returnHtml();
         }
     }
@@ -1280,6 +1291,7 @@ class FinanceController extends BaseController{
         if($request){
             $data = $this->Redis->get($request);
             if(count($data)<2){
+                $this->LogCom->log(7);
                 preg_match_all("/([^\/]+)\.([\S]+)$/",basename($data[0]['url']),$match);
                 $fileName = preg_replace("/([^\/]+)\.[\S]+$/",$data[0]['from']."_".$data[0]['project']."_".$data[0]['user']."_".$data[0]['id'].".".$match[2][0],basename($data[0]['url']));
                 header('Content-Disposition:attachment;filename=' . $fileName);
@@ -1292,16 +1304,23 @@ class FinanceController extends BaseController{
                     exit('无法打开文件，或者文件创建失败');
                   }  
                 foreach ($data as $file) {
-                    if(file_exists($file['url'])){
+                    if(file_exists(iconv("utf-8","gbk",$file['url']))){
                         preg_match_all("/([^\/]+)\.([\S]+)$/",basename($file['url']),$match);
-                        $fileName = preg_replace("/([^\/]+)\.[\S]+$/",$file['from']."_".$file['project']."_".$file['user']."_".$file['id'].".".$match[2][0],basename($file['url']));
-                        $zip->addFile( $file['url'],$fileName);
+                        $fName = preg_replace("/([^\/]+)\.[\S]+$/",$file['from']."_".$file['project']."_".$file['user']."_".$file['id'].".".$match[2][0],basename($file['url']));
+                        // echo $fName,";";
+                        // echo iconv("utf-8","gbk",$file['url']);
+                        // $zip->addFile( iconv("utf-8","gbk",$file['url']),$fName);
+                        $zip->addFromString( iconv('utf-8', 'gbk//ignore', $fName), file_get_contents(iconv("utf-8","gbk",$file['url'])));
                     }
                 }
+                // echo $zip->numFiles ;
+                // exit;
+                // echo $filename;
                 $zip->close();
                 if(!file_exists($filename)){  
                     exit("无法找到文件"); //即使创建，仍有可能失败。。。。  
                 }
+                $this->LogCom->log(7);
                 header("Cache-Control: public"); 
                 header("Content-Description: File Transfer"); 
                 header('Content-disposition: attachment; filename='.basename($filename)); //文件名  
