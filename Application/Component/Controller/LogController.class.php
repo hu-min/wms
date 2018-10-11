@@ -8,7 +8,7 @@ namespace Component\Controller;
  */
 class LogController extends BaseController{
     protected $logType=[0=>"logout",1=>"login",2=>"read",3=>"insert",4=>"edit",5=>"del",6=>"deepdel",7=>"export",8=>"import",9=>"login",100=>'debug'];
-    protected $desc=[0=>"用户 %s 于 %s 退出系统。%s %s",1=>"用户 %s 于 %s 通过电脑登录系统。%s %s",2=>"用户 %s 于 %s 访问控制器 %s ; 执行查询，请求参数 %s ",3=>" 用户 %s 于 %s 访问控制器 %s 执行新增 %s",4=>"用户 %s 于 %s 访问控制器 %s ; 执行修改数据 %s",5=>"用户 %s 于 %s 访问控制器 %s ; 执行浅删除，请求参数 %s ",6=>"用户 %s 于 %s 访问控制器 %s ; 执行深度删除，请求参数 %s",7=>"用户 %s 于 %s 访问控制器 %s ; 执行导出;请求参数 %s",8=>"用户 %s 于 %s 访问控制器 %s ; 执行导出 ; %s",9=>"用户 %s 于 %s 通企业微信登录系统。%s %s",100=>""];
+    protected $desc=[0=>"用户 %s 于 %s 退出系统。%s %s",1=>"用户 %s 于 %s 通过电脑登录系统。%s %s",2=>"用户 %s 于 %s 访问控制器 %s ; 执行查询，请求参数 %s ",3=>" 用户 %s 于 %s 访问控制器 %s 执行新增 %s",4=>"用户 %s 于 %s 访问控制器 %s ; 执行修改数据 %s",5=>"用户 %s 于 %s 访问控制器 %s ; 执行浅删除，请求参数 %s ",6=>"用户 %s 于 %s 访问控制器 %s ; 执行深度删除，请求参数 %s",7=>"用户 %s 于 %s 访问控制器 %s ; 执行导出;请求参数 %s",8=>"用户 %s 于 %s 访问控制器 %s ; 执行导出 ; %s",9=>"用户 %s 于 %s 通过企业微信登录系统。%s %s",100=>""];
     public function _initialize(){
         parent::_initialize();
         $this->selfDB = D('Component/Log');

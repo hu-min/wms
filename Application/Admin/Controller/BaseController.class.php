@@ -44,7 +44,7 @@ class BaseController extends \Common\Controller\BaseController{
         ];
         $this->refreNode();
         
-        if($_GET['code']){
+        if($_GET['code'] && ACTION_NAME=='Login'){
             vendor('WeixinQy.WeixinQy');//引入WeiXin企业
             $this->WxConf=getWeixinConf();
             $this->Wxqy = new \WeixinQy($this->WxConf["1000009"]["corpid"],$this->WxConf["1000009"]["corpsecret"]);
@@ -69,6 +69,9 @@ class BaseController extends \Common\Controller\BaseController{
                 session("history",domain(false).__SELF__);
                 $this->redirect('Index/Login');
             }elseif($this->isLogin() && ACTION_NAME=='Login'){
+                if($_GET['code']){
+                    $this->vlog(9);
+                }
                 $this->redirect('Index/Main');
             }
         }else{ 
@@ -194,7 +197,7 @@ class BaseController extends \Common\Controller\BaseController{
      * @Desc: 设置登录和退出 
      */    
     protected function setLogin($userInfo=[]){
-        $this->log($userInfo);
+        // $this->log($userInfo);
         if(empty($userInfo)){
 	        $this->vlog(0);
             //退出设置
