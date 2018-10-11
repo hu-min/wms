@@ -1239,9 +1239,6 @@ class FinanceController extends BaseController{
         if($reqType){
             $this->$reqType();
         }else{
-            if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-				fastcgi_finish_request();//linux下才有这个函数
-            }
             $fileArr = [];
             getFiles("Download",$fileArr);
             foreach ($fileArr as $file) {
