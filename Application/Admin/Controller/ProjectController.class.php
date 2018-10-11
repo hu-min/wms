@@ -284,7 +284,7 @@ class ProjectController extends BaseController{
                     return $result;
                 }
                 break;
-            case 'create_user': case 'business': case 'leader': case 'earlier_user': case 'scene_user': case 'author' :
+            case 'create_user': case 'business': case 'leader': case 'earlier_user': case 'scene_user': case 'author' : case 'to_user' :
                 if($key!=""){
                     $where["userName"]=["LIKE","%{$key}%"];
                 }
