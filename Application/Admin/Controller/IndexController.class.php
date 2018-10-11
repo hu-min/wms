@@ -37,19 +37,20 @@ class IndexController extends BaseController{
      * @Desc: 登录页面 
      */    
     function Login(){
-        // vendor('WeixinQy.WeixinQy');//引入WeiXin企业
-        // $this->WxConf=getWeixinConf();
-        // $this->Wxqy = new \WeixinQy($this->WxConf["1000009"]["corpid"],$this->WxConf["1000009"]["corpsecret"]);
+        vendor('WeixinQy.WeixinQy');//引入WeiXin企业
+        $this->WxConf=getWeixinConf();
+        $this->Wxqy = new \WeixinQy($this->WxConf["1000009"]["corpid"],$this->WxConf["1000009"]["corpsecret"]);
         // $this->LogCom->log(100);
-        // if($_GET["code"]){
-        //     $userInfo=$this->Wxqy->user()->getUserInfo($_GET["code"],true);
-        //     // return false;
-        //     if($userInfo->userid!=""){
-        //         session("oa_islogin","1");
-        //         session("oa_user_code",$userInfo->userid);
-        //         $this->getUser(session("oa_user_code"));
-        //     }
-        // }
+        if($_GET["code"]){
+            $userInfo=$this->Wxqy->user()->getUserInfo($_GET["code"],true);
+            // return false;
+            if($userInfo->userid!=""){
+                $this->LogCom->log(100,json_encode($userInfo));
+                // session("oa_islogin","1");
+                // session("oa_user_code",$userInfo->userid);
+                // $this->getUser(session("oa_user_code"));
+            }
+        }
         //https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx650b23fa694c8ff7&redirect_uri=http://twsh.twoway.com.cn/Admin/Index/Login&response_type=code&scope=SCOPE&state=STATE#wechat_redirect
         $this->display();
     }

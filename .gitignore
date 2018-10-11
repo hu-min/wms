@@ -1,4 +1,5 @@
 /Application/Runtime/*
 /Uploads/*
 /Download/*
+/accesstoken/*
 i.php
