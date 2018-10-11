@@ -47,6 +47,8 @@ class UserController extends BaseController{
             unset($userResult["password"]);
             unset($userResult["seniorPassword"]);
             if($qiye_id){
+                session("userId",$userResult["userId"]);
+			    session("userName",$userResult["userName"]);
                 $param = [
                     "where"=>$parameter,
                     "data"=>['qiye_id'=>$qiye_id],
