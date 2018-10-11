@@ -1,8 +1,8 @@
 <?php
 $CONFIG=array(
     'DB_TYPE'   => 'mysql',
-     'DB_USER'   => ($_SERVER["HTTP_HOST"]=='twsh.vitionst.top')?'vwms':'root', // 用户名
-     'DB_PWD'    => ($_SERVER["HTTP_HOST"]=='twsh.vitionst.top')?'Vwms2018#23':'root', // 密码
+     'DB_USER'   => (in_array($_SERVER["HTTP_HOST"],['twsh.vitionst.top','twsh.twoway.com.cn']))?'vwms':'root', // 用户名
+     'DB_PWD'    => (in_array($_SERVER["HTTP_HOST"],['twsh.vitionst.top','twsh.twoway.com.cn']))?'Vwms2018#23':'root', // 密码
     'DB_PREFIX' => 'v_', // 数据库表前缀 
     'URL_MODEL'=> 2,//伪静态
     // 'DB_HOST' => '47.52.132.90',
