@@ -110,13 +110,13 @@ class UserController extends BaseController{
                 'lastTime'=>time(),
                 'loginNum'=>0,
             ];
-            foreach (['userId','loginName','userName','avatar','gender','birthday','userType','roleId','id_card','email','bank_name','bank_card','wechat','alipay','status'] as $key ) {
+            foreach (['userId','loginName','userName','avatar','gender','birthday','userType','roleId','id_card','email','bank_name','bank_card','wechat','alipay','status','qiye_id'] as $key ) {
                 if(isset($datas[$key])){
                     $userInfo[$key] = $datas[$key];
                 }
             }
         }elseif($reqType=="Edit"){
-            foreach (['userId','loginName','userName','avatar','gender','phone','userType','roleId','birthday','id_card','email','bank_name','bank_card','wechat','alipay','status'] as $key ) {
+            foreach (['userId','loginName','userName','avatar','gender','phone','userType','roleId','birthday','id_card','email','bank_name','bank_card','wechat','alipay','status','qiye_id'] as $key ) {
                 if(isset($datas[$key])){
                     $userInfo[$key] = $datas[$key];
                 }
