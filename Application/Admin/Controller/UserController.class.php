@@ -57,14 +57,14 @@ class UserController extends BaseController{
         }
     }
     function user_modalOne(){
-        $title = "新建用户";
+        $title = "新建员工";
         $btnTitle = "添加数据";
         $gettype = I("gettype");
         $resultData=[];
         $id = I("id");
         
         if($gettype=="Edit"){
-            $title = "编辑用户";
+            $title = "编辑员工";
             $btnTitle = "保存数据";
             $redisName="userList";
             $resultData=$this->userCom->redis_one($redisName,"userId",$id);

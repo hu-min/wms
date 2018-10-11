@@ -41,17 +41,29 @@ class IndexController extends BaseController{
         $this->WxConf=getWeixinConf();
         $this->Wxqy = new \WeixinQy($this->WxConf["1000009"]["corpid"],$this->WxConf["1000009"]["corpsecret"]);
         // $this->LogCom->log(100);
+
         if($_GET["code"]){
-            $userInfo=$this->Wxqy->user()->getUserInfo($_GET["code"],true);
+            session('qiye_ucode',$_GET["code"]);
+        }
+        if(session('qiye_ucode')){
+            $userInfo=$this->Wxqy->user()->getUserInfo(session('qiye_ucode'),true);
             // return false;
             if($userInfo->userid!=""){
-                $this->LogCom->log(100,json_encode($userInfo));
+                $data['qiye_id']=$userInfo->userid;
+                $userResult=$this->userCom->checkUser($data);
+                
+                if(isset($userResult->errCode) && $userResult->errCode==0){
+                    $this->setLogin($userResult->data);
+                    $this->redirect('Index/Main');
+                }
+                // $this->LogCom->log(100,json_encode($userInfo,JSON_UNESCAPED_UNICODE));
+                // {"errcode":0,"errmsg":"ok","userid":"1000000999","name":"\u90ed\u4f1f\u5347","department":[1],"position":"","mobile":"13430310719","gender":"1","email":"","avatar":"http:\/\/p.qlogo.cn\/bizmail\/RLrLIym6EQNnU0uMgeyPLxZD4RBNvxJdd1wN3e9wju0O4qW573fu5g\/0","status":1,"isleader":0,"extattr":{"attrs":[{"name":"\u82f1\u6587\u540d","value":""}]},"english_name":"","telephone":"","enable":1,"hide_mobile":0,"order":[0],"qr_code":"http:\/\/open.work.weixin.qq.com\/wwopen\/userQRCode?vcode=vc158a033866263f5b","alias":""}
+
                 // session("oa_islogin","1");
                 // session("oa_user_code",$userInfo->userid);
                 // $this->getUser(session("oa_user_code"));
             }
         }
-        //https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx650b23fa694c8ff7&redirect_uri=http://twsh.twoway.com.cn/Admin/Index/Login&response_type=code&scope=SCOPE&state=STATE#wechat_redirect
         $this->display();
     }
     function Main(){
@@ -87,6 +99,9 @@ class IndexController extends BaseController{
      */    
     function checkLogin(){
         $data=I('data');
+        if(session('qiye_ucode')){
+            $data['qiye_id'] = session('qiye_ucode');
+        }
         $userResult=$this->userCom->checkUser($data);
         if($userResult->errCode==0){
             $this->setLogin($userResult->data);

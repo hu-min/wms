@@ -17,13 +17,13 @@
                     <div class="box-body search-body">
                         <div class="col-md-12">
                             <div class="form-inline">
-                                <label  class="control-label">登录名称：</label>
+                                <label  class="control-label">登陆账号：</label>
                                 <div class="form-group">
-                                    <input class="form-control search-info"  name="loginName" placeholder="登录名" type="text">
+                                    <input class="form-control search-info"  name="loginName" placeholder="登陆账号" type="text">
                                 </div>
-                                <label class="control-label">用户名：</label>
+                                <label class="control-label">员工姓名：</label>
                                 <div class="form-group">
-                                    <input class="form-control search-info"  name="userName" placeholder="用户名" type="text">
+                                    <input class="form-control search-info"  name="userName" placeholder="员工姓名" type="text">
                                 </div>
                                 <div class="form-group">
                                     <label for="gender" class="control-label">性别：</label>
@@ -35,14 +35,14 @@
                                 </div>
                                 <if condition="$nodeAuth egt 2">
                                     <div class="form-group">
-                                        <button type="button" data-gettype="Add" data-toggle="modal"  data-vtarget=".global-modal" data-con="{$controlName}" data-url="{$url}" class="btn btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 添加用户</button>
+                                        <button type="button" data-gettype="Add" data-toggle="modal"  data-vtarget=".global-modal" data-con="{$controlName}" data-url="{$url}" class="btn btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 添加员工</button>
                                     </div> 
                                 </if>
                             </div>
                             <br>
                             <div class="form-inline">
                                 <div class="form-group">
-                                    <label for="userType" class="control-label">用户类型：</label>
+                                    <label for="userType" class="control-label">员工类型：</label>
                                     <select class="form-control search-info" id="userType" name="userType">
                                         <option value="">全部</option>
                                         <volist name="userType" id="item">
@@ -93,12 +93,12 @@
                 <table id="" class="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th>用户Id</th>
-                            <th>登录名</th>
-                            <th>用户名</th>
+                            <th>员工Id</th>
+                            <th>登陆账号</th>
+                            <th>员工姓名</th>
                             <th>头像</th>
                             <th>电话号码</th>
-                            <th>用户类型</th>
+                            <th>员工类型</th>
                             <th>注册来源</th>
                             <th>角色</th>
                             <th>注册时间</th>

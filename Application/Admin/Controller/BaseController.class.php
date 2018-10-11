@@ -179,7 +179,7 @@ class BaseController extends \Common\Controller\BaseController{
     protected function setLogin($userInfo=[]){
         $this->log($userInfo);
         if(empty($userInfo)){
-	    $this->vlog(0);
+	        $this->vlog(0);
             //退出设置
             session("userInfo",NULL);
             session('userId',NULL);
@@ -208,6 +208,7 @@ class BaseController extends \Common\Controller\BaseController{
             }
             session("userInfo",$userInfo);
             session('isLogin',1);
+            session('qiye_ucode',NULL);
 	        $this->vlog(1);
             
 

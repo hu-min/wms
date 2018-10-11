@@ -16,14 +16,23 @@ class UserController extends BaseController{
      */    
     function checkUser($parameter=[]){
         // $this->log($parameter);
+        $qiye_id = false;
         $res=$this->initRes();
-        if(!$parameter['loginName'] || !$parameter['password']){
+        if($parameter['qiye_id'] && (!$parameter['loginName'] && !$parameter['password'])){
+
+        }else if($parameter['loginName'] && $parameter['password']){
+            $parameter['loginName'] = strtolower($parameter['loginName']);
+            $parameter['password']=sha1(sha1($parameter['password']));
+            if($parameter['qiye_id']){
+                $qiye_id = $parameter['qiye_id'];
+                unset($parameter['qiye_id']);
+            }
+        }else{
             $res->errCode=110;
             $res->error=getError(110);
             return $res;
         }
-        $parameter['loginName'] = strtolower($parameter['loginName']);
-        $parameter['password']=sha1(sha1($parameter['password']));
+        
         $parArray=[
             'where'=>$parameter,
             'fields'=>'*',
@@ -33,9 +42,17 @@ class UserController extends BaseController{
             ],
         ];
         $userResult=$this->selfDB->getOne($parArray);
-        $this->log($this->selfDB->_sql());
+        // $this->log($this->selfDB->_sql());
         if($userResult){
             unset($userResult["password"]);
+            unset($userResult["seniorPassword"]);
+            if($qiye_id){
+                $param = [
+                    "where"=>$parameter,
+                    "data"=>['qiye_id'=>$qiye_id],
+                ];
+                $this->update($param);
+            }
             if($userResult['status']!=1){
                 $res->errCode=10002;
                 $res->error=getError(10002);
