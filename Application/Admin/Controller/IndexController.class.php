@@ -5,7 +5,24 @@ namespace Admin\Controller;
 class IndexController extends BaseController{
 
     public function _initialize() {
+        if($_GET['code']){
+            vendor('WeixinQy.WeixinQy');//引入WeiXin企业
+            $this->WxConf=getWeixinConf();
+            $this->Wxqy = new \WeixinQy($this->WxConf["1000009"]["corpid"],$this->WxConf["1000009"]["corpsecret"]);
+            $userInfo=$this->Wxqy->user()->getUserInfo($_GET['code'],true);
+            if($userInfo->userid!=""){
+                $data['qiye_id']=$userInfo->userid;
+                $userResult=$this->userCom->checkUser($data);
+                if(isset($userResult->errCode) && $userResult->errCode==0 && !$this->isLogin()){
+                    $this->setLogin($userResult->data);
+                    // $this->redirect('Index/Main');
+                }else{
+                    session('qiye_id',$userInfo->userid);
+                }
+            }
+        }
         $this->AUser = A('Admin/User');
+        
         parent::_initialize();
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
@@ -19,15 +36,13 @@ class IndexController extends BaseController{
             'export'=>'导出',
             'import'=>'导入',
         ]; 
+        
     }
     
     /**
      * 后台管理入口
      */
     function Index(){
-        if($_GET["code"]){
-            session('qiye_ucode',$_GET["code"]);
-        }
         if($this->isLogin()){
             $this->redirect('Index/Main');
         }else{
@@ -40,34 +55,34 @@ class IndexController extends BaseController{
      * @Desc: 登录页面 
      */    
     function Login(){
-        vendor('WeixinQy.WeixinQy');//引入WeiXin企业
-        $this->WxConf=getWeixinConf();
-        $this->Wxqy = new \WeixinQy($this->WxConf["1000009"]["corpid"],$this->WxConf["1000009"]["corpsecret"]);
         // $this->LogCom->log(100);
 
-        if(session('qiye_ucode')){
-            $userInfo=$this->Wxqy->user()->getUserInfo(session('qiye_ucode'),true);
-            // return false;
-            if($userInfo->userid!=""){
-                $data['qiye_id']=$userInfo->userid;
-                $userResult=$this->userCom->checkUser($data);
-                
-                if(isset($userResult->errCode) && $userResult->errCode==0){
-                    $this->setLogin($userResult->data);
-                    $this->redirect('Index/Main');
-                }
-                // $this->LogCom->log(100,json_encode($userInfo,JSON_UNESCAPED_UNICODE));
-                // {"errcode":0,"errmsg":"ok","userid":"1000000999","name":"\u90ed\u4f1f\u5347","department":[1],"position":"","mobile":"13430310719","gender":"1","email":"","avatar":"http:\/\/p.qlogo.cn\/bizmail\/RLrLIym6EQNnU0uMgeyPLxZD4RBNvxJdd1wN3e9wju0O4qW573fu5g\/0","status":1,"isleader":0,"extattr":{"attrs":[{"name":"\u82f1\u6587\u540d","value":""}]},"english_name":"","telephone":"","enable":1,"hide_mobile":0,"order":[0],"qr_code":"http:\/\/open.work.weixin.qq.com\/wwopen\/userQRCode?vcode=vc158a033866263f5b","alias":""}
+        // if(session('qiye_ucode')){
+        //     vendor('WeixinQy.WeixinQy');//引入WeiXin企业
+        //     $this->WxConf=getWeixinConf();
+        //     $this->Wxqy = new \WeixinQy($this->WxConf["1000009"]["corpid"],$this->WxConf["1000009"]["corpsecret"]);
 
-                // session("oa_islogin","1");
-                // session("oa_user_code",$userInfo->userid);
-                // $this->getUser(session("oa_user_code"));
-            }
-        }
+        //     $userInfo=$this->Wxqy->user()->getUserInfo(session('qiye_ucode'),true);
+        //     // return false;
+        //     if($userInfo->userid!=""){
+        //         $data['qiye_id']=$userInfo->userid;
+        //         $userResult=$this->userCom->checkUser($data);
+                
+        //         if(isset($userResult->errCode) && $userResult->errCode==0){
+        //             $this->setLogin($userResult->data);
+        //             $this->redirect('Index/Main');
+        //         }
+        //         // $this->LogCom->log(100,json_encode($userInfo,JSON_UNESCAPED_UNICODE));
+        //         // {"errcode":0,"errmsg":"ok","userid":"1000000999","name":"\u90ed\u4f1f\u5347","department":[1],"position":"","mobile":"13430310719","gender":"1","email":"","avatar":"http:\/\/p.qlogo.cn\/bizmail\/RLrLIym6EQNnU0uMgeyPLxZD4RBNvxJdd1wN3e9wju0O4qW573fu5g\/0","status":1,"isleader":0,"extattr":{"attrs":[{"name":"\u82f1\u6587\u540d","value":""}]},"english_name":"","telephone":"","enable":1,"hide_mobile":0,"order":[0],"qr_code":"http:\/\/open.work.weixin.qq.com\/wwopen\/userQRCode?vcode=vc158a033866263f5b","alias":""}
+
+        //         // session("oa_islogin","1");
+        //         // session("oa_user_code",$userInfo->userid);
+        //         // $this->getUser(session("oa_user_code"));
+        //     }
+        // }
         $this->display();
     }
     function Main(){
-        // print_r($_SESSION);
         $this->userId=session('userId');
         if(!$this->userId){
             $this->redirect('Index/LogOut');
@@ -99,11 +114,8 @@ class IndexController extends BaseController{
      */    
     function checkLogin(){
         $data=I('data');
-        if(session('qiye_ucode')){
-            $userInfo=$this->Wxqy->user()->getUserInfo(session('qiye_ucode'),true);
-            if($userInfo->userid!=""){
-                $data['qiye_id'] = $userInfo->userid;
-            }
+        if(session('qiye_id')){
+            $data['qiye_id'] = session('qiye_id');
         }
         $userResult=$this->userCom->checkUser($data);
         if($userResult->errCode==0){

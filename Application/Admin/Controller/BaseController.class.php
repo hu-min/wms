@@ -208,7 +208,7 @@ class BaseController extends \Common\Controller\BaseController{
             }
             session("userInfo",$userInfo);
             session('isLogin',1);
-            session('qiye_ucode',NULL);
+            session('qiye_id',NULL);
 	        $this->vlog(1);
             
 
