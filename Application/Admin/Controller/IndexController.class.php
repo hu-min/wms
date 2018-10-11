@@ -25,6 +25,9 @@ class IndexController extends BaseController{
      * 后台管理入口
      */
     function Index(){
+        if($_GET["code"]){
+            session('qiye_ucode',$_GET["code"]);
+        }
         if($this->isLogin()){
             $this->redirect('Index/Main');
         }else{
@@ -42,9 +45,6 @@ class IndexController extends BaseController{
         $this->Wxqy = new \WeixinQy($this->WxConf["1000009"]["corpid"],$this->WxConf["1000009"]["corpsecret"]);
         // $this->LogCom->log(100);
 
-        if($_GET["code"]){
-            session('qiye_ucode',$_GET["code"]);
-        }
         if(session('qiye_ucode')){
             $userInfo=$this->Wxqy->user()->getUserInfo(session('qiye_ucode'),true);
             // return false;
