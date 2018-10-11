@@ -88,6 +88,9 @@ class UserController extends BaseController{
         if(isset($datas['birthday'])){
             $datas['birthday'] = strtotime($datas['birthday']." 00:00:00");
         }
+        if(isset($datas['loginName'])){
+            $datas['loginName'] = strtolower($datas['loginName']);
+        }
         $filesData=I("filesData");
         if($filesData[urlencode($datas['avatar'])]){
             $datas['avatar']=base64Img($filesData[urlencode($datas['avatar'])])["url2"];

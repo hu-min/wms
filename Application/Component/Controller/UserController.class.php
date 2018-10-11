@@ -22,6 +22,7 @@ class UserController extends BaseController{
             $res->error=getError(110);
             return $res;
         }
+        $parameter['loginName'] = strtolower($parameter['loginName']);
         $parameter['password']=sha1(sha1($parameter['password']));
         $parArray=[
             'where'=>$parameter,

@@ -128,7 +128,7 @@
                                     </volist>
                                 </select>
                             </td>
-                            <td>
+                            <td style="min-width:100px;max-width:200px;">
                                 <select class="form-control modal-info chosen-select" title="承接模块" data-value="basicId" data-req="getModuleList" data-text="name" name="module" multiple="multiple" data-cname="supplier_com" data-pname="type" >
                                     <option value="999999999">全部承接模块</option>
                                     <volist name="moduleArr" id="item">
@@ -154,22 +154,16 @@
                             </td>
                             <!-- <td ><input class="form-control modal-info" name="region" readonly="readonly" type="text"></td> -->
                             <td>
-                                <input class="form-control modal-info" required="required"  name="contract_amount" title="合同金额"  value="" placeholder="合同金额" type="text">
+                                <input style="min-width:60px;" class="form-control modal-info" required="required"  name="contract_amount" title="合同金额"  value="" placeholder="合同金额" type="text">
                             </td>
                             <td>
                                 <div class="input-group date">
-                                    <div class="input-group-addon">
-                                        <i class="fa fa-calendar"></i>
-                                    </div>
-                                    <input class="form-control pull-right date-input modal-info" name="sign_date" type="text">
+                                    <input style="min-width:120px;"  class="form-control pull-right date-input modal-info" name="sign_date" type="text">
                                 </div>
                             </td>
                             <td>
                                 <div class="input-group date">
-                                    <div class="input-group-addon">
-                                        <i class="fa fa-calendar"></i>
-                                    </div>
-                                    <input class="form-control pull-right date-input modal-info" name="advance_date" type="text">
+                                    <input style="min-width:120px;"  class="form-control pull-right date-input modal-info" name="advance_date" type="text">
                                 </div>
                             </td>
                             <td>

@@ -588,3 +588,12 @@ function imge2thumb($file){
     }
     return "";
 }
+/** 
+ * @Author: vition 
+ * @Date: 2018-10-11 17:27:24 
+ * @Desc: 取微信配置信息 
+ */
+function getWeixinConf(){
+    $WxConf = '{"1000009":{"corpid":"wx650b23fa694c8ff7","corpsecret":"HdwjcqIUmY80OR4wzEeMDMO9AsFlebGq1yjT3E2hang"},"contacts":{"corpid":"wx650b23fa694c8ff7","corpsecret":"GDTwLEDVdhiCz0ViKGOVKJZbQc3eLN9URy9ugIVJNm0"}}';
+    return json_decode($WxConf,true);
+}
