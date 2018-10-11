@@ -44,6 +44,23 @@ class BaseController extends \Common\Controller\BaseController{
         ];
         $this->refreNode();
         
+        if($_GET['code']){
+            vendor('WeixinQy.WeixinQy');//引入WeiXin企业
+            $this->WxConf=getWeixinConf();
+            $this->Wxqy = new \WeixinQy($this->WxConf["1000009"]["corpid"],$this->WxConf["1000009"]["corpsecret"]);
+            $userInfo=$this->Wxqy->user()->getUserInfo($_GET['code'],true);
+            if($userInfo->userid!=""){
+                $data['qiye_id']=$userInfo->userid;
+                $userResult=$this->userCom->checkUser($data);
+                if(isset($userResult->errCode) && $userResult->errCode==0 && !$this->isLogin()){
+                    $this->setLogin($userResult->data);
+                    // $this->redirect('Index/Main');
+                }else{
+                    session('qiye_id',$userInfo->userid);
+                }
+            }
+        }
+
         // print_r($this->nodeAuth);
         // $this->setLogin();
         $nowConAct=MODULE_NAME."/".CONTROLLER_NAME.'/'.ACTION_NAME;
