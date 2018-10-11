@@ -100,7 +100,10 @@ class IndexController extends BaseController{
     function checkLogin(){
         $data=I('data');
         if(session('qiye_ucode')){
-            $data['qiye_id'] = session('qiye_ucode');
+            $userInfo=$this->Wxqy->user()->getUserInfo(session('qiye_ucode'),true);
+            if($userInfo->userid!=""){
+                $data['qiye_id'] = $userInfo->userid;
+            }
         }
         $userResult=$this->userCom->checkUser($data);
         if($userResult->errCode==0){
