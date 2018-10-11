@@ -39,31 +39,6 @@ class IndexController extends BaseController{
      * @Desc: 登录页面 
      */    
     function Login(){
-        // $this->LogCom->log(100);
-
-        // if(session('qiye_ucode')){
-        //     vendor('WeixinQy.WeixinQy');//引入WeiXin企业
-        //     $this->WxConf=getWeixinConf();
-        //     $this->Wxqy = new \WeixinQy($this->WxConf["1000009"]["corpid"],$this->WxConf["1000009"]["corpsecret"]);
-
-        //     $userInfo=$this->Wxqy->user()->getUserInfo(session('qiye_ucode'),true);
-        //     // return false;
-        //     if($userInfo->userid!=""){
-        //         $data['qiye_id']=$userInfo->userid;
-        //         $userResult=$this->userCom->checkUser($data);
-                
-        //         if(isset($userResult->errCode) && $userResult->errCode==0){
-        //             $this->setLogin($userResult->data);
-        //             $this->redirect('Index/Main');
-        //         }
-        //         // $this->LogCom->log(100,json_encode($userInfo,JSON_UNESCAPED_UNICODE));
-        //         // {"errcode":0,"errmsg":"ok","userid":"1000000999","name":"\u90ed\u4f1f\u5347","department":[1],"position":"","mobile":"13430310719","gender":"1","email":"","avatar":"http:\/\/p.qlogo.cn\/bizmail\/RLrLIym6EQNnU0uMgeyPLxZD4RBNvxJdd1wN3e9wju0O4qW573fu5g\/0","status":1,"isleader":0,"extattr":{"attrs":[{"name":"\u82f1\u6587\u540d","value":""}]},"english_name":"","telephone":"","enable":1,"hide_mobile":0,"order":[0],"qr_code":"http:\/\/open.work.weixin.qq.com\/wwopen\/userQRCode?vcode=vc158a033866263f5b","alias":""}
-
-        //         // session("oa_islogin","1");
-        //         // session("oa_user_code",$userInfo->userid);
-        //         // $this->getUser(session("oa_user_code"));
-        //     }
-        // }
         $this->display();
     }
     function Main(){

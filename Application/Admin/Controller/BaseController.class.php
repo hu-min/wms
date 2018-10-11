@@ -225,10 +225,13 @@ class BaseController extends \Common\Controller\BaseController{
             }
             session("userInfo",$userInfo);
             session('isLogin',1);
-            session('qiye_id',NULL);
-	        $this->vlog(1);
             
-
+            if(session('qiye_id')){
+                $this->vlog(9);
+                session('qiye_id',NULL);
+            }else{
+                $this->vlog(1);
+            }
             $this->userCom->logIORec($userInfo['userId']);
         }
     }

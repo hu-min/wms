@@ -94,6 +94,7 @@
                     <thead>
                         <tr>
                             <th>员工Id</th>
+                            <th>企业微信Id</th>
                             <th>登陆账号</th>
                             <th>员工姓名</th>
                             <th>头像</th>
@@ -152,7 +153,7 @@
         // }
         /*设置编辑用户信息*/
         function user_setInfo(info){
-            ['userId','loginName','userName','avatar','phone','birthday','id_card','email','bank_name','bank_card','wechat','alipay'].forEach(element => {
+            ['userId','loginName','userName','avatar','phone','birthday','id_card','email','bank_name','bank_card','wechat','alipay','qiye_id'].forEach(element => {
                 $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
             });
    
@@ -160,7 +161,7 @@
             $(tabId+" .modal-info[name='password']").val('');
             $(tabId+" .modal-info[name='password']").removeAttr("required")
             $(tabId+" .modal-info[name='gender']").find("option[value='"+info['gender']+"']").prop("selected",true);
-            $(tabId+" .modal-info[name='userType']").find("option[value='"+info['userType']+"']").prop("selected",true);
+            // $(tabId+" .modal-info[name='userType']").find("option[value='"+info['userType']+"']").prop("selected",true);
 
             $(tabId+" .modal-info[name='roleId']").find("option[value='"+info['roleId']+"']").prop("selected",true);
             set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
