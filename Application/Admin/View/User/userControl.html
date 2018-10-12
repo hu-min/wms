@@ -162,6 +162,9 @@
         function user_setInfo(info){
             ['userId','loginName','userName','avatar','phone','birthday','id_card','email','bank_name','bank_card','wechat','alipay','qiye_id'].forEach(element => {
                 $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
+                if(element=='qiye_id' && info[element]!=""){
+                    $(tabId+" .modal-info[name='"+element+"']").prop("disabled",true);
+                }
             });
    
             $(tabId+" .modal-info[name='phone']").val(info['phone']);
