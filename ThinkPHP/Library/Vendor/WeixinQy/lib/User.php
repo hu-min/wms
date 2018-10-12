@@ -24,14 +24,17 @@ class User extends Urllib{
 	 */
 	function createUser($userDataArr){
 		$resultDataJson=$this->post("https://qyapi.weixin.qq.com/cgi-bin/user/create?access_token=".$this->accessToken,$userDataArr);
-		$result=json_decode($resultDataJson);
-		if($result->errmsg=="mobile existed:".$userDataArr["userid"]){
-			return "用户名：".$userDataArr["name"]."；ID:".$userDataArr["userid"]."已经存在";
-		}else if($result->errmsg=="created"){
-			return "success";
-		}else{
-			return $resultDataJson;
-		}
+		$result=json_decode($resultDataJson,true);
+		// $result->error = $this->getError($result->errcode);
+		$result['error'] = $this->getError($result['errcode']);
+		return $result;
+		// if($result->errmsg=="mobile existed:".$userDataArr["userid"]){
+		// 	return "用户名：".$userDataArr["name"]."；ID:".$userDataArr["userid"]."已经存在";
+		// }else if($result->errmsg=="created"){
+		// 	return "success";
+		// }else{
+		// 	return $resultDataJson;
+		// }
 	}
 	/**
 	 * [getUserInfo 通过code获取用户信息，一般在验证登录时使用]
@@ -65,14 +68,16 @@ class User extends Urllib{
 	 */
 	function updateUser($userDataArr){
 		$resultDataJson=$this->post("https://qyapi.weixin.qq.com/cgi-bin/user/update?access_token=".$this->accessToken,$userDataArr);
-		$result=json_decode($resultDataJson);
-		if($result->errmsg=="updated"){
-			return "success";
-		}else if($result->errmsg=="userid not found"){
-			return "用户不存在";
-		}else{
-			return $resultDataJson;
-		}
+		$result=json_decode($resultDataJson,true);
+		$result['error'] = $this->getError($result['errcode']);
+		return $result;
+		// if($result->errmsg=="updated"){
+		// 	return "success";
+		// }else if($result->errmsg=="userid not found"){
+		// 	return "用户不存在";
+		// }else{
+		// 	return $resultDataJson;
+		// }
 	}
 
 	/**
@@ -82,14 +87,16 @@ class User extends Urllib{
 	 */
 	function deleteUser($userid){
 		$resultDataJson=$this->get("https://qyapi.weixin.qq.com/cgi-bin/user/delete?access_token={$this->accessToken}&userid={$userid}");
-		$result=json_decode($resultDataJson);
-		if($result->errmsg=="deleted"){
-			return "success";
-		}else if($result->errmsg=="userid not found"){
-			return "用户不存在";
-		}else{
-			return $resultDataJson;
-		}
+		$result=json_decode($resultDataJson,true);
+		$result['error'] = $this->getError($result['errcode']);
+		return $result;
+		// if($result->errmsg=="deleted"){
+		// 	return "success";
+		// }else if($result->errmsg=="userid not found"){
+		// 	return "用户不存在";
+		// }else{
+		// 	return $resultDataJson;
+		// }
 	}
 
 	/**

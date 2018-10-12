@@ -383,6 +383,7 @@ class BaseController extends \Common\Controller\BaseController{
         $dbObject=M($db,NULL);
         $msg="删除成功！";
         $logType = 5;
+        $qiye_id = 0;
         if(!$id && $db!='v_purcha'){
             $this->ajaxReturn(['errCode'=>110,'error'=>'ID异常']);
         }
@@ -391,6 +392,9 @@ class BaseController extends \Common\Controller\BaseController{
         }
         if(is_array($ids) && !empty($ids)){
             $id = ["IN",$ids];
+        }
+        if($db=='v_user'){
+            $qiye_id = $dbObject->field('qiye_id')->where([$dbObject->getPk()=>$id])->find()['qiye_id'];
         }
         if($statusType=="del"){
             if($db!='v_purcha'){
@@ -426,6 +430,21 @@ class BaseController extends \Common\Controller\BaseController{
         }
         if($conResult){
             $this->LogCom->log($logType);
+            if($db=="v_user"){ //用户表需要执行企业微信号的通讯录
+                vendor('WeixinQy.WeixinQy');//引入WeiXin企业
+                $this->WxConf=getWeixinConf();
+                $this->Wxqy = new \WeixinQy($this->WxConf["contacts"]["corpid"],$this->WxConf["contacts"]["corpsecret"]);
+
+                if($statusType=="del"){
+                    $userData = [
+                        "userid"=>$qiye_id,
+                        "enable" => 0,
+                    ];
+                    $this->Wxqy->user()->updateUser($userData);
+                }else if($statusType=="deepDel"){
+                    $this->Wxqy->user()->deleteUser($qiye_id);
+                }
+            }
             $this->ajaxReturn(['errCode'=>0,'error'=>$msg]);
         }
         $msg = "操作异常！";

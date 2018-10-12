@@ -79,7 +79,7 @@ class BaseController extends \Common\Controller\BaseController{
             $joins=$parameter['joins']?$parameter['joins']:null;
             $having=$parameter['having']?$parameter['having']:null;
             $sum=$parameter['sum']?$parameter['sum']:null;
-            $classList=$this->selfDB->getOne(['where'=>$where,'fields'=>$fields,"joins"=>$joins,"having"=>$having,"sum"=>$sum]);
+            $classList=$this->selfDB->getOne(['where'=>$where,'order'=>$orderStr,'fields'=>$fields,"joins"=>$joins,"having"=>$having,"sum"=>$sum]);
         }else{
             $classList=$this->selfDB->getOne($parameter);
         }

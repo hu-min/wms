@@ -99,7 +99,7 @@
                             <th>员工姓名</th>
                             <th>头像</th>
                             <th>电话号码</th>
-                            <th>员工类型</th>
+                            <!-- <th>员工类型</th> -->
                             <th>注册来源</th>
                             <th>角色</th>
                             <th>注册时间</th>
@@ -134,6 +134,13 @@
         }
         $(function(){
             $(tabId+" .search-list").trigger("click");
+            $(tabId).on("click",".modal-info[name='qiye_sync']",function(){
+                if($(this).is(":checked")){
+                    $(tabId+" .modal-info[name='phone']").prop('required',true)
+                }else{
+                    $(tabId+" .modal-info[name='phone']").prop('required',false)
+                }
+            })
         })
         /*查询列表函数*/
         // function userSearchFuns(){

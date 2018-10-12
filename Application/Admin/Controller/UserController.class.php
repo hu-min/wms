@@ -133,9 +133,18 @@ class UserController extends BaseController{
      * @Desc: 添加、修改用户信息 
      */    
     function userEdit(){
+        $qiye_sync = I("data")['qiye_sync'];
         $userInfo=$this->manageUserInfo();
+        
         if($userInfo["userId"]==1 && session("userId")!=1){
             $this->ajaxReturn(['errCode'=>10003,'error'=>getError(10003)]);
+        }
+        if($qiye_sync){
+            $wxResult = $this->qiye_sync($userInfo);
+            if($wxResult['errcode']!=0){
+                $this->ajaxReturn(['errCode'=>$wxResult['errcode'],'error'=>$wxResult['error']]);
+            }
+            $userInfo['qiye_id'] = $userInfo['qiye_id'];
         }
         $updateResult=$this->userCom->updateUser($userInfo);
         
@@ -150,13 +159,66 @@ class UserController extends BaseController{
      * @Desc: 执行添加 
      */    
     function userAdd(){
+        $qiye_sync = I("data")['qiye_sync'];
         $userInfo=$this->manageUserInfo();
+        if($qiye_sync){
+            $wxResult = $this->qiye_sync($userInfo);
+            if($wxResult['errcode']!=0){
+                $this->ajaxReturn(['errCode'=>$wxResult['errcode'],'error'=>$wxResult['error']]);
+            }
+            $userInfo['qiye_id'] = $userInfo['qiye_id'];
+        }
         $insertResult=$this->userCom->insertUser($userInfo);
         if($insertResult->errCode==0){
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
         }
         
         $this->ajaxReturn(['errCode'=>100,'error'=>getError(100),'reqType'=>$reqType]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-12 10:37:16 
+     * @Desc: 同步企业微信信息 
+     */    
+    function qiye_sync($userInfo){
+        vendor('WeixinQy.WeixinQy');//引入WeiXin企业
+        $this->WxConf=getWeixinConf();
+        $this->Wxqy = new \WeixinQy($this->WxConf["contacts"]["corpid"],$this->WxConf["contacts"]["corpsecret"]);
+        $sQiyeId = 1000001000;
+        $userData = [
+            "userid"=>$userInfo["qiye_id"],
+            "name"=>$userInfo["userName"],
+            "department"=>[1],
+            "position"=>'',
+            "mobile"=>$userInfo["phone"],
+            "gender"=>$userInfo["gender"], 
+            "email" => $userInfo["email"], 
+            "enable" => 1,
+        ];
+        if($userInfo['qiye_id']>0){
+            $userResult = $this->Wxqy->user()->getUser($userInfo['qiye_id']);
+            if($userResult->userid > 0){ //存在则修改信息
+                $WxResult = $this->Wxqy->user()->updateUser($userData);
+            }else{
+                $WxResult = $this->Wxqy->user()->createUser($userData);
+            }
+            $WxResult['qiye_id'] = $userInfo['qiye_id'];
+        }else{
+            $param = [
+                'where' => ['qiye_id'=>["neq",'']],
+                'fields' => 'qiye_id',
+                'orderStr' => 'qiye_id DESC',
+            ];
+            $idResult = $this->userCom->getOne($param);
+            if(isset($idResult['list']['qiye_id'])){
+                $sQiyeId = $idResult['list']['qiye_id']+1;
+            }
+            $userData['userid'] = $sQiyeId;
+            $WxResult = $this->Wxqy->user()->createUser($userData);
+            $WxResult['qiye_id'] = $sQiyeId;
+        }
+        return $WxResult;
+        
     }
     /** 
      * @Author: vition 

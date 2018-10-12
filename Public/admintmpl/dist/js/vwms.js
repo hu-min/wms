@@ -355,10 +355,18 @@ $(document).on("click",'.save-info',function(){
         // console.log(global_modal)
         $(tabId+global_modal+" .modal-info").each(function(){
             var name =$(this).attr("name");
-            var val =$(this).val();
             var required=$(this).attr("required");
             var title=$(this).attr("title");
-            if(required=="required" && (val=="" || val == "0")){
+            if($(this).attr("type")=='checkbox'){
+                if($(this).is(":checked")){
+                    val = 1;
+                }else{
+                    val = 0;
+                }
+            }else{
+                var val =$(this).val();
+            }
+            if(required && (val=="" || val == "0")){
                 notice(110,title,"输入异常");
                 throw title
             }else{
