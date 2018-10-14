@@ -19,6 +19,9 @@ class BaseController extends Controller{
 
     public function _initialize() {
         $this->Redis= new Redis();
+        vendor('WeixinQy.WeixinQy');//引入WeiXin企业
+        $this->WxConf=getWeixinConf();
+        $this->Wxqy = new \WeixinQy($this->WxConf["1000009"]["corpid"],$this->WxConf["1000009"]["corpsecret"]);
     }
     /**
      * 写日志

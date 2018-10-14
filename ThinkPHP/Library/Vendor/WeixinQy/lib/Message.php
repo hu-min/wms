@@ -32,7 +32,8 @@ class Message extends Urllib{
 	function send($dataArray){
 		// array("touser"=>"1000000107","msgtype"=>"text","agentid"=>"0","text"=>array("content"=>"这是测试信息"))
 		$resultDataJson=$this->post("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=".$this->accessToken,$dataArray);
-		$result=json_decode($resultDataJson);
+		$result=json_decode($resultDataJson,true);
+		$result['error'] = $this->getError($result['errcode']);
 		return $result;
 	}
 

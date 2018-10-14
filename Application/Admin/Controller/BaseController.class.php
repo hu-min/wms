@@ -43,11 +43,8 @@ class BaseController extends \Common\Controller\BaseController{
             'Admin/Index/Index',
         ];
         $this->refreNode();
-        
-        if($_GET['code'] && ACTION_NAME=='Login'){
-            vendor('WeixinQy.WeixinQy');//引入WeiXin企业
-            $this->WxConf=getWeixinConf();
-            $this->Wxqy = new \WeixinQy($this->WxConf["1000009"]["corpid"],$this->WxConf["1000009"]["corpsecret"]);
+
+        if($_GET['code']){
             $userInfo=$this->Wxqy->user()->getUserInfo($_GET['code'],true);
             if($userInfo->userid!=""){
                 $data['qiye_id']=$userInfo->userid;
@@ -60,7 +57,6 @@ class BaseController extends \Common\Controller\BaseController{
                 }
             }
         }
-
         // print_r($this->nodeAuth);
         // $this->setLogin();
         $nowConAct=MODULE_NAME."/".CONTROLLER_NAME.'/'.ACTION_NAME;
@@ -431,10 +427,7 @@ class BaseController extends \Common\Controller\BaseController{
         if($conResult){
             $this->LogCom->log($logType);
             if($db=="v_user"){ //用户表需要执行企业微信号的通讯录
-                vendor('WeixinQy.WeixinQy');//引入WeiXin企业
-                $this->WxConf=getWeixinConf();
-                $this->Wxqy = new \WeixinQy($this->WxConf["contacts"]["corpid"],$this->WxConf["contacts"]["corpsecret"]);
-
+                $this->Wxqy->secret($this->WxConf["contacts"]["corpsecret"]);
                 if($statusType=="del"){
                     $userData = [
                         "userid"=>$qiye_id,

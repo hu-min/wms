@@ -39,11 +39,16 @@ class WeixinQy extends Urllib{
 	 * @param    [type]     $corpsecret [description]
 	 * @return   [type]                 [返回当前对象]
 	 */
-	function secret($corpsecret){
-		$this->corpsecret=$corpsecret;
-		$this->aTFile="accesstoken/".$this->corpsecret.".php";
-		$this->getToken();
-		return $this;
+	function secret($corpsecret=false){
+		if($corpsecret){
+			$this->corpsecret=$corpsecret;
+			$this->aTFile="accesstoken/".$this->corpsecret.".php";
+			$this->getToken();
+			return $this;
+		}else{
+			return $this->corpsecret;
+		}
+		
 	}
 	/**
 	 * [getToken 获取access token，缓存机制]

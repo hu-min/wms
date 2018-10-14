@@ -15,12 +15,24 @@ class MessageController extends BaseController{
         $current = 0;
         $datas['group_id'] = $datas['from_user'].$datas['add_time'];
         
+        $relationRes = A("Component/User")->getOne(["where"=>["userId"=>["IN",$relationArray]],"fields"=>"GROUP_CONCAT(userName) relation_uname,GROUP_CONCAT(qiye_id) qiye_ids"]);
         if($allNum>1){
             $datas['relation_user'] = implode(",",$datas['to_user']);
-            $relationRes = A("Component/User")->getOne(["where"=>["userId"=>["IN",$relationArray]],"fields"=>"GROUP_CONCAT(userName) relation_uname "]);
             $datas['relation_uname'] = $relationRes["list"]["relation_uname"];
-            
         }
+        $touser = str_replace(",","|",$relationRes["list"]["qiye_ids"]);
+        
+        $msgData = [
+            "touser" => $touser,
+            "msgtype" => "textcard",
+            "agentid" => "0",
+            "textcard" => [
+                        "title" => $datas['title'],
+                        "description" => "<div class=\"gray\">".date("Y年m月d日",$datas['add_time'])."</div> <div class=\"highlight\">".utf8_substr($datas['content'],30)."</div>",
+                        "url" => C('qiye_url')."/Admin/Index/Main.html?action=Public/messageControl",
+                        "btntxt"=>"更多"
+            ]
+        ];
         $this->startTrans();
         foreach ($relationArray as $to_user) {
             $datas['to_user'] = $to_user;
@@ -30,7 +42,10 @@ class MessageController extends BaseController{
                 $current++;
             }
         }
-        if($allNum > 0 && $current==$allNum){
+        $this->Wxqy->secret($this->WxConf["helper"]["corpsecret"]);
+        $msgResult = $this->Wxqy->message()->send($msgData);
+        // print_r($msgResult );
+        if($allNum > 0 && $current==$allNum && $msgResult['errcode']==0){
             $this->commit();
             return ['errCode'=>0,'error'=>getError(0)];
         }else{

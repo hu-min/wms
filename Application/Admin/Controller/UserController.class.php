@@ -181,9 +181,7 @@ class UserController extends BaseController{
      * @Desc: 同步企业微信信息 
      */    
     function qiye_sync($userInfo){
-        vendor('WeixinQy.WeixinQy');//引入WeiXin企业
-        $this->WxConf=getWeixinConf();
-        $this->Wxqy = new \WeixinQy($this->WxConf["contacts"]["corpid"],$this->WxConf["contacts"]["corpsecret"]);
+        $this->Wxqy->secret($this->WxConf["contacts"]["corpsecret"]);
         $sQiyeId = 1000001000;
         $userData = [
             "userid"=>$userInfo["qiye_id"],
