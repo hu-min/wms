@@ -20,19 +20,7 @@ class MessageController extends BaseController{
             $datas['relation_user'] = implode(",",$datas['to_user']);
             $datas['relation_uname'] = $relationRes["list"]["relation_uname"];
         }
-        $touser = str_replace(",","|",$relationRes["list"]["qiye_ids"]);
-        
-        $msgData = [
-            "touser" => $touser,
-            "msgtype" => "textcard",
-            "agentid" => "0",
-            "textcard" => [
-                        "title" => $datas['title'],
-                        "description" => "<div class=\"gray\">".date("Y年m月d日",$datas['add_time'])."</div> <div class=\"highlight\">".utf8_substr($datas['content'],30)."</div>",
-                        "url" => C('qiye_url')."/Admin/Index/Main.html?action=Public/messageControl".C('qiye_redirect'),
-                        "btntxt"=>"更多"
-            ]
-        ];
+        $touser = A("Component/User")->getQiyeId($relationArray);
         $this->startTrans();
         foreach ($relationArray as $to_user) {
             $datas['to_user'] = $to_user;
@@ -42,10 +30,14 @@ class MessageController extends BaseController{
                 $current++;
             }
         }
-        $this->Wxqy->secret($this->WxConf["helper"]["corpsecret"]);
-        $msgResult = $this->Wxqy->message()->send($msgData);
+        
         // print_r($msgResult );
-        if($allNum > 0 && $current==$allNum && $msgResult['errcode']==0){
+        if($allNum > 0 && $current==$allNum){
+            if(!empty($touser)){
+                $desc = "<div class=\"gray\">".date("Y年m月d日",$datas['add_time'])."</div> <div class=\"normal\">".utf8_substr($datas['content'],30)."</div>";
+                $url = C('qiye_url')."/Admin/Index/Main.html?action=Public/messageControl";
+                $msgResult = $this->QiyeCom-> textcard($touser,$datas['title'],$desc,$url);
+            }
             $this->commit();
             return ['errCode'=>0,'error'=>getError(0)];
         }else{

@@ -35,6 +35,7 @@ class BaseController extends \Common\Controller\BaseController{
         $this->nodeAuth=session('nodeAuth');
         $this->basicCom=getComponent('Basic');
         $this->resetCom=getComponent('ResetApply');
+        $this->QiyeCom=getComponent('Qiye');
         $this->exemption=[//排除的控制器
             'Admin/Index/Login',
             'Admin/Index/Main',
@@ -60,6 +61,7 @@ class BaseController extends \Common\Controller\BaseController{
         // print_r($this->nodeAuth);
         // $this->setLogin();
         $nowConAct=MODULE_NAME."/".CONTROLLER_NAME.'/'.ACTION_NAME;
+
         if(in_array($nowConAct,$this->exemption) || ( in_array(ACTION_NAME,['excel_import','upload_filesAdd','excel_export','template_down','reset_apply']) && $this->isLogin())){
             if(!$this->isLogin() && !in_array(ACTION_NAME,['checkLogin','Login']) ){
                 session("history",domain(false).__SELF__);

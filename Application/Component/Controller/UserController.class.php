@@ -286,4 +286,30 @@ class UserController extends BaseController{
         }
         return$whiteIds;
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-14 16:08:58 
+     * @Desc: 用户id转企业微信id 
+     */    
+    function getQiyeId($userId){
+        $where = [];
+        if(is_array($userId)){
+            $where['userId'] = ["IN",$userId];
+        }else{
+            $where['userId'] = $userI; 
+        }
+        $parameter=[
+            'where'=>$where,
+            'fields'=>'qiye_id',
+        ];
+        $userResult=$this->getList($parameter);
+        $qiye_id = "";
+        $qiye_arr = [];
+        foreach ($userResult['list'] as $value) {
+            if($value['qiye_id']){
+                array_push($qiye_arr,$value['qiye_id']);
+            }
+        }
+        return implode("|",$qiye_arr);
+    }
 }

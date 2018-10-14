@@ -42,6 +42,7 @@ class IndexController extends BaseController{
         $this->display();
     }
     function Main(){
+        $this->LogCom->log(100,$_SERVER['HTTP_USER_AGENT']);
         $this->userId=session('userId');
         if(!$this->userId){
             $this->redirect('Index/LogOut');

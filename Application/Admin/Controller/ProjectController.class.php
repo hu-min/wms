@@ -605,11 +605,31 @@ class ProjectController extends BaseController{
      * @Desc: 项目添加 
      */    
     function projectAdd(){
+        $datas=I("data");
         $projectInfo=$this->manageProjectInfo();
         // print_r($projectInfo);exit;
         if($projectInfo){
+            $userArray = [];
+            foreach (['leader','business','earlier_user','scene_user'] as $key) {
+                if($datas[$key]){
+                    if(is_array($datas[$key])){
+                        $userArray = array_merge($userArray,$datas[$key]);
+                    }else{
+                        array_push($userArray,$datas[$key]);
+                    }
+                }
+            }
+            $userArray = array_unique($userArray);
+            if(!empty($userArray)){
+                $touser = $this->userCom->getQiyeId($userArray);
+            }
             $insertResult=$this->projectCom->insertProject($projectInfo);
             if($insertResult && $insertResult->errCode==0){
+                if(!empty($touser)){
+                    $desc = "<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."创建了项目【{$projectInfo['name']}】，当中@了你，来围观吧！</div>";
+                    $url = C('qiye_url')."/Admin/Index/Main.html?action=Project/projectItem";
+                    $msgResult = $this->QiyeCom-> textcard($touser,"立项【{$projectInfo['name']}】",$desc,$url);
+                }
                 $this->ApprLogCom->createApp($this->projectCom->tableName(),$insertResult->data,session("userId"),"");
                 if($projectInfo['status']==1){
                     $this->ReceCom->createOrder($insertResult->data,session('userId'));
