@@ -29,7 +29,7 @@ class MessageController extends BaseController{
             "textcard" => [
                         "title" => $datas['title'],
                         "description" => "<div class=\"gray\">".date("Y年m月d日",$datas['add_time'])."</div> <div class=\"highlight\">".utf8_substr($datas['content'],30)."</div>",
-                        "url" => C('qiye_url')."/Admin/Index/Main.html?action=Public/messageControl",
+                        "url" => C('qiye_url')."/Admin/Index/Main.html?action=Public/messageControl".C('qiye_redirect'),
                         "btntxt"=>"更多"
             ]
         ];
