@@ -795,7 +795,11 @@ $(function(){
 function getUrlAction(){
     var clSearch=window.location.search
     if(clSearch!="" && clSearch.search(/\?action\=/)>=0){
-        return clSearch.match(/\=([\S\/]*)(&[\S\/]*)/)[1];
+        if(clSearch.indexOf("&")>=0){
+            return clSearch.match(/\=([\S\/]*)(&+[\S\/]*)/)[1];
+        }else{
+            return clSearch.match(/\=([\S\/]*)([\S\/]*)/)[1];
+        }
     }
     return false;
 }

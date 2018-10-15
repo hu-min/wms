@@ -301,6 +301,12 @@ class PurchaController extends BaseController{
             }
         }
         if($isInsert){
+            $touser = $this->userCom->getQiyeId(explode(',',$examines["examine"])[0],true);
+            if(!empty($touser)){
+                $desc = "<div class='gray'>".date("Y年m月d日",time())."</div> <div class='normal'>".session('userName')."添加供应商成本，@你了，点击进入审批吧！</div>";
+                $url = C('qiye_url')."/Admin/Index/Main.html?action=Purcha/costInsert";
+                $msgResult = $this->QiyeCom-> textcard($touser,session('userName')."添加供应商成本",$desc,$url);
+            }
             $this->ajaxReturn(['errCode'=>0,'error'=>"添加成功"]);
         }
         $this->ajaxReturn(['errCode'=>$insertResult->errCode,'error'=>$insertResult->error]);
