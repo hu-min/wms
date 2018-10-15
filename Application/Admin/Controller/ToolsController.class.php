@@ -93,6 +93,14 @@ class ToolsController extends BaseController{
         
         extract($_REQUEST);
         $this->log($_REQUEST);
+        $this->nodeCom=getComponent('Node');
+        $tableInfo = $this->nodeCom->getOne(['db_table'=>$table,"nodeType"=>2]);
+        if(!$tableInfo){
+            $this->ajaxReturn(['errCode'=>100,'error'=>'当前数据表异常，请联系管理员']);
+        }
+        $title = $tableInfo['list']['nodeTitle'];
+        $controller = $tableInfo['list']['controller'];
+        
         // [table] => v_expense_sub
         // [id] => 8
         // [tableId] => 5
@@ -126,7 +134,6 @@ class ToolsController extends BaseController{
             "status" => $status, //审批流程里的状态是实际状态
             "remark" => $remark,
         ];
-        
         $this->approveCom->M()->startTrans();
         $insertRes = $this->approveCom->insert($parameter);
         if(isset($insertRes->errCode) && $insertRes->errCode==0){
@@ -195,6 +202,16 @@ class ToolsController extends BaseController{
                 }else if($table=="v_project" && $state==1){
                     $this->ReceCom=getComponent('Receivable');
                     $this->ReceCom->createOrder($tableId,session('userId'));
+                }
+                $examineRes = $db ->field("process_level,examine")->where([$db->getPk()=>$id])->find();
+                               
+                if(isset($examine[$place]) && $examine[$place] > 0){
+                    $touser = $this->userCom->getQiyeId($examine[$place],true);
+                    if(!empty($touser)){
+                        $desc = "<div class='gray'>".date("Y年m月d日",time())."</div> <div class='normal'>".session('userName')."在【{$title}】中@您审批，点击进入审批吧！</div>";
+                        $url = C('qiye_url')."/Admin/Index/Main.html?action={$controller}";
+                        $msgResult = $this->QiyeCom-> textcard($touser,"【{$title}】审批",$desc,$url);
+                    }
                 }
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }else{
