@@ -795,7 +795,7 @@ $(function(){
 function getUrlAction(){
     var clSearch=window.location.search
     if(clSearch!="" && clSearch.search(/\?action\=/)>=0){
-        return clSearch.match(/\=([\S\/]*)/)[1];
+        return clSearch.match(/\=([\S\/]*)(&[\S\/]*)/)[1];
     }
     return false;
 }
