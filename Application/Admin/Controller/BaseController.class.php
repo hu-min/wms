@@ -52,6 +52,12 @@ class BaseController extends \Common\Controller\BaseController{
                 $userResult=$this->userCom->checkUser($data);
                 if(isset($userResult->errCode) && $userResult->errCode==0 && !$this->isLogin()){
                     $this->setLogin($userResult->data);
+                    if(session("history")){
+                        $history = session("history");
+                        session("history",NULL);
+                        redirect($history);
+                    }
+                    
                     // $this->redirect('Index/Main');
                 }else{
                     session('qiye_id',$userInfo->userid);
