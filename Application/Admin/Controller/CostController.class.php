@@ -216,6 +216,12 @@ class CostController extends BaseController{
         if($info){
             $insertResult=$this->debitCom->insert($info);
             if(isset($insertResult->errCode) && $insertResult->errCode==0){
+                $touser = $this->userCom->getQiyeId(explode(',',$info['examine'])[0],true);
+                if(!empty($touser)){
+                    $desc = "<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."申请借支，@你了，点击进入审批吧！</div>";
+                    $url = C('qiye_url')."/Admin/Index/Main.html?action=Cost/debitControl";
+                    $msgResult = $this->QiyeCom-> textcard($touser,session('userName')."申请了借支",$desc,$url);
+                }
                 $this->ApprLogCom->createApp($this->debitCom->tableName(),$insertResult->data,session("userId"),"");
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
@@ -447,6 +453,8 @@ class CostController extends BaseController{
         ];
         //添加时必备数据
         $examines = getComponent('Process')->getExamine(I("vtabId"),$leader);
+        // print_r($examines);
+        // exit;
         // $process = $this->nodeCom->getProcess(I("vtabId"));
         // $expInfo['process_id'] = $process["processId"];
         $expInfo['process_id'] = $examines["process_id"];
@@ -496,6 +504,12 @@ class CostController extends BaseController{
                 }
             }
             if($isInsert){
+                $touser = $this->userCom->getQiyeId(explode(',',$examines["examine"])[0],true);
+                if(!empty($touser)){
+                    $desc = "<div class='gray'>".date("Y年m月d日",time())."</div> <div class='normal'>".session('userName')."申请报销，@你了，点击进入审批吧！</div>";
+                    $url = C('qiye_url')."/Admin/Index/Main.html?action=Cost/expenseControl";
+                    $msgResult = $this->QiyeCom-> textcard($touser,session('userName')."申请了报销",$desc,$url);
+                }
                 $this->ajaxReturn(['errCode'=>0,'error'=>"添加成功"]);
             }
         }

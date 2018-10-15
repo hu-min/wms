@@ -291,12 +291,13 @@ class UserController extends BaseController{
      * @Date: 2018-10-14 16:08:58 
      * @Desc: 用户id转企业微信id 
      */    
-    function getQiyeId($userId){
+    function getQiyeId($userId,$role=false){
         $where = [];
+        $key = $role ? 'roleId' : 'userId';
         if(is_array($userId)){
-            $where['userId'] = ["IN",$userId];
+            $where[$key] = ["IN",$userId];
         }else{
-            $where['userId'] = $userI; 
+            $where[$key] = $userId; 
         }
         $parameter=[
             'where'=>$where,

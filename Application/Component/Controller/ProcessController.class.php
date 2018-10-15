@@ -114,6 +114,9 @@ class ProcessController extends BaseController{
         $returnData['place'] = $process["place"];
         $returnData['process_id'] = $process["processId"];
         // print_r($returnData);exit;
+        if($returnData['examine']==""){
+            $this->ajaxReturn(['errCode'=>20001,'error'=>getError(20001)]);
+        }
         return $returnData;
     }
 }

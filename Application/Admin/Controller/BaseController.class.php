@@ -45,7 +45,7 @@ class BaseController extends \Common\Controller\BaseController{
         ];
         $this->refreNode();
 
-        if($_GET['code']){
+        if($_GET['code'] && ACTION_NAME=='Login'){
             $userInfo=$this->Wxqy->user()->getUserInfo($_GET['code'],true);
             if($userInfo->userid!=""){
                 $data['qiye_id']=$userInfo->userid;
@@ -58,6 +58,9 @@ class BaseController extends \Common\Controller\BaseController{
                 }
             }
         }
+        if($_GET['isWechat']){
+            session('is_wechat',true);
+        }
         // print_r($this->nodeAuth);
         // $this->setLogin();
         $nowConAct=MODULE_NAME."/".CONTROLLER_NAME.'/'.ACTION_NAME;
@@ -65,7 +68,13 @@ class BaseController extends \Common\Controller\BaseController{
         if(in_array($nowConAct,$this->exemption) || ( in_array(ACTION_NAME,['excel_import','upload_filesAdd','excel_export','template_down','reset_apply']) && $this->isLogin())){
             if(!$this->isLogin() && !in_array(ACTION_NAME,['checkLogin','Login']) ){
                 session("history",domain(false).__SELF__);
-                $this->redirect('Index/Login');
+                if(session('is_wechat')){
+                    session('is_wechat',NULL);
+                    redirect('https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx650b23fa694c8ff7&redirect_uri=http://twsh.twoway.com.cn/Admin/Index/Login&response_type=code&scope=SCOPE&state=STATE#wechat_redirect');
+                }else{
+                    $this->redirect('Index/Login');
+                }
+                
             }elseif($this->isLogin() && ACTION_NAME=='Login'){
                 if($_GET['code']){
                     $this->vlog(9);
