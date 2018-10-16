@@ -167,6 +167,11 @@ class IndexController extends BaseController{
         $this->tablePage($listResult,'Index/table/appList',"homeAppList",5,"",["bigSize"=>false]);
         // $this->ajaxReturn($result);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-16 10:48:55 
+     * @Desc: 与我有关的列表 
+     */    
     function relItemList(){
         $page=I("p")?I("p"):1;
         $pageNum = 5;
@@ -186,6 +191,11 @@ class IndexController extends BaseController{
         $listResult = getComponent('Project')->getList($param);
         $this->tablePage($listResult,'Index/table/relItemList',"relItemList",5,"",["rollPage"=>5,"onlyPage"=>true,"bigSize"=>false]);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-16 10:49:09 
+     * @Desc: 最后登录的列表 
+     */    
     function lastLoginList(){
         $page=I("p")?I("p"):1;
         $param=[
@@ -198,6 +208,29 @@ class IndexController extends BaseController{
         $listResult = $this->LogCom->getList($param);
         $listResult["count"] = $listResult["count"]>100 ? 100 : $listResult["count"];
         $this->tablePage($listResult,'Index/table/lastLoginList',"lastLoginList",5,"",["rollPage"=>5,"onlyPage"=>true,"bigSize"=>false]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-16 10:51:52 
+     * @Desc: 项目概要 
+     */    
+    function projectDescList(){
+        $projectCom=getComponent('Project');
+        $page=I("p")?I("p"):1;
+        $param=[
+            "where" => ["project_id"=>"0",'stage'=>["gt","0"]],
+            'page'=>$page,
+            "fields" => "count(projectId) num,stage,stage_name",
+            'pageSize' => 5,
+            'orderStr' => "addTime DESC",
+            'groupBy' => 'stage',
+            'joins' =>[
+                "LEFT JOIN (SELECT basicId stage_id,name stage_name FROM v_basic WHERE class = 'stage' ) s ON s.stage_id = stage"
+            ],
+        ];
+        $listResult = $projectCom->getList($param);
+        $count = array_sum(array_column($listResult["list"],'num'));
+        $this->tablePage($listResult,'Index/table/projectDescList',"projectDescList",5,$count,["rollPage"=>5,"onlyPage"=>false,"bigSize"=>false]);
     }
     /** 
      * @Author: vition 

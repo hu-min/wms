@@ -136,12 +136,13 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-2">
                 <div class="box box-warning box-solid">
                     <div class="box-header with-border">
                         <h3 class="box-title">项目概况</h3>
+                        <div></div>
                         <div class="box-tools">
-                        <button type="button" name="" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
+                        <button type="button" name="projectDescList" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
                         </button>
                         </div>
                     </div>
@@ -150,7 +151,8 @@
                         <table class="table table-bordered">
                         <thead>
                         <tr>
-                            <th>更多功能开发中</th>
+                            <th>所处阶段</th>
+                            <th>数量</th>
                         </tr>
                     </thead>
                         <tbody class="-table"></tbody>
@@ -203,6 +205,7 @@
             updateList("getAppList")
             updateList("relItemList")
             updateList("lastLoginList")
+            updateList("projectDescList")
             $(tabId+" .refresh").offon("click",function(){
 				updateList($(this).attr("name"))
             })
