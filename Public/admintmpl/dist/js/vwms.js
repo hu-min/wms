@@ -902,6 +902,7 @@ function fun_is_exits(funcName){
  * @Desc: 设置加载图标 
  */
 function setLoad(timeOut){
+    console.log($("#loadwaiting"))
     if($("#loadwaiting").hasClass("none")){
         $("#loadwaiting").removeClass("none")
     }else{

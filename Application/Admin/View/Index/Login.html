@@ -19,7 +19,34 @@
 
   <link rel="stylesheet" href="__ADMINT__/plugins/iCheck/square/blue.css">
 
-
+  <style>
+    #loadwaiting{
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      z-index: 9999999;
+      background: rgba(255,255,255,0.7);
+      top: 0px;
+      left: 0px;
+    }
+    #loadwaiting .overlay{
+      position: relative;
+      height: 100%;
+      
+    }
+    #loadwaiting .overlay .fa-refresh{
+      font-size: 3em;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      /* margin-left: -180px; */
+      /* margin-top: -72px; */
+    }
+    .none{
+      display: none;
+    }
+  </style>
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -69,7 +96,11 @@
   <!-- /.login-box-body -->
 </div>
 <!-- /.login-box -->
-
+<div id="loadwaiting" class="none">
+  <div class="overlay">
+    <i class="fa fa-refresh"></i>
+  </div>
+</div>
 <!-- jQuery 3 -->
 <script src="__ADMINT__/bower_components/jquery/dist/jquery-3.3.1.min.js"></script>
 <!-- Bootstrap 3.3.7 -->
@@ -97,25 +128,38 @@
             }
             datas['data'][name]=val;
         })
-        $.ajax({
-            url:"{:U('Index/checkLogin')}",
-            type:"post",
-            dataType:"json",
-            data:datas,
-            success:function(result){
-                if(result.errCode==0){
-					if(result.data.history){
-						window.location.href=result.data.history;
-					}else{
-						window.location.href="{:U('Index/Index')}";
-					}
-                }else if(result.error){
-                	alert(result.error)
-                }else{
-                	alert("账户异常请联系管理员")
-                }
+        post("{:U('Index/checkLogin')}",datas,function(result){
+          if(result.errCode==0){
+              if(result.data.history){
+                window.location.href=result.data.history;
+              }else{
+                window.location.href="{:U('Index/Index')}";
+              }
+            }else if(result.error){
+              alert(result.error)
+            }else{
+              alert("账户异常请联系管理员")
             }
-        })
+        },false)
+        // $.ajax({
+        //     url:"{:U('Index/checkLogin')}",
+        //     type:"post",
+        //     dataType:"json",
+        //     data:datas,
+        //     success:function(result){
+        //         if(result.errCode==0){
+        //           if(result.data.history){
+        //             window.location.href=result.data.history;
+        //           }else{
+        //             window.location.href="{:U('Index/Index')}";
+        //           }
+        //         }else if(result.error){
+        //         	alert(result.error)
+        //         }else{
+        //         	alert("账户异常请联系管理员")
+        //         }
+        //     }
+        // })
     })
   });
 </script>
