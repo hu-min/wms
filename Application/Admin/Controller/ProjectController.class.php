@@ -292,10 +292,16 @@ class ProjectController extends BaseController{
                     'where'=>$where,
                     'fields'=>"userId,userName,roleName",
                     'orderStr'=>"userId DESC",
+                    'pageSize' => 50,
                     'joins'=>'LEFT JOIN (SELECT roleId rid,roleName FROM v_role ) r ON r.rid = roleId',
                 ];
                 $result=$this->userCom->getUserList($parameter);
                 if($result){
+                    if($type=="to_user"){
+                        foreach ($result["list"] as $key => $value) {
+                            $result["list"][$key]['userName'] =  "【{$value['roleName']}】{$value['userName']}";
+                        }
+                    }
                     return $result["list"];
                 }
                 break;

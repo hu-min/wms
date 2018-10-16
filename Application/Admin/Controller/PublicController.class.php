@@ -13,7 +13,7 @@ class PublicController extends BaseController{
 
     function messageControl(){
         $reqType=I('reqType');
-        $this->assign('userArr',A("Project")->_getOption("create_user"));
+        $this->assign('userArr',A("Project")->_getOption("to_user"));
         $this->assign('no_read',$this->MesCom->noRead());
         if($reqType){
             $this->$reqType();

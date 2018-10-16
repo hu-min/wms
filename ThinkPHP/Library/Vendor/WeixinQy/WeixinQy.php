@@ -64,7 +64,7 @@ class WeixinQy extends Urllib{
 			}
 		}else{
 			if(!is_dir("accesstoken/")){
-				mkdir("accesstoken/",0777,true);
+				mkdir("accesstoken/",0755,true);
 			}
 			$this->accessToken=$this->createToken();
 		}
