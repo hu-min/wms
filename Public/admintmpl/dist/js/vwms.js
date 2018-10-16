@@ -22,8 +22,9 @@ $.fn.extend({offon:function(){
  * @Desc: get方式获取数据 
  */    
 var get = function(url,indata,callBack){
-    setLoad()
     asyncs=arguments[3]!=undefined?arguments[3]:true;
+    load=arguments[4]!=undefined?arguments[4]:true;
+    if(load){setLoad();}
     indata["vtabId"]=tabId
     $.ajax({
         url:url,
@@ -33,7 +34,7 @@ var get = function(url,indata,callBack){
         data:indata,
         async:asyncs,
     }).done(function(result) {if(result.errCode=="405"){window.location.reload();}callBack(result);})
-      .always(function() { setLoad();datas={};})
+      .always(function() { if(load){setLoad();}datas={};})
 }
 /** 
  * javascript comment 
@@ -43,7 +44,9 @@ var get = function(url,indata,callBack){
  */
 function post(url,indata,callBack){
     asyncs=arguments[3]!=undefined?arguments[3]:true;
-    setLoad()
+    load=arguments[4]!=undefined?arguments[4]:true;
+    if(load){setLoad();}
+    
     indata["vtabId"]=tabId
     $.ajax({
         url:url,
@@ -53,7 +56,7 @@ function post(url,indata,callBack){
         data:indata,
         async:asyncs,
     }).done(function(result) {if(result.errCode=="405"){window.location.reload();}callBack(result);})
-    .always(function() { setLoad();datas={};})
+    .always(function() {if(load){setLoad();}datas={};})
 }
 //enter-input class的输入框键盘回车事件
 $(document).on("keypress",".enter-input",function(e){
@@ -902,7 +905,6 @@ function fun_is_exits(funcName){
  * @Desc: 设置加载图标 
  */
 function setLoad(timeOut){
-    console.log($("#loadwaiting"))
     if($("#loadwaiting").hasClass("none")){
         $("#loadwaiting").removeClass("none")
     }else{

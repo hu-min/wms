@@ -128,6 +128,7 @@
             }
             datas['data'][name]=val;
         })
+        setLoad();
         post("{:U('Index/checkLogin')}",datas,function(result){
           if(result.errCode==0){
               if(result.data.history){
@@ -140,7 +141,7 @@
             }else{
               alert("账户异常请联系管理员")
             }
-        },false)
+        },false,false)
         // $.ajax({
         //     url:"{:U('Index/checkLogin')}",
         //     type:"post",
