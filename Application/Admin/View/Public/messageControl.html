@@ -133,7 +133,7 @@
                             <select class="form-control modal-info chosen-select" required="required" title="请选择收件人" placeholder="收件人：" multiple="multiple" title="员工姓名" name="to_user" data-value="userId"  data-text="userName">
                                 <option value="员工姓名"></option>
                                 <volist name="userArr" id="item">
-                                    <option value="{$item['userId']}">【{$item['roleName']}】{$item['userName']}</option>
+                                    <option value="{$item['userId']}">{$item['userName']}</option>
                                 </volist>
                             </select>
                             </div>
