@@ -598,7 +598,7 @@ $(function(){
     $(document).offon("click",tabId+" .clear-media",function(){
         $(this).parent().children(".upload-file").val("")
     })
-    $(document).on("mouseover",".approve-group .approve-log,.approve-group .approve-con",function(){
+    $(document).offon("mouseover click",".approve-group .approve-log,.approve-group .approve-con",function(event){
         if(!$(this).hasClass("disabled") && ($("#approve-log-modal").css("display")=="none" || $("#approve-log-modal").css("display")==undefined)){
             var table = $(this).parents(".approve-group").data("table")
             var id = $(this).parents(".approve-group").data("id")
@@ -714,14 +714,28 @@ $(function(){
             var height = $("#"+apl_id+" .modal-dialog .modal-content").height()
             // height = Number(height)+100
             // console.log(height)
+            // console.log($(this).offset().top)
             $("#"+apl_id).css({width:width+"px",left:"50%",top:"50%",height:height+"px",marginTop:"-"+(height/2)+"px",marginLeft:"-"+(width/2)+"px"});
             $("#"+apl_id+" .modal-dialog").css({top:"0px",width:width+"px",height:height+"px",margin:"0px"});
+            // console.log($("#approve-log-modal").offset().top)
+            // console.log($("#approve-log-modal").height());
         }
         
     })
-    $(document).on("mouseout",".approve-group .approve-log",function(){
+    $(document).on("mouseout",".approve-group .approve-log",function(evnet){
+        // var mouse  = evnet.screenY;
+        // var modalTop = $("#approve-log-modal").position().top;
+        // var height = $("#approve-log-modal").height();
+        var width = $(window).width();
+        // console.log(mouse)
+        // console.log(modalTop)
+        // console.log(height)
         if($("#approve-log-modal").find(".approve-btn").length==0){
-            $("#approve-log-modal .modal-close").click();
+            if(width>600){
+                $("#approve-log-modal .modal-close").click();
+            }else{
+            }
+            
         }
     })
     $(document).on("click",tabId+" input[class='all-checked']",function(){
@@ -1274,9 +1288,15 @@ function media(mediafile,title){
     var suffix = fileArr[fileArr.length-1].toLowerCase();
     var mediaHtml = "";
     var height = $(window).height()*0.7;
+    var width = $(window).width();
     if(in_array(suffix,["jpg","jpeg","png","gif","bmp"])){
         //支持的图片格式处理
-        mediaHtml = '<div style="text-align: center;height:'+height+'px"><img style="height: 100%;" src="'+mediafile+'" /></div>';
+        if(width<767){
+            var style ='width:100%;';
+        }else{
+            var style ='height: 100%;';
+        }
+        mediaHtml = '<div style="padding-bottom: 5px;"><button class="img-enlarge"><i class="fa fa-fw fa-search-plus"></i>放大</button><button class="img-reduce"><i class="fa fa-fw fa-search-minus"></i>缩小</button><button class="img-cwise"><i class="fa fa-fw fa-rotate-right"></i>顺时针90°</button><button class="img-acwise"><i class="fa fa-fw fa-rotate-left"></i>逆时针90°</button></div><div class="img-box" style="justify-content: center;height:'+height+'px;display: flex;align-items: center;position: relative;overflow: hidden;"><p style="position: relative;"><img style="'+style+'" src="'+mediafile+'" /></p></div>';
     }else if(suffix=="pdf"){
         //pdf处理
         mediaHtml = '<iframe style="width:100%;height:'+height+'px" src="'+domain()+"/Admin/Tools/viewPdf?src="+mediafile+'" frameborder="0"></iframe>';
@@ -1292,7 +1312,7 @@ function media(mediafile,title){
     // return false;
     if($("#vmedia-box").html()==undefined){
         
-        var html = '<div id="vmedia-box" class="modal fade" aria-hidden="true" data-backdrop="static" ><div class="modal-dialog modal-lg modal-full"><div class="modal-content"><div class="modal-header"><button type="button" class="close modal-close" data-dismiss="modal" aria-label="关闭"><span aria-hidden="true"> × </span></button><h4 class="modal-title">'+title+'</h4></div><div class="modal-body">       </div><div class="modal-footer"><button type="button" class="btn btn-default pull-left modal-close" data-dismiss="modal">关闭</button></div></div></div></div>';
+        var html = '<div id="vmedia-box" class="modal fade" aria-hidden="true" data-backdrop="static" ><div class="modal-dialog modal-lg modal-full"><div class="modal-content"><div class="modal-header"><button type="button" class="close modal-close" data-dismiss="modal" aria-label="关闭"><span aria-hidden="true"> × </span></button><h4 class="modal-title">'+title+'</h4></div><div class="modal-body" style="overflow: hidden;">       </div><div class="modal-footer"><button type="button" class="btn btn-default pull-left modal-close" data-dismiss="modal">关闭</button></div></div></div></div>';
         $(document).find("body").append(html);
         $("#vmedia-box").toggle()
         $("#vmedia-box").toggleClass("in")
@@ -1305,6 +1325,68 @@ function media(mediafile,title){
         $("#vmedia-box").toggleClass("in")
     }
     $("#vmedia-box .modal-body").html(mediaHtml)
+    // $div_img = $("#vmedia-box").find(".img-box p")
+    if(in_array(suffix,["jpg","jpeg","png","gif","bmp"])){
+        $("#vmedia-box .modal-body .img-box p").bind("mousedown",function(event){event.preventDefault&&event.preventDefault();
+            var $thisImg = $(this) 
+            var offset_x=Number($(this).css('left').replace("px",""));
+            var offset_y=Number($(this).css('top').replace("px",""));
+            var mouse_x=event.pageX;
+            var mouse_y=event.pageY;
+            $("#vmedia-box .modal-body .img-box").bind("mousemove",function(ev){
+                var _x=ev.pageX-mouse_x;
+                var _y=ev.pageY-mouse_y;
+                var now_x=(offset_x+_x)+"px";
+                var now_y=(offset_y+_y)+"px";
+                $thisImg.css({top:now_y,left:now_x});
+            });
+        });
+        $("#vmedia-box .modal-body .img-box").bind("mouseup",function(){
+            $(this).unbind("mousemove");
+        })
+        var zoom_n=1;
+        $("#vmedia-box .modal-body").offon("click",".img-enlarge",function(){
+            zoom_n+=0.1;
+            $("#vmedia-box .modal-body .img-box img").css({
+                "transform":"scale("+zoom_n+")",
+                "-moz-transform":"scale("+zoom_n+")",
+                "-ms-transform":"scale("+zoom_n+")",
+                "-o-transform":"scale("+zoom_n+")",
+                "-webkit-transform":"scale("+zoom_n+")"
+            });
+        })
+        $("#vmedia-box .modal-body").offon("click",".img-reduce",function(){
+            zoom_n-=0.1;zoom_n=zoom_n<=0.1?0.1:zoom_n;
+            $("#vmedia-box .modal-body .img-box img").css({
+                "transform":"scale("+zoom_n+")",
+                "-moz-transform":"scale("+zoom_n+")",
+                "-ms-transform":"scale("+zoom_n+")",
+                "-o-transform":"scale("+zoom_n+")",
+                "-webkit-transform":"scale("+zoom_n+")"
+            });
+        })
+        var spin_n=0;
+        $("#vmedia-box .modal-body").offon("click",".img-cwise",function(){
+            spin_n+=90;
+            $("#vmedia-box .modal-body .img-box img").parent("p").css({
+                "transform":"rotate("+spin_n+"deg)",
+                "-moz-transform":"rotate("+spin_n+"deg)",
+                "-ms-transform":"rotate("+spin_n+"deg)",
+                "-o-transform":"rotate("+spin_n+"deg)",
+                "-webkit-transform":"rotate("+spin_n+"deg)"
+            })
+        })
+        $("#vmedia-box .modal-body").offon("click",".img-acwise",function(){
+            spin_n-=90;
+            $("#vmedia-box .modal-body .img-box img").parent("p").css({
+                "transform":"rotate("+spin_n+"deg)",
+                "-moz-transform":"rotate("+spin_n+"deg)",
+                "-ms-transform":"rotate("+spin_n+"deg)",
+                "-o-transform":"rotate("+spin_n+"deg)",
+                "-webkit-transform":"rotate("+spin_n+"deg)"
+            })
+        })
+    }
 }
 function domain(){
     return window.location.protocol+"//"+window.location.host

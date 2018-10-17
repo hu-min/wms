@@ -1,23 +1,22 @@
 <volist name="list" id="item">
     <tr>
-        <td>{$item['brand_name']}</td>
-        <td>{$item['code']}</td>
-        <td>{$item['project_time']|date='Y-m-d',###}</td>
+        <td class="hidden-xs">{$item['code']}</td>
+        <td class="hidden-xs">{$item['project_time']|date='Y-m-d',###}</td>
         <td title="{$item['name']}">{$item['name']}</td>
-        <td>{$item['city_name']}</td>
-        <td>{$item['customer_com_name']}</td>
-        <td>{$item['customer_cont_name']}</td>
-        <td>{$item['leader_name']}</td>
-        <td>{$item['type_name']}</td>
-        <td>{$item['session_all']}</td>
-        <td>{$item['session_cur']}</td>
-        <td>{$item['amount']}</td>
-        <td>{$item['radvance']}</td>
-        <td>{$item['rsurplus']}</td>
-        <td>{$cost = ($item['pcontract_amount']+$item['ddebit_money']+$item['emoney']) > 0 ? ($item['pcontract_amount']+$item['ddebit_money']+$item['emoney']) : $item['cost_budget']}</td>
-        <td>{$profit=$item['amount']-$cost}</td>
-        <td>{:round($profit/$item['amount']*100,2)}%</td>
-        <td>{$item['stage_name']}</td>
+        <td class="hidden-xs">{$item['customer_com_name']}</td>
+        <td class="hidden-xs">{$item['customer_cont_name']}</td>
+        <td >{$item['leader_name']}</td>
+        <td >{$item['business_name']}</td>
+        <td class="hidden-xs">{$item['type_name']}</td>
+        <td class="hidden-xs">{$item['session_all']}</td>
+        <!-- <td class="hidden-xs">{$item['session_cur']}</td> -->
+        <td >{$item['amount']}</td>
+        <td class="hidden-xs">{$item['radvance']}</td>
+        <td class="hidden-xs">{$item['rsurplus']}</td>
+        <td class="hidden-xs">{$cost = ($item['pcontract_amount']+$item['ddebit_money']+$item['emoney']) > 0 ? ($item['pcontract_amount']+$item['ddebit_money']+$item['emoney']) : $item['cost_budget']}</td>
+        <td class="hidden-xs">{$profit=$item['amount']-$cost}</td>
+        <td class="hidden-xs">{:round($profit/$item['amount']*100,2)}%</td>
+        <td class="hidden-xs">{$item['stage_name']}</td>
         {:list_btn(get_defined_vars(),"projectId",[],true)}
     </tr>
 </volist>

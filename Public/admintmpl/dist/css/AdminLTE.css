@@ -451,6 +451,7 @@ a:focus {
     transform: translate(-230px, 0);
   }
 }
+@media(max-width:767px){.modal-dialog{width:100%;}}
 @media (max-width: 767px) {
   .sidebar-open .main-sidebar {
     -webkit-transform: translate(0, 0);

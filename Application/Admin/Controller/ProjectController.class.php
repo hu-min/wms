@@ -495,8 +495,13 @@ class ProjectController extends BaseController{
 
             }
         }else{
-            $listRedis = 'projectList';
+            if($search){
+                $listRedis = $search;
+            }else{
+                $listRedis = 'projectList';
+            }
             $template = 'Project/projectTable/'.$listRedis;
+            // echo $template;
         }
         $this->tablePage($listResult,$template,$listRedis);
         // if($projectResult){
@@ -927,7 +932,7 @@ class ProjectController extends BaseController{
      * @Desc: 营业数据 
      */    
     function businessList(){
-        $this->projectList("finance");
+        $this->projectList("businessList");
     }
     function business_modalOne(){
         $title = "立项/添加场次";

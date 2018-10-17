@@ -1,15 +1,15 @@
 <volist name="list" id="item">
     <tr>
-        <td>{$item.user_name}</td>
-        <td>{$item.name}</td>
-        <td title="{$item.code}" style="max-width:150px;">{$item.code}</td>
-        <td>{$item.add_time}</td>
-        <td class="modal-info" name="debit_num" >{$item.debit_num|default=0}</td>
-        <td class="modal-info" name="debit_money" >{$item.debit_money|default=0}</td>
-        <td class="modal-info" name="expense_num" >{$item.expense_num|default=0}</td>
-        <td class="modal-info" name="expense_money" >{$item.expense_money|default=0}</td>
-        <td class="modal-info" name="invoice_money" >{$item["invoice_money"]}</td>
-        <td class="modal-info" name="all_money" >{$item["all_money"]}</td>
+        <td style="min-width:100px;" >{$item.user_name}</td>
+        <td style="min-width:100px;" >{$item.name}</td>
+        <td title="{$item.code}" style="max-width:150px;min-width:100px;">{$item.code}</td>
+        <td style="min-width:100px;" >{$item.add_time}</td>
+        <td style="min-width:100px;"  class="modal-info" name="debit_num" >{$item.debit_num|default=0}</td>
+        <td style="min-width:100px;"  class="modal-info" name="debit_money" >{$item.debit_money|default=0}</td>
+        <td style="min-width:100px;"  class="modal-info" name="expense_num" >{$item.expense_num|default=0}</td>
+        <td style="min-width:100px;"  class="modal-info" name="expense_money" >{$item.expense_money|default=0}</td>
+        <td style="min-width:100px;"  class="modal-info" name="invoice_money" >{$item["invoice_money"]}</td>
+        <td style="min-width:100px;"  class="modal-info" name="all_money" >{$item["all_money"]}</td>
 
         <td>
             {:approve_btn($tableName,$item['id'],$item['place'],$item['process_level'],$item['status'])}

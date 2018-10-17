@@ -12,72 +12,74 @@
         </div>
     </if>
     <input type="hidden" value="{$project_id}" class="modal-info" name="project_id">
-    <table class="table table-bordered table-hover">
-        <thead>
-            <tr>
-                <th>文件类型</th>
-                <th>文件名称</th>
-                <th>上传者</th>
-                <th>上传时间</th>
-                <th>上传或查看</th>
-            </tr>
-        </thead>
-        <tbody class="files-table">
-            <tr class="demo none">
-                <td>
-                    <select class="form-control modal-info input-sm" required="required" title="文件类型"  name="file_type">
-                        <volist name="fileType" id="item">
-                            <option value="{$key}">{$item}</option>
-                        </volist>
-                    </select>
-                </td>
-                <td>
-                    <input class="form-control modal-info input-sm" name="file_name" title="不填写默认文件名" value="" placeholder="不填写默认文件名" type="text">
-                </td>
-                <td>
-                    <input class="form-control input-sm" readonly="readonly" name="user_name" title="上传者" value="当前者" placeholder="当前者" type="text">
-                </td>
-                <td>
-                    <input class="form-control input-sm" readonly="readonly" name="add_name" title="上传时间" value="当前时间" placeholder="上传时间" type="text">
-                </td>
-                <td>
-                    <div class="input-group">
-                        <input class="form-control modal-info upload-file input-sm"  readonly="readonly" title="请选择上传文件" name="file_path" type="text">
-                        <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
-                    </div>
-                </td>
-            </tr>
-            <volist name="list" id="item">
-                
-                    <tr>
-                        <td>
-                            <input class="form-control input-sm" readonly="readonly" name="file_type" title="文件类型" value="{$fileType[$item['file_type']]}" placeholder="文件类型" type="text">
-                        </td>
-                        <td>
-                            <input class="form-control modal-info input-sm" readonly="readonly" name="file_name" title="不填写默认文件名" value="{$item.file_name}" placeholder="不填写默认文件名" type="text">
-                        </td>
-                        <td>
-                            <input class="form-control input-sm" readonly="readonly" name="user_name" title="上传者" value="{$item.user_name}" placeholder="当前者" type="text">
-                        </td>
-                        <td>
-                            <input class="form-control input-sm" readonly="readonly" name="add_name" title="上传时间" value="{$item.add_time}" placeholder="上传时间" type="text">
-                        </td>
-                        <td>
-                            <!-- {$item['business']}- {$item['leader']}- {$nodeAuth}-{$Think.session.userId} -->
-                            <?php if($nodeAuth >= 7 || ($item['business'] == session('userId')) || ($item['file_type'] == 3) || ($item['leader'] == session('userId') && $item['file_type'] == 4)){?>
-                                <div class="input-group">
-                                    <input class="form-control modal-info upload-file input-sm" onlyread="onlyread" readonly="readonly" value="<?php echo $item['file_path']?>" title="请选择上传文件" name="file_path" type="text">
-                                    <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
-                                </div>
-                            <?php }else{?>
-                                无权限查看
-                            <?php }?>
-                        </td>
-                    </tr>
-                
-            </volist>
-        </tbody>
-    </table>       
+    <div style="overflow-x: auto;">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th style="min-width:100px;">文件类型</th>
+                    <th style="min-width:100px;">文件名称</th>
+                    <th style="min-width:100px;">上传者</th>
+                    <th style="min-width:100px;">上传时间</th>
+                    <th>上传或查看</th>
+                </tr>
+            </thead>
+            <tbody class="files-table">
+                <tr class="demo none">
+                    <td style="min-width:100px;">
+                        <select class="form-control modal-info input-sm" required="required" title="文件类型"  name="file_type">
+                            <volist name="fileType" id="item">
+                                <option value="{$key}">{$item}</option>
+                            </volist>
+                        </select>
+                    </td>
+                    <td style="min-width:100px;">
+                        <input class="form-control modal-info input-sm" name="file_name" title="不填写默认文件名" value="" placeholder="不填写默认文件名" type="text">
+                    </td>
+                    <td style="min-width:100px;">
+                        <input class="form-control input-sm" readonly="readonly" name="user_name" title="上传者" value="当前者" placeholder="当前者" type="text">
+                    </td>
+                    <td style="min-width:100px;">
+                        <input class="form-control input-sm" readonly="readonly" name="add_name" title="上传时间" value="当前时间" placeholder="上传时间" type="text">
+                    </td>
+                    <td style="min-width:100px;">
+                        <div class="input-group">
+                            <input class="form-control modal-info upload-file input-sm"  readonly="readonly" title="请选择上传文件" name="file_path" type="text">
+                            <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
+                        </div>
+                    </td>
+                </tr>
+                <volist name="list" id="item">
+                    
+                        <tr>
+                            <td>
+                                <input class="form-control input-sm" readonly="readonly" name="file_type" title="{$fileType[$item['file_type']]}" value="{$fileType[$item['file_type']]}" placeholder="文件类型" type="text">
+                            </td>
+                            <td>
+                                <input class="form-control modal-info input-sm" readonly="readonly" name="file_name" title="{$item.file_name}" value="{$item.file_name}" placeholder="不填写默认文件名" type="text">
+                            </td>
+                            <td>
+                                <input class="form-control input-sm" readonly="readonly" name="user_name" title="{$item.user_name}" value="{$item.user_name}" placeholder="当前者" type="text">
+                            </td>
+                            <td>
+                                <input class="form-control input-sm" readonly="readonly" name="add_name" title="{$item.add_time}" value="{$item.add_time}" placeholder="上传时间" type="text">
+                            </td>
+                            <td>
+                                <!-- {$item['business']}- {$item['leader']}- {$nodeAuth}-{$Think.session.userId} -->
+                                <?php if($nodeAuth >= 7 || ($item['business'] == session('userId')) || ($item['file_type'] == 3) || ($item['leader'] == session('userId') && $item['file_type'] == 4)){?>
+                                    <div class="input-group">
+                                        <input class="form-control modal-info upload-file input-sm" onlyread="onlyread" readonly="readonly" value="<?php echo $item['file_path']?>" title="请选择上传文件" name="file_path" type="text">
+                                        <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
+                                    </div>
+                                <?php }else{?>
+                                    无权限查看
+                                <?php }?>
+                            </td>
+                        </tr>
+                    
+                </volist>
+            </tbody>
+        </table>
+    </div>       
 </div>
 <div class="modal-footer">
         

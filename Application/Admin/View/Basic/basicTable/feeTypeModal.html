@@ -39,41 +39,44 @@
             <div class="row">
                 <div class="col-md-12"> <h5 class="box-title">根据地区设置不同的费用上限金额：点击右边"+"添加地区<i class="fa fa-fw fa-plus-square text-aqua add-region" title="添加地区" style="cursor: pointer;"></i></h5></div>
             </div>
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th>省份</th>
-                        <th>城市</th>
-                        <th>已选择</th>
-                        <th>费用上限金额</th>
-                    </tr>
-                </thead>
-                <tbody class="regLimit-table">
-                    <tr class="demo none">
-                        <td>
-                            <input class="modal-info" title="费用上限Id" name="limitId" type="hidden">
-                            <select class="form-control chosen-select" title="项目省份" name="province" data-cname="city">
-                                <option value="">省份</option>
-                                <volist name="provinceArr" id="item">
-                                    <option value="{$item['pid']}">{$item['province']}</option>
-                                </volist>
-                            </select>
-                        </td>
-                        <td>
-                            <select class="form-control chosen-select" data-req="getCityList" data-value="cid"  data-text="city" data-noupdate="true" data-pname="province" title="城市" name="city">
-                                <option value="">城市</option>
-                            </select>
-                        </td>
-                        <td>
-                            <select class="form-control chosen-select modal-info" multiple="multiple"  title="已选择" name="regions">
-                            </select>
-                        </td>
-                        <td>
-                            <input class="form-control modal-info input-sm" name="limit_money" title="费用上限金额" placeholder="费用上限金额" type="text">
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div style="overflow: auto;">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>省份</th>
+                            <th>城市</th>
+                            <th>已选择</th>
+                            <th style="min-width:100px;">费用上限金额</th>
+                        </tr>
+                    </thead>
+                    <tbody class="regLimit-table">
+                        <tr class="demo none">
+                            <td>
+                                <input class="modal-info" title="费用上限Id" name="limitId" type="hidden">
+                                <select class="form-control chosen-select" title="项目省份" name="province" data-cname="city">
+                                    <option value="">省份</option>
+                                    <volist name="provinceArr" id="item">
+                                        <option value="{$item['pid']}">{$item['province']}</option>
+                                    </volist>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="form-control chosen-select" data-req="getCityList" data-value="cid"  data-text="city" data-noupdate="true" data-pname="province" title="城市" name="city">
+                                    <option value="">城市</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="form-control chosen-select modal-info" multiple="multiple"  title="已选择" name="regions">
+                                </select>
+                            </td>
+                            <td style="min-width:100px;">
+                                <input class="form-control modal-info input-sm" name="limit_money" title="费用上限金额" placeholder="费用上限金额" type="text">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
         </div>
     </form>            
 </div>

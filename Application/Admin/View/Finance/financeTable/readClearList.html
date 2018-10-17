@@ -1,13 +1,13 @@
 <volist name="list" id="item">
     <tr <if condition="$item['clear_status'] eq 0"> style="color: #fff;background: #555;" </if> >   
-        <td>{$item.name}</td>
-        <td title="{$item.code}" style="max-width:150px;">{$item.code}</td>
-        <td>{$item.user_name}</td>
-        <td class="modal-info" name="debit_num" >{$item.debit_num|default=0}</td>
-        <td class="modal-info" name="debit_money" >{$item.debit_money|default=0}</td>
-        <td class="modal-info" name="expense_num" >{$item.expense_num|default=0}</td>
-        <td class="modal-info" name="expense_money" >{$item.expense_money|default=0}</td>
-        <td class="modal-info" name="invoice_money" ><span class="label bg-{$clearType[$item['clear_status']]['color']}">{$clearType[$item["clear_status"]]["title"]}</span></td>
+        <td style="min-width:100px;">{$item.name}</td>
+        <td title="{$item.code}" style="max-width:150px;min-width:100px;">{$item.code}</td>
+        <td style="min-width:100px;">{$item.user_name}</td>
+        <td style="min-width:100px;" class="modal-info" name="debit_num" >{$item.debit_num|default=0}</td>
+        <td style="min-width:100px;" class="modal-info" name="debit_money" >{$item.debit_money|default=0}</td>
+        <td style="min-width:100px;" class="modal-info" name="expense_num" >{$item.expense_num|default=0}</td>
+        <td style="min-width:100px;" class="modal-info" name="expense_money" >{$item.expense_money|default=0}</td>
+        <td style="min-width:100px;" class="modal-info" name="invoice_money" ><span class="label bg-{$clearType[$item['clear_status']]['color']}">{$clearType[$item["clear_status"]]["title"]}</span></td>
         <td>
             <if condition="$item['clear_status'] eq 0">
                 <button type="button" class="btn btn-info btn-xs read-clear" data-con="readClear" data-id="{$item['project_id']}" data-userid="{$item['user_id']}"><i class="fa fa-envelope"></i> 催促清算 </button>

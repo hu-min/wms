@@ -7,9 +7,9 @@
         <td>{$item['remark']}</td>
         <td><span class="label bg-{$statusLabel[$item['status']]}">{$statusType[$item['status']]}</span></td>
         <td class="status-con" data-db="{$tableName}" data-con="{$controlName}" data-id="{$item['id']}" data-url="{$url}" >
-            <button type="button" data-gettype="Edit" data-toggle="modal"  data-url="{$url}" data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-primary btn-sm v-showmodal"><i class="fa fa-fw fa-eye "></i> 查看 </button>            
+            <button type="button" data-gettype="Edit" data-toggle="modal"  data-url="{$url}" data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-primary btn-xs v-showmodal"> 查看 </button>            
             <if condition="$nodeAuth egt 4 ">
-                <button type="button" class="btn btn-danger btn-sm status-info" data-status="4" data-reqtype="Del"  >删除</button>
+                <button type="button" class="btn btn-danger btn-xs status-info" data-status="4" data-reqtype="Del"  >删除</button>
             </if>
         </td>
     </tr>
