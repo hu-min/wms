@@ -472,7 +472,7 @@ $(document).on("click",".status-info",function(){
     if(ids>1){
         var title ="批量删除，已选中 "+ids+" 条数据"
     }
-    var html = '<div class="v-status-box" style="text-align: center;" data-status="'+status+'"  data-db="'+db+'" data-con="'+con+'" data-url="'+url+'" data-id="'+id+'"><div class="col-sm-3"><button type="button" name="del"  class="btn btn-xs bg-orange submit-status">删除</button></div><div class="col-sm-5"><input type="password" placeholder="输入二级密码" class="form-control input-sm senior-password" /></div><div class="col-sm-3"><button type="button" name="deepDel" class="btn bg-navy btn-xs submit-status">彻底删除</button></div></div>'
+    var html = '<div class="v-status-box" style="text-align: center;" data-status="'+status+'"  data-db="'+db+'" data-con="'+con+'" data-url="'+url+'" data-id="'+id+'"><div class="col-sm-3 col-xs-3"><button type="button" name="del"  class="btn btn-xs bg-orange submit-status">删除</button></div><div class="col-sm-5 col-xs-5"><input type="password" placeholder="输入二级密码" class="form-control input-sm senior-password" /></div><div class="col-sm-3 col-xs-3"><button type="button" name="deepDel" class="btn bg-navy btn-xs submit-status">彻底删除</button></div></div>'
     notice(100,html,title,0)
 })
 $(document).on("click",".submit-status",function(){
@@ -1327,6 +1327,7 @@ function media(mediafile,title){
     $("#vmedia-box .modal-body").html(mediaHtml)
     // $div_img = $("#vmedia-box").find(".img-box p")
     if(in_array(suffix,["jpg","jpeg","png","gif","bmp"])){
+        //如果是图片具备操作
         $("#vmedia-box .modal-body .img-box p").bind("mousedown",function(event){event.preventDefault&&event.preventDefault();
             var $thisImg = $(this) 
             var offset_x=Number($(this).css('left').replace("px",""));

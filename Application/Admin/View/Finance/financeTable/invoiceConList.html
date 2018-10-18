@@ -2,13 +2,13 @@
     <tr>
         <!-- <input type="hidden" class="modal-info" name="table_name" value="{$item['table_name']}">
         <input type="hidden" class="modal-info" name="id" value="{$item['id']}"> -->
-        <td><input type="checkbox" class="item-checked" data-table="{$item['table_name']}" data-id="{$item['id']}"></td>
-        <td class="from_source">{$item.from_source}</td>
-        <td class="project_name">{$item.project_name}</td>
-        <td class="user_name">{$item.user_name}</td>
-        <td class="add_time" >{$item.add_time|date="Y-m-d H:i:s",###}</td>
-        <td class="money">{$item.money}</td>
-        <td style="max-width: 50px;">
+        <td style="min-width:100px;" ><input type="checkbox" class="item-checked" data-table="{$item['table_name']}" data-id="{$item['id']}"></td>
+        <td style="min-width:100px;" class="from_source">{$item.from_source}</td>
+        <td style="min-width:100px;" class="project_name">{$item.project_name}</td>
+        <td style="min-width:100px;" class="user_name">{$item.user_name}</td>
+        <td style="min-width:100px;" class="add_time" >{$item.add_time|date="Y-m-d H:i:s",###}</td>
+        <td style="min-width:100px;" class="money">{$item.money}</td>
+        <td style="min-width: 100px;">
             <div class="input-group">
                 <input class="form-control modal-info upload-file" readonly="readonly" name="invoice_file" title="查看发票" value="{$item.invoice}" type="text">
                 <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
