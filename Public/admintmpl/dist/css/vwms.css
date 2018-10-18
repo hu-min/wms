@@ -73,8 +73,10 @@
 		min-width: 100px;
 	}
 }
+
 .table thead th,.table tbody td{
 	text-align: center;
+	min-width: 100px;
 }
 .chosen-select{
 	padding: 0;

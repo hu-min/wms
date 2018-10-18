@@ -62,6 +62,17 @@
                         <!-- /.box-body -->
                         <div class="box-footer no-padding">
                             <div class="mailbox-controls">
+                                    <div class="row">
+                                        <div class="col-sm-2">
+                                            <select name="pageSize"  class="form-control input-sm search-info">
+                                                <volist name="entries" id="item"><option value="{$item}">{$item}</option></volist>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-10">
+                                            <div class="pull-right message-page page-div" data-url="{$url}" data-param='type:1' data-call="mes_cache" data-reqtype="getMessageList" data-con="message" style="width: 60%;display: inline-block;height: 30px;line-height: 30px;">
+                                        </div>
+                                    </div>
+                                
                                 <!-- Check all button -->
                                 
                                 <!-- <div class="btn-group">
@@ -73,7 +84,7 @@
                                 <!-- <div  class="relItem-page row page-div" data-url="{$url}" data-reqtype="relItemList" data-con="relItem">
                                 
                                 </div> -->
-                                <div class="pull-right message-page page-div" data-url="{$url}" data-param='type:1' data-call="mes_cache" data-reqtype="getMessageList" data-con="message" style="width: 60%;display: inline-block;height: 30px;line-height: 30px;">
+                                
 
                                     <!-- 1-50/200
                                     <div class="btn-group">
@@ -182,7 +193,8 @@
             };
             
             var getMessageList = function(type){
-                datas={reqType:"getMessageList",type:type}
+                var pageSize = $(tabId+" .search-info[name='pageSize']").val()
+                datas={reqType:"getMessageList",type:type,data:{pageSize:pageSize}}
                 get("{$url}",datas,function(result){
                     if(result.table==""){
                         result.table = '<tr><td colspan="7">暂无信息</td></tr>'

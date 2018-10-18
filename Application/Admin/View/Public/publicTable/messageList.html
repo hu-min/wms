@@ -3,7 +3,7 @@
     <tr>
         <td><input type="checkbox"></td>
         <if condition="$type eq 1">
-            <td>
+            <td style="min-width:100px;">
                 <a href="#" class="read-message" data-id="{$item.id}">
                     <if condition="$item.status eq 0">
                         <i class="fa fa-envelope"></i> 未读 
@@ -19,8 +19,8 @@
             </td>
         </if>
         <!-- <td class="mailbox-star"><a href="#"><i class="fa fa-star text-yellow"></i></a></td> -->
-        <td class="mailbox-name"><a href="#" class="read-message" data-id="{$item.id}">{$item.title}</a></td>
-        <td class="mailbox-user">
+        <td style="min-width:100px;" class="mailbox-name"><a href="#" class="read-message" data-id="{$item.id}">{$item.title}</a></td>
+        <td style="min-width:100px;" class="mailbox-user">
             <a href="#" class="read-message" data-id="{$item.id}">
                 <if condition="$item['relation_uname']">
                     {$item.relation_uname}
@@ -29,8 +29,8 @@
                 </if>
             </a>
         </td>
-        <td class="mailbox-subject"><a href="#" class="read-message" data-id="{$item.id}">{$item.content|utf8_substr=25}</a></td>
-        <td class="mailbox-attachment"></td>
-        <td class="mailbox-date"><a href="#" class="read-message" data-id="{$item.id}">{$item.add_time|disTime}</a></td>
+        <td style="min-width:100px;" class="mailbox-subject"><a href="#" class="read-message" data-id="{$item.id}">{$item.content|utf8_substr=25}</a></td>
+        <td style="min-width:100px;" class="mailbox-attachment"></td>
+        <td style="min-width:100px;" class="mailbox-date"><a href="#" class="read-message" data-id="{$item.id}">{$item.add_time|disTime}</a></td>
     </tr>
 </volist>

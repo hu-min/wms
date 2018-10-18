@@ -24,6 +24,7 @@ class PublicController extends BaseController{
     function getMessageList(){
         $type = I("type") ? I("type") : I("param")['type'];
         // print_r($type);exit;
+        $data=I("data");
         $p=I("p")?I("p"):1;
         $where=["to_user"=>session("userId")];
         $userKey = "from_user";
@@ -52,12 +53,12 @@ class PublicController extends BaseController{
                 unset($where["to_user"]);
                 break;
         }
-        
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             "where" => $where,
             'page'=>$p,
             'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') date_time",
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"`status` ASC,add_time DESC",
             'groupBy'=>$groupBy,
             "joins"=>[
@@ -68,7 +69,7 @@ class PublicController extends BaseController{
         $listResult = $this->MesCom->getList($parameter);
         $this->assign("type",$type);
         // print_r($parameter);
-        $this->tablePage($listResult,'Public/publicTable/messageList',"lastLoginList",10,"",["bigSize"=>false,"returnData"=>true]);
+        $this->tablePage($listResult,'Public/publicTable/messageList',"lastLoginList",$pageSize,"",["bigSize"=>false,"returnData"=>true]);
     }
     function readMesOne(){
 
