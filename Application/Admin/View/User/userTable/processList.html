@@ -1,7 +1,7 @@
 <volist name="list" id="item">
     <tr>
         <td>{$item['processName']}</td>
-        <td>{:utf8_substr($item['processDepict'],100,true)}</td>
+        <td class="hidden-xs">{:utf8_substr($item['processDepict'],100,true)}</td>
         <td>{$item['addTime']|date='Y-m-d H:i:s',###}</td>
         <td><gt name="item['updateTime']" value="0" >{$item['updateTime']|date='Y-m-d H:i:s',###}</gt></td>
         {:list_btn(get_defined_vars(),"processId")}
