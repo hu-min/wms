@@ -245,7 +245,7 @@
                 //     $(tabId+" .modal-info[name='"+element+"']").prop("disabled",true);
                 // }
             });
-            ["brand","customer_com","customer_cont","province","city","field","create_user","is_bid","bidding","business","leader","execute","execute_sub","type","stage"].forEach(element => {
+            ["brand","customer_com","customer_cont","province","city","field","create_user","is_bid","bidding","business","leader","execute","execute_sub","type","stage","re_status"].forEach(element => {
                 var select= $(tabId+" .modal-info[name='"+element+"']")
                 if(info[element]>0){
                     if(select.find("option[value='"+info[element]+"']").length==0){
@@ -263,6 +263,9 @@
                     if(select.hasClass("chosen-select")){
                         select.trigger("chosen:updated");
                     }
+                }
+                if(element == "re_status"){
+                    rest_control(info);
                 }
                 // if(info["status"]>0){
                 //     select.prop("disabled",true);

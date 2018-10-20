@@ -134,6 +134,8 @@ class ProjectController extends BaseController{
                     "LEFT JOIN (SELECT basicId type_id,name type_name FROM v_basic WHERE class = 'projectType' ) pt ON pt.type_id = type",
                     "LEFT JOIN (SELECT basicId stage_id,name stage_name FROM v_basic WHERE class = 'stage' ) s ON s.stage_id = stage",
                     "LEFT JOIN (SELECT project_id project_sid,COUNT(projectId) session_count FROM v_project WHERE projectId = 0 GROUP BY project_id) sc ON sc.project_sid = projectId",
+                    "LEFT JOIN (SELECT table_id re_id , status re_status,datas rest_datas,user_id ruser_id,FROM_UNIXTIME(add_time,'%Y-%m-%d') reset_date FROM v_reset_apply WHERE table_name='v_project' ) r ON r.re_id = projectId",
+                    "LEFT JOIN (SELECT userId ruser_id,userName reset_user FROM v_user) ru ON ru.ruser_id = r.ruser_id",
                 ]
             ];
             $resultData = $this->projectCom->getOne($parameter)["list"];

@@ -757,7 +757,14 @@ $(function(){
             $(this).parents(".modal").find(".modal-info").each(function(){
                 var val = $(this).val()
                 var name = $(this).attr("name")
-                sourceData[name] = val
+                
+                var tagType = $(this).get(0).tagName.toLocaleLowerCase()
+                if(tagType=="select"){
+                    var text = $(this).find("option:selected").text()
+                    sourceData[name] = {key:val,text:text}
+                }else{
+                    sourceData[name] = val
+                }
                 $(this).prop("disabled",false);
                 if($(this).hasClass("chosen-select")){
                     $(this).trigger("chosen:updated");
@@ -768,8 +775,18 @@ $(function(){
             $(this).parents(".modal").find(".modal-info").each(function(){
                 var val = $(this).val()
                 var name = $(this).attr("name")
-                if(sourceData[name]!==val && !in_array(val,["00:00:00"]) && JSON.stringify(val) != "[]" ){
-                    resetData[name] = val
+                var tagType = $(this).get(0).tagName.toLocaleLowerCase()
+
+                if(tagType=="select"){
+                    var text = $(this).find("option:selected").text()
+                    sourceData[name] = {key:val,text:text}
+                    if(sourceData[name]['key']!==val && !in_array(val,["00:00:00"]) && JSON.stringify(val) != "[]" ){
+                        resetData[name] = {key:val,text:text}
+                    }
+                }else{
+                    if(sourceData[name]!==val && !in_array(val,["00:00:00"]) && JSON.stringify(val) != "[]" ){
+                        resetData[name] = val
+                    }
                 }
             })
             if(JSON.stringify(resetData) === "{}"){
@@ -1557,4 +1574,17 @@ var excel_import = function(option){
             $(excel_modal).css("display","block")
         }
     })
+}
+var rest_control = function(info,option,callback){
+    if(typeof(info['re_status'])=="string" && Number(info['re_status']) === 0){
+        $(tabId+" .modal-footer").find(".reset-info-active").remove();
+        var reset_datas = JSON.parse(info['rest_datas']);
+
+        for (var key in reset_datas) {
+            // $(tabId+" .modal-info[name='"+key+"']").val(reset_datas[key])
+            $(tabId+" .modal-info[name='"+key+"']").addClass("data-reset");
+            $(tabId+" .modal-info[name='"+key+"']").after('<span class="badge bg-red">'+info['reset_user']+' '+info['reset_date']+' 提交修改为：'+reset_datas[key]+'</span>')   
+        }
+        console.log(reset_datas)
+    }
 }

@@ -111,7 +111,7 @@ class BaseController extends \Common\Controller\BaseController{
             $this->assign('statusType',$this->statusType);
             $this->assign('statusTypeJ',json_encode($this->statusType));
             $this->assign('statusLabel',$this->statusLabel);
-            $this->assign('entries',[5,10,30,35,40,45,50]);
+            $this->assign('entries',[30,35,40,45,50]);
             // $nodeId = getTabId(I("vtabId"));
             $this->nodeId = getTabId(I("vtabId"));
             // $this->assign('processType',$this->processType);
@@ -786,10 +786,11 @@ class BaseController extends \Common\Controller\BaseController{
             'user_id' => session('userId'),
             'add_time' => time(),
             'datas' => json_encode($data['datas'],JSON_UNESCAPED_UNICODE),
+            'status' => 0,
         ];
-        // $this->resetCom->insert();
-        // print_r($param);
-        $this->ajaxReturn(['errCode'=>0,'error'=>getError(0),'data'=>$param]);
+        // $result = $this->resetCom->insert($param);
+        print_r($param);
+        $this->ajaxReturn(['errCode'=>$result->errCode,'error'=>getError($result->errCode)]);
         // $this->resetCom->a();
     }
 }
