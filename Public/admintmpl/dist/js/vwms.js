@@ -761,6 +761,7 @@ $(function(){
                 var tagType = $(this).get(0).tagName.toLocaleLowerCase()
                 if(tagType=="select"){
                     var text = $(this).find("option:selected").text()
+                    
                     sourceData[name] = {key:val,text:text}
                 }else{
                     sourceData[name] = val
