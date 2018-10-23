@@ -76,7 +76,7 @@
 
 .table thead th,.table tbody td{
 	text-align: center;
-	min-width: 80px;
+	min-width: 100px;
 }
 .chosen-select{
 	padding: 0;
