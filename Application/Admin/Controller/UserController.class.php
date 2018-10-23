@@ -226,6 +226,7 @@ class UserController extends BaseController{
     protected function userList(){
         $data=I("data");
         $p=I("p")?I("p"):1;
+        $export = I('export');
         $where=[];
         if($data['loginName']){
             $where['loginName']=['LIKE','%'.$data['loginName'].'%'];
@@ -251,16 +252,19 @@ class UserController extends BaseController{
         if($data['regFrom']){
             $where['regFrom']=$data['regFrom'];
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'fields'=>'*,FROM_UNIXTIME(birthday,"%Y-%m-%d") birthday',
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>'regTime DESC',
         ];
-        
+        if($export){
+            $config = ['control'=>CONTROLLER_NAME];
+        }
         $userResult=$this->userCom->getUserList($parameter);
-        $this->tablePage($userResult,'User/userTable/userList',"userList");
+        $this->tablePage($userResult,'User/userTable/userList',"userList",$pageSize,'',$config);
         // if($userResult){
         //     $uListRed="userList_".session("userId");
         //     $this->Redis->set($uListRed,json_encode($userResult['list']),3600);

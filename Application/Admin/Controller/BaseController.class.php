@@ -670,13 +670,15 @@ class BaseController extends \Common\Controller\BaseController{
         $con = I("con");
         if(isset($_FILES["excel"])){
             $excelData = excelImport(["file"=>$_FILES["excel"]["tmp_name"]]);
+            // print_r($excelData);exit;
             if($excelData){
+                
                 $db = M($table,NULL);
                 $dbFileds = $db->getDbFields();
-
+                $priKey = $db->getPk();
                 //验证上传字段是否存在数据表中
                 foreach ($excelData[0] as $key ) {
-                    if(!in_array($key,$dbFileds)){
+                    if(!empty($key) && !in_array($key,$dbFileds)){
                         $this->ajaxReturn(['errCode'=>116,'error'=>getError(116).":".$key]);
                     }
                 }
@@ -701,23 +703,26 @@ class BaseController extends \Common\Controller\BaseController{
                     // print_r($insertData[0]);
                     foreach ($insertData[0] as $key => $val ) {
                         // dump(in_array($key,$dbFileds));
-                        if(!in_array($key,$dbFileds)){
+                        if(!empty($key) && !in_array($key,$dbFileds)){
                             $this->ajaxReturn(['errCode'=>116,'error'=>getError(116).":".$key]);
                         }
                     }
-                    
-                    // print_r($dbFileds);exit;
                     $db->startTrans();
                     $this->ApprLogCom->startTrans();
+                    
                     foreach ($insertData as $row => $data) {
-                        $result = $db->add($data);
+                        // print_r($data);
+                        if(isset($data[$priKey]) && $data[$priKey] > 0 ){
+                            $result = $db->save($data);
+                        }else{
+                            $this->ApprLogCom->createApp($table,$result,session("userId"),"");
+                            $result = $db->add($data);
+                        }
                         if(!$result){
                             $db->rollback();
                             $this->ajaxReturn(['errCode'=>116,'error'=>getError(116)."；错误行数：".$row]);
                         }
-                        $this->ApprLogCom->createApp($table,$result,session("userId"),"");
                     }
-                    
                     $db->commit();
                     $this->ApprLogCom->commit();
                     $this->LogCom->log(8);

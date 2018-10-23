@@ -514,7 +514,9 @@ function excelImport($parameter=[]){
     for($row=1;$row<=$highestRow;$row++){
         $rowData = [];
         for ($col=1; $col <= alphaIndex($highestColumn); $col++) { 
-            array_push($rowData,$objPHPExcel->getActiveSheet()->getCell(alphaIndex(false,$col).$row)->getValue());
+            $cell = $objPHPExcel->getActiveSheet()->getCell(alphaIndex(false,$col).$row)->getValue();
+            if(is_object($cell))  $cell = $cell->__toString();
+            array_push($rowData,$cell);
         }
         array_push($dataArray,$rowData);
     }

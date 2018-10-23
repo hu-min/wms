@@ -328,8 +328,11 @@ class PublicController extends BaseController{
                         $temp[$key] = $excelRow[$i];
                     }
                 }
-                $temp = $this->manageWorderInfo(["data"=>$temp,"reqType"=>"work_orderAdd","roleId"=>0]);
-                array_push($insertData,$temp);
+                $tempData = $this->manageWorderInfo(["data"=>$temp,"reqType"=>"work_orderAdd","roleId"=>0]);
+                if(isset($temp["id"])){
+                    $tempData["id"] = $temp["id"];
+                }
+                array_push($insertData,$tempData);
             }
         }
         return $insertData;

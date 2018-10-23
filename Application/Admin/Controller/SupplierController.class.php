@@ -247,10 +247,15 @@ class SupplierController extends BaseController{
             if($index>0){
                 $temp = [];
                 foreach ($excelData[0] as $i=>$key) {
-                    $temp[$key] = $excelRow[$i];
+                    if(!empty($key)){
+                        $temp[$key] = $excelRow[$i];
+                    }   
                 }
-                $temp = $this->manageSupTypeInfo(["data"=>$temp,"reqType"=>"supTypeAdd"]);
-                array_push($insertData,$temp);
+                $tempData = $this->manageSupTypeInfo(["data"=>$temp,"reqType"=>"supTypeAdd"]);
+                if(isset($temp["basicId"])){
+                    $tempData["basicId"] = $temp["basicId"];
+                }
+                array_push($insertData,$tempData);
             }
         }
         return $insertData;
@@ -520,12 +525,15 @@ class SupplierController extends BaseController{
                         $temp[$key] = M("province")->where(['province'=>$excelRow[$i]])->find()['pid'];
                     }elseif($key=="cityId"){
                         $temp[$key] = M("city")->where(["city"=>$excelRow[$i],'pid'=>$temp["provinceId"]])->find()['cid'];
-                    }else{
+                    }elseif(!empty($key)){
                         $temp[$key] = $excelRow[$i];
                     }
                 }
-                $temp = $this->manageCompanyInfo(["data"=>$temp,"reqType"=>"sup_companyAdd"]);
-                array_push($insertData,$temp);
+                $tempData = $this->manageCompanyInfo(["data"=>$temp,"reqType"=>"sup_companyAdd"]);
+                if(isset($temp["companyId"])){
+                    $tempData["companyId"] = $temp["companyId"];
+                }
+                array_push($insertData,$tempData);
             }
         }
         return $insertData;
@@ -555,7 +563,7 @@ class SupplierController extends BaseController{
                 }
             }
         }
-        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'供应商类别表'];
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'供应商表'];
         return $exportData ;
     } 
     //供应商公司管理结束
@@ -674,7 +682,7 @@ class SupplierController extends BaseController{
     /** 
      * @Author: vition 
      * @Date: 2018-10-04 09:47:34 
-     * @Desc: 供应商导入 
+     * @Desc: 供应商联系人导入 
      */    
     function supcontact_import($excelData){
         $insertData = [];
@@ -684,12 +692,15 @@ class SupplierController extends BaseController{
                 foreach ($excelData[0] as $i=>$key) {
                     if($key=="companyId"){
                         $temp[$key] = $this->supplierCom->getCompanyList(['where'=>['company'=>$excelRow[$i]]],true)['companyId'];
-                    }else{
+                    }elseif(!empty($key)){
                         $temp[$key] = $excelRow[$i];
                     }
                 }
-                $temp = $this->manageContactInfo(["data"=>$temp,"reqType"=>"supcontactAdd"]);
-                array_push($insertData,$temp);
+                $tempData = $this->manageContactInfo(["data"=>$temp,"reqType"=>"supcontactAdd"]);
+                if(isset($temp["contactId"])){
+                    $tempData["contactId"] = $temp["contactId"];
+                }
+                array_push($insertData,$tempData);
             }
         }
         return $insertData;

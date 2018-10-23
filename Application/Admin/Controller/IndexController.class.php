@@ -19,6 +19,8 @@ class IndexController extends BaseController{
             'deepdel'=>'深度删除',
             'export'=>'导出',
             'import'=>'导入',
+            'bankstock'=>'银行库存',
+            'cashstock'=>'现金库存',
         ]; 
         
     }

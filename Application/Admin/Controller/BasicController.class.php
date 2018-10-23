@@ -145,8 +145,11 @@ class BasicController extends BaseController{
                 foreach ($excelData[0] as $i=>$key) {
                     $temp[$key] = $excelRow[$i];
                 }
-                $temp = $this->manageBrandInfo(["data"=>$temp,"reqType"=>"basic_brandAdd"]);
-                array_push($insertData,$temp);
+                $tempData = $this->manageBrandInfo(["data"=>$temp,"reqType"=>"basic_brandAdd"]);
+                if(isset($temp["basicId"])){
+                    $tempData["basicId"] = $temp["basicId"];
+                }
+                array_push($insertData,$tempData);
             }
         }
         return $insertData;
@@ -316,8 +319,11 @@ class BasicController extends BaseController{
                         $temp[$key] = $excelRow[$i];
                     }
                 }
-                $temp = $this->manageFieldInfo(["data"=>$temp,"reqType"=>"basic_fieldAdd"]);
-                array_push($insertData,$temp);
+                $tempData = $this->manageFieldInfo(["data"=>$temp,"reqType"=>"basic_fieldAdd"]);
+                if(isset($temp["id"])){
+                    $tempData["id"] = $temp["id"];
+                }
+                array_push($insertData,$tempData);
             }
         }
         return $insertData;
@@ -473,8 +479,11 @@ class BasicController extends BaseController{
                 foreach ($excelData[0] as $i=>$key) {
                     $temp[$key] = $excelRow[$i];
                 }
-                $temp = $this->manageStageInfo(["data"=>$temp,"reqType"=>"basic_stageAdd"]);
-                array_push($insertData,$temp);
+                $tempData = $this->manageStageInfo(["data"=>$temp,"reqType"=>"basic_stageAdd"]);
+                if(isset($temp["basicId"])){
+                    $tempData["basicId"] = $temp["basicId"];
+                }
+                array_push($insertData,$tempData);
             }
         }
         return $insertData;
@@ -657,8 +666,11 @@ class BasicController extends BaseController{
                 foreach ($excelData[0] as $i=>$key) {
                     $temp[$key] = $excelRow[$i];
                 }
-                $temp = $this->manageProjectTypeInfo(["data"=>$temp,"reqType"=>"basic_projectTypeAdd"]);
-                array_push($insertData,$temp);
+                $tempData = $this->manageProjectTypeInfo(["data"=>$temp,"reqType"=>"basic_projectTypeAdd"]);
+                if(isset($temp["basicId"])){
+                    $tempData["basicId"] = $temp["basicId"];
+                }
+                array_push($insertData,$tempData);
             }
         }
         return $insertData;
@@ -1281,8 +1293,11 @@ class BasicController extends BaseController{
                 foreach ($excelData[0] as $i=>$key) {
                     $temp[$key] = $excelRow[$i];
                 }
-                $temp = $this->manageModuleInfo(["data"=>$temp,"reqType"=>"basic_moduleAdd"]);
-                array_push($insertData,$temp);
+                $tempData = $this->manageModuleInfo(["data"=>$temp,"reqType"=>"basic_moduleAdd"]);
+                if(isset($temp["basicId"])){
+                    $tempData["basicId"] = $temp["basicId"];
+                }
+                array_push($insertData,$tempData);
             }
         }
         return $insertData;
@@ -1429,8 +1444,11 @@ class BasicController extends BaseController{
                 foreach ($excelData[0] as $i=>$key) {
                     $temp[$key] = $excelRow[$i];
                 }
-                $temp = $this->manageExpenClasInfo(["data"=>$temp,"reqType"=>"expenClasAdd"]);
-                array_push($insertData,$temp);
+                $tempData = $this->manageExpenClasInfo(["data"=>$temp,"reqType"=>"expenClasAdd"]);
+                if(isset($temp["basicId"])){
+                    $tempData["basicId"] = $temp["basicId"];
+                }
+                array_push($insertData,$tempData);
             }
         }
         return $insertData;
@@ -1582,8 +1600,11 @@ class BasicController extends BaseController{
                 foreach ($excelData[0] as $i=>$key) {
                     $temp[$key] = $excelRow[$i];
                 }
-                $temp = $this->manageExpenseTypeInfo(["data"=>$temp,"reqType"=>"basic_expense_typeAdd"]);
-                array_push($insertData,$temp);
+                $tempData = $this->manageExpenseTypeInfo(["data"=>$temp,"reqType"=>"basic_expense_typeAdd"]);
+                if(isset($temp["basicId"])){
+                    $tempData["basicId"] = $temp["basicId"];
+                }
+                array_push($insertData,$tempData);
             }
         }
         return $insertData;
