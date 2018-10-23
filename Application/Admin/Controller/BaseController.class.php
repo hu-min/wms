@@ -788,8 +788,9 @@ class BaseController extends \Common\Controller\BaseController{
             'datas' => json_encode($data['datas'],JSON_UNESCAPED_UNICODE),
             'status' => 0,
         ];
-        // $result = $this->resetCom->insert($param);
-        print_r($param);
+        $result = $this->resetCom->insert($param);
+        $this->ApprLogCom->createApp($data['db'],$data['id'],session("userId"),"",2);
+        // print_r($param);
         $this->ajaxReturn(['errCode'=>$result->errCode,'error'=>getError($result->errCode)]);
         // $this->resetCom->a();
     }

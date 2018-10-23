@@ -10,7 +10,7 @@ class ApproveLogController extends BaseController{
      * @Date: 2018-08-23 23:34:14 
      * @Desc: 提交申请的时候加入 
      */    
-    function createApp($table,$id,$userId,$remark){
+    function createApp($table,$id,$userId,$remark,$effect=1){
         $parameter=[
             "table_name" => $table,
             "table_id" => $id,
@@ -18,6 +18,7 @@ class ApproveLogController extends BaseController{
             "user_id" => $userId,
             "status" => 0,
             "remark" => $remark,
+            "effect" => $effect,
         ];
         return $this->insert($parameter);
     }

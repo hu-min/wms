@@ -753,7 +753,9 @@ $(function(){
      */    
     $(document).on("click",tabId+" .reset-info-active",function(){
         var title = $(this).text()
+        
         if(title=="重新提审"){
+            sourceData = {}
             $(this).parents(".modal").find(".modal-info").each(function(){
                 var val = $(this).val()
                 var name = $(this).attr("name")
@@ -761,8 +763,12 @@ $(function(){
                 var tagType = $(this).get(0).tagName.toLocaleLowerCase()
                 if(tagType=="select"){
                     var text = $(this).find("option:selected").text()
+                    if($.isArray(val)){
+                        sourceData[name] = {key:val.join(","),text:text}
+                    }else{
+                        sourceData[name] = {key:val,text:text}
+                    }
                     
-                    sourceData[name] = {key:val,text:text}
                 }else{
                     sourceData[name] = val
                 }
@@ -780,9 +786,15 @@ $(function(){
 
                 if(tagType=="select"){
                     var text = $(this).find("option:selected").text()
-                    sourceData[name] = {key:val,text:text}
+                    // sourceData[name] = {key:val,text:text}
+                    
                     if(sourceData[name]['key']!==val && !in_array(val,["00:00:00"]) && JSON.stringify(val) != "[]" ){
-                        resetData[name] = {key:val,text:text}
+                        // resetData[name] = {key:val,text:text}
+                        if($.isArray(val)){
+                            resetData[name] = {key:val.join(","),text:text}
+                        }else{
+                            resetData[name] = {key:val,text:text}
+                        }
                     }
                 }else{
                     if(sourceData[name]!==val && !in_array(val,["00:00:00"]) && JSON.stringify(val) != "[]" ){
@@ -790,20 +802,58 @@ $(function(){
                     }
                 }
             })
+            // console.log(resetData);throw '';
             if(JSON.stringify(resetData) === "{}"){
                 notice(101,"没修改任何数据","输入异常");
             }else{
+                var self = this
+                var gettype=$(this).data("gettype");
+                var con=$(this).data("con");
+                var isModal=$(this).data("modal");
+                // var search=con+"_search";
+
                 var url = $(this).data('url');
-                var gettyp = $(this).data('gettyp');
                 var db = $(this).data('db');
                 var id = $(this).parents('.modal').find(".table-id").val();
-                datas.reqType = gettyp
+                datas.reqType = gettype
                 datas.data = {}
                 datas.data.datas = resetData
                 datas.data.db = db
                 datas.data.id = id
                 post(url,datas,function(result){
                     console.log(result)
+                    if(result.errCode==0){
+                        notice(result.errCode,result.error);
+                        url=$(tabId+" .search-list").data("url");
+                        reqtype=$(tabId+" .search-list").data("reqtype");
+                        var table=con+"-table";
+                        var page=con+"-page";
+                        var count=con+"-count";
+                        datas.reqType=reqtype;
+                        if(fun_is_exits(con+"_searchInfo")){
+                            eval(con+"_searchInfo(result)")//对不同的id设置不同的发送数据
+                        }else{
+                            datas['data']={}
+                            $(tabId+" .search-info").each(function(){
+                                var name=$(this).attr("name");
+                                var val=$(this).val();
+                                if(val!=""){
+                                    datas['data'][name]=val
+                                }
+                            })
+                        }
+                        if(isModal){
+                            searchFun({url:url,datas:datas,table:table,page:page,count:count})
+                        }
+                        if($('body').hasClass('modal-open')){
+                            $(tabId+" .modal").modal('hide')
+                        }
+                        if(datas.reqType=="Add"){
+                            $(self).data("gettype","");
+                        }
+                    }else{
+                        notice(result.errCode,result.error);
+                    }
                 });
                 // console.log(resetData)
             }
@@ -1584,7 +1634,15 @@ var rest_control = function(info,option,callback){
         for (var key in reset_datas) {
             // $(tabId+" .modal-info[name='"+key+"']").val(reset_datas[key])
             $(tabId+" .modal-info[name='"+key+"']").addClass("data-reset");
-            $(tabId+" .modal-info[name='"+key+"']").after('<span class="badge bg-red">'+info['reset_user']+' '+info['reset_date']+' 提交修改为：'+reset_datas[key]+'</span>')   
+            // console.log(reset_datas)
+            // console.log(typeof(reset_datas[key]))
+            if(typeof(reset_datas[key])=="object"){
+                var text = reset_datas[key].text
+            }else{
+                var text = reset_datas[key]
+            }
+
+            $(tabId+" .modal-info[name='"+key+"']").after('<span class="badge bg-red" style="white-space:pre-wrap;text-align: left;">'+info['reset_user']+' '+info['reset_date']+' 提交修改为：'+text+'</span>')   
         }
         console.log(reset_datas)
     }

@@ -432,8 +432,10 @@ class ProjectController extends BaseController{
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
             $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (author = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 )";
             $whites = $this->whiteCom->getWhites();
+            // print_r($whites);exit;
             if($whites && $search==""){
                 $whiteWhere = " AND user_id NOT IN (".implode(',',$whites).")";
+                $where["author"] = ['NOT IN',$whites];
             }
         }
         // $whites = $this->whiteCom->getWhites();

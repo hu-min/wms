@@ -294,7 +294,7 @@ function save_btn($defind_vars,$always=false,$hide=false){
     }
     
     if(($item["author"] == $userId || $item["user_id"] == $userId) && $item['status'] == 1){
-        echo "<button type='button' class='btn btn-sm btn-info reset-info-active' data-gettyp='reset_apply' data-db='{$tableName}' data-url='{$url}' {$noModal}>重新提审</button>";
+        // echo "<button type='button' class='btn btn-sm btn-info reset-info-active' data-con='{$controlName}' data-gettype='reset_apply' data-db='{$tableName}' data-url='{$url}' {$noModal}>重新提审</button>";
     }
     
     // if((($item["author"] == $userId && $item['status'] == 0) || ($gettype == "Add" && $processAuth['level'] > 0) || (($processAuth['level'] -1) == $item["process_level"] && $item["process_level"] > 0))  || $nodeAuth>= 7){
