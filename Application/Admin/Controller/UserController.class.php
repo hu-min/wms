@@ -166,7 +166,7 @@ class UserController extends BaseController{
             if($wxResult['errcode']!=0){
                 $this->ajaxReturn(['errCode'=>$wxResult['errcode'],'error'=>$wxResult['error']]);
             }
-            $userInfo['qiye_id'] = $userInfo['qiye_id'];
+            $userInfo['qiye_id'] = $wxResult['qiye_id'];
         }
         $insertResult=$this->userCom->insertUser($userInfo);
         if($insertResult->errCode==0){
