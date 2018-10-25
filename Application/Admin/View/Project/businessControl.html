@@ -67,38 +67,41 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-12" style="font-size:0.95em;overflow: auto;z-index: 1;">
-                <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;">
+            <div class="col-sm-12 table-outbox">
+                <div style="font-size:0.95em;overflow: auto;z-index: 1;">
+                    <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;">
+                    </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <!-- <th>品牌</th> -->
+                                <th class="hidden-xs is-frozen">项目编号</th>
+                                <th class="hidden-xs is-frozen">项目日期</th>
+                                <th class="is-frozen">项目名称</th>
+                                <th class="hidden-xs is-frozen">签约公司</th>
+                                <th class="hidden-xs">客户</th>
+                                <th >营业</th>
+                                <th >主担</th>
+                                <th class="hidden-xs">项目类型</th>
+                                <th class="hidden-xs">总场次</th>
+                                <!-- <th class="hidden-xs">目前场次</th> -->
+                                <th >合同额</th>
+                                <th class="hidden-xs">预付款</th>
+                                <th class="hidden-xs">未付款</th>
+                                <th class="hidden-xs">成本</th>
+                                <th class="hidden-xs">纯利</th>
+                                <th class="hidden-xs">纯利率</th>
+                                <th class="hidden-xs">项目阶段</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="{$controlName}-table">
+                            {$tables}
+                        </tbody>
+                    </table>
                 </div>
-                <table class="table table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <!-- <th>品牌</th> -->
-                            <th class="hidden-xs">项目编号</th>
-                            <th class="hidden-xs">项目日期</th>
-                            <th>项目名称</th>
-                            <th class="hidden-xs">签约公司</th>
-                            <th class="hidden-xs">客户</th>
-                            <th >营业</th>
-                            <th >主担</th>
-                            <th class="hidden-xs">项目类型</th>
-                            <th class="hidden-xs">总场次</th>
-                            <!-- <th class="hidden-xs">目前场次</th> -->
-                            <th >合同额</th>
-                            <th class="hidden-xs">预付款</th>
-                            <th class="hidden-xs">未付款</th>
-                            <th class="hidden-xs">成本</th>
-                            <th class="hidden-xs">纯利</th>
-                            <th class="hidden-xs">纯利率</th>
-                            <th class="hidden-xs">项目阶段</th>
-                            <th>状态</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody class="{$controlName}-table">
-                        {$tables}
-                    </tbody>
-                </table>
+                
             </div>
         </div>
         <div class="dataTables_wrapper">

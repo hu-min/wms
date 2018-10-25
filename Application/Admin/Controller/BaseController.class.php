@@ -104,14 +104,16 @@ class BaseController extends \Common\Controller\BaseController{
             if($vtabId){
                 $this->assign('vtabId',ltrim($vtabId,"#"));
             }
+
             $this->processAuth=$this->iniProcessAuth();
+            // print_r($this->processAuth);exit;
             $this->assign('nodeAuth',$this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]);
             $this->assign('userId',session("userId"));
             $this->assign('processAuth',$this->processAuth);
             $this->assign('statusType',$this->statusType);
             $this->assign('statusTypeJ',json_encode($this->statusType));
             $this->assign('statusLabel',$this->statusLabel);
-            $this->assign('entries',[30,35,40,45,50]);
+            $this->assign('entries',[5,30,35,40,45,50]);
             // $nodeId = getTabId(I("vtabId"));
             $this->nodeId = getTabId(I("vtabId"));
             // $this->assign('processType',$this->processType);
@@ -337,8 +339,8 @@ class BaseController extends \Common\Controller\BaseController{
      */    
     protected function iniProcessAuth(){
         $actionRedis = ACTION_NAME.session("userId");
-        
-        $authNodeId=I("authNodeId");
+        // $authNodeId=I("authNodeId");
+        $authNodeId=getTabId(I("vtabId"));
         $roleId=session('roleId');
         $rolePid=session('rolePid');
         $isLevel=0;
@@ -354,6 +356,7 @@ class BaseController extends \Common\Controller\BaseController{
             "fields"=>"nodeId,processIds"
         ];
         $nodeInfo=$this->nodeCom->getNodeOne($parameter);
+        // print_r($nodeInfo);exit;
         if(!empty($nodeInfo["list"])){
             $processArray=explode(",",$nodeInfo["list"]["processIds"]);
             $processCom=getComponent('Process');
@@ -362,12 +365,16 @@ class BaseController extends \Common\Controller\BaseController{
                 "fields"=>"processOption",
             ];
             $processRes=$processCom->getProcessList($processPar);
+            // print_r($processRes);exit;
             if(!empty($processRes["list"])){
-                
                 foreach ($processRes["list"] as $process) {
                     $processOption = json_decode($process["processOption"],true);
                     foreach ($processOption as $level => $subProcess) {
-                        if($subProcess["type"]==1){
+                        // print_r($subProcess);
+                        if(in_array("99999999",$subProcess["role"])){
+                            $isLevel = 1;
+                            $allLevel = count($processOption);
+                        }else if($subProcess["type"]==1){
                             if(in_array($rolePid,$subProcess["role"])){
                                 $isLevel=$level + 1;
                                 $allLevel = count($processOption);

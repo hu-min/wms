@@ -828,8 +828,13 @@ class BasicController extends BaseController{
         $datas = $param['data'] ? $param['data'] : I("data");
 
         if(isset($datas['pId'])){
-            $nodePInfo=$this->getPid('execute',$datas['pId']);
-            $datas['level']=$nodePInfo['level']+1;
+            if($datas['pId']>0){
+                $nodePInfo=$this->getPid('execute',$datas['pId']);
+                // print_r($nodePInfo);
+                $datas['level'] = $nodePInfo['level']+1;
+            }else{
+                $datas['level'] = 1;
+            }
         }
         if($reqType=="basic_executeAdd"){
             $datas['class']="execute";
@@ -848,7 +853,7 @@ class BasicController extends BaseController{
         return "";
     }
     function getPid($class,$pid){
-        return $this->basicCom->getOne(['where'=>['class'=>$class,'pId'=>$pid]])['list'];
+        return $this->basicCom->getOne(['where'=>['class'=>$class,'basicId'=>$pid]])['list'];
     }
     function basic_executeAdd(){
         $executeInfo=$this->manageExecuteInfo();

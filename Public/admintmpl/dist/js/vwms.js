@@ -145,6 +145,8 @@ function searchFun(option){
             if(fun_is_exits(callfun+"")){
                 eval(callfun+"(result.data)")//
             }
+            table_frozen($(tabId+" ."+table));
+            //这里插入一个js修改table
         }else{
             if(result.url){
                 window.location.href = result.url+"&con="+con; 
@@ -987,11 +989,6 @@ function fun_is_exits(funcName){
  * @Desc: 设置加载图标 
  */
 function setLoad(timeOut){
-    if($("#loadwaiting").hasClass("none")){
-        $("#loadwaiting").removeClass("none")
-    }else{
-        $("#loadwaiting").addClass("none")
-    }
     if($("#loadwaiting .overlay i").hasClass("fa-spin")){
         $("#loadwaiting .overlay i").removeClass("fa-spin")
     }else{
@@ -1002,6 +999,11 @@ function setLoad(timeOut){
                 setLoad()
             }
         },timeOut);
+    }
+    if($("#loadwaiting").hasClass("none")){
+        $("#loadwaiting").removeClass("none")
+    }else{
+        $("#loadwaiting").addClass("none")
     }
 }
 /** 
@@ -1646,4 +1648,65 @@ var rest_control = function(info,option,callback){
         }
         console.log(reset_datas)
     }
+}
+/** 
+ * javascript comment 
+ * @Author: vition 
+ * @Date: 2018-10-25 09:56:02 
+ * @Desc: 重新定义表格，冻结带了 frozen 类的元素
+ */
+var table_frozen = function($this){
+    var scrollHtml = "<table class='table table-bordered table-hover frozen-table' style='width: auto;position: absolute;background: #ffffff;'><thead><tr>";
+    var scrollCols = [];
+    $this.parents('table').find("thead th").each(function(index,self){
+        if($(self).hasClass("is-frozen")){
+            scrollCols.push(index);
+            scrollHtml+=$(self).prop("outerHTML");
+        }
+    })
+    scrollHtml+="</tr></thead><tbody>";
+    var trs =""
+    $this.parents('table').find("tbody tr").each(function(index,self){
+        var tr ="<tr>"
+        $(self).find("td").each(function(td,tdSelf){
+            if(in_array(td,scrollCols)){
+                $(tdSelf).css({"width":$(tdSelf).width()+"px","height":$(tdSelf).parents("tr").height()+"px"})
+                tr += $(tdSelf).prop("outerHTML");
+            }
+        })
+        tr += "</tr>"
+        trs += tr
+    })
+    scrollHtml+=trs+"</tbody></table>"
+    $this.parents('table').before(scrollHtml)
+    var tleft = $(tabId+" .table-outbox").find(".frozen-table").css("left").replace("px","")
+    $(tabId+" .table-outbox").scroll(function(){
+        left = Number($(this).scrollLeft()+Number(tleft))
+        $(tabId+" .table-outbox").find(".frozen-table").css("left",left+"px")
+    })
+    $(tabId+" table tbody tr").on("mouseenter",function(){
+        table_tr_active(this,"add")
+    })
+    $(tabId+" table tbody tr").on("mouseleave",function(){
+        table_tr_active(this,"remove")
+    })
+}
+/** 
+ * javascript comment 
+ * @Author: vition 
+ * @Date: 2018-10-25 10:28:42 
+ * @Desc: 鼠标移动到tr的状态 
+ */
+var table_tr_active = function($this,type){
+    var tableBox = $($this).parents(".table-outbox")
+    var tables = tableBox.find("table");
+    var tableIndex = $(tables).index($($this).parents("table"))
+    var $trs = tableBox.find("table").eq(tableIndex).find("tr");
+    var otherTable = tableIndex > 0 ? 0 : 1;
+    if(type=="add"){
+        tableBox.find("table").eq(otherTable).find("tr").eq($($trs).index($this)).addClass("tr-active");
+    }else{
+        tableBox.find("table").eq(otherTable).find("tr").eq($($trs).index($this)).removeClass("tr-active");
+    }
+    
 }

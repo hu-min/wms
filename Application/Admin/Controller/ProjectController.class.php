@@ -411,12 +411,13 @@ class ProjectController extends BaseController{
         $this->assign("place",$process["place"]);
         $where=[];
         // $where['_string']=" (process_level = ".($this->processAuth["level"]-1)." OR process_level = 0 OR author = ".session("userId")." OR FIND_IN_SET(".session("userId").",examine)) OR (create_user = '{$userId}') OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}') ";
-
+        // $data['code'] = 'TWSH12fengtiangz22018101416';
         foreach (['name','code','customer_com_name','customer_cont_name','business_name','leader_name'] as $key) {
             if(isset($data[$key])){
                 $where[$key]=['LIKE','%'.$data[$key].'%'];
             }
         }
+
         foreach (['brand'] as $key) {
             if(isset($data[$key])){
                 $where[$key]=$data[$key];
