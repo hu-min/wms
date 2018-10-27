@@ -607,7 +607,7 @@ class BaseController extends \Common\Controller\BaseController{
             $uploadFile = $_FILES['file'];
         }else if(isset($_FILES['upload'])){
             $uploadFile = $_FILES['upload'];
-            $cb = $_GET['CKEditorFuncNum'];
+            // $cb = $_GET['CKEditorFuncNum'];
         }else{
             $this->ajaxReturn(['errCode'=>100,'error'=>'文件上传参数有误！']);
         }
@@ -639,9 +639,11 @@ class BaseController extends \Common\Controller\BaseController{
         if(isset($_FILES['upload'])){
             if($copyState){
                 $url = '/Uploads/'.CONTROLLER_NAME.'/'.date('Ymd',time())."/".$viewName;
-                echo "<script>window.parent.CKEDITOR.tools.callFunction($cb, '$url', '');</script>";
+                $this->ajaxReturn(['uploaded'=>1,'fileName'=>$viewName,'url'=>$url]);
+                // echo "<script>window.parent.CKEDITOR.tools.callFunction($cb, '$url', '');</script>";
             }else{
-                echo "<script>window.parent.CKEDITOR.tools.callFunction($cb, '', '上传失败');</script>";
+                $this->ajaxReturn(['uploaded'=>0,'error'=>['message'=>'文件上传错误！']]);
+                // echo "<script>window.parent.CKEDITOR.tools.callFunction($cb, '', '上传失败');</script>";
             }
             exit;
             
