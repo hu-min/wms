@@ -441,10 +441,8 @@ class IndexController extends BaseController{
             $data["value"] = isset($data["value"]) && !empty($data["value"]) ? $data["value"] : sha1(sha1('123456'));
             $result = $this->configCom->insert($data);
         }
-        if(isset($result->errCode) && $result->errCode == 0){
-            session('web_lock_password',NULL);
-            $this->clearRedis('config_web_lock');
-        }
+        session('web_lock_password',NULL);
+        $this->clearRedis('config_web_lock');
         if($data["status"] == 1){
             $result->errCode = 407;
             $result->error = getError(407);
