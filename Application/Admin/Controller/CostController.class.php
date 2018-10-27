@@ -74,11 +74,12 @@ class CostController extends BaseController{
         // if($data['expenClas']){
         //     $where['expenClas']=$data['expenClas'];
         // }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'fields'=>"*,FROM_UNIXTIME(debit_date,'%Y-%m-%d') debit_date,FROM_UNIXTIME(require_date,'%Y-%m-%d') require_date,FROM_UNIXTIME(loan_date,'%Y-%m-%d') loan_date",
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"id DESC",
             "joins"=>[
                 "LEFT JOIN (SELECT projectId,code,name project_name,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,business,leader FROM v_project ) p ON p.projectId = project_id ",
@@ -90,7 +91,7 @@ class CostController extends BaseController{
             ]
         ];
         $listResult=$this->debitCom->getList($parameter);
-        $this->tablePage($listResult,'Cost/costTable/debitList',"debitList");
+        $this->tablePage($listResult,'Cost/costTable/debitList',"debitList",$pageSize);
     }
     function debit_modalOne(){
         $title = "新增借支";
@@ -288,11 +289,12 @@ class CostController extends BaseController{
                 // $where=["status"=>1];
             }
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'fields'=>"*,FROM_UNIXTIME(debit_date,'%Y-%m-%d') debit_date,FROM_UNIXTIME(require_date,'%Y-%m-%d') require_date,FROM_UNIXTIME(loan_date,'%Y-%m-%d') loan_date,FIND_IN_SET({$roleId},examine) place",
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize ,
             'orderStr'=>"id DESC",
             "joins"=>[
                 "LEFT JOIN (SELECT projectId,code,name project_name,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,business,leader FROM v_project ) p ON p.projectId = project_id ",
@@ -304,7 +306,7 @@ class CostController extends BaseController{
         ];
         $listResult=$this->debitCom->getList($parameter);
     // echo        $this->debitCom->M()->_sql();
-        $this->tablePage($listResult,'Cost/costTable/financedebitList',"finance_debitList");
+        $this->tablePage($listResult,'Cost/costTable/financedebitList',"finance_debitList",$pageSize );
     }
     function finance_debit_modalOne(){
         $title = "借支控制";
@@ -392,11 +394,12 @@ class CostController extends BaseController{
             // print_r(session('userId'));
             $where['user_id'] = session('userId');
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_date ",
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"id DESC",
             "joins"=>[
                 "LEFT JOIN (SELECT projectId,code,name project_name,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,business,leader FROM v_project ) p ON p.projectId = project_id ",
@@ -407,7 +410,7 @@ class CostController extends BaseController{
         ];
         
         $listResult=$this->expenseCom->getList($parameter);
-        $this->tablePage($listResult,'Cost/costTable/expenseList',"expenseList");
+        $this->tablePage($listResult,'Cost/costTable/expenseList',"expenseList",$pageSize);
     }
     function expenseManage($datas,$reqType=false){
         $reqType = $reqType ? $reqType : I("reqType");
@@ -619,12 +622,12 @@ class CostController extends BaseController{
             // }
         }
         
-        
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_date",
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"id DESC",
             "joins"=>[
                 // "LEFT JOIN (SELECT id pId , project_id,user_id FROM v_expense) e ON e.pId = parent_id",
@@ -639,7 +642,7 @@ class CostController extends BaseController{
         //"LEFT JOIN (SELECT GROUP_CONCAT(table_id ORDER BY add_time DESC) aid ,GROUP_CONCAT(status ORDER BY add_time DESC) last_status FROM v_approve_log WHERE table_name = '".$this->expenseSubCom->tableName()."' GROUP BY table_id) al ON al.aid = id",
         $listResult=$this->expenseCom->getList($parameter);
         // print_r($listResult);exit;
-        $this->tablePage($listResult,'Cost/costTable/fin_expenseList',"fin_expenseList");
+        $this->tablePage($listResult,'Cost/costTable/fin_expenseList',"fin_expenseList",$pageSize);
     }
     function fin_expense_modalOne(){
         $title = "报销管理";

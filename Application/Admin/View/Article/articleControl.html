@@ -61,26 +61,28 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-12" style="overflow-x: auto;z-index: 1;">
-                <table id="" class="table table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <th>文章Id</th>
-                            <th>标题</th>
-                            <th>封面</th>
-                            <th>作者</th>
-                            <th>分类</th>
-                            <th>内容概要</th>
-                            <th>添加时间</th>
-                            <th>更新时间</th>
-                            <th>状态</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody class="{$controlName}-table">
-                        {$tables}
-                    </tbody>
-                </table>
+            <div class="col-sm-12 table-outbox" style="z-index: 1;">
+                <div style="font-size:0.95em;overflow: auto;">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>文章Id</th>
+                                <th>标题</th>
+                                <th>封面</th>
+                                <th>作者</th>
+                                <th>分类</th>
+                                <th>内容概要</th>
+                                <th>添加时间</th>
+                                <th>更新时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="{$controlName}-table">
+                            {$tables}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <div class="dataTables_wrapper">

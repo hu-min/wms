@@ -165,7 +165,7 @@ function status_label($defind_vars){
     
     $statusType = $defind_vars["statusType"];
     $item = $defind_vars["item"];
-    print_r($item);
+    // print_r($item);
     echo "<span class='label bg-{$statusLabel[$item['status']]}'>{$statusType[$item['status']]}</span>";
 }
 //各类权限按钮全局函数开始

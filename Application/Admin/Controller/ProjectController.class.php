@@ -11,7 +11,6 @@ class ProjectController extends BaseController{
     public function _initialize() {
         parent::_initialize();
         $this->projectCom=getComponent('Project');
-        $this->configCom=getComponent('Config');
         $this->customerCom=getComponent('Customer');
         $this->supplierCom=getComponent('Supplier');
         $this->purchaCom=getComponent('Purcha');
@@ -463,11 +462,12 @@ class ProjectController extends BaseController{
         if($data['template'] == 'schedule'){
             $file_type="3,4";
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'fields'=>"*,FIND_IN_SET({$roleId},examine) place",
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"addTime DESC",
             "joins"=>[
                 "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = brand",
@@ -508,7 +508,7 @@ class ProjectController extends BaseController{
             $template = 'Project/projectTable/'.$listRedis;
             // echo $template;
         }
-        $this->tablePage($listResult,$template,$listRedis);
+        $this->tablePage($listResult,$template,$listRedis,$pageSize);
         // if($projectResult){
         //     $projectRed="projectList";
         //     $this->Redis->set($projectRed,json_encode($projectResult['list']),3600);

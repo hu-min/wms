@@ -33,8 +33,9 @@ var get = function(url,indata,callBack){
         dataType:'json',
         data:indata,
         async:asyncs,
-    }).done(function(result) {if(result.errCode=="405"){window.location.reload();}callBack(result);})
-      .always(function() { if(load){setLoad();}datas={};})
+    }).done(function(result) {
+        if(in_array(result.errCode,[405,407])){window.location.reload();}callBack(result);
+    }).always(function() { if(load){setLoad();}datas={};})
 }
 /** 
  * javascript comment 
@@ -55,8 +56,9 @@ function post(url,indata,callBack){
         dataType:'json',
         data:indata,
         async:asyncs,
-    }).done(function(result) {if(result.errCode=="405"){window.location.reload();}callBack(result);})
-    .always(function() {if(load){setLoad();}datas={};})
+    }).done(function(result) {
+        if(in_array(result.errCode,[405,407])){window.location.reload();}callBack(result);
+    }).always(function() {if(load){setLoad();}datas={};})
 }
 //enter-input class的输入框键盘回车事件
 $(document).on("keypress",".enter-input",function(e){
@@ -1656,10 +1658,11 @@ var rest_control = function(info,option,callback){
  * @Desc: 重新定义表格，冻结带了 frozen 类的元素
  */
 var table_frozen = function($this){
-    var scrollHtml = "<table class='table table-bordered table-hover frozen-table' style='width: auto;position: absolute;background: #ffffff;'><thead><tr>";
+    var scrollHtml = "<thead><tr>";
     var scrollCols = [];
-    $this.parents('table').find("thead th").each(function(index,self){
-        if($(self).hasClass("is-frozen")){
+
+    $this.parents('table').find("thead tr:not(.none)").find("th").each(function(index,self){
+        if($(self).hasClass("is-frozen") && !$(self).parents("tr").hasClass("none")){
             scrollCols.push(index);
             scrollHtml+=$(self).prop("outerHTML");
         }
@@ -1667,7 +1670,8 @@ var table_frozen = function($this){
     scrollHtml+="</tr></thead><tbody>";
     var trs =""
     $this.parents('table').find("tbody tr").each(function(index,self){
-        var tr ="<tr>"
+        var style  = $(self).attr("style") ? "style='"+$(self).attr("style")+"'" : "" ;
+        var tr ="<tr "+style+">"
         $(self).find("td").each(function(td,tdSelf){
             if(in_array(td,scrollCols)){
                 $(tdSelf).css({"width":$(tdSelf).width()+"px","height":$(tdSelf).parents("tr").height()+"px"})
@@ -1677,19 +1681,26 @@ var table_frozen = function($this){
         tr += "</tr>"
         trs += tr
     })
-    scrollHtml+=trs+"</tbody></table>"
-    $this.parents('table').before(scrollHtml)
-    var tleft = $(tabId+" .table-outbox").find(".frozen-table").css("left").replace("px","")
-    $(tabId+" .table-outbox").scroll(function(){
-        left = Number($(this).scrollLeft()+Number(tleft))
-        $(tabId+" .table-outbox").find(".frozen-table").css("left",left+"px")
-    })
-    $(tabId+" table tbody tr").on("mouseenter",function(){
-        table_tr_active(this,"add")
-    })
-    $(tabId+" table tbody tr").on("mouseleave",function(){
-        table_tr_active(this,"remove")
-    })
+    scrollHtml+=trs+"</tbody>"
+    if($this.parents('.table-outbox').html()!=undefined){
+        if($this.parents('.table-outbox').find(".frozen-table").html()==undefined){
+            $this.parents('table').before("<table class='table table-bordered table-hover frozen-table' style='width: auto;position: absolute;background: #ffffff;'>"+scrollHtml+"</table>")
+        }else{
+            $this.parents('.table-outbox').find(".frozen-table").html(scrollHtml)
+        }
+        
+        var tleft = $this.parents('.table-outbox').find(".frozen-table").css("left").replace("px","")
+        $this.parents('.table-outbox').scroll(function(){
+            left = Number($(this).scrollLeft()+Number(tleft))
+            $this.parents('.table-outbox').find(".frozen-table").css("left",left+"px")
+        })
+        $(tabId+" table tbody tr").on("mouseenter",function(){
+            table_tr_active(this,"add")
+        })
+        $(tabId+" table tbody tr").on("mouseleave",function(){
+            table_tr_active(this,"remove")
+        })
+    }
 }
 /** 
  * javascript comment 

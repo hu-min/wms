@@ -15,6 +15,9 @@
             <a class="btn btn-app v-showmodal" data-gettype="Edit" data-toggle="modal" data-url="{$url}" data-vtarget=".global-modal" data-con="index_process">
                 <i class="fa fa-edit"></i> 特殊流程配置
             </a>
+            <a class="btn btn-app v-showmodal" data-gettype="Edit" data-toggle="modal" data-url="{$url}" data-vtarget=".global-modal" data-con="index_lock">
+                <i class="fa fa-lock"></i> 系统锁定
+            </a>
             <!-- <a class="btn btn-app">
                 <i class="fa fa-play"></i> Play
             </a>
@@ -53,9 +56,19 @@
         </div>
     </div>
     <script>
+        /** 
+         * @Author: vition 
+         * @Date: 2018-10-27 09:38:27 
+         * @Desc: 流程配置初始化 
+         */        
         var index_process_initInfo = function(){
             init_chosen("{$url}","getOptionList",".global-modal");
         }
+        /** 
+         * @Author: vition 
+         * @Date: 2018-10-27 09:38:20 
+         * @Desc:  流程配置设置数据
+         */        
         var index_process_setInfo = function(result){
             $(tabId+" .global-modal .modal-info[name='processIds']").val(result['processIds']);
             if(result.name){
@@ -67,6 +80,15 @@
                 });
             }
             $(tabId+" .global-modal .chosen-select").trigger("chosen:updated");
+        }
+        /** 
+         * @Author: vition 
+         * @Date: 2018-10-27 09:39:01 
+         * @Desc: 系统锁定设置数据 
+         */        
+        var index_lock_setInfo = function(info){
+            $(tabId+" .global-modal .modal-info[name='config_id']").val(info['id']);
+            set_status_btn($(tabId+" .global-modal .lock-status .status-btn[name='"+info['status']+"']"),info,"{$Think.session.userId}","{$nodeAuth}")
         }
         $(function(){
             $(tabId).on("change",".global-modal .modal-info[name='process_type']",function(){

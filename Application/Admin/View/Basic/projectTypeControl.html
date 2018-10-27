@@ -56,21 +56,23 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-12" style="overflow: auto;z-index: 1;">
-                <table class="table table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <th>项目类型名称</th>
-                            <th>项目类型别名</th>
-                            <th>项目类型备注</th>
-                            <th>状态</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody class="{$controlName}-table">
-                        {$tables}
-                    </tbody>
-                </table>
+            <div class="col-sm-12 table-outbox" style="z-index: 1;">
+                <div style="font-size:0.95em;overflow: auto;">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th class="is-frozen">项目类型名称</th>
+                                <th>项目类型别名</th>
+                                <th>项目类型备注</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="{$controlName}-table">
+                            {$tables}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <div class="dataTables_wrapper">

@@ -27,6 +27,18 @@ class BaseController extends \Common\Controller\BaseController{
     public function _initialize() {
         // echo 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'];exit;
         parent::_initialize();
+        $nowConAct=MODULE_NAME."/".CONTROLLER_NAME.'/'.ACTION_NAME;
+        $this->configCom=getComponent('Config');
+
+        $locks = $this->configCom->get_val("web_lock");
+        
+        if(isset($locks['value']) && $locks['value'] != session('web_lock_password') && strtolower($nowConAct) !="admin/index/lock"){
+            $this->redirect('Index/lock');
+        }else{
+            if($locks['value'] == session('web_lock_password') && strtolower($nowConAct) =="admin/index/lock"){
+                $this->redirect('Index/Login');
+            }
+        }
         $this->userCom=getComponent('User');
         $this->LogCom=getComponent('Log');
         $this->ApprLogCom=getComponent('ApproveLog');
@@ -36,13 +48,16 @@ class BaseController extends \Common\Controller\BaseController{
         $this->basicCom=getComponent('Basic');
         $this->resetCom=getComponent('ResetApply');
         $this->QiyeCom=getComponent('Qiye');
+        
         $this->exemption=[//排除的控制器
             'Admin/Index/Login',
             'Admin/Index/Main',
             'Admin/Index/logOut',
             'Admin/Index/checkLogin',
             'Admin/Index/Index',
+            'Admin/Index/lock',
         ];
+        
         $this->refreNode();
 
         if($_GET['code'] && ACTION_NAME=='Login'){
@@ -69,10 +84,10 @@ class BaseController extends \Common\Controller\BaseController{
         }
         // print_r($this->nodeAuth);
         // $this->setLogin();
-        $nowConAct=MODULE_NAME."/".CONTROLLER_NAME.'/'.ACTION_NAME;
+        
 
         if(in_array($nowConAct,$this->exemption) || ( in_array(ACTION_NAME,['excel_import','upload_filesAdd','excel_export','template_down','reset_apply']) && $this->isLogin())){
-            if(!$this->isLogin() && !in_array(ACTION_NAME,['checkLogin','Login']) ){
+            if(!$this->isLogin() && !in_array(ACTION_NAME,['checkLogin','Login','lock'])){
                 session("history",domain(false).__SELF__);
                 if(session('is_wechat')){
                     session('is_wechat',NULL);
@@ -113,7 +128,7 @@ class BaseController extends \Common\Controller\BaseController{
             $this->assign('statusType',$this->statusType);
             $this->assign('statusTypeJ',json_encode($this->statusType));
             $this->assign('statusLabel',$this->statusLabel);
-            $this->assign('entries',[5,30,35,40,45,50]);
+            $this->assign('entries',[30,35,40,45,50]);
             // $nodeId = getTabId(I("vtabId"));
             $this->nodeId = getTabId(I("vtabId"));
             // $this->assign('processType',$this->processType);
@@ -228,6 +243,8 @@ class BaseController extends \Common\Controller\BaseController{
             session('nodeAuth',[]);
             session('nodeInfo',[]);
             session("history",NULL);
+            session('web_lock_password',NULL);
+            $this->clearRedis('config_web_lock');
             $this->redirect('Index/Login');
         }else{
             //登录设置

@@ -3,13 +3,13 @@
         <td class="hidden-xs">{$item['code']}</td>
         <td class="hidden-xs">{$item['project_time']|date='Y-m-d',###}</td>
         <td title="{$item['name']}">{$item['name']}</td>
-        <td class="hidden-xs">{$item['city_name']}</td>
-        <td class="hidden-xs">{$item['customer_com_name']}</td>
-        <td class="hidden-xs">{$item['customer_cont_name']}</td>
-        <td class="hidden-xs">{$item['type_name']}</td>
-        <td class="hidden-xs">{$item['business_name']}</td>
-        <td class="hidden-xs">{$item['leader_name']}</td>
-        <td class="hidden-xs">{$item['earlier_users']}</td>
+        <td>{$item['city_name']}</td>
+        <td>{$item['customer_com_name']}</td>
+        <td>{$item['customer_cont_name']}</td>
+        <td>{$item['type_name']}</td>
+        <td>{$item['business_name']}</td>
+        <td>{$item['leader_name']}</td>
+        <td>{$item['earlier_users']}</td>
         <td>{$item['stage_name']}</td>
         <td  class="status-con"  data-con="project_file" data-id="{$item['projectId']}" data-url="{$url}" style="min-width: 80px;">
             <button type="button" data-gettype="leader"" data-toggle="modal" data-vtarget=".files-modal" class="btn btn-xs btn-info v-showmodal">查看</button><if condition="$item['file_num'] gt 0"><span class="label label-success files-num-label">{$item.file_num|default=0}</span><else/><span class="label bg-gray files-num-label">0</span></if>

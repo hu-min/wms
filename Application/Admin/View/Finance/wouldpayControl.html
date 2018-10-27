@@ -71,51 +71,57 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-12" style="font-size:0.95em;overflow: auto;z-index: 1;">
-                <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;">
+            <div class="col-sm-12 table-outbox" style="z-index: 1;">
+                <div style="font-size:0.95em;overflow: auto;">
+                    <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;"></div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <!-- <th>品牌</th> -->
+                                <th class="hidden-xs hidden-sm is-frozen">项目编号</th>
+                                <th class="is-frozen">项目日期</th>
+                                <th class="is-frozen">项目名称</th>
+                                <th>结束日期</th>
+                                <th>项目主担</th>
+                                <th>公司账户</th>
+                                <th>供应商名称</th>
+                                <th>供应商类型</th>
+                                <th>合同查看</th>
+                                <th>供应商联系人</th>
+                                <!-- <th>采购内容</th> -->
+                                <!-- <th>付款方式</th> -->
+                                <!-- <th>付款金额</th> -->
+                                <!-- <th>付款日期</th> -->
+                                <th>合同支付总额</th>
+                                <th>最晚支付日期</th>
+                                <!-- <th>预付款</th> -->
+                                <!-- <th>预付款比</th> -->
+                                <!-- <th>预付日期</th> -->
+                                <th>已付款</th>
+                                <th>未付款</th>
+                                <th>下次付款日期</th>
+                                <th>未付占比</th>
+                                <th>支付优先级</th>
+                                <!-- <th>发票类型</th> -->
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="{$controlName}-table">
+                            {$tables}
+                        </tbody>
+                    </table>
                 </div>
-                <table class="table table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <th>品牌</th>
-                            <th>项目编号</th>
-                            <th>项目日期</th>
-                            <th>项目名称</th>
-                            <th>结束日期</th>
-                            <th>项目主担</th>
-                            <th>公司账户</th>
-                            <th>供应商名称</th>
-                            <th>供应商类型</th>
-                            <th>合同查看</th>
-                            <th>供应商联系人</th>
-                            <!-- <th>采购内容</th> -->
-                            <!-- <th>付款方式</th> -->
-                            <!-- <th>付款金额</th> -->
-                            <!-- <th>付款日期</th> -->
-                            <th>合同支付总额</th>
-                            <th>合同最晚支付日期</th>
-                            <!-- <th>预付款</th> -->
-                            <!-- <th>预付款比</th> -->
-                            <!-- <th>预付日期</th> -->
-                            <th>已付款</th>
-                            <th>未付款</th>
-                            <th>下次付款日期</th>
-                            <th>未付占比</th>
-                            <th>支付优先级</th>
-                            <!-- <th>发票类型</th> -->
-                            <th>状态</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody class="{$controlName}-table">
-                        {$tables}
-                    </tbody>
-                </table>
             </div>
         </div>
         <div class="dataTables_wrapper">
-            <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
-                {$pages}
+            <div class="row">
+                <div class="col-md-2 col-sm-3 col-xs-12"><div class="dataTables_length" ><label>显示 <select name="pageSize"  class="form-control input-sm search-info">
+                    <volist name="entries" id="item"><option value="{$item}">{$item}</option></volist>
+                </select> 条</label></div></div>
+                <div  class="{$controlName}-page row page-div col-md-10 col-sm-9 col-xs-12" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+                    {$pages}
+                </div>
             </div>
         </div>
     </section>

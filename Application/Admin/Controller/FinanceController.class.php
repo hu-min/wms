@@ -408,11 +408,12 @@ class FinanceController extends BaseController{
                 $where['_string'] = "leader=".session('userId')." OR business=".session('userId');
             }
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'fields'=>"*,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_time,FROM_UNIXTIME(contract_date,'%Y-%m-%d') contract_date",
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"add_time DESC",
             "joins"=>[
                 "LEFT JOIN (SELECT projectId,session_all,code,name,project_time,brand,customer_com,leader,business,type,amount FROM v_project ) p ON p.projectId = project_id ",
@@ -425,7 +426,7 @@ class FinanceController extends BaseController{
         
         $listResult=$this->receivableCom->getList($parameter);
         // echo $this->receivableCom->M()->_sql();exit;
-        $this->tablePage($listResult,'Finance/financeTable/receivableList',"receivableList");
+        $this->tablePage($listResult,'Finance/financeTable/receivableList',"receivableList",$pageSize);
     }
     function receivableAdd(){
         $info=$this->manageReceivableInfo();
@@ -889,11 +890,12 @@ class FinanceController extends BaseController{
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
             $where['user_id'] = session('userId');
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time",
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"id DESC",
             "joins"=>[
                 "LEFT JOIN (SELECT projectId,code,name FROM v_project ) p ON p.projectId = project_id ",
@@ -902,7 +904,7 @@ class FinanceController extends BaseController{
             ]
         ];
         $listResult=$this->clearCom->getList($parameter);
-        $this->tablePage($listResult,'Finance/financeTable/staffClearList',"staffClearList");
+        $this->tablePage($listResult,'Finance/financeTable/staffClearList',"staffClearList",$pageSize);
     }
     function staffClear_modalOne(){
         $title = "提交清算";
@@ -1094,18 +1096,20 @@ class FinanceController extends BaseController{
         }else{
             $where = "";
         }
-    $table = "SELECT p.project_id project_id,SUM(debit_money) debit_money,COUNT(debit_money) debit_num,SUM(money) expense_money,COUNT(money) expense_num,SUM(invoice_money) invoice_money,GROUP_CONCAT(did) debit_ids,GROUP_CONCAT(eid) expense_ids,user_id, clear_status,vp.name,vp.code,user_name  FROM (SELECT project_id,user_id,clear_status FROM v_debit WHERE `status`=1 UNION SELECT project_id,user_id,clear_status FROM v_expense_sub RIGHT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m1 ON m1.exId=parent_id) p LEFT JOIN (SELECT project_id,debit_money,id did,user_id user_did FROM v_debit WHERE `status`=1) d ON d.project_id=p.project_id AND d.user_did = p.user_id LEFT JOIN (SELECT project_id,parent_id,money,invoice_money,id eid,user_id user_eid  FROM v_expense_sub RIGHT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m ON m.exId=parent_id ) e ON e.project_id=p.project_id AND e.user_eid=p.user_id LEFT JOIN (SELECT projectId,name,code,leader FROM v_project) vp ON vp.projectId=p.project_id LEFT JOIN (SELECT userId ,userName user_name FROM v_user) u ON u.userId = user_id GROUP BY p.project_id,clear_status";
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
 
-        $sql="SELECT * FROM ({$table}) c {$where} LIMIT ".(($p-1)*$this->pageSize).",".$this->pageSize;
+        $table = "SELECT p.project_id project_id,SUM(debit_money) debit_money,COUNT(debit_money) debit_num,SUM(money) expense_money,COUNT(money) expense_num,SUM(invoice_money) invoice_money,GROUP_CONCAT(did) debit_ids,GROUP_CONCAT(eid) expense_ids,user_id, clear_status,vp.name,vp.code,user_name  FROM (SELECT project_id,user_id,clear_status FROM v_debit WHERE `status`=1 UNION SELECT project_id,user_id,clear_status FROM v_expense_sub RIGHT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m1 ON m1.exId=parent_id) p LEFT JOIN (SELECT project_id,debit_money,id did,user_id user_did FROM v_debit WHERE `status`=1) d ON d.project_id=p.project_id AND d.user_did = p.user_id LEFT JOIN (SELECT project_id,parent_id,money,invoice_money,id eid,user_id user_eid  FROM v_expense_sub RIGHT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m ON m.exId=parent_id ) e ON e.project_id=p.project_id AND e.user_eid=p.user_id LEFT JOIN (SELECT projectId,name,code,leader FROM v_project) vp ON vp.projectId=p.project_id LEFT JOIN (SELECT userId ,userName user_name FROM v_user) u ON u.userId = user_id GROUP BY p.project_id,clear_status";
+
+        $sql="SELECT * FROM ({$table}) c {$where} LIMIT ".(($p-1)*$pageSize).",".$pageSize;
         $db = M();
         $addResult = $db->query($sql);
         
         $countResult = $db->query("SELECT count(*) vcount FROM ({$table}) c {$where}");
         // print_r($countResult);
         $count = isset($countResult[0]["vcount"]) ? $countResult[0]["vcount"] : 0;
-        $listResult=["list" => $addResult,"count" => count($count)];
+        $listResult=["list" => $addResult,"count" => $count];
         $this->assign("clearType",$clearType);
-        $this->tablePage($listResult,'Finance/financeTable/readClearList',"readClearList");
+        $this->tablePage($listResult,'Finance/financeTable/readClearList',"readClearList",$pageSize);
     }
     function readClear_modalOne(){
         $title = "提交清算";
@@ -1192,11 +1196,12 @@ class FinanceController extends BaseController{
             $orderStr = "id DESC,project_id DESC";
             $template = "financeClearUList";
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'fields'=>$fields,
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>$orderStr,
             "groupBy" =>$groupBy,
             "joins"=>[
@@ -1214,9 +1219,9 @@ class FinanceController extends BaseController{
         $countResult = $this->clearCom->getOne($parameter);
         // print_r($countResult);
         // echo $this->clearCom->M()->_sql();exit;
-        $countStr = "<div><label>借支次数总计：<span class='text-light-blue'>".$countResult["list"]["debit_num"]."</span></label> | <label>借支金额总计：<span class='text-light-blue'>".$countResult["list"]["debit_money"]."</span></label> | <label>报销金额总计：<span class='text-light-blue'>".$countResult["list"]["expense_num"]."</span></label> | <label>报销金额总计：<span class='text-light-blue'>".$countResult["list"]["expense_money"]."</span></label> | <label>清算金额总计：<span class='text-light-blue'>".$countResult["list"]["all_money"]."</span></label></div>";
+        $countStr = "<div><label>借支次数总计：<span class='text-light-blue'>".$countResult["list"]["debit_num"]."</span></label> | <label>借支金额总计：<span class='text-light-blue'>".$countResult["list"]["debit_money"]."</span></label> | <label>报销次数总计：<span class='text-light-blue'>".$countResult["list"]["expense_num"]."</span></label> | <label>报销金额总计：<span class='text-light-blue'>".$countResult["list"]["expense_money"]."</span></label> | <label>清算金额总计：<span class='text-light-blue'>".$countResult["list"]["all_money"]."</span></label></div>";
         // echo $countStr;exit;
-        $this->tablePage($listResult,'Finance/financeTable/'.$template,"finance_clearList",false,$countStr);
+        $this->tablePage($listResult,'Finance/financeTable/'.$template,"finance_clearList",$pageSize,$countStr);
     }
     function financeClear_modalOne(){
         $title = "清算审核";

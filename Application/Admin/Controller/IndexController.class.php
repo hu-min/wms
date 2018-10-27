@@ -377,6 +377,78 @@ class IndexController extends BaseController{
         ];
         $this->modalOne($modalPara);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-27 08:18:56 
+     * @Desc: 维护界面，锁屏 
+     */    
+    function lock(){
+        $reqType=I('reqType'); 
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-27 08:19:09 
+     * @Desc: 检测维护密码 
+     */    
+    function checkRepair(){
+        $datas = I("data");
+        $locks = $this->configCom->get_val("web_lock");
+        if(isset($datas['password']) && !empty($datas['password']) && $locks['value']==sha1(sha1($datas['password']))){
+            session('web_lock_password',sha1(sha1($datas['password'])));
+            $this->ajaxReturn(["errCode"=>0,"error"=>getError(0)]);
+        }else{
+            $this->ajaxReturn(["errCode"=>406,"error"=>getError(406)]);
+        }
+    }
+    function index_lock_modalOne(){
+        $title = "系统锁定";
+        $btnTitle = "修改配置";
+        extract($_REQUEST);
+        $this->assign("controlName","index_lock");
+        $this->assign("tableName",$this->configCom->tableName());
+        $lockInfo = $this->configCom->getOne(['where'=>['name'=>"web_lock"]]);
+        if(isset($lockInfo['list']['value'])){
+            unset($lockInfo['list']['value']);
+        }
+        $modalPara=[
+            "data"=> $lockInfo['list'],
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "tpFolder"=>'Index',
+            "folder"=>'table',
+            "template"=>"lockModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    function index_lockEdit(){
+        extract($_REQUEST);
+        if(!empty($data["password"])){
+            $data["value"] = sha1(sha1($data["password"]));
+        }else{
+            unset($data["password"]);
+        }
+        if($data["config_id"]>0){
+            $config_id = $data["config_id"];
+            unset($data["config_id"]);
+            $result = $this->configCom->update(['where'=>['id'=>$config_id],'data'=>$data]);
+        }else{
+            $data['name'] = 'web_lock';
+            $data["value"] = isset($data["value"]) && !empty($data["value"]) ? $data["value"] : sha1(sha1('123456'));
+            $result = $this->configCom->insert($data);
+        }
+        if($data["status"] == 1){
+            session('web_lock_password',NULL);
+            $this->clearRedis('config_web_lock');
+            $result->errCode = 407;
+            $result->error = getError(407);
+        }
+        $this->ajaxReturn($result);
+    }
 }
 
 /** 

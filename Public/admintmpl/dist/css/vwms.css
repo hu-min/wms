@@ -227,10 +227,13 @@ table .tsort-up:hover,table .tsort-down:hover{
 .data-reset{
 	box-shadow: 0px 0px 10px 4px #FF0000;
 }
-.is-frozen{
-	/* position : relative;
-	border : solid #A4D3EE 1px; */
+.frozen-table{
+	border-color:#3c8dbc;
+	z-index:2;
 }
 .tr-active{
 	background:#F5F5F5;
+}
+.dataTables_wrapper{
+	margin-top:5px;
 }

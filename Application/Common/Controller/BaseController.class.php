@@ -70,4 +70,7 @@ class BaseController extends Controller{
     function __call($fun,$argu){
         return $fun.'方法不存在';
     }
+    function clearRedis($redisName){
+        $this->Redis->set($redisName,null,1);
+    }
 }

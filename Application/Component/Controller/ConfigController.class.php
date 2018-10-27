@@ -13,18 +13,28 @@ class ConfigController extends BaseController{
      * @Desc: 根据name获取配置项指定值 
      */    
     function get_val($name,$json_decode=true){
-        $parameter=[
-            "where"=>["name"=>$name,"status"=>1],
-            "fields"=>"value",
-        ];
-        $configRes=$this->selfDB->getOne($parameter);
+        $redsName = "config_".$name;
+        $val = $this->Redis->get($redsName);
+        if($val){
+            return $val;
+        }else{
+            $parameter=[
+                "where"=>["name"=>$name,"status"=>1],
+                "fields"=>"value",
+            ];
+            $configRes=$this->selfDB->getOne($parameter);
+        }
+       
         if(!is_null($configRes)){
             if($configRes){
+                $this->Redis->set($redsName,$configRes,3600);
                 return $configRes;
             }
             if($json_decode){
+                $this->Redis->set($redsName,json_decode($configRes["value"],true),3600);
                 return json_decode($configRes["value"],true);
             }
+            $this->Redis->set($redsName,$configRes["value"],3600);
             return $configRes["value"];
         }
         return false;

@@ -67,8 +67,8 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-12 table-outbox">
-                <div style="font-size:0.95em;overflow: auto;z-index: 1;">
+            <div class="col-sm-12 table-outbox" style="z-index: 1;">
+                <div style="font-size:0.95em;overflow: auto;">
                     <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;">
                     </div>
                     <table class="table table-bordered table-hover">
@@ -105,8 +105,13 @@
             </div>
         </div>
         <div class="dataTables_wrapper">
-            <div  class="{$controlName}-page row page-div" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
-                {$pages}
+            <div class="row">
+                <div class="col-md-2 col-sm-3 col-xs-12"><div class="dataTables_length" ><label>显示 <select name="pageSize"  class="form-control input-sm search-info">
+                    <volist name="entries" id="item"><option value="{$item}">{$item}</option></volist>
+                </select> 条</label></div></div>
+                <div  class="{$controlName}-page row page-div col-md-10 col-sm-9 col-xs-12" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+                    {$pages}
+                </div>
             </div>
         </div>
     </section>

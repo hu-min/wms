@@ -58,6 +58,7 @@ class PurchaController extends BaseController{
         $costs = $this->projectCom->getCosts($id);
         $resultData['current_cost'] = $costs['allCost'];
         $resultData['rate'] = round((($resultData['amount']-$costs['allCost'])/$resultData['amount'])*100,2);
+        $resultData['expect_rate'] = round((($resultData['amount']-$resultData['cost_budget'])/$resultData['amount'])*100,2);
         $resultData['debit_expense'] = $costs['allCost'] - $costs['contract'];
         if($return){
             return $resultData;
@@ -293,9 +294,9 @@ class PurchaController extends BaseController{
             if($dataInfo){
                 $insertResult=$this->purchaCom->insert($dataInfo);
                 
-                if($insertResult->errCode==0){
+                if(isset($insertResult->errCode) && $insertResult->errCode==0){
                     $this->ApprLogCom->createApp($this->purchaCom->tableName(),$insertResult->data,session("userId"),"");
-                    // $this->wouldpayCom->insert(["cost_id"=>$insertResult->data]);
+                    $this->wouldpayCom->insert(["cost_id"=>$insertResult->data]);
                     $isInsert =true;
                 }
             }
@@ -314,12 +315,29 @@ class PurchaController extends BaseController{
     function cost_insertEdit(){
         $datas=I("data");
         $dels=I("del");
+        // print_r($dels);
+        // print_r($datas);exit;
         if($dels && !empty($dels)){
             $delResult=$this->purchaCom->del(["id"=>["IN",$dels]]);
             if(isset($delResult->errCode) && $delResult->errCode==0){
                 $isUpdate =true;
             }
         }
+
+        $examines = getComponent('Process')->getExamine(I("vtabId"),$datas[0]["leader"]);
+        $rolePlace = $examines['place'];
+        $status = 0;
+        if($rolePlace!==false){
+            $process_level=$rolePlace+2;
+            if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
+                $status = 1;
+            }else{
+                $status = 2;
+            }
+        }else{
+            $process_level=$rolePlace > 0 ? $rolePlace : 1;
+        }
+
         if($datas[0]["project_id"]>0){
             $ids = array_column($datas,'id');
             $dbCom = "purcha";
@@ -335,12 +353,13 @@ class PurchaController extends BaseController{
             //     $this->ajaxReturn(['errCode'=>77,'error'=>$html]);
             // }
         }
-        
+        // exit;
         $isUpdate =false;
         foreach ($datas as $suprInfo) {
             
             if($suprInfo["id"]>0){
                 $dataInfo = $this->manageCostInsertInfo($suprInfo);
+                // print_r($dataInfo);
                 if($dataInfo){
                     $updateResult=$this->purchaCom->update($dataInfo);
                     if($updateResult->errCode==0){
@@ -350,6 +369,11 @@ class PurchaController extends BaseController{
                 }
             }else{
                 $dataInfo = $this->manageCostInsertInfo($suprInfo,"cost_insertAdd");
+                $dataInfo["process_id"] = $examines['process_id'];
+                $dataInfo["examine"] = $examines['examine'];;
+                $dataInfo['process_level'] = $process_level;
+                $dataInfo['status'] = $status;
+                // print_r($dataInfo);
                 if($dataInfo){
                     $insertResult=$this->purchaCom->insert($dataInfo);
                     if($insertResult->errCode==0){

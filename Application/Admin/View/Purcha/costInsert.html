@@ -65,26 +65,27 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-12" style="font-size:0.95em;overflow-x: auto;z-index: 1;">
-                <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;">
+            <div class="col-sm-12 table-outbox" style="z-index: 1;">
+                <div style="font-size:0.95em;overflow: auto;">
+                    <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;"></div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th class="is-frozen">项目名称</th>
+                                <th class="hidden-xs is-frozen">项目编号</th>
+                                <th>项目主担</th>
+                                <th>营业主担</th>
+                                <th>供应商数量</th>
+                                <th>成本总额</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="{$controlName}-table">
+                            {$tables}
+                        </tbody>
+                    </table>
                 </div>
-                <table class="table table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <th>项目名称</th>
-                            <th>项目编号</th>
-                            <th>项目主担</th>
-                            <th>营业主担</th>
-                            <th>供应商数量</th>
-                            <th>成本总额</th>
-                            <th>状态</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody class="{$controlName}-table">
-                        {$tables}
-                    </tbody>
-                </table>
             </div>
         </div>
         <div class="dataTables_wrapper">
@@ -104,8 +105,10 @@
         </div>
     </div>
     <script>
+        var delData = {};
+        var current_amount = 0;
         function cost_insert_initInfo(gettype){
-            datas[tabId] = {del:[]}
+            delData[tabId] = {del:[]}
             if(gettype=="Add"){
                 init_chosen("{$url}","getProjectOne",".create-rece");
                 init_chosen("{$url}","getProjectOne",$(tabId).find(".supr-list tbody tr"));
@@ -120,7 +123,7 @@
         function cost_insert_setInfo(info){
             var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
             if(info["list"] == undefined){
-                ["code","leader_name","business_name","leader","project_date","cost_budget","amount","current_cost","rate","debit_expense"].forEach(element => {
+                ["code","leader_name","business_name","leader","project_date","cost_budget",'expect_rate',"amount","current_cost","rate","debit_expense"].forEach(element => {
                     if(element=="project_date"){
                         info[element] = info["project_date"]+" 至 "+ info["end_date"]
                     }
@@ -146,6 +149,7 @@
                     }
                     
                     user_id = supritem["user_id"]
+                    current_amount += float(supritem["contract_amount"]);
                     $(tabId+" .global-modal .supr-list tbody").append(info.template);
                     var $current = $(tabId+" .global-modal .supr-list tbody tr").eq(rows);
                     $current.find(".serial").text(Number(rows+1));
@@ -174,13 +178,13 @@
                             }else if(element == "modules"){
                                 if(supritem['modules']){
                                     supritem['modules'].forEach(function(tmodule){
-                                        if($(tabId+" .modal-info[name='module']").find("option[value='"+tmodule['basicId']+"']").length==0 && tmodule['basicId'] && tmodule['name']){
-                                            $(tabId+" .modal-info[name='module']").append('<option value="'+tmodule['basicId']+'">'+tmodule['name']+'</option>');
+                                        if($current.find(".modal-info[name='module']").find("option[value='"+tmodule['basicId']+"']").length==0 && tmodule['basicId'] && tmodule['name']){
+                                            $current.find(".modal-info[name='module']").append('<option value="'+tmodule['basicId']+'">'+tmodule['name']+'</option>');
                                         }
-                                        $(tabId+" .modal-info[name='module']").find("option[value='"+tmodule['basicId']+"']").prop("selected",true)
+                                        $current.find(".modal-info[name='module']").find("option[value='"+tmodule['basicId']+"']").prop("selected",true)
                                     })
                                 }else if(supritem['module']=="999999999"){
-                                    $(tabId+" .modal-info[name='module']").find("option[value='999999999']").prop("selected",true)
+                                    $current.find(".modal-info[name='module']").find("option[value='999999999']").prop("selected",true)
                                 }
                                 $current.find(".modal-info[name='module']").trigger("chosen:updated");
                             }else{
@@ -234,11 +238,14 @@
             datas["data"] = []
             $(tabId+" .global-modal .supr-list tbody tr").each(function(){
                 var tempSupr = {project_id:project_id,status:status,leader:leader}
-                $(this).find(".modal-info").each(function(){
-                    var name = $(this).attr("name")
-                    var val = $(this).val()
-                    var required=$(this).attr("required");
-                    var title=$(this).attr("title");
+                $(this).find(".modal-info").each(function(index,self){
+                    var name = $(self).attr("name")
+                    var val = $(self).val()
+                    var required=$(self).attr("required");
+                    var title=$(self).attr("title");
+                    // if(name=="module"){
+                    //     console.log($(self).children("option:selected"))
+                    // } 
                     if(required=="required" && val==""){
                         notice(110,title,"输入异常");
                         throw title
@@ -249,6 +256,9 @@
                 })
                 datas["data"].push(tempSupr);
             })
+            if(delData[tabId]['del']){
+                datas['del'] = delData[tabId]['del'];
+            }
         }
 
         $(function(){
@@ -274,8 +284,6 @@
                 if(province_name && city_name){
                     $(this).parents("tr").find(".modal-info[name='region']").val(province_name+"-"+city_name);
                 }
-                
-                
             });
             $(tabId).offon("click",".add-suprcompany",function(){
                 datas["reqType"]='getSuprLiOne';
@@ -290,12 +298,12 @@
             })
             $(tabId).offon("click",".supr-remove",function(){
                 // console.log(typeof(datas[tabId]['del']))
-                if(datas[tabId]==undefined){
-                    datas[tabId] = {del:[]}
+                if(delData[tabId]==undefined){
+                    delData[tabId] = {del:[]}
                 }
                 var id = $(this).parents("tr").find(".modal-info[name='id']").val()
                 if(id>0){
-                    datas[tabId]['del'].push($(this).parents("tr").find(".modal-info[name='id']").val());
+                    delData[tabId]['del'].push($(this).parents("tr").find(".modal-info[name='id']").val());
                 }
                 $(this).parents("tr").remove();
                 // console.log(datas[tabId])
@@ -306,6 +314,26 @@
                     $(this).trigger("chosen:updated");
                 }
             })
+            /** 
+             * @Author: vition 
+             * @Date: 2018-10-27 11:31:00 
+             * @Desc: 计算修改成本 
+             */            
+            $(tabId).offon("change"," .global-modal .modal-info[name='contract_amount']",function(){
+                var project_amount = $(tabId+" .global-modal .project-info[name='amount']").val()
+                var allAmount = $(tabId+" .global-modal .project-info[name='current_cost']").val()
+                var suprAmount = allAmount - current_amount;
+                console.log(suprAmount)
+
+                var amount = 0;
+                $(tabId+" .global-modal .modal-info[name='contract_amount']").each(function(){
+                    amount += float($(this).val());
+                })
+                var cedit_cost = amount+suprAmount
+                $(tabId+" .global-modal .project-info[name='cedit_cost']").val(cedit_cost)
+                var cedit_rate = float((project_amount-cedit_cost)/project_amount*100)
+                $(tabId+" .global-modal .project-info[name='cedit_rate']").val(cedit_rate)
+            });
             // $(tabId).off("change"," .modal-info[name='project_id']").on("change"," .modal-info[name='project_id']",function(){
             //     console.log(this)
             // })

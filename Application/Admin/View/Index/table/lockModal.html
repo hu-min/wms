@@ -1,0 +1,30 @@
+<div class="modal-header">
+        <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">{$title}</h4>
+    </div>
+    <div class="modal-body">
+        <form role="form">
+            <div class="box-body">
+                <div class="form-group">
+                        <input class="modal-info" value="" name="config_id" type="hidden">
+                    <label class="control-label">维护密码：</label>
+                    <input type="password" class="form-control modal-info" name="password" placeholder="******">                       
+                </div>
+                <div class="form-group">
+                    <label class="control-label">系统开放状态：</label>
+                    <div class="btn-group lock-status status-group" data-toggle="btn-toggle" style="display: block;">
+                        <input class="modal-info" value="0" name="status" type="hidden">
+                        <button type="button" name="1" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-default"></i> 维护锁定 </button>
+                        <button type="button" name="0" class="btn btn-default btn-sm status-btn active"><i class="fa fa-check-square text-green"> 开放访问 </i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>            
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+        {:save_btn(get_defined_vars())}
+    </div>
