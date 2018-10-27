@@ -16,6 +16,7 @@ $CONFIG=array(
     'DATA_CACHE_TIME'       => 3600,
     'DATA_CACHE_PREFIX'     => 'vwms_',
     'DEFAULT_MODULE'        =>'Admin',
+    'URL_CASE_INSENSITIVE'  =>  false,//区分大小写
     //'APP_SUB_DOMAIN_DEPLOY' => 1,
     //'APP_SUB_DOMAIN_RULES' => [
 //	'twsh' => 'Admin',
