@@ -446,7 +446,7 @@ class IndexController extends BaseController{
             $this->clearRedis('config_web_lock');
         }
         if($data["status"] == 1){
-            $result->errCode = 408;
+            $result->errCode = 407;
             $result->error = getError(407);
         }
         $this->ajaxReturn($result);

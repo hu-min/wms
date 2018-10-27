@@ -31,7 +31,7 @@ class BaseController extends \Common\Controller\BaseController{
         $this->configCom=getComponent('Config');
 
         $locks = $this->configCom->get_val("web_lock");
-        
+        // print_r($locks);
         if(isset($locks['value']) && $locks['value'] != session('web_lock_password') && strtolower($nowConAct) !="admin/index/lock"){
             if(IS_AJAX){
                 $this->ajaxReturn(['errCode'=>407,'error'=>getError(407)]);
