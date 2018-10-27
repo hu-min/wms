@@ -147,7 +147,9 @@ function searchFun(option){
             if(fun_is_exits(callfun+"")){
                 eval(callfun+"(result.data)")//
             }
-            table_frozen($(tabId+" ."+table));
+            var noData = result.table == '<tr><td colspan="'+tdNum+'">无数据</td></tr>' ? true : false
+            table_frozen($(tabId+" ."+table),noData);
+           
             //这里插入一个js修改table
         }else{
             if(result.url){
@@ -1657,10 +1659,13 @@ var rest_control = function(info,option,callback){
  * @Date: 2018-10-25 09:56:02 
  * @Desc: 重新定义表格，冻结带了 frozen 类的元素
  */
-var table_frozen = function($this){
+var table_frozen = function($this,noData){
     var scrollHtml = "<thead><tr>";
     var scrollCols = [];
-
+    $this.parents('.table-outbox').find(".frozen-table").remove();
+    if(noData){
+        return false;
+    }
     $this.parents('table').find("thead tr:not(.none)").find("th").each(function(index,self){
         if($(self).hasClass("is-frozen") && !$(self).parents("tr").hasClass("none")){
             scrollCols.push(index);
@@ -1683,11 +1688,12 @@ var table_frozen = function($this){
     })
     scrollHtml+=trs+"</tbody>"
     if($this.parents('.table-outbox').html()!=undefined){
-        if($this.parents('.table-outbox').find(".frozen-table").html()==undefined){
-            $this.parents('table').before("<table class='table table-bordered table-hover frozen-table' style='width: auto;position: absolute;background: #ffffff;'>"+scrollHtml+"</table>")
-        }else{
-            $this.parents('.table-outbox').find(".frozen-table").html(scrollHtml)
-        }
+        $this.parents('table').before("<table class='table table-bordered table-hover frozen-table' style='width: auto;position: absolute;background: #ffffff;'>"+scrollHtml+"</table>")
+        // if($this.parents('.table-outbox').find(".frozen-table").html()==undefined){
+        //     $this.parents('table').before("<table class='table table-bordered table-hover frozen-table' style='width: auto;position: absolute;background: #ffffff;'>"+scrollHtml+"</table>")
+        // }else{
+        //     $this.parents('.table-outbox').find(".frozen-table").html(scrollHtml)
+        // }
         
         var tleft = $this.parents('.table-outbox').find(".frozen-table").css("left").replace("px","")
         $this.parents('.table-outbox').scroll(function(){

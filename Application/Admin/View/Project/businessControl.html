@@ -122,7 +122,12 @@
     </div>
     <script>
         var business_setInfo = function(info){
-            
+            ["projectId","end_date","leader_name","business_name","name","amount","code","session_all","session_cur","contract","project_time","days","customer_other",'cost_budget',"create_time","bid_date","bid_time","status"].forEach(element => {
+                if(info[element]!=null){
+                    $(tabId+" .project-info[name='"+element+"']").val(info[element]);
+                }
+            });
+            $(tabId+" .global-modal .business-files-table").html(info['fileTable']);
         }
         $(function(){
 
