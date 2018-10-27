@@ -33,7 +33,11 @@ class BaseController extends \Common\Controller\BaseController{
         $locks = $this->configCom->get_val("web_lock");
         
         if(isset($locks['value']) && $locks['value'] != session('web_lock_password') && strtolower($nowConAct) !="admin/index/lock"){
-            $this->redirect('Index/lock');
+            if(IS_AJAX){
+                $this->ajaxReturn(['errCode'=>407,'error'=>getError(407)]);
+            }else{
+                $this->redirect('Index/lock');
+            }
         }else{
             if($locks['value'] == session('web_lock_password') && strtolower($nowConAct) =="admin/index/lock"){
                 $this->redirect('Index/Login');
