@@ -1,0 +1,23 @@
+<volist name="list" id="item">
+    <tr>
+        <td>{$item.supplier_com_name|default=''}</td>
+       <td>
+            {$item.suprt_name|default=''}
+       </td>
+       <td>{$item.supplier_cont_name|default=''}</td>
+       <td>{$item.province_name|default=''}-{$item.city_name|default=''}</td>
+       <td>{$item.modules|default=''}</td>
+       <td>{$item.contract_amount|default=0}</td>
+       <td>{$item.supply_paid|default=0}</td>
+       <td>{$item.supply_surplus|default=''}</td>
+       <td>
+           <if condition="$item.contract_file neq '' " >
+                <div class="input-group">
+                    <input class="form-control modal-info upload-file" disabled="disabled" name="invoice_file" title="上传/查看发票"  type="text" value="{$item.contract_file|default=''}">
+                    <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
+                </div>
+            </if>
+        </td>
+       <td>{$item.remark|default=''}</td>
+    </tr>
+</volist>
