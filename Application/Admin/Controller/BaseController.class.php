@@ -21,6 +21,8 @@ class BaseController extends \Common\Controller\BaseController{
     protected $statusType=[0=>"提交",1=>"批准",2=>"等待",3=>"驳回",4=>"删除",5=>"拒绝"];
 
     protected $statusLabel=[0=>"blue",1=>"green",2=>"yellow",3=>"orange ",4=>"red",5=>'black'];
+
+    protected $invoiceType = ["0"=>"无","1"=>"收据","2"=>"增值税普通","3"=>"增值税专用"];
     /**
      * 对admin的每一个控制器和方法做权限检查
      */ 

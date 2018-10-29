@@ -18,6 +18,8 @@ class ProjectController extends BaseController{
         $this->filesCom=getComponent('ProjectFiles');
         $this->ReceCom=getComponent('Receivable');
         $this->whiteCom=getComponent('White');
+        $this->InvoiceCom=getComponent('Invoice');
+        $this->payCom=getComponent('Pay');
         $this->processArr=["0"=>"沟通","1"=>"完结","2"=>"裁决","3"=>"提案","4"=>"签约","5"=>"LOST","6"=>"筹备","7"=>"执行","8"=>"完成"];
         $this->dateArr=["0"=>"立项日期","1"=>"提案日期","2"=>"项目日期","3"=>"结束日期"];
 
@@ -1009,7 +1011,91 @@ class ProjectController extends BaseController{
             $fresultData = $this->filesCom->getList($fileParam);
             $this->assign('list',$fresultData['list']);
             $resultData["fileTable"]=$this->fetch("Project/projectTable/filestr");
+
             // print_r($resultData);
+            //获取发票信息
+            $invoiceParam = [
+                "fields" => "*,FROM_UNIXTIME(invoice_date,'%Y-%m-%d') invoice_date",
+                "where" => ['relation_type'=>2,"relation_id"=>$id],
+            ];
+            $this->assign("invoiceType",$this->invoiceType);
+            $incoiceResult = $this->InvoiceCom->getList($invoiceParam);
+            $resultData["invoiced"] = array_sum(array_column($incoiceResult['list'],'invoice_money'));
+            $resultData["incoice_surplus"] = $resultData["amount"] - $resultData["invoiced"];
+            // print_r($this->InvoiceCom->M()->_sql());exit;
+            $this->assign('list',$incoiceResult['list']);
+            $resultData["invoiceTable"]=$this->fetch("Project/projectTable/invoicetr");
+            //供应商数据
+            $supplyParam = [
+                "fields" => "*,FROM_UNIXTIME(sign_date,'%Y-%m-%d') sign_date,FROM_UNIXTIME(advance_date,'%Y-%m-%d') advance_date",
+                "where" => ["project_id"=>$id],
+                "joins"=>[
+                    "LEFT JOIN(SELECT projectId, name,code,business,leader FROM v_project) p ON p.projectId = project_id",
+                    "LEFT JOIN (SELECT userId buser_id,userName business_name FROM v_user) bu ON bu.buser_id = p.business",
+                    "LEFT JOIN (SELECT userId luser_id,userName leader_name FROM v_user) lu ON lu.luser_id = p.leader",
+                    "LEFT JOIN (SELECT companyId cid,company supplier_com_name,provinceId,cityId FROM v_supplier_company WHERE status=1) c ON c.cid=supplier_com",
+                    "LEFT JOIN (SELECT contactId cid,contact supplier_cont_name FROM v_supplier_contact WHERE status=1) ct ON ct.cid=supplier_cont",
+                    "LEFT JOIN (SELECT pid ,province province_name FROM v_province) pr ON pr.pid=c.provinceId",
+                    "LEFT JOIN (SELECT cid,city city_name,pid FROM v_city) ci ON ci.cid=c.cityId",
+                    "LEFT JOIN (SELECT basicId,name suprt_name FROM v_basic WHERE class='supType') st ON st.basicId=type",
+                    "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='v_purcha' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id",
+                    "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
+                ],
+            ];
+            $supplyResult = $this->purchaCom->getList($supplyParam);
+            
+            $resultData["supplyed"] = 0;
+            foreach ($supplyResult['list'] as $key => $purcha) {
+                if($purcha['module']){
+                    $parameter=[
+                        'where'=>["class"=>"module",'basicId'=>["IN",explode(",",$purcha['module'])]],
+                        'fields'=>'GROUP_CONCAT(name) modules',
+                        'page'=>1,
+                        'pageSize'=>9999,
+                        'orderStr'=>"basicId DESC",
+                    ];
+                    $basicResult=$this->basicCom->getOne($parameter);
+                    $supplyResult['list'][$key]["modules"]=$basicResult['list']['modules'];
+                }
+                if($purcha['status']==1){
+                    $resultData["supplyed"] ++;
+                }
+                $payParam=[
+                    'where'=>["insert_type"=>2,'purcha_id'=>$purcha['id']],
+                    'fields'=>'SUM(fact_pay_money) fact_pay_money',
+                ];
+                $payResult = $this->payCom->getOne($payParam);
+                $supplyResult['list'][$key]["supply_paid"] = $payResult['list']['fact_pay_money'];
+                $supplyResult['list'][$key]["supply_surplus"] = $purcha['contract_amount'] - $payResult['list']['fact_pay_money'];
+            }
+            
+            $this->assign('list',$supplyResult['list']);
+            $resultData["supply_num"] = $supplyResult['count'];
+            $resultData["supplyTable"]= $this->fetch("Project/projectTable/supplytr");
+            $resultData["supply_amount"] = array_sum(array_column($supplyResult['list'],'contract_amount'));
+            //获取员工报销金额
+            $this->expenseSubCom=getComponent('ExpenseSub');
+            $expenseParam=[
+                'where'=>["status"=>1],
+                'fields'=>'SUM(money) expense_money',
+                "joins"=>[
+                    "RIGHT JOIN (SELECT id mid FROM `v_expense` WHERE project_id = {$id}) e ON e.mid = parent_id",
+                ],
+            ];
+            $expenseResult = $this->expenseSubCom->getOne($expenseParam);
+            //获取员工借支
+            $this->debitSubCom=getComponent('Debit');            
+            $debitParam=[
+                'where'=>["status"=>1,'project_id'=>$id],
+                'fields'=>'SUM(debit_money) debit_money',
+            ];
+            $debitResult = $this->debitSubCom->getOne($debitParam);
+
+            $resultData["expense_money"] = $expenseResult['list']['expense_money'] > $debitResult['list']['debit_money'] ? $expenseResult['list']['expense_money'] : $debitResult['list']['debit_money'];
+
+            // echo $this->expenseSubCom->M()->_sql();
+            // print_r($expenseResult);
+
         }
         $modalPara=[
             "data"=>$resultData,
@@ -1019,6 +1105,41 @@ class ProjectController extends BaseController{
         ];
         $this->modalOne($modalPara);
     }
+    function businessEdit(){
+        $data = I("data");
+        $project_id = I("project_id");
+        $all_num = count($data);
+        $num = 0;
+        if($project_id>0){
+            $this->InvoiceCom->startTrans();
+            foreach ($data as  $invoice) {
+                $insertData = [
+                    'relation_type' => 2,
+                    'relation_id' => $project_id,
+                    'invoice_file' => $invoice["invoice_file"],
+                    'invoice_date' => strtotime($invoice["invoice_date"]),
+                    'invoice_type' => $invoice["invoice_type"],
+                    'invoice_ratio' => $invoice["invoice_ratio"],
+                    'invoice_money' => $invoice["invoice_money"],
+                    'remark' => $invoice["remark"],
+                    'user_id' => session("userId"),
+                    'add_time' => time(),
+                ];
+                $updateResult = $this->InvoiceCom->insert($insertData);
+                if(isset($updateResult->errCode) && $updateResult->errCode == 0){
+                    $num++;
+                }
+            }
+            
+            if($all_num == $num && $all_num > 0){
+                $this->InvoiceCom->commit();
+                $this->ajaxReturn(['errCode'=>0,'error'=>"修改成功"]);
+            }
+        }
+        $this->InvoiceCom->rollback();
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+    
     function project_file_modalOne(){
         $title = "报价/成本 文件列表";
         $btnTitle = "确定添加";
@@ -1100,5 +1221,11 @@ class ProjectController extends BaseController{
      */    
     function createRec(){
 
+    }
+    function getInvoiceOne(){
+        $this->assign("invoiceType",$this->invoiceType);
+        $this->assign('list',[1]);
+        $this->assign('rows',I('rows'));
+        $this->ajaxReturn(['errCode'=>0,'data' => getError(0),'table'=>$this->fetch("Project/projectTable/invoicetr")]);
     }
 }

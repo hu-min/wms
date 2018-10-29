@@ -122,17 +122,66 @@
     </div>
     <script>
         var business_setInfo = function(info){
-            ["projectId","end_date","leader_name","business_name","name","amount","code","session_all","session_cur","contract","project_time","days","customer_other",'cost_budget',"create_time","bid_date","bid_time","status"].forEach(element => {
+            ["projectId","end_date","leader_name","business_name","name","amount","code","session_all","session_cur","contract","project_time","days","customer_other",'cost_budget',"create_time","bid_date","bid_time","status",'supply_num','invoiced','incoice_surplus','supplyed','supply_amount','expense_money'].forEach(element => {
                 if(info[element]!=null){
-                    $(tabId+" .project-info[name='"+element+"']").val(info[element]);
+                    $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
                 }
             });
+            $(tabId+" .global-modal .project-info[name='all_invoice']").val(info['amount']);
             $(tabId+" .global-modal .business-files-table").html(info['fileTable']);
+            $(tabId+" .global-modal .business-invoice-table").html(info['invoiceTable']);
+            console.log($(tabId+" .global-modal .business-invoice-table").find(".invoice-info"));
+            $(tabId+" .global-modal .business-invoice-table").find(".invoice-info").prop("disabled",true);
+            $(tabId+" .global-modal .business-supply-table").html(info['supplyTable']);
+            table_frozen($(tabId+" .global-modal .business-supply-table"));
+
+            init_date(false,$(tabId+" .global-modal .business-invoice-table"));
+        }
+        var business_getInfo =function(){
+            datas["reqType"] = "businessEdit"
+            datas["data"] = [];
+            $(tabId+" .global-modal .business-invoice-table tr").each(function(){
+                if($(this).find(".supr-remove").html()){
+                    var temp = {};
+                    $(this).find(".invoice-info").each(function(){
+                        var name =$(this).attr("name");
+                        var required=$(this).attr("required");
+                        var title=$(this).attr("title");
+                        var val =$(this).val();
+
+                        if(required && (val=="" || val == "0")){
+                            notice(110,title,"输入异常");
+                            throw title
+                        }else{
+                            temp[name]=val;
+                        }
+                    })
+                    datas["data"].push(temp);
+                }
+            })
+            if(JSON.stringify(datas["data"]) == "[]"){
+                throw "not found data";
+            }
+            datas["project_id"] = $(tabId+" .global-modal .project-info[name='projectId']").val()
+            
         }
         $(function(){
 
             $(tabId+" .search-list").trigger("click");
             init_chosen("{$url}","getOptionList",".search-body");
+            upload({url:"{:U('Project/upload_filesAdd')}"})
+            $(tabId).offon("click",".global-modal .add-invoice",function(){
+                datas["reqType"]="getInvoiceOne";
+                datas["rows"]=$(tabId+" .global-modal .business-invoice-table tr").length;
+                var rows = datas["rows"];
+                get("{$url}",datas,function(result){
+                    $(tabId+" .global-modal .business-invoice-table").append(result.table);
+                    init_date(false,$(tabId+" .global-modal .business-invoice-table tr").eq(rows));
+                })
+            })
+            $(tabId).offon("click",".global-modal .business-invoice-table .supr-remove",function(){
+                $(this).parents("tr").remove();
+            })
         })
             
     </script>

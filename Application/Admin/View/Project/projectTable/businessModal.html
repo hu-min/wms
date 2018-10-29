@@ -152,40 +152,46 @@
                         </div>
                             <div id="{$vtabId}-collapseFour" class="panel-collapse collapse">
                             <div class="box-body">
-                                <div class="col-md-12">
-                                    <table class="table table-bordered table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>序号</th>
-                                                <th>上传/查看发票</th>
-                                                <th>发票金额</th>
-                                                <th>发票开具日期</th>
-                                                <th>发票类别</th>
-                                                <th>发票税率</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="{$controlName}-invoce-table">
-                                            {$tables}
-                                        </tbody>
-                                    </table>
+                                <div class="row">
+                                    <div class="col-md-12"> <h5 class="box-title"><i class="fa fa-plus-square text-aqua add-invoice" title="添加发票信息" data-target=".bankstock-tab" style="cursor: pointer;"> 添加发票信息</i></h5></div>
+                                </div>
+                                <div class="table-outbox" style="z-index: 1;">
+                                    <div style="font-size:0.95em;overflow: auto;">
+                                        <table class="table table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th style="min-width: 50px;">序号</th>
+                                                    <th>上传/查看发票</th>
+                                                    <th>发票金额</th>
+                                                    <th>发票开具日期</th>
+                                                    <th>发票类别</th>
+                                                    <th>发票税率</th>
+                                                    <th>备注</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="{$controlName}-invoice-table">
+                                                {$tables}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">需要提交发票总额：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="需要提交发票总额"  value="" placeholder="需要提交发票总额" type="text">
+                                            <input class="form-control project-info" readonly="readonly" name="all_invoice" title="需要提交发票总额"  value="0" placeholder="需要提交发票总额" type="text">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">已提交发票额：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="已提交发票额"  value="" placeholder="已提交发票额" type="text">
+                                            <input class="form-control project-info" readonly="readonly" name="invoiced" title="已提交发票额"  value="0" placeholder="已提交发票额" type="text">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">未提交发票额：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="未提交发票额"  value="" placeholder="未提交发票额" type="text">
+                                            <input class="form-control project-info" readonly="readonly" name="incoice_surplus" title="未提交发票额"  value="0" placeholder="未提交发票额" type="text">
                                         </div>
                                     </div>
                                 </div>
@@ -206,13 +212,13 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">供应商录入数量：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="供应商录入数量"  value="" placeholder="供应商录入数量" type="text">
+                                            <input class="form-control project-info" readonly="readonly" name="supply_num" title="供应商录入数量"  value="0" placeholder="供应商录入数量" type="text">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">已审批数量：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="已审批数量"  value="" placeholder="已审批数量" type="text">
+                                            <input class="form-control project-info" readonly="readonly" name="supplyed" title="已审批数量"  value="0" placeholder="已审批数量" type="text">
                                         </div>
                                     </div>
                                 </div>
@@ -221,21 +227,20 @@
                                         <table class="table table-bordered table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th>序号</th>
+                                                    <th class="is-frozen">供应商名称</th>
                                                     <th>供应商类别</th>
-                                                    <th>供应商名称</th>
                                                     <th>供应商联系人</th>
                                                     <th>所在地</th>
                                                     <th>承接类型</th>
                                                     <th>合同总额</th>
                                                     <th>已付款</th>
                                                     <th>未付款</th>
-                                                    <th>报销查看</th>
+                                                    <!-- <th>报销查看</th> -->
                                                     <th>合同查看</th>
                                                     <th>备注</th>
                                                 </tr>
                                             </thead>
-                                            <tbody class="{$controlName}-table">
+                                            <tbody class="{$controlName}-supply-table">
                                                 {$tables}
                                             </tbody>
                                         </table>
@@ -258,13 +263,13 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">供应商采购成本：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="供应商采购成本"  value="" placeholder="供应商采购成本" type="text">
+                                            <input class="form-control project-info" readonly="readonly" name="supply_amount" title="供应商采购成本"  value="0" placeholder="供应商采购成本" type="text">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="info-title">员工报销：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="员工报销"  value="" placeholder="员工报销" type="text">
+                                            <label for="info-title">员工借支/报销（借支和报销选择最大值）：</label>
+                                            <input class="form-control project-info" readonly="readonly" name="expense_money" title="员工借支/报销"  value="0" placeholder="员工借支/报销" type="text">
                                         </div>
                                     </div>
                                 </div>
@@ -280,7 +285,7 @@
 </div>
 <div class="modal-footer">
         
-    <input class="modal-info" name="projectId" value="0" type="hidden">
+    <input class="project-info" name="projectId" value="0" type="hidden">
     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-    {:save_btn(get_defined_vars())}
+    {:save_btn(get_defined_vars(),true)}
 </div>
