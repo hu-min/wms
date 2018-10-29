@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-header">
+                        <i class="fa fa-plus-square"></i>
+                        <h4 class="box-title">项目安排</h4>
+                    </div>
+                    <div class="box-body search-body">
+                        <div class="col-md-12">
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <label for="info-title">项目编号：</label>
+                                    <input class="form-control search-info input-sm" name="code" title="项目编号" required="required" value="" placeholder="项目编号" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">项目名称：</label>
+                                    <input class="form-control search-info input-sm" name="name" placeholder="项目名称" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">签约公司：</label>
+                                    <input class="form-control search-info input-sm" name="customer_com_name" placeholder="签约公司" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">客户主担：</label>
+                                    <input class="form-control search-info input-sm" name="customer_cont_name" placeholder="客户主担" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">营业主担：</label>
+                                    <input class="form-control search-info input-sm" name="business_name" placeholder="营业主担" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">项目主担：</label>
+                                    <input class="form-control search-info input-sm" name="leader_name" placeholder="项目主担" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label >状态：</label>
+                                    <select class="form-control search-info input-sm" title="状态" name="status">
+                                        <option value="">全部</option>
+                                        <volist name="statusType" id="item">
+                                            <option value="{$key}">{$item}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                </div>
+                                <br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 table-outbox" style="z-index: 1;">
+                <div style="font-size:0.95em;overflow: auto;">
+                    <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;">
+                    </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <!-- <th>品牌</th> -->
+                                <th class="hidden-xs is-frozen">项目编号</th>
+                                <th class="hidden-xs is-frozen">项目日期</th>
+                                <th class="is-frozen">项目名称</th>
+                                <th class="hidden-xs is-frozen">签约公司</th>
+                                <th class="hidden-xs">客户</th>
+                                <th >营业</th>
+                                <th >主担</th>
+                                <th class="hidden-xs">项目类型</th>
+                                <th class="hidden-xs">总场次</th>
+                                <!-- <th class="hidden-xs">目前场次</th> -->
+                                <th >合同额</th>
+                                <th class="hidden-xs">预付款</th>
+                                <th class="hidden-xs">未付款</th>
+                                <th class="hidden-xs">成本</th>
+                                <th class="hidden-xs">纯利</th>
+                                <th class="hidden-xs">纯利率</th>
+                                <th class="hidden-xs">项目阶段</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="{$controlName}-table">
+                            {$tables}
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+        </div>
+        <div class="dataTables_wrapper">
+            <div class="row">
+                <div class="col-md-2 col-sm-3 col-xs-12"><div class="dataTables_length" ><label>显示 <select name="pageSize"  class="form-control input-sm search-info">
+                    <volist name="entries" id="item"><option value="{$item}">{$item}</option></volist>
+                </select> 条</label></div></div>
+                <div  class="{$controlName}-page row page-div col-md-10 col-sm-9 col-xs-12" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+                    {$pages}
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="modal fade global-modal" aria-hidden="true" data-backdrop="static" >
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+    <script>
+        var business_setInfo = function(info){
+            ["projectId","end_date","leader_name","business_name","name","amount","code","session_all","session_cur","contract","project_time","days","customer_other",'cost_budget',"create_time","bid_date","bid_time","status",'supply_num','invoiced','incoice_surplus','supplyed','supply_amount','expense_money'].forEach(element => {
+                if(info[element]!=null){
+                    $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
+                }
+            });
+            $(tabId+" .global-modal .project-info[name='all_invoice']").val(info['amount']);
+            $(tabId+" .global-modal .business-files-table").html(info['fileTable']);
+            $(tabId+" .global-modal .business-invoice-table").html(info['invoiceTable']);
+            console.log($(tabId+" .global-modal .business-invoice-table").find(".invoice-info"));
+            $(tabId+" .global-modal .business-invoice-table").find(".invoice-info").prop("disabled",true);
+            $(tabId+" .global-modal .business-supply-table").html(info['supplyTable']);
+            table_frozen($(tabId+" .global-modal .business-supply-table"));
+
+            init_date(false,$(tabId+" .global-modal .business-invoice-table"));
+        }
+        var business_getInfo =function(){
+            datas["reqType"] = "businessEdit"
+            datas["data"] = [];
+            $(tabId+" .global-modal .business-invoice-table tr").each(function(){
+                if($(this).find(".supr-remove").html()){
+                    var temp = {};
+                    $(this).find(".invoice-info").each(function(){
+                        var name =$(this).attr("name");
+                        var required=$(this).attr("required");
+                        var title=$(this).attr("title");
+                        var val =$(this).val();
+
+                        if(required && (val=="" || val == "0")){
+                            notice(110,title,"输入异常");
+                            throw title
+                        }else{
+                            temp[name]=val;
+                        }
+                    })
+                    datas["data"].push(temp);
+                }
+            })
+            if(JSON.stringify(datas["data"]) == "[]"){
+                throw "not found data";
+            }
+            datas["project_id"] = $(tabId+" .global-modal .project-info[name='projectId']").val()
+            
+        }
+        $(function(){
+
+            $(tabId+" .search-list").trigger("click");
+            init_chosen("{$url}","getOptionList",".search-body");
+            upload({url:"{:U('Project/upload_filesAdd')}"})
+            $(tabId).offon("click",".global-modal .add-invoice",function(){
+                datas["reqType"]="getInvoiceOne";
+                datas["rows"]=$(tabId+" .global-modal .business-invoice-table tr").length;
+                var rows = datas["rows"];
+                get("{$url}",datas,function(result){
+                    $(tabId+" .global-modal .business-invoice-table").append(result.table);
+                    init_date(false,$(tabId+" .global-modal .business-invoice-table tr").eq(rows));
+                })
+            })
+            $(tabId).offon("click",".global-modal .business-invoice-table .supr-remove",function(){
+                $(this).parents("tr").remove();
+            })
+        })
+            
+    </script>
+</body>
+</html>
