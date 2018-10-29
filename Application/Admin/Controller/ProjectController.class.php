@@ -934,7 +934,7 @@ class ProjectController extends BaseController{
     /** 
      * @Author: vition 
      * @Date: 2018-09-19 19:45:46 
-     * @Desc: 营业数据 
+     * @Desc: 营业数据  更改后卫财务查看
      */    
     function businessList(){
         $this->projectList("businessList");
@@ -992,6 +992,24 @@ class ProjectController extends BaseController{
             ];
             $result=$this->userCom->getUserList($parameter);
             $resultData["user_ids"]=$result["list"];
+
+            //获取文件
+            $where = [
+                "project_id" => $id,
+            ];
+            $fileParam = [
+                "fields" => "*,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time",
+                "where" => $where,
+                "joins" =>[
+                    "LEFT JOIN (SELECT userId,userName user_name FROM v_user) u ON u.userId = user_id",
+                    "LEFT JOIN(SELECT projectId,business,leader FROM v_project) p ON p.projectId = project_id",
+                ],
+            ];
+            $this->assign("fileType",[1=>"报价",2=>"成本",3=>"方案",4=>"标书"]);
+            $fresultData = $this->filesCom->getList($fileParam);
+            $this->assign('list',$fresultData['list']);
+            $resultData["fileTable"]=$this->fetch("Project/projectTable/filestr");
+            // print_r($resultData);
         }
         $modalPara=[
             "data"=>$resultData,

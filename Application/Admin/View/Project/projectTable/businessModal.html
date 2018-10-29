@@ -26,19 +26,19 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">项目名称：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="项目名称"  value="" placeholder="项目名称" type="text">
+                                            <input class="form-control project-info" readonly="readonly" name="name" title="项目名称"  value="" placeholder="项目名称" type="text">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">项目编号：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="项目编号"  value="" placeholder="项目编号" type="text">
+                                            <input class="form-control project-info" readonly="readonly" name="code" title="项目编号"  value="" placeholder="项目编号" type="text">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">项目日期：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="项目日期"  value="" placeholder="项目日期" type="text">
+                                            <input class="form-control project-info" readonly="readonly" name="project_time" title="项目日期"  value="" placeholder="项目日期" type="text">
                                         </div>
                                     </div>
                                 </div>
@@ -46,19 +46,19 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">结束日期：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="结束日期"  value="" placeholder="结束日期" type="text">
+                                            <input class="form-control project-info" readonly="readonly" name="end_date" title="结束日期"  value="" placeholder="结束日期" type="text">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">项目主担：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="项目主担"  value="" placeholder="项目主担" type="text">
+                                            <input class="form-control project-info" readonly="readonly" name="leader_name" title="项目主担"  value="" placeholder="项目主担" type="text">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">营业主担：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="营业主担"  value="" placeholder="营业主担" type="text">
+                                            <input class="form-control project-info" readonly="readonly" name="business_name" title="营业主担"  value="" placeholder="营业主担" type="text">
                                         </div>
                                     </div>
                                 </div>
@@ -75,22 +75,20 @@
                         </div>
                             <div id="{$vtabId}-collapseTwo" class="panel-collapse collapse">
                             <div class="box-body">
-                                <div class="col-md-12">
-                                    <table class="table table-bordered table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>序号</th>
-                                                <th>项目阶段 数据引用</th>
-                                                <th>说明</th>
-                                                <th>上传</th>
-                                                <th>员工</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="{$controlName}-table">
-                                            {$tables}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>文件类型</th>
+                                            <th>文件名称</th>
+                                            <th>上传者</th>
+                                            <th>上传时间</th>
+                                            <th>文件查看</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="{$controlName}-files-table">
+                                        {$tables}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -108,36 +106,39 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">合同：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="合同"  value="" placeholder="合同" type="text">
+                                            <div class="input-group">
+                                                <input class="form-control project-info upload-file input-sm"  readonly="readonly" title="合同" name="contract" type="text">
+                                                <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">合同金额：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="合同金额"  value="" placeholder="合同金额" type="text">
+                                            <input class="form-control project-info" readonly="readonly" name="amount" title="合同金额"  value="" placeholder="合同金额" type="text">
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <!-- <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">客户营业：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="客户营业"  value="" placeholder="客户营业" type="text">
+                                            <input class="form-control project-info" readonly="readonly" name="business_name" title="客户营业"  value="" placeholder="客户营业" type="text">
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
-                                <div class="row">
+                                <!-- <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">签约日期：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="签约日期"  value="" placeholder="签约日期" type="text">
+                                            <input class="form-control project-info" readonly="readonly" name="project_time" title="签约日期"  value="" placeholder="签约日期" type="text">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">项目主担：</label>
-                                            <input class="form-control project-info" readonly="readonly" name="project_name" title="项目主担"  value="" placeholder="项目主担" type="text">
+                                            <input class="form-control project-info" readonly="readonly" name="leader_name" title="项目主担"  value="" placeholder="项目主担" type="text">
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -163,7 +164,7 @@
                                                 <th>发票税率</th>
                                             </tr>
                                         </thead>
-                                        <tbody class="{$controlName}-table">
+                                        <tbody class="{$controlName}-invoce-table">
                                             {$tables}
                                         </tbody>
                                     </table>
@@ -215,28 +216,30 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-12">
-                                    <table class="table table-bordered table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>序号</th>
-                                                <th>供应商类别</th>
-                                                <th>供应商名称</th>
-                                                <th>供应商联系人</th>
-                                                <th>所在地</th>
-                                                <th>承接类型</th>
-                                                <th>合同总额</th>
-                                                <th>已付款</th>
-                                                <th>未付款</th>
-                                                <th>报销查看</th>
-                                                <th>合同查看</th>
-                                                <th>备注</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="{$controlName}-table">
-                                            {$tables}
-                                        </tbody>
-                                    </table>
+                                <div class="table-outbox" style="z-index: 1;">
+                                    <div style="font-size:0.95em;overflow: auto;">
+                                        <table class="table table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>序号</th>
+                                                    <th>供应商类别</th>
+                                                    <th>供应商名称</th>
+                                                    <th>供应商联系人</th>
+                                                    <th>所在地</th>
+                                                    <th>承接类型</th>
+                                                    <th>合同总额</th>
+                                                    <th>已付款</th>
+                                                    <th>未付款</th>
+                                                    <th>报销查看</th>
+                                                    <th>合同查看</th>
+                                                    <th>备注</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="{$controlName}-table">
+                                                {$tables}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
