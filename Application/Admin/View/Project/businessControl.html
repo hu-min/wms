@@ -130,10 +130,10 @@
             $(tabId+" .global-modal .project-info[name='all_invoice']").val(info['amount']);
             $(tabId+" .global-modal .business-files-table").html(info['fileTable']);
             $(tabId+" .global-modal .business-invoice-table").html(info['invoiceTable']);
-            console.log($(tabId+" .global-modal .business-invoice-table").find(".invoice-info"));
             $(tabId+" .global-modal .business-invoice-table").find(".invoice-info").prop("disabled",true);
             $(tabId+" .global-modal .business-supply-table").html(info['supplyTable']);
-            table_frozen($(tabId+" .global-modal .business-supply-table"));
+            // table_frozen($(tabId+" .global-modal .business-supply-table"));
+            
 
             init_date(false,$(tabId+" .global-modal .business-invoice-table"));
         }
@@ -181,6 +181,17 @@
             })
             $(tabId).offon("click",".global-modal .business-invoice-table .supr-remove",function(){
                 $(this).parents("tr").remove();
+            })
+            $(tabId).offon("click",".global-modal .box-solid .box-header",function(){
+                var id = $(this).find(".box-title a").attr("href");
+
+                if(id=="#vtabs17-collapseFive"){
+                    // table_frozen($(tabId+" .global-modal .business-supply-table"));
+                    setTimeout(function(){
+                        table_frozen($(tabId+" .global-modal .business-supply-table"))
+                    },500)
+                    // console.log(tabId+" .global-modal .business-supply-table")
+                }
             })
         })
             
