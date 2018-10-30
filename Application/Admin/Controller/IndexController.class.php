@@ -30,10 +30,6 @@ class IndexController extends BaseController{
      */
     function Index(){
         if($this->isLogin()){
-            if(session('is_wechat')){
-                $this->vlog(9);
-                session('is_wechat',Null);
-            }
             $this->redirect('Index/Main');
         }else{
             $this->redirect('Index/Login');

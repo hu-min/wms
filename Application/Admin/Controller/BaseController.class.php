@@ -102,6 +102,10 @@ class BaseController extends \Common\Controller\BaseController{
                 }
                 
             }elseif($this->isLogin() && ACTION_NAME=='Login'){
+                if(session('is_wechat')){
+                    $this->vlog(9);
+                    session('is_wechat',Null);
+                }
                 $this->redirect('Index/Main');
             }
         }else{ 
