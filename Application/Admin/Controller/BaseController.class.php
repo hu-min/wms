@@ -96,7 +96,6 @@ class BaseController extends \Common\Controller\BaseController{
             if(!$this->isLogin() && !in_array(ACTION_NAME,['checkLogin','Login','lock'])){
                 session("history",domain(false).__SELF__);
                 if(session('is_wechat')){
-                    session('is_wechat',NULL);
                     redirect('https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx650b23fa694c8ff7&redirect_uri=http://twsh.twoway.com.cn/Admin/Index/Login&response_type=code&scope=SCOPE&state=STATE#wechat_redirect');
                 }else{
                     $this->redirect('Index/Login');
@@ -267,11 +266,13 @@ class BaseController extends \Common\Controller\BaseController{
             session("userInfo",$userInfo);
             session('isLogin',1);
             
-            if($_GET['isWechat']){
+
+            if(session('is_wechat')){
                 $this->vlog(9);
             }else{
                 $this->vlog(1);
             }
+            session('is_wechat',NULL);
             $this->userCom->logIORec($userInfo['userId']);
         }
     }
