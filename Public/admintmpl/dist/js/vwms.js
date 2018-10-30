@@ -865,17 +865,6 @@ $(function(){
             }
         }
     });
-    // $(document).on("click",tabId+" .excel-export",function(){
-    //     var url = $(this).data("url");
-    //     var param = {}
-    //     $(tabId+" .search-info").each(function(){
-    //         var name=$(this).attr("name");
-    //         var val=$(this).val();
-    //         if(val!=""){
-    //             param[name]=val
-    //         }
-    //     })
-    // })
 })
 /** 
  * javascript comment 
@@ -1151,9 +1140,11 @@ function init_chosen(url,reqType,parental){
         if(disSearch!=undefined){
             option["disable_search"] = true
         }
-        // console.log(option)
         $(this).chosen(option)
-
+        var $thisChosen = $(this)
+        $(this).next(".chosen-container").offon("dblclick",function(){
+            $thisChosen.chosen_ajax();
+        })
         if($(this).parents(".form-inline").length>0 && $(window).width() > 750){
             var width = $(this).parents(".form-inline").find(".chosen-fcopy").width();
             if(width){

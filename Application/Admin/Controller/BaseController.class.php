@@ -267,7 +267,7 @@ class BaseController extends \Common\Controller\BaseController{
             session("userInfo",$userInfo);
             session('isLogin',1);
             
-            if(session('qiye_id')){
+            if(session('qiye_id') && $_GET['code']){
                 $this->vlog(9);
                 session('qiye_id',NULL);
             }else{
