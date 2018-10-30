@@ -267,9 +267,8 @@ class BaseController extends \Common\Controller\BaseController{
             session("userInfo",$userInfo);
             session('isLogin',1);
             
-            if(session('qiye_id') && $_GET['code']){
+            if($_GET['isWechat']){
                 $this->vlog(9);
-                session('qiye_id',NULL);
             }else{
                 $this->vlog(1);
             }
