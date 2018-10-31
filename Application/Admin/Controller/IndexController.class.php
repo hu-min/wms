@@ -41,6 +41,20 @@ class IndexController extends BaseController{
      * @Desc: 登录页面 
      */    
     function Login(){
+        $identify = cookie('identify');
+        if($identify && !$this->isLogin()){
+            $userInfo = $this->userCom->getOne(['where'=>['_string'=>" SHA1(loginName) = '{$identify}'"]]);
+            if($userInfo){
+                $userData = $userInfo['list'];
+                unset($userInfo['list']);
+                unset($userData['password']);
+                unset($userData['seniorPassword']);
+                $this->setLogin($userData);
+                $this->redirect('Index/Main');
+            }
+            
+        }
+        // $this->userCom->getOne();
         $this->display();
     }
     function Main(){
@@ -76,11 +90,15 @@ class IndexController extends BaseController{
      */    
     function checkLogin(){
         $data=I('data');
+        $remember=I('remember');
         if(session('qiye_id')){
             $data['qiye_id'] = session('qiye_id');
         }
         $userResult=$this->userCom->checkUser($data);
         if($userResult->errCode==0){
+            if($remember){
+                cookie('identify',sha1($data['loginName']),7948800);//设置cookie
+            }
             $this->setLogin($userResult->data);
         }
         if(session("history")){

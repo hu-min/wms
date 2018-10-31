@@ -543,8 +543,17 @@ class ProjectController extends BaseController{
             $datas['bid_date']=strtotime($datas['bid_date']);
         }
         if(isset($datas['create_time'])){
-            $datas['create_time']=strtotime($datas['create_time']);
+            $datas['create_time'] = $datas['create_time']!="" ? strtotime($datas['create_time']) : time();
+        }else{
+            if($reqType=="projectAdd"){
+                $datas['create_time'] = time();
+            }
         }
+        if(!isset($datas['create_user']) || $datas['create_user']){
+            $datas['create_user'] = session('userId');
+        }
+        
+        
         if(isset($datas['project_time'])){
             $datas['project_time']= $datas['project_time'] !="" ? strtotime($datas['project_time']) : time();
         }
@@ -870,7 +879,7 @@ class ProjectController extends BaseController{
             'where'=>["companyId"=>$cId],
         ];
         $companyResult=$this->customerCom->getCompanyList($parameter,true);
-        $retData = $prefix.($numResult+1).$companyResult['alias'].($comNumResult+1).date("YmdH");
+        $retData = $prefix.($numResult+1).$companyResult['alias'].($comNumResult+1)."-".date("YmdH");
         if($companyId>0){
             return $retData;
         }else{

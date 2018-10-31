@@ -82,7 +82,7 @@
         <div class="col-xs-8">
           <div class="checkbox icheck">
             <label>
-              <input type="checkbox"> 记住状态
+              <input type="checkbox" name="remember" class="login-option"> 记住状态
             </label>
           </div>
         </div>
@@ -129,6 +129,11 @@
             }
             datas['data'][name]=val;
         })
+        if($(".login-option").is(":checked")){
+          datas['remember'] = 1
+        }else{
+          datas['remember'] = 0
+        }
         setLoad();
         post("{:U('Index/checkLogin')}",datas,function(result){
           if(result.errCode==0){

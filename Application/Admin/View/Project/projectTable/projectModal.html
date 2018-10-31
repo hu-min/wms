@@ -44,7 +44,7 @@
                                         <div class="form-group">
                                             <label >品牌：</label>
                                             <select class="form-control modal-info chosen-project required="required" chosen-select" title="品牌" data-value="basicId"  data-text="name" name="brand">
-                                                <option value="">品牌</option>
+                                                <option value="">选择品牌</option>
                                                 <volist name="brandArr" id="item">
                                                     <option value="{$item['basicId']}">{$item['name']}</option>
                                                 </volist>
@@ -57,7 +57,7 @@
                                         <div class="form-group">
                                             <label for="info-title">签约公司：</label>
                                             <select class="form-control modal-info chosen-project chosen-select" data-value="companyId" required="required"  data-text="company" data-cname="customer_cont" title="签约公司" name="customer_com">
-                                                <option value="">公司</option>
+                                                <option value="" >选择签约公司</option>
                                                 <volist name="cusComArr" id="item">
                                                     <option value="{$item['companyId']}">{$item['company']}</option>
                                                 </volist>
@@ -223,7 +223,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="info-title">竞标类型：</label>
-                                            <select class="form-control modal-info bid-group" title="竞标类型" name="bidding">
+                                            <select class="form-control modal-info bid-group" required="required" title="竞标类型" name="bidding">
                                                 <option value="">竞标类型</option>
                                                 <option value="1">技术标</option>
                                                 <option value="2">商务标</option>
@@ -239,7 +239,7 @@
                                                 <div class="input-group-addon">
                                                     <i class="fa fa-calendar"></i>
                                                 </div>
-                                                <input class="form-control pull-right date-input modal-info bid-group" name="bid_date" type="text">
+                                                <input class="form-control pull-right date-input modal-info bid-group" required="required"  name="bid_date" type="text">
                                             </div>
                                         </div>
                                     </div>
@@ -250,7 +250,7 @@
                                                 <div class="input-group-addon">
                                                     <i class="fa fa-calendar"></i>
                                                 </div>
-                                                <input class="form-control pull-right date-input modal-info bid-group" name="bid_time" data-type="time" type="text">
+                                                <input class="form-control pull-right date-input modal-info bid-group" required="required" name="bid_time" data-type="time" type="text">
                                             </div>
                                         </div>
                                     </div>

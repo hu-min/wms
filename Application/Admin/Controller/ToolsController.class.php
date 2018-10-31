@@ -205,8 +205,10 @@ class ToolsController extends BaseController{
                 }
                 $examineRes = $db ->field("process_level,examine")->where([$db->getPk()=>$id])->find();
                                
-                if(isset($examine[$place]) && $examine[$place] > 0){
-                    $touser = $this->userCom->getQiyeId($examine[$place],true);
+                if(isset($examine[$place-1]) && $examine[$place-1] > 0){
+                    $this->log($examine);
+                    $this->log($examine[$place-1]);
+                    $touser = $this->userCom->getQiyeId($examine[$place-1],true);
                     if(!empty($touser)){
                         $desc = "<div class='gray'>".date("Y年m月d日",time())."</div> <div class='normal'>".session('userName')."在【{$title}】中@您审批，点击进入审批吧！</div>";
                         $url = C('qiye_url')."/Admin/Index/Main.html?action={$controller}";

@@ -250,6 +250,7 @@ class BaseController extends \Common\Controller\BaseController{
             session('nodeInfo',[]);
             session("history",NULL);
             session('web_lock_password',NULL);
+            cookie('identify',null);
             $this->clearRedis('config_web_lock');
             $this->redirect('Index/Login');
         }else{

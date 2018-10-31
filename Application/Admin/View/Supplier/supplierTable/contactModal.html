@@ -10,7 +10,7 @@
             <input class="modal-info" value="0" name="contactId" type="hidden">
             <div class="form-group"> 
                 <label class="control-label">供应商名称：</label>
-                <select class="form-control modal-info chosen-select" title="供应商名称" name="companyId">
+                <select class="form-control modal-info chosen-select" title="供应商名称" name="companyId" data-value="companyId"  data-text="company">
                     <option value="">无</option>
                     <volist name="supplierList" id="item">
                         <option value="{$item.companyId}">{$item.company}</option>

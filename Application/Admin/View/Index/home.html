@@ -12,7 +12,7 @@
 <body>
     <section class="content">
         <div class="row">
-            <div class="col-md-5">
+            <div class="col-md-9">
                 <div class="box box-primary box-solid">
                     <div class="box-header with-border">
                       <h3 class="box-title">待审批列表</h3>
@@ -23,12 +23,12 @@
                     </div>
                     <!-- /.box-header -->
                     <div class="box-body">
-                        <div class="col-sm-12" style="overflow: auto;z-index: 1;">
+                        <div style="overflow: auto;z-index: 1;">
                             <table class="table table-bordered table-hover">
                                 <thead>
                                 <tr>
                                 <th style="min-width: 40px;max-width: 50px">#</th>
-                                <th>提交人</th>
+                                <th style="min-width: 40px;max-width: 50px">提交人</th>
                                 <th>模块名称</th>
                                 <th>项目名称</th>
                                 <th style="max-width: 120px;">提交时间</th>
@@ -50,7 +50,42 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <div class="box box-primary box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">最新登录 TOP100</h3>
+                        <div class="box-tools">
+                        <button type="button" name="lastLoginList" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
+                        </button>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div style="overflow: auto;z-index: 1;">
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>员工姓名</th>
+                                    <th>登录时间</th>
+                                </tr>
+                                </thead>
+                                    <tbody class="lastLogin-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                    <div class="box-footer clearfix">
+                        <div class="">
+                            <div  class="lastLogin-page row page-div" data-url="{$url}" data-reqtype="lastLoginList" data-con="lastLogin">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-5">
                 <div class="box box-primary box-solid">
                     <div class="box-header with-border">
                         <h3 class="box-title">与我有关的项目</h3>
@@ -61,7 +96,7 @@
                     </div>
                     <!-- /.box-header -->
                     <div class="box-body">
-                        <div class="col-sm-12" style="overflow: auto;z-index: 1;">
+                        <div style="overflow: auto;z-index: 1;">
                             <table class="table table-bordered">
                                 <thead>
                                 <tr>
@@ -84,39 +119,6 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="box box-primary box-solid">
-                    <div class="box-header with-border">
-                        <h3 class="box-title">最新登录 TOP100</h3>
-                        <div class="box-tools">
-                        <button type="button" name="lastLoginList" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
-                        </button>
-                        </div>
-                    </div>
-                    <!-- /.box-header -->
-                    <div class="box-body">
-                        <table class="table table-bordered">
-                        <thead>
-                        <tr>
-                            <th>员工姓名</th>
-                            <th>登录时间</th>
-                        </tr>
-                    </thead>
-                        <tbody class="lastLogin-table"></tbody>
-                    </table>
-                    </div>
-                    <!-- /.box-body -->
-                    <div class="box-footer clearfix">
-                        <div class="">
-                            <div  class="lastLogin-page row page-div" data-url="{$url}" data-reqtype="lastLoginList" data-con="lastLogin">
-                                
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
             <div class="col-md-4">
                 <div class="box box-warning box-solid">
                     <div class="box-header with-border">
@@ -172,6 +174,8 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="row">
             <div class="col-md-4">
                 <div class="box box-warning box-solid">
                     <div class="box-header with-border">

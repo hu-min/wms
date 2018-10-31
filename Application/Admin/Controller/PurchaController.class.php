@@ -46,6 +46,11 @@ class PurchaController extends BaseController{
     }
     function getProjectOne($return=false){
         $id = I("id");
+        $type = I("type");
+        if($type){
+            $key = I("key");
+            $this->ajaxReturn(["data"=>$this->project->_getOption($type,$key)]);
+        }
         $parameter=[
             "where"=>["projectId"=>$id],
             "fields" => "projectId,name project_name,FROM_UNIXTIME(project_time,'%Y-%m-%d') project_date,date_sub(FROM_UNIXTIME(project_time,'%Y-%m-%d'),interval - days day) end_date,code,leader,leader_name,business,business_name,cost_budget,amount",

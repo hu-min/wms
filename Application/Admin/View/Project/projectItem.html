@@ -210,8 +210,10 @@
                 var is_bid = $(this).val();
                 if(is_bid>0){
                     $(tabId+" .global-modal .bid-group").prop("disabled",false);
+                    $(tabId+" .global-modal .bid-group").prop("required","required");
                 }else{
                     $(tabId+" .global-modal .bid-group").prop("disabled",true);
+                    $(tabId+" .global-modal .bid-group").prop("required",false);
                 }
             })
         })
@@ -239,7 +241,7 @@
                 projectChosen.find("option[value='"+projectId+"']").prop("selected",true);
                 projectChosen.trigger("chosen:updated");
             }
-            ["projectId","session_all","session_cur","contract","amount","code","project_time","days","name","customer_other",'cost_budget',"create_time","bid_date","bid_time","status"].forEach(element => {
+            ["projectId","session_all","session_cur","contract","amount","code","project_time","days","name","customer_other",'cost_budget',"create_time","status"].forEach(element => {
                 if(info[element]!=null){
                     $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
                 }
@@ -247,7 +249,7 @@
                 //     $(tabId+" .modal-info[name='"+element+"']").prop("disabled",true);
                 // }
             });
-            ["brand","customer_com","customer_cont","province","city","field","create_user","is_bid","bidding","business","leader","execute","execute_sub","type","stage","re_status"].forEach(element => {
+            ["brand","customer_com","customer_cont","province","city","field","create_user","is_bid","business","leader","execute","execute_sub","type","stage","re_status"].forEach(element => {
                 var select= $(tabId+" .modal-info[name='"+element+"']")
                 if(info[element]>0){
                     if(select.find("option[value='"+info[element]+"']").length==0){
@@ -268,6 +270,18 @@
                 }
                 if(element == "re_status"){
                     rest_control(info);
+                }else if(element == "is_bid"){
+                    $(tabId+" .modal-info[name='"+element+"']").val(info[element])
+                    if(info[element]>0){
+                        ["bid_date","bid_time","bidding"].forEach(bidinfo => {
+                            $(tabId+" .modal-info[name='"+bidinfo+"']").val(info[bidinfo])
+                        })
+                        $(tabId+" .global-modal .bid-group").prop("disabled",false);
+                        $(tabId+" .global-modal .bid-group").prop("required","required");
+                    }else{
+                        $(tabId+" .global-modal .bid-group").prop("disabled",true);
+                        $(tabId+" .global-modal .bid-group").prop("required",false);
+                    }
                 }
                 // if(info["status"]>0){
                 //     select.prop("disabled",true);

@@ -1143,6 +1143,7 @@ function init_chosen(url,reqType,parental){
         $(this).chosen(option)
         var $thisChosen = $(this)
         $(this).next(".chosen-container").offon("dblclick",function(){
+            console.log('dblclick');
             $thisChosen.chosen_ajax();
         })
         if($(this).parents(".form-inline").length>0 && $(window).width() > 750){
