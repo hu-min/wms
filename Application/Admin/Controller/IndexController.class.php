@@ -43,7 +43,14 @@ class IndexController extends BaseController{
     function Login(){
         $identify = cookie('identify');
         if($identify && !$this->isLogin()){
-            $userInfo = $this->userCom->getOne(['where'=>['_string'=>" SHA1(loginName) = '{$identify}'"]]);
+            $prama = [
+                'where'=>['_string'=>" SHA1(loginName) = '{$identify}'"],
+                'joins'=>[
+                    'LEFT JOIN (SELECT roleId role_id ,rolePid,roleName FROM v_role) r ON r.role_id = roleId',
+                    'LEFT JOIN (SELECT roleId role_pid ,roleName rolePName FROM v_role) rp ON rp.role_pid = r.rolePid',
+                ],
+            ];
+            $userInfo = $this->userCom->getOne($prama);
             if($userInfo){
                 $userData = $userInfo['list'];
                 unset($userInfo['list']);
@@ -423,13 +430,18 @@ class IndexController extends BaseController{
             $this->ajaxReturn(["errCode"=>406,"error"=>getError(406)]);
         }
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-11-02 10:56:22 
+     * @Desc: 系统锁定显示 
+     */    
     function index_lock_modalOne(){
         $title = "系统锁定";
         $btnTitle = "修改配置";
         extract($_REQUEST);
         $this->assign("controlName","index_lock");
         $this->assign("tableName",$this->configCom->tableName());
-        $lockInfo = $this->configCom->getOne(['where'=>['name'=>"web_lock"]]);
+        $lockInfo = $this->configCom->getOne(['where'=>['name'=>"cost_conf"]]);
         if(isset($lockInfo['list']['value'])){
             unset($lockInfo['list']['value']);
         }
@@ -439,10 +451,15 @@ class IndexController extends BaseController{
             "btnTitle"=>$btnTitle,
             "tpFolder"=>'Index',
             "folder"=>'table',
-            "template"=>"lockModal",
+            "template"=>"costConfModal",
         ];
         $this->modalOne($modalPara);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-11-02 10:57:18 
+     * @Desc: 系统锁定编辑 
+     */    
     function index_lockEdit(){
         extract($_REQUEST);
         if(!empty($data["password"])){
@@ -466,6 +483,31 @@ class IndexController extends BaseController{
             $result->error = getError(407);
         }
         $this->ajaxReturn($result);
+    }
+
+    function index_cost_conf_modalOne(){
+        $title = "采购编辑配置";
+        $btnTitle = "修改配置";
+        extract($_REQUEST);
+        $resultData=[];
+        $this->assign("processData",$this->AUser->getProcess());
+        $this->assign("controlName","index_process");
+
+        $controlType = [
+            'supplier' => '供应商合同相关',
+            'purchase' => '采购付款安排',
+            'invoice' => '发票添加',
+        ];
+        $this->assign("controlType",$controlType);
+        $modalPara=[
+            "data"=> [],
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "tpFolder"=>'Index',
+            "folder"=>'table',
+            "template"=>"processModal",
+        ];
+        $this->modalOne($modalPara);
     }
 }
 
