@@ -494,6 +494,7 @@ class PurchaController extends BaseController{
         $this->modalOne($modalPara);
     }
     function purcha_applyEdit(){
+        exit;
         // $data=I("data");
         extract($_POST);
         // $contract_file=I("contract_file");

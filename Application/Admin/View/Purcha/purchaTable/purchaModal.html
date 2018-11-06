@@ -158,13 +158,13 @@
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label for="info-title">合同总额：</label>
-                                                    <input class="form-control project-info" name="contract_amount" title="合同总额"  value="" placeholder="合同总额" type="text">
+                                                    <input class="form-control modal-info project-info" name="contract_amount" title="合同总额"  value="" placeholder="合同总额" type="text">
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label for="info-title">签约日期：</label>
-                                                    <input class="form-control project-info date-input" readonly="readonly" name="sign_date" title="签约日期"  value="" placeholder="签约日期" type="text">
+                                                    <input class="form-control modal-info project-info date-input" readonly="readonly" name="sign_date" title="签约日期"  value="" placeholder="签约日期" type="text">
                                                 </div>
                                             </div>
                                         </div>
@@ -172,13 +172,13 @@
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label for="info-title">签约公司：</label>
-                                                    <input class="form-control project-info"  name="company" title="签约公司"  value="" placeholder="签约公司" type="text">
+                                                    <input class="form-control modal-info project-info"  name="company" title="签约公司"  value="" placeholder="签约公司" type="text">
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label for="info-title">采购部备注：</label>
-                                                    <input class="form-control project-info" name="remark" title="采购部备注"  value="" placeholder="采购部备注" type="text">
+                                                    <input class="form-control modal-info project-info" name="remark" title="采购部备注"  value="" placeholder="采购部备注" type="text">
                                                 </div>
                                             </div>
                                         </div>
@@ -199,23 +199,25 @@
                                             <div class="col-md-12"> <h5 class="box-title"><i class="fa fa-plus-square text-aqua add-purpay" title="添加支付安排" data-target=".bankstock-tab" style="cursor: pointer;"> 添加支付安排</i></h5></div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-12">
-                                                <table class="table table-bordered table-hover suprpay-list">
-                                                    <div>合同付款次数 </div>
-                                                    <thead>
-                                                        <tr>
-                                                            <th>序号</th>
-                                                            <th>支付金额</th>
-                                                            <th>支付比例%</th>
-                                                            <th>支付日期</th>
-                                                            <th>付款方式</th>
-                                                            <th>备注</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody >
-                                                        
-                                                    </tbody>
-                                                </table>
+                                            <div class="table-outbox" style="z-index: 1;">
+                                                <div style="font-size:0.95em;overflow: auto;">
+                                                    <table class="table table-bordered table-hover suprpay-list">
+                                                        <div>合同付款次数 </div>
+                                                        <thead>
+                                                            <tr>
+                                                                <th>序号</th>
+                                                                <th>支付金额</th>
+                                                                <th>支付比例%</th>
+                                                                <th>支付日期</th>
+                                                                <th>付款方式</th>
+                                                                <th>备注</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody >
+                                                            
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

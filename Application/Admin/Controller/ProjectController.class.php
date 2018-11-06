@@ -1150,15 +1150,16 @@ class ProjectController extends BaseController{
     }
     
     function project_file_modalOne(){
-        $title = "报价/成本 文件列表";
         $btnTitle = "确定添加";
         $gettype = I("gettype");
         $this->assign("controlName","project_file");
         if($gettype=="business"){
             $this->assign("fileType",[1=>"报价",2=>"成本"]);
+            $title = "报价/成本 文件列表";
             $typeWhere = ["IN",[1,2]];
         }else{
             $this->assign("fileType",[3=>"方案",4=>"标书"]);
+            $title = "方案/标书 文件列表";
             $typeWhere = ["IN",[3,4]];
         }
         $project_id = I("id");

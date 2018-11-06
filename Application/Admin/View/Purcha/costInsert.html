@@ -65,7 +65,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-12 table-outbox" style="z-index: 1;">
+            <div class="table-outbox" style="z-index: 1;">
                 <div style="font-size:0.95em;overflow: auto;">
                     <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;"></div>
                     <table class="table table-bordered table-hover">
@@ -136,7 +136,9 @@
                 });
                 ["project_id"].forEach(element => {
                     $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info.list[0][element]);
-                    init_chosen("{$url}","getProjectOne",".global-modal");
+                    $(tabId+" .global-modal .modal-info[name='"+element+"']").prop("disabled",true);
+                    init_chosen("{$url}","getProjectOne",".global-modal");                    
+                    // $(tabId+" .global-modal .modal-info[name='"+element+"']").trigger("chosen:updated");
                 });
                 var status = 0
                 var user_id = 0
@@ -223,6 +225,7 @@
             }
             if(( status > 0 || user_id != "{$Think.session.userId}") && "{$nodeAuth}"<7 && status !=3 && gettype !="Add"){
                 $(tabId+" .chosen-select").prop("disabled",true)
+
                 $(tabId+" .global-modal").find(".add-suprcompany").parent().remove();
             }
             // console.log(status)

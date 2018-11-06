@@ -14,14 +14,11 @@
     </td>
     <td>
         <div class="input-group date">
-            <div class="input-group-addon">
-                <i class="fa fa-calendar"></i>
-            </div>
             <input class="form-control pull-right date-input modal-info" name="invoice_date" type="text">
         </div>
     </td>
     <td>
-        <select class="form-control modal-info" required="required" title="发票类型" name="invoice_type" >
+        <select class="form-control modal-info" required="required" title="发票类型" name="invoice_type" style="min-width:120px;">
             <option value="">发票类型</option>
             <volist name="invoiceType" id="item">
                 <option value="{$key}">{$item}</option>

@@ -253,7 +253,7 @@ class BaseController extends \Common\Controller\BaseController{
             cookie('identify',null);
             $this->clearRedis('config_web_lock');
             $this->redirect('Index/Login');
-        }else{
+        }elseif(!session('userId')){
             //登录设置
             if($userInfo['avatar']=="" || !file_exists($userInfo['avatar'])){
                 $userInfo['avatar']='Public'.'/admintmpl'."/dist/img/avatar/avatar".rand(1,5).".png";

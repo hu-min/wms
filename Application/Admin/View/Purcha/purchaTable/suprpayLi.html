@@ -1,5 +1,5 @@
 <tr>
-    <td>
+    <td style="min-width:50px;">
         <button type="button" class="close supr-remove"><span>×</span></button><span class="serial">{$rows}</span>
         <input type="hidden" class="modal-info" name="id" value="0">
     </td>
@@ -18,7 +18,7 @@
         </div>
     </td>
     <td>
-        <select class="form-control modal-info" required="required" title="供应商类型" name="pay_type" >
+        <select class="form-control modal-info" required="required" title="供应商类型" name="pay_type" style="min-width:110px;">
             <option value="">选择供应商类型</option>
             <volist name="payType" id="item">
                 <option value="{$key}">{$item}</option>

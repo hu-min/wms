@@ -1286,7 +1286,7 @@ class FinanceController extends BaseController{
         }
         $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $sql = "SELECT from_source,project_name,user_name,invoice,money,table_name,id,inv.add_time add_time FROM (SELECT '报销' from_source,project_id,user_id,vouch_file invoice,invoice_money money,'v_expense_sub' table_name,es.id id,es.add_time add_time FROM v_expense_sub es LEFT JOIN v_expense e ON e.id=parent_id WHERE vouch_file <> '' AND invoice_money > 0 UNION ALL
-        SELECT '供应商成本' from_source,project_id,user_id,invoice_file invoice,invoice_money money,'v_invoice' table_name,i.id id,pu.add_time add_time FROM v_invoice  i LEFT JOIN v_purcha pu ON pu.id=relation_id WHERE relation_type=1) inv LEFT JOIN (SELECT projectId,name project_name FROM v_project ) p ON p.projectId = inv.project_id LEFT JOIN (SELECT userId user_id,userName user_name FROM v_user) bu ON bu.user_id = inv.user_id".$whereStr;
+        SELECT '供应商成本' from_source,project_id,i.user_id user_id,invoice_file invoice,invoice_money money,'v_invoice' table_name,i.id id,pu.add_time add_time FROM v_invoice  i LEFT JOIN v_purcha pu ON pu.id=relation_id WHERE relation_type=1) inv LEFT JOIN (SELECT projectId,name project_name FROM v_project ) p ON p.projectId = inv.project_id LEFT JOIN (SELECT userId user_id,userName user_name FROM v_user) bu ON bu.user_id = inv.user_id".$whereStr;
         // echo $sql,exit;
         $basicResult['list'] = M()->query($sql);
         if($export){

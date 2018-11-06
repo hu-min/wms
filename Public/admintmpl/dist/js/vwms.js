@@ -1336,8 +1336,11 @@ function read_file(){
     })
 }
 function in_array(val,array){
-    for (let index = 0; index < array.length; index++) {
+    for (var index = 0; index < array.length; index++) {
         if (val == array[index]){
+            if(arguments[2]){
+                return ++ index
+            }
             return true;
         }
     }
