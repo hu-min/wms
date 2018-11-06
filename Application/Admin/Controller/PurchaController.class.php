@@ -290,7 +290,9 @@ class PurchaController extends BaseController{
             $dataInfo["process_id"] = $examines['process_id'];
             // $dataInfo["process_id"] = $process_id;
             // $dataInfo["examine"] = $examine;
-            $dataInfo["examine"] = $examines['examine'];;
+            // $dataInfo["examine"] = $examines['examine'];
+            $dataInfo['examine'] = getComponent('Process')->filterExamine(session('roleId'),$dataInfo['examine']);
+            
             $dataInfo['process_level'] = $process_level;
             $dataInfo['status'] = $status;
             // print_r($process);
@@ -375,7 +377,8 @@ class PurchaController extends BaseController{
             }else{
                 $dataInfo = $this->manageCostInsertInfo($suprInfo,"cost_insertAdd");
                 $dataInfo["process_id"] = $examines['process_id'];
-                $dataInfo["examine"] = $examines['examine'];;
+                // $dataInfo["examine"] = $examines['examine'];;
+                $examines['examine'] = getComponent('Process')->filterExamine(session('roleId'),$examines['examine']);
                 $dataInfo['process_level'] = $process_level;
                 $dataInfo['status'] = $status;
                 // print_r($dataInfo);

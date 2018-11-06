@@ -54,7 +54,7 @@ class BaseController extends \Common\Controller\BaseController{
         $this->basicCom=getComponent('Basic');
         $this->resetCom=getComponent('ResetApply');
         $this->QiyeCom=getComponent('Qiye');
-        
+        $this->whiteCom=getComponent('White');
         $this->exemption=[//排除的控制器
             'Admin/Index/Login',
             'Admin/Index/Main',

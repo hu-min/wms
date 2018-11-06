@@ -17,7 +17,6 @@ class FinanceController extends BaseController{
         $this->purchaCom=getComponent('Purcha');
         $this->payCom=getComponent('Pay');
         $this->clearCom=getComponent('Liquidate');
-        $this->whiteCom=getComponent('White');
         $this->payGradeType = ["1"=>"A级[高]","2"=>"B级[次]","3"=>"C级[中]","4"=>"D级[低]"];
         $this->invoiceType = ["0"=>"无","1"=>"收据","2"=>"增值税普通","3"=>"增值税专用"];
         $this->payType = ['1'=>'公对公','2'=>'现金付款','3'=>'支票付款'];
@@ -974,7 +973,7 @@ class FinanceController extends BaseController{
             }else{
                 $datas['process_level']=$process["place"] > 0 ? $process["place"] : 1;
             }
-
+            $datas['examine'] = getComponent('Process')->filterExamine(session('roleId'),$datas['examine']);
             // $datas['process_level']=$process["place"];
             unset($datas['id']);
             return $datas;

@@ -187,7 +187,7 @@ class CostController extends BaseController{
             }
             //如果自己处于某个申请阶段，直接跳过下级;
             // $datas['process_level']=$this->processAuth["level"];
-            unset($datas['id']);
+            $datas['examine'] = getComponent('Process')->filterExamine(session('roleId'),$datas['examine']);
             return $datas;
         }else if($reqType=="debitEdit"){
             $where=["id"=>$datas['id']];
@@ -215,14 +215,22 @@ class CostController extends BaseController{
     function debitAdd(){
         $info=$this->manageDebitInfo();
         if($info){
+            
             $insertResult=$this->debitCom->insert($info);
             if(isset($insertResult->errCode) && $insertResult->errCode==0){
-                $touser = $this->userCom->getQiyeId(explode(',',$info['examine'])[0],true);
-                if(!empty($touser)){
-                    $desc = "<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."申请借支，@你了，点击进入审批吧！</div>";
-                    $url = C('qiye_url')."/Admin/Index/Main.html?action=Cost/debitControl";
-                    $msgResult = $this->QiyeCom-> textcard($touser,session('userName')."申请了借支",$desc,$url);
+                //检查下一个审批者是否存在白名单中，和当前用户判断，如果当前用户在白名单中，指定用户未在白名单中将不会发送信息
+                $touserRoleId = explode(',',$info['examine'])[0];
+                $limitWhite = $this->whiteCom->limitWhite(session('roleId'),$touserRoleId,true);
+                if(!$limitWhite){
+                    $touser = $this->userCom->getQiyeId($touserId,true);
+                    if(!empty($touser)){
+                        $desc = "<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."申请借支，@你了，点击进入审批吧！</div>";
+                        $url = C('qiye_url')."/Admin/Index/Main.html?action=Cost/debitControl";
+                        $msgResult = $this->QiyeCom-> textcard($touser,session('userName')."申请了借支",$desc,$url);
+                    }
                 }
+               
+                
                 $this->ApprLogCom->createApp($this->debitCom->tableName(),$insertResult->data,session("userId"),"");
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
@@ -305,7 +313,6 @@ class CostController extends BaseController{
             ]
         ];
         $listResult=$this->debitCom->getList($parameter);
-    // echo        $this->debitCom->M()->_sql();
         $this->tablePage($listResult,'Cost/costTable/financedebitList',"finance_debitList",$pageSize );
     }
     function finance_debit_modalOne(){
@@ -461,7 +468,8 @@ class CostController extends BaseController{
         // $process = $this->nodeCom->getProcess(I("vtabId"));
         // $expInfo['process_id'] = $process["processId"];
         $expInfo['process_id'] = $examines["process_id"];
-        $expInfo['examine'] = $examines["examine"];
+        // $expInfo['examine'] = $examines["examine"];
+        $expInfo['examine'] = getComponent('Process')->filterExamine(session('roleId'),$expInfo['examine']);
         if($expInfo["project_id"]>0){ 
             //检查成本预算是否超支
             $this->projectCom->checkCost($expInfo["project_id"],array_sum(array_column($datas["expense-list"],'money')));

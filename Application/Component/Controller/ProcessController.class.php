@@ -65,7 +65,13 @@ class ProcessController extends BaseController{
         print_r($processAppList);
         // print_r($nodeProce);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-11-06 19:58:13 
+     * @Desc: 获取 审批流程人员
+     */    
     function getExamine($vtabId=false,$leader=0,$roleId=0,$processIds=0){
+        // $limitWhite = $this->whiteCom->limitWhite(session('roleId'),$touserRoleId,true);
         // print_r($processIds);exit;
         $vtabId = $vtabId ? $vtabId : I("vtabId");
         $roleId = $roleId ? $roleId : session("roleId");
@@ -107,7 +113,9 @@ class ProcessController extends BaseController{
             }
             $examines = $process["examine"];
         }
-        
+        // print_r($examines);exit;
+        // $limitWhite = A("Component/White")->limitWhite(session('roleId'),$touserRoleId,true);
+
         $process["place"] = search_last_key($roleId,array_unique(explode(",",$examines)));
 
         $returnData['examine'] = trim(implode(",",array_unique(explode(",",$examines))),",");
@@ -118,5 +126,20 @@ class ProcessController extends BaseController{
             $this->ajaxReturn(['errCode'=>20001,'error'=>getError(20001)]);
         }
         return $returnData;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-11-06 21:18:32 
+     * @Desc: 根据白名单过滤审批流程 
+     */    
+    function filterExamine($userRoleId,$examines){
+        $examine = explode(",",$examines);
+        foreach ($examine as $key => $value) {
+            $limitWhite = A("Component/White")->limitWhite($userRoleId,$value,true);
+            if($limitWhite){
+                unset($examine[$key]);
+            }
+        }
+        return implode(",",$examine);
     }
 }

@@ -230,6 +230,7 @@ class PublicController extends BaseController{
             }else{
                 $datas['process_level']=$process["place"] > 0 ? $process["place"] : 1;
             }
+            $datas['examine'] = getComponent('Process')->filterExamine(session('roleId'),$datas['examine']);
             unset($datas['id']);
             return $datas;
         }else if($reqType=="work_orderEdit"){

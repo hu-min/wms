@@ -157,6 +157,7 @@ class IndexController extends BaseController{
         $nodeProce = A("Component/Node")->nodeProcess();
         $nodeAuth = session('nodeAuth');
         $roleId = session("roleId");
+        
         // print_r($nodeProce);exit;
         // print_r($nodeAuth);
         $db = M();
@@ -179,9 +180,15 @@ class IndexController extends BaseController{
         }
         $sql = implode(" UNION ALL ",$sqlArr);
         if($sql != ""){
-            $sqls = "SELECT nodeId, project_id,project_name,`moudle_name`,`user_id`,`user_name`,`process_level`,`status`,examine,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time,controller FROM ({$sql}) p LEFT JOIN (SELECT userId,userName `user_name` FROM v_user WHERE status =1) u ON userId = `user_id` LEFT JOIN (SELECT projectId pId,name project_name FROM v_project) pr ON pr.pId = project_id ORDER BY add_time DESC LIMIT ".($page - 1) * $pageNum.",".$pageNum; 
+            $whites = $this->whiteCom->getWhites();
+            $where = "";
+            if($whites){
+                $where = " WHERE user_id NOT IN (".implode(",",$whites).")";
+            }
+
+            $sqls = "SELECT nodeId, project_id,project_name,`moudle_name`,`user_id`,`user_name`,`process_level`,`status`,examine,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time,controller FROM ({$sql}) p LEFT JOIN (SELECT userId,userName `user_name` FROM v_user WHERE status =1) u ON userId = `user_id` LEFT JOIN (SELECT projectId pId,name project_name FROM v_project) pr ON pr.pId = project_id ".$where." ORDER BY add_time DESC LIMIT ".($page - 1) * $pageNum.",".$pageNum;
             // echo $sqls;exit;
-            $cqls = "SELECT count(*) `count` FROM ({$sql}) p LEFT JOIN (SELECT userId,userName `user_name` FROM v_user WHERE status =1) u ON userId = `user_id` ";
+            $cqls = "SELECT count(*) `count` FROM ({$sql}) p LEFT JOIN (SELECT userId,userName `user_name` FROM v_user WHERE status =1) u ON userId = `user_id` ".$where;
             $result = $db ->query($sqls);
             $countRes = $db ->query($cqls);
             $listResult = ["list"=>$result,"count"=>$countRes[0]["count"]];

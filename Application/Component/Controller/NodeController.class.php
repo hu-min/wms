@@ -20,7 +20,7 @@ class NodeController extends BaseController{
             $processResult =  A("Component/Process")->getList(['where'=>['processId'=>$processId],"fields"=>"processId, {$processId} processIds,processOption"]);
             // print_r($processResult);exit;
         }else{
-            $processResult = $this->getList(["fields"=>"processId,processIds,processOption","where"=>["nodeId"=> $nodeId],"joins"=>["LEFT JOIN (SELECT processId,processOption FROM v_process WHERE status = 1) p ON FIND_IN_SET(p.processId,processIds)"] ]);
+            $processResult = $this->getList(["fields"=>"processId,controller,processIds,processOption","where"=>["nodeId"=> $nodeId],"joins"=>["LEFT JOIN (SELECT processId,processOption FROM v_process WHERE status = 1) p ON FIND_IN_SET(p.processId,processIds)"] ]);
         }
         
         $processInfo = ["process"=>[],"allProcess"=>1,"place"=>0,"processId"=>0,"examine"=>''];
@@ -28,6 +28,8 @@ class NodeController extends BaseController{
         // print_r($processResult);exit;
         // $this->log($processResult);
         if(is_array($processResult["list"])){
+            $nodeAuth = session('nodeAuth');
+            $auth = $nodeAuth[$processResult["list"][0]["controller"]];
             $processIds = explode(",",$processResult["list"][0]["processIds"]);
             foreach ($processIds as  $processId) {
                 foreach ($processResult["list"] as $key => $processData) {
@@ -42,7 +44,8 @@ class NodeController extends BaseController{
 
                 $process = json_decode($processData["processOption"],true);
                 $processId = $processData["processId"];
-                if(($process[0]["type"] ==1 && in_array(99999999,$process[0]["role"])) || (($process[0]["type"] ==1 && in_array($rolePid,$process[0]["role"])) || ($process[0]["type"] == 2) && $roleId==$process[0]["role"])){
+                if( $auth >=7 || ($process[0]["type"] ==1 && in_array(99999999,$process[0]["role"])) || (($process[0]["type"] ==1 && in_array($rolePid,$process[0]["role"])) || ($process[0]["type"] == 2) && $roleId==$process[0]["role"])){
+                    
                     $processInfo["place"] =0;
                     $examine = [];
                     $processInfo["processId"] = $processId;

@@ -601,6 +601,7 @@ class ProjectController extends BaseController{
             // }
 
             unset($datas['projectId']);
+            $datas['examine'] = getComponent('Process')->filterExamine(session('roleId'),$datas['examine']);
             return $datas;
         }else if($reqType=="projectEdit"){
             $where=["projectId"=>$datas['projectId']];
