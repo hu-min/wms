@@ -82,32 +82,34 @@
                     <div class="col-md-12"> <h5 class="box-title"><i class="fa fa-plus-square text-aqua add-expense" title="添加报销信息" data-target=".bankstock-tab" style="cursor: pointer;"> 添加报销信息</i></h5></div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12" style="overflow: auto;z-index: 1;">
-                        <table class="table table-bordered table-hover expense-list">
-                            <thead>
-                                <tr>
-                                    <th>序号</th>
-                                    <th>发生日期</th>
-                                    <th>报销类别</th>
-                                    <th>目标城市[住宿，交通]</th>
-                                    <th>费用类别</th>
-                                    <th>费用说明</th>
-                                    <th>报销凭证类型</th>
-                                    <th>发生金额</th>
-                                    <th>收款账户类别</th>
-                                    <th>收款账户</th>
-                                    <th>备注</th>
-                                    <th>发票或凭证</th>
-                                    <th>发票金额</th>
-                                    <th>报销状态</th>
-                                    <th>审批备注</th>
-                                    <th>审批记录</th>
-                                </tr>
-                            </thead>
-                            <tbody class="{$controlName}-table">
-                                {$tables}
-                            </tbody>
-                        </table>
+                    <div class="col-sm-12 table-outbox" style="z-index: 1;">
+                        <div style="font-size:0.95em;overflow: auto;">
+                            <table class="table table-bordered table-hover expense-list">
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>发生日期</th>
+                                        <th>报销类别</th>
+                                        <th>目标城市[住宿，交通]</th>
+                                        <th>费用类别</th>
+                                        <th>费用说明</th>
+                                        <th>报销凭证类型</th>
+                                        <th>发生金额</th>
+                                        <th>收款账户类别</th>
+                                        <th>收款账户</th>
+                                        <th>备注</th>
+                                        <th>发票或凭证</th>
+                                        <th>发票金额</th>
+                                        <th>报销状态</th>
+                                        <th>审批备注</th>
+                                        <th>审批记录</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="modal-{$controlName}-table">
+                                    {$tables}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
                 <div class="row">

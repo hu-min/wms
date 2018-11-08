@@ -148,6 +148,7 @@ function searchFun(option){
                 eval(callfun+"(result.data)")//
             }
             var noData = result.table == '<tr><td colspan="'+tdNum+'">无数据</td></tr>' ? true : false
+            // console.log(tabId+" ."+table)
             table_frozen($(tabId+" ."+table),noData);
            
             //这里插入一个js修改table
@@ -1669,6 +1670,9 @@ var table_frozen = function($this,noData){
     })
     scrollHtml+="</tr></thead><tbody>";
     var trs =""
+    // console.log($this.parents('table'))
+    // console.log($this.parents('table').find("tbody tr"))
+    // console.log($this.parents('table').find("tbody tr").length)
     $this.parents('table').find("tbody tr").each(function(index,self){
         var style  = $(self).attr("style") ? "style='"+$(self).attr("style")+"'" : "" ;
         var tr ="<tr "+style+">"

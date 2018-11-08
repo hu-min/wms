@@ -6,10 +6,7 @@
     </td> 
     <td>
         <div class="input-group">
-            <div class="input-group-addon">
-                <i class="fa fa-calendar"></i>
-            </div>
-            <input class="form-control pull-right date-input input-sm modal-info" readonly="readonly" name="happen_date" type="text">
+            <input class="form-control pull-right date-input input-sm modal-info" readonly="readonly" name="happen_date" type="text" style="min-width: 90px;">
         </div>
     </td>
     <td>
@@ -51,7 +48,7 @@
         </select>
     </td>
     <td>
-        <input class="form-control modal-info input-sm"  name="money" title="发生金额"  value="" placeholder="发生金额" type="text">
+        <input class="form-control modal-info input-sm"  name="money" required="required" title="发生金额"  value="" placeholder="发生金额" type="text">
     </td>
     <td>
         <select class="form-control modal-info chosen-select" required="required" title="收款账户类型"  name="account_type">

@@ -62,7 +62,7 @@ class ProcessController extends BaseController{
         // exit;
         return $processAppList;
         // print_r($proccePlace);
-        print_r($processAppList);
+        // print_r($processAppList);
         // print_r($nodeProce);
     }
     /** 
@@ -121,6 +121,7 @@ class ProcessController extends BaseController{
         $returnData['examine'] = trim(implode(",",array_unique(explode(",",$examines))),",");
         $returnData['place'] = $process["place"];
         $returnData['process_id'] = $process["processId"];
+        $returnData['auth'] = $process["auth"];
         // print_r($returnData);exit;
         if($returnData['examine']==""){
             $this->ajaxReturn(['errCode'=>20001,'error'=>getError(20001)]);

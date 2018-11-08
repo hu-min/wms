@@ -916,7 +916,7 @@ class FinanceController extends BaseController{
             $btnTitle = "保存数据";
             $redisName="staffClearList";
             $resultData=$this->clearCom->redis_one($redisName,"id",$id);
-            // print_r($resultData);
+            // print_r($resultData);exit;
             $this->assign("list",[$resultData]);
             $this->assign("gettype",$gettype);
             $html = $this->fetch('Finance/financeTable/reckonLi');
@@ -1220,7 +1220,7 @@ class FinanceController extends BaseController{
         // echo $this->clearCom->M()->_sql();exit;
         $countStr = "<div><label>借支次数总计：<span class='text-light-blue'>".$countResult["list"]["debit_num"]."</span></label> | <label>借支金额总计：<span class='text-light-blue'>".$countResult["list"]["debit_money"]."</span></label> | <label>报销次数总计：<span class='text-light-blue'>".$countResult["list"]["expense_num"]."</span></label> | <label>报销金额总计：<span class='text-light-blue'>".$countResult["list"]["expense_money"]."</span></label> | <label>清算金额总计：<span class='text-light-blue'>".$countResult["list"]["all_money"]."</span></label></div>";
         // echo $countStr;exit;
-        $this->tablePage($listResult,'Finance/financeTable/'.$template,"finance_clearList",$pageSize,$countStr);
+        $this->tablePage($listResult,'Finance/financeTable/'.$template,"financeClearList",$pageSize,$countStr);
     }
     function financeClear_modalOne(){
         $title = "清算审核";

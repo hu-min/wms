@@ -37,9 +37,10 @@
                                 <div class="form-group">
                                     <label >清算状态：</label>
                                     <select class="form-control search-info input-sm" title="清算状态" name="status">
-                                        <option value="">全部</option>
-                                        <option value="1">已清算</option>
+                                        <option value="">所有状态</option>
                                         <option value="0">未清算</option>
+                                        <option value="1">已清算</option>
+                                        <option value="2">清算中</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -103,7 +104,7 @@
     <script>
         var staffClear_getInfo = function(){
             datas["data"] =[];
-            $(tabId+" .global-modal .{$controlName}-table tr").each(function(){
+            $(tabId+" .global-modal .modal-{$controlName}-table tr").each(function(){
                 tempSupr = {}
                 $(this).find(".modal-info").each(function(){
                     var name = $(this).attr("name");
@@ -119,7 +120,7 @@
         }
         var compute_ClearMoney = function(){
             var allReckon = 0
-            $(tabId+" .global-modal .{$controlName}-table tr").each(function(){
+            $(tabId+" .global-modal .modal-{$controlName}-table tr").each(function(){
                 var money = $(this).find(".modal-info[name='all_money']").text()
                 if(money!==""){
                     allReckon+="+"+money
@@ -137,14 +138,14 @@
         }
         $(function(){
             $(tabId+" .search-list").trigger("click");
-            $(tabId).offon("click",".global-modal .{$controlName}-table .supr-remove",function(){
+            $(tabId).offon("click",".global-modal .modal-{$controlName}-table .supr-remove",function(){
                 $(this).parents("tr").remove();
                 compute_ClearMoney();
             })
             $(tabId).offon("click",".global-modal .refresh",function(){
                 var req = $(this).attr("name")
                 get("{$url}",{reqType:req},function(result){
-                    $(tabId+" .global-modal .{$controlName}-table").html(result.table);
+                    $(tabId+" .global-modal .modal-{$controlName}-table").html(result.table);
                     compute_ClearMoney();
                 })
             })

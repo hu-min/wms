@@ -94,7 +94,11 @@ class ToolsController extends BaseController{
         extract($_REQUEST);
         $this->log($_REQUEST);
         $this->nodeCom=getComponent('Node');
-        $tableInfo = $this->nodeCom->getOne(['db_table'=>$table,"nodeType"=>2]);
+        if($table=="v_expense_sub"){
+            $tableInfo = $this->nodeCom->getOne(['db_table'=>"v_expense","nodeType"=>2]);
+        }else{
+            $tableInfo = $this->nodeCom->getOne(['db_table'=>$table,"nodeType"=>2]);
+        }
         if(!$tableInfo){
             $this->ajaxReturn(['errCode'=>100,'error'=>'当前数据表异常，请联系管理员']);
         }

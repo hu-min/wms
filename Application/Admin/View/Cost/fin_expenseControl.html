@@ -162,18 +162,9 @@
                     var template = info["tableData"][element]["template"];
                     var statusType = JSON.parse('{$statusTypeJ}')
                     var allMoney = 0;
-                    
-                    list.forEach(function(listData,rows){
-                        $(tabId+" .global-modal ."+element+" tbody").append(template);
-                        var $current = $(tabId+" .global-modal ."+element+" tbody tr").eq(rows);
-                        $current.find(".serial").text(Number(rows+1));
-                        //处理权限问题，这个比较特殊，
-                        if(info.process.place<1 || listData["a_status"] >= 1){
-                            $current.find(".approve-group .approve-con").addClass("disabled")
-                            $current.find(".approve-group .approve-con").prop("disabled",true)
-                        }
-                        $current.find(".clear-media").remove();
-                        
+                    var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
+                    set_table_data(["expense-list"],info["tableData"],JSON.parse('{$statusTypeJ}'),function($current,listData,statusType){
+                        // $current.find(".approve-group .approve-con").remove()
                         for (var key in listData) {
                             if(key == "status"){
                                 var status = listData[key]
@@ -181,15 +172,82 @@
                                     status= listData["last_status"]
                                 }
                                 $current.find("td[name='"+key+"']").text(statusType[status]);
-                            }else if(key == "id"){
-                                $current.find(".approve-group").data("id",listData[key])
-                            }else{
                                 $current.find(".modal-info[name='"+key+"']").val(listData[key]);
+                            }else  if(key == "city"){
+                                // console.log(listData)
+                                // console.log($(tabId+" .expense-list .chosen-select[name='province']"))
+                                $current.find(".chosen-select[name='province']").find("option[value='"+listData["cpid"]+"']").prop("selected",true)
+        
+                                var city_optoin = '<option value="">城市</option>'
+                                listData["citys"].forEach(city => {
+                                    city_optoin+='<option value="'+city["cid"]+'">'+city["city"]+'</option>'
+                                });
+                                $current.find(".chosen-select[name='city']").html(city_optoin);
+                                $current.find(".chosen-select[name='city']").find("option[value='"+listData['city']+"']").prop("selected",true);
+                            }else if(key == "aremark" ){
+                                if(listData[key]){
+                                    $current.find("td[name='"+key+"']").text(listData["approve_name"]+"："+listData["aremark"]);
+                                }else{
+                                    $current.find("td[name='"+key+"']").text(listData["approve_name"]);
+                                }
+                            }else{
+                                if(key == "id"){
+                                    $current.find(".approve-group").data("id",listData[key])
+                                }
+                                $current.find(".modal-info[name='"+key+"']").val(listData[key]);
+                                if(!in_array(listData["status"],[0,3])){
+                                    $current.find(".modal-info[name='"+key+"']").prop("disabled",true);
+                                    $current.find(".chosen-select").prop("disabled",true);
+                                    $current.find(".clear-media").remove();
+                                }
                             }
-                            $current.find(".modal-info[name='"+key+"']").prop("disabled",true);
+                            
+                            if(( listData['status'] > 0 || info['user_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && listData['status'] !=3 && gettype !="Add"){
+                                $current.find(".modal-info").prop("disabled",true);
+                                $current.find(".chosen-select").prop("disabled",true);
+                                $current.find(".clear-media").remove();
+                            }
+                            // console.log(listData['process_level'])
+                            // console.log(listData['place'])
+                            if(listData['process_level'] > listData['place'] || listData['status'] == 3){
+                                if(info["user_id"] == "{$Think.session.userId}"){
+                                    $current.find(".approve-group .approve-con").remove();
+                                }else{
+                                    $current.find(".approve-group .approve-con").addClass("disabled");
+                                    $current.find(".approve-group .approve-con").prop("disabled",true);
+                                }
+                            }
                         }
                         init_date(false,$current);
                     });
+                    
+                    // list.forEach(function(listData,rows){
+                    //     $(tabId+" .global-modal ."+element+" tbody").append(template);
+                    //     var $current = $(tabId+" .global-modal ."+element+" tbody tr").eq(rows);
+                    //     $current.find(".serial").text(Number(rows+1));
+                    //     //处理权限问题，这个比较特殊，
+                    //     if(info.process.place<1 || listData["a_status"] >= 1){
+                    //         $current.find(".approve-group .approve-con").addClass("disabled")
+                    //         $current.find(".approve-group .approve-con").prop("disabled",true)
+                    //     }
+                    //     $current.find(".clear-media").remove();
+                        
+                    //     for (var key in listData) {
+                    //         if(key == "status"){
+                    //             var status = listData[key]
+                    //             if(Number(listData["last_status"])>1){
+                    //                 status= listData["last_status"]
+                    //             }
+                    //             $current.find("td[name='"+key+"']").text(statusType[status]);
+                    //         }else if(key == "id"){
+                    //             $current.find(".approve-group").data("id",listData[key])
+                    //         }else{
+                    //             $current.find(".modal-info[name='"+key+"']").val(listData[key]);
+                    //         }
+                    //         $current.find(".modal-info[name='"+key+"']").prop("disabled",true);
+                    //     }
+                    //     init_date(false,$current);
+                    // });
                 }
             });
         }

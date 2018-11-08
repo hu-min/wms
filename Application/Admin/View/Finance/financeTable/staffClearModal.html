@@ -17,28 +17,30 @@
                      </button>
                 </div>
             </div>
-            <div class="row">
-                <table class="table table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <th>序号</th>
-                            <th>请选择项目</th>
-                            <th>项目编号</th>
-                            <th>借支数量</th>
-                            <th>借支总额</th>
-                            <th>报销单数量</th>
-                            <th>报销总额</th>
-                            <th>已提交发票金额</th>
-                            <th>清算金额</th>
-                            <if condition="$gettype eq Edit">
-                                <th>提交时间</th>
-                            </if>
-                        </tr>
-                    </thead>
-                    <tbody class="{$controlName}-table">
-                        {$tables}
-                    </tbody>
-                </table>
+            <div class="col-sm-12 table-outbox" style="z-index: 1;">
+                <div style="font-size:0.95em;overflow: auto;">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>请选择项目</th>
+                                <th>项目编号</th>
+                                <th>借支数量</th>
+                                <th>借支总额</th>
+                                <th>报销单数量</th>
+                                <th>报销总额</th>
+                                <th>已提交发票金额</th>
+                                <th>清算金额</th>
+                                <if condition="$gettype eq Edit">
+                                    <th>提交时间</th>
+                                </if>
+                            </tr>
+                        </thead>
+                        <tbody class="modal-{$controlName}-table">
+                            {$tables}
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div class="row">
                 <div class="col-md-12" style="text-align: right;">

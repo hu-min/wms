@@ -71,6 +71,17 @@ class CostController extends BaseController{
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
             $where['user_id'] = session('userId');
         }
+        
+        foreach (['project_name'] as $key ) {
+            if(isset($data[$key])){
+                $where[$key]=["LIKE","%{$data[$key]}%"];
+            }
+        }
+        foreach (['clear_status'] as $key ) {
+            if(isset($data[$key])){
+                $where[$key]=$data[$key];
+            }
+        }
         // if($data['expenClas']){
         //     $where['expenClas']=$data['expenClas'];
         // }
@@ -401,6 +412,16 @@ class CostController extends BaseController{
             // print_r(session('userId'));
             $where['user_id'] = session('userId');
         }
+        foreach (['project_name'] as $key ) {
+            if(isset($data[$key])){
+                $where[$key]=["LIKE","%{$data[$key]}%"];
+            }
+        }
+        foreach (['clear_status'] as $key ) {
+            if(isset($data[$key])){
+                $where[$key]=$data[$key];
+            }
+        }
         $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
@@ -421,8 +442,8 @@ class CostController extends BaseController{
     }
     function expenseManage($datas,$reqType=false){
         $reqType = $reqType ? $reqType : I("reqType");
-        foreach (["happen_date"] as $date) {
-            $datas[$date] = strtotime($datas[$date]);
+        foreach (["happen_date"] as $key) {
+            $datas[$key] = isset($datas[$key]) && !empty($datas[$key]) ? strtotime($datas[$key]) : time();
         }
         if($reqType=="expenseAdd"){
             $datas['add_time']=time();
@@ -469,7 +490,7 @@ class CostController extends BaseController{
         // $expInfo['process_id'] = $process["processId"];
         $expInfo['process_id'] = $examines["process_id"];
         // $expInfo['examine'] = $examines["examine"];
-        $expInfo['examine'] = getComponent('Process')->filterExamine(session('roleId'),$expInfo['examine']);
+        $expInfo['examine'] = getComponent('Process')->filterExamine(session('roleId'),$examines['examine']);
         if($expInfo["project_id"]>0){ 
             //检查成本预算是否超支
             $this->projectCom->checkCost($expInfo["project_id"],array_sum(array_column($datas["expense-list"],'money')));
@@ -500,6 +521,10 @@ class CostController extends BaseController{
         // $expInfo['process_level']=$process["place"];
 
         $isInsert = false;
+        // print_r($expInfo);
+        // $dataInfo = $this->expenseManage($datas["expense-list"][0]);
+        // print_r($dataInfo);
+        // exit;
         $insertRes = $this->expenseCom->insert($expInfo);
         if($insertRes->errCode==0){
             foreach ($datas["expense-list"] as $subExpInfo) {
@@ -581,7 +606,8 @@ class CostController extends BaseController{
             ];
             $reLimit = $this->basicCom->getOne($param)['list']['limit_money'];
             $limit_money = $reLimit > 0 ? $reLimit : $baseLimit;
-            if($datas['money']>$limit_money && $limit_money > 0){
+            if(($datas['money']>$limit_money && $limit_money > 0) || ($datas['money']>100000 && $limit_money <= 0)){
+                $limit_money = $limit_money > 0 ? $limit_money : 100000;
                 $this->ajaxReturn(['errCode'=>100,'error'=>$feeRes['name'].'报销金额不能超过'.$limit_money,'data'=>['limit_money'=>$limit_money]]);
             }else{
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
@@ -658,8 +684,14 @@ class CostController extends BaseController{
         $gettype = I("gettype");
         $resultData=[];
         $id = I("id");
+        $roleId = session('roleId');
         $nodeId = getTabId(I("vtabId"));
-       
+        $this->assign("provinceArr",$this->basicCom->get_provinces());
+        $option='<option value="0">费用类别</option>';
+        foreach ($this->ABasic->getFeeTypeTree() as $key => $value) {
+            $option.=$this->ABasic->getfeeType($value,0);
+        }
+        $this->assign("pidoption",$option);
         // print_r($process);
         if($gettype=="Edit"){
             $title = "编辑报销";
@@ -672,14 +704,18 @@ class CostController extends BaseController{
             $resultData["process"] = $this->nodeCom->getProcess($nodeId);
             $subPar=[
                 "where" => ["parent_id"=>$id],
-                "fields"=> "*,FROM_UNIXTIME(happen_date,'%Y-%m-%d') happen_date",
+                "fields"=> "*,FROM_UNIXTIME(happen_date,'%Y-%m-%d') happen_date,FIND_IN_SET({$roleId},examine) place",
                 "joins" =>[
                     "LEFT JOIN (SELECT table_id,status a_status FROM v_approve_log WHERE table_name = '".$this->expenseSubCom->tableName()."' AND user_id = ".session("userId").") ap ON ap.table_id = id",
+                    "LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct ON ct.ctid = city",
                     "LEFT JOIN (SELECT GROUP_CONCAT(table_id ORDER BY add_time DESC) aid ,GROUP_CONCAT(status ORDER BY add_time DESC) last_status FROM v_approve_log WHERE table_name = '".$this->expenseSubCom->tableName()."' GROUP BY table_id) al ON al.aid = id",
                 ],
             ];
-
-            $resultData["tableData"]["expense-list"] = ["list"=>$this->expenseSubCom->getList($subPar)["list"],"template"=>$this->fetch('Cost/costTable/expenseLi')];
+            $subExpRes = $this->expenseSubCom->getList($subPar)["list"];
+            foreach ($subExpRes as $key => $subInfo) {
+                $subExpRes[$key]["citys"] = $this->basicCom->get_citys($subInfo["cpid"]);
+            }
+            $resultData["tableData"]["expense-list"] = ["list"=>$subExpRes,"template"=>$this->fetch('Cost/costTable/expenseLi')];
         }
         $modalPara=[
             "data"=>$resultData,

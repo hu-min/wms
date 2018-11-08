@@ -618,7 +618,8 @@
                         }
                         setUrlAction(cMatch[1],cMatch[1]);
                     }
-                    get(controller.split('&')[0],{authNodeId:nodeid,id:id},function(result){
+                    tabId = nodeid
+                    get(controller.split('&')[0],{authNodeId:nodeid,id:id,vtabId:"#vtabs"+nodeid},function(result){
                         createTab(title,"vtabs"+nodeid,result.html);
                     },false);
                     

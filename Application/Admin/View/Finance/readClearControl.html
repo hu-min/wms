@@ -36,9 +36,10 @@
                                 <div class="form-group">
                                     <label >清算状态：</label>
                                     <select class="form-control search-info input-sm" title="清算状态" name="status">
-                                        <option value="">全部</option>
-                                        <option value="1">已清算</option>
+                                        <option value="">所有状态</option>
                                         <option value="0">未清算</option>
+                                        <option value="1">已清算</option>
+                                        <option value="2">清算中</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -104,7 +105,12 @@
                 
                 datas["data"]={}
                 datas["data"]["title"] = "清算催促！";
-                datas["data"]["content"] = encodeURI('<p>您好！请尽快提交【'+project+'】项目的清算！谢谢合作</p>');
+                if(project!=""){
+                    datas["data"]["content"] = encodeURI('<p>您好！请尽快提交【'+project+'】项目的借支/报销清算！谢谢合作</p>');
+                }else{
+                    datas["data"]["content"] = encodeURI('<p>您好！请尽快提交非项目的借支/报销清算！谢谢合作</p>');
+                }
+                
                 datas["data"]["to_user"] = [userid];
                 datas["reqType"] = "messageAdd";
                 // console.log(datas);

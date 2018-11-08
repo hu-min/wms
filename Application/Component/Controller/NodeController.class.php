@@ -23,13 +23,14 @@ class NodeController extends BaseController{
             $processResult = $this->getList(["fields"=>"processId,controller,processIds,processOption","where"=>["nodeId"=> $nodeId],"joins"=>["LEFT JOIN (SELECT processId,processOption FROM v_process WHERE status = 1) p ON FIND_IN_SET(p.processId,processIds)"] ]);
         }
         
-        $processInfo = ["process"=>[],"allProcess"=>1,"place"=>0,"processId"=>0,"examine"=>''];
+        $processInfo = ["process"=>[],"allProcess"=>1,"place"=>0,"processId"=>0,"examine"=>'',"auth"=>0];
         $processList = [];
         // print_r($processResult);exit;
         // $this->log($processResult);
         if(is_array($processResult["list"])){
             $nodeAuth = session('nodeAuth');
             $auth = $nodeAuth[$processResult["list"][0]["controller"]];
+            $processInfo["auth"] = $auth;
             $processIds = explode(",",$processResult["list"][0]["processIds"]);
             foreach ($processIds as  $processId) {
                 foreach ($processResult["list"] as $key => $processData) {
