@@ -36,11 +36,11 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label">项目名称：</label>
-                                    <input class="form-control search-info input-sm" name="projectId" placeholder="项目名称" type="text">
+                                    <input class="form-control search-info input-sm" name="name" placeholder="项目名称" type="text">
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label">员工姓名：</label>
-                                    <input class="form-control search-info input-sm" name="userId" placeholder="员工姓名" type="text">
+                                    <input class="form-control search-info input-sm" name="user_name" placeholder="员工姓名" type="text">
                                 </div>
                                 <div class="form-group">
                                     <label >清算状态：</label>
@@ -133,6 +133,14 @@
         </div>
     </div>
     <script>
+        var financeClear_setInfo = function(info){
+            $(tabId+" .global-modal").find(".approve-group").data("id",info['id']);
+            $(tabId+" .global-modal").find(".approve-group .approve-con").remove();
+            var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
+            if(gettype=="Edit"){
+                $(tabId+" .global-modal .modal-footer").find(".save-info").hide();
+            }
+        }
         $(function(){
             $(tabId+" .search-list").trigger("click");
             $(tabId+" .search-info[name='countype']").offon("change",function(){

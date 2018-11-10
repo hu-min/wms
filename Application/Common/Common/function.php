@@ -611,3 +611,16 @@ function getWeixinConf(){
     $WxConf = '{"1000009":{"corpid":"wx650b23fa694c8ff7","corpsecret":"HdwjcqIUmY80OR4wzEeMDMO9AsFlebGq1yjT3E2hang"},"contacts":{"corpid":"wx650b23fa694c8ff7","corpsecret":"GDTwLEDVdhiCz0ViKGOVKJZbQc3eLN9URy9ugIVJNm0"},"helper":{"corpsecret":"m7RF-7gpvjgIrguJSV6d8NrHX9gL9-R89EWEGLbDJv8"}}';
     return json_decode($WxConf,true);
 }
+/** 
+ * @Author: vition 
+ * @Date: 2018-11-10 10:39:36 
+ * @Desc: 格式化文件的大写格式 
+ */
+function fsizeFormat($size){
+    if(round($size/1024/1024) < 1){
+        $fileSize = round($size/1024,2)."K";
+    }else{
+        $fileSize = round($size/1024/1024,2)."M";
+    }
+    return $fileSize;
+}

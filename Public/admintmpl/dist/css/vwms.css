@@ -69,14 +69,19 @@
 	.modal-full{
 		width:95%;
 	}
-	.table thead th,.table tbody td{
+	.table thead th:not(.serial_num),.table tbody td:not(.serial_num){
 		min-width: 100px;
 	}
 }
 
-.table thead th,.table tbody td{
+.table thead th:not(.serial_num),.table tbody td:not(.serial_num){
 	text-align: center;
 	min-width: 100px;
+}
+.table thead .serial_num,.table tbody .serial_num{
+	text-align: center;
+	min-width: 50px;
+	max-width: 100px;
 }
 .chosen-select{
 	padding: 0;

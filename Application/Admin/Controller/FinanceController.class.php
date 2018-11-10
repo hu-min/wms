@@ -1165,9 +1165,9 @@ class FinanceController extends BaseController{
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
             $where["_string"] = "FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0";
         }
-        foreach (["project_id","user_id"] as $param) {
-            if($$param){
-                $where[$param] = $$param;
+        foreach (["name","user_name"] as $key) {
+            if(isset($data[$key])){
+                $where[$key] = ['LIKE',"%{$data[$key]}%"];
             }
         }
 
@@ -1233,6 +1233,12 @@ class FinanceController extends BaseController{
             $btnTitle = "清算审核";
             $redisName="financeClearList";
             $resultData=$this->clearCom->redis_one($redisName,"id",$id);
+
+            $this->assign("list",[$resultData]);
+            $this->assign("gettype",$gettype);
+            $html = $this->fetch('Finance/financeTable/fin_reckonLi');
+            $this->assign("allReckon",$resultData["all_money"]);
+            $this->assign("tables",$html);
         }
         $modalPara=[
             "data"=>$resultData,

@@ -1,0 +1,16 @@
+<volist name="list" id="item">
+    <tr>
+        <td>{$item['file_name']}</td>
+        <td>{$item['user_name']}</td>
+        <td>{$item['type_name']}</td>
+        <td>{$item['file_size']|fsizeFormat}</td>
+        <td>{$item['add_time']|date="Y-m-d H:i:s",###}</td>
+        <!-- <td><span class="label bg-{$statusLabel[$item['status']]}">{$statusType[$item['status']]}</span></td> -->
+        <td class="status-con" data-db="{$tableName}" data-con="{$controlName}" data-id="{$item['id']}" data-url="{$url}" >
+            <button type="button" data-gettype="Edit" data-toggle="modal"  data-url="{$url}" data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-primary btn-xs v-showmodal"> 查看 </button>            
+            <if condition="$nodeAuth egt 4 ">
+                <button type="button" class="btn btn-danger btn-xs status-info" data-status="4" data-reqtype="Del"  >删除</button>
+            </if>
+        </td>
+    </tr>
+</volist>

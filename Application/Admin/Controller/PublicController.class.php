@@ -4,9 +4,11 @@ namespace Admin\Controller;
 class PublicController extends BaseController{
 
     public function _initialize() {
+        $this->AUser=A('User');
         parent::_initialize();
         $this->MesCom=getComponent('Message');
         $this->workOrderCom=getComponent('WorkOrder');
+        $this->pubFilesCom=getComponent('PublicFiles');
         $this->AProject=A('Project');
         $this->worderType = ["1"=>"个人信息","2"=>"项目相关","3"=>"其他"];
     }
@@ -365,4 +367,339 @@ class PublicController extends BaseController{
         $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'工单数据'];
         return $exportData ;
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-11-09 14:11:23 
+     * @Desc: 共享文件管理 
+     */    
+    
+    /** 
+     * @Author: vition 
+     * @Date: 2018-11-09 14:13:12 
+     * @Desc: 共享文件类型 
+     */    
+    function pubFilesType(){
+        $reqType=I('reqType');
+        $this->assign("controlName","pub_files_type");
+        $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
+        if($reqType){
+            $this->$reqType();
+        }else{         
+            $this->returnHtml();
+        }
+    }
+    //显示文件类型
+    function pub_files_type_modalOne(){
+        $title = "新建文件类型";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑文件类型";
+            $btnTitle = "保存数据";
+            $redisName="pubFilesTypeList";
+            $resultData=$this->basicCom->redis_one($redisName,"basicId",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "template"=>"pubFilesTypeModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    //文件类型列表
+    function pub_files_typeList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $export = I('export');
+        $where=["class"=>"pub_files"];
+
+        foreach (['name','alias'] as $key) {
+            if($data[$key]){
+                $where[$key]=['LIKE','%'.$data[$key].'%'];
+            }
+        }
+        if(isset($data['status'])){
+            $where['status']=$data['status'];
+        }else{
+            $where['status']=["lt",3];
+        }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
+        $parameter=[
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$pageSize,
+            'orderStr'=>"basicId DESC",
+        ];
+        if($export){
+            $config = ['control'=>CONTROLLER_NAME];
+        }
+        $basicResult=$this->basicCom->getBasicList($parameter);
+        $this->tablePage($basicResult,'Public/publicTable/pubFilesTypeList',"pubFilesTypeList",$pageSize,'',$config);
+    }
+    //控制文件类型
+    function managepubFilesTypeInfo($param=[]){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
+        if($reqType=="pub_files_typeAdd"){
+            $datas['class']="pub_files";
+            $datas['status']=1;
+            unset($datas['basicId']);
+            return $datas;
+        }else if($reqType=="pub_files_typeEdit"){
+            $where=["basicId"=>$datas['basicId']];
+            $data=[];
+            foreach (['name','alias','remark','status'] as $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
+            }
+            return ["where"=>$where,"data"=>$data];
+        }
+        return "";
+    }
+    //添加文件类型
+    function pub_files_typeAdd(){
+        $info=$this->managepubFilesTypeInfo();
+        if($info){
+            $insertResult=$this->basicCom->insertBasic($info);
+            if($insertResult && $insertResult->errCode==0){
+                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+            }
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    } 
+    //编辑文件类型
+    function pub_files_typeEdit(){
+        $info=$this->managepubFilesTypeInfo();
+        $updateResult=$this->basicCom->updateBasic($info);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+    //文件类型导入
+    function pub_files_type_import($excelData){
+        $insertData = [];
+        foreach ($excelData as $index => $excelRow) {
+            if($index>0){
+                $temp = [];
+                foreach ($excelData[0] as $i=>$key) {
+                    $temp[$key] = $excelRow[$i];
+                }
+                $tempData = $this->manageBrandInfo(["data"=>$temp,"reqType"=>"pub_files_typeAdd"]);
+                if(isset($temp["basicId"])){
+                    $tempData["basicId"] = $temp["basicId"];
+                }
+                array_push($insertData,$tempData);
+            }
+        }
+        return $insertData;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-04 08:48:49 
+     * @Desc: 文件类型导出 
+     */    
+    function pub_files_type_export($excelData){
+        $schema=[
+            'basicId' => ['name'=>'文件类型id'],
+            'name' => ['name'=>'文件类型名称'],
+            'alias' => ['name'=>'文件类型别名'],
+            'remark' => ['name'=>'备注'],
+            'sort' => ['name'=>'排序'],
+            'status' => ['name'=>'状态'],
+        ];
+        foreach ($excelData as $index => $val) {
+            foreach ($val as $key => $value) {
+                if($key=="status"){
+                    $excelData[$index][$key] = $this->statusType[$value];
+                }
+            }
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'文件类型数据表'];
+        return $exportData ;
+    } 
+    /** 
+     * @Author: vition 
+     * @Date: 2018-11-09 15:58:29 
+     * @Desc:  文件管理
+     */    
+    function pubFiles(){
+        $reqType=I('reqType');
+
+        $this->assign("controlName","pub_files");
+        // $this->assign("pubFilesType",$this->worderType);
+        $this->assign("tableName",$this->pubFilesCom->tableName());
+        $where=["class"=>"pub_files"];
+        $parameter=[
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>9999999,
+            'orderStr'=>"basicId DESC",
+        ];
+        $basicResult = $this->basicCom->getList($parameter);
+        $filesType = array_combine(array_column($basicResult['list'],"basicId"),array_column($basicResult['list'],"name"));
+        $this->assign("filesType",$filesType);
+        if($reqType){
+            $this->$reqType();
+        }else{         
+            $this->returnHtml();
+        }
+    }
+    //显示文件
+    function pub_files_modalOne(){
+        $title = "新建文件";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        // print_r($this->AUser->getRoles(1));
+        $this->assign("groupData",$this->AUser->getRoles(1));
+	    $this->assign("roleData",$this->AUser->getRoles(2));
+        if($gettype=="Edit"){
+            $title = "编辑文件";
+            $btnTitle = "保存数据";
+            $redisName="pubFilesList";
+            $resultData=$this->pubFilesCom->redis_one($redisName,"id",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "template"=>"pubFilesModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-11-09 15:59:36 
+     * @Desc: 公共文件列表 
+     */    
+    function pub_filesList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $export = I('export');
+        $where=[];
+        $user_id = session("userId");
+        $role_id = session("roleId");
+        $role_pid = session("rolePid");
+        foreach (['file_name'] as $key) {
+            if($data[$key]){
+                $where[$key]=['LIKE','%'.$data[$key].'%'];
+            }
+        }
+        if(isset($data['file_type'])){
+            $where['file_type'] = $data['file_type'];
+        }
+        $where['_string'] = " (uids ='' AND gids ='') OR ( FIND_IN_SET({$role_id},uids) > 0 OR FIND_IN_SET({$role_id},gids) > 0 OR FIND_IN_SET({$role_pid},gids) > 0 ) OR (user_id = {$user_id})";
+ 
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
+        $parameter=[
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$pageSize,
+            'orderStr'=>"id DESC",
+            'joins' => [
+                'LEFT JOIN (SELECT userId,userName user_name FROM v_user) u ON u.userId= user_id',
+                'LEFT JOIN (SELECT basicId,name type_name FROM v_basic) b ON b.basicId= file_type',
+            ],
+        ];
+        if($export){
+            $config = ['control'=>CONTROLLER_NAME];
+        }
+        $basicResult=$this->pubFilesCom->getList($parameter);
+        $this->tablePage($basicResult,'Public/publicTable/pubFilesList',"pubFilesList",$pageSize,'',$config);
+    }
+    function managepubFilesInfo($param=[]){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
+
+        $datas['uids'] = "";
+        $datas['gids'] = "";
+        $datas['user_id'] = session("userId");
+        
+        if($datas['roleType'] == 1){
+            $datas['gids'] = implode(",",$datas['groups']);
+        }if($datas['roleType'] == 2){
+            $datas['uids'] = implode(",",$datas['roles']);
+        }
+        unset($datas['groups']);
+        unset($datas['roles']);
+        if($reqType=="pub_filesAdd"){
+            $datas['add_time'] = time();
+            unset($datas['id']);
+            return $datas;
+        }else if($reqType=="pub_filesEdit"){
+            $where=["id"=>$datas['id']];
+            $data=[];
+            foreach (['user_id','file_name','file_path','file_type','file_size','uids','gids','status'] as $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
+            }
+            return ["where"=>$where,"data"=>$data];
+        }
+        return "";
+    }
+    //文件添加
+    function pub_filesAdd(){
+        $info=$this->managepubFilesInfo();
+        $insertResult=$this->pubFilesCom->insert($info);
+        $this->ajaxReturn(['errCode'=>$insertResult->errCode,'error'=>getError($insertResult->errCode)]);
+    } 
+    //编辑文件
+    function pub_filesEdit(){
+        $info=$this->managepubFilesInfo();
+        $updateResult=$this->pubFilesCom->update($info);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+    //文件导入
+    function pub_files_import($excelData){
+        $insertData = [];
+        foreach ($excelData as $index => $excelRow) {
+            if($index>0){
+                $temp = [];
+                foreach ($excelData[0] as $i=>$key) {
+                    $temp[$key] = $excelRow[$i];
+                }
+                $tempData = $this->pubFilesCom(["data"=>$temp,"reqType"=>"pub_filesAdd"]);
+                if(isset($temp["id"])){
+                    $tempData["id"] = $temp["id"];
+                }
+                $tempData["user_id"] = session("userId");
+                $tempData["add_time"] = time();
+                array_push($insertData,$tempData);
+            }
+        }
+        return $insertData;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-04 08:48:49 
+     * @Desc: 文件导出 
+     */    
+    function pub_files_export($excelData){
+        $schema=[
+            'id' => ['name'=>'文件id'],
+            'file_name' => ['name'=>'文件名称'],
+            'user_id' => ['name'=>'上传者'],
+            'type_name' => ['name'=>'文件类别'],
+            'file_size' => ['name'=>'文件大小'],
+            'add_time' => ['name'=>'上传时间'],
+            'sort' => ['name'=>'排序'],
+            'status' => ['name'=>'状态'],
+        ];
+        foreach ($excelData as $index => $val) {
+            foreach ($val as $key => $value) {
+                if($key=="status"){
+                    $excelData[$index][$key] = $this->statusType[$value];
+                }elseif($key=="file_size"){
+                    $excelData[$index][$key] = fsizeFormat($value);
+                }
+            }
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'文件类型数据表'];
+        return $exportData ;
+    } 
 }

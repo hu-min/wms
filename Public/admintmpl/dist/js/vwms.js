@@ -557,8 +557,8 @@ $(function(){
         }
         var splitArr=paramMatch.split("/");
         
-        var match= window.document.body.innerHTML.match(new RegExp("\/Admin\/"+splitArr[0]+"\/"+splitArr[1]+"[\.a-zA-Z]*","gim"))
-        
+        var match= window.document.body.innerHTML.match(new RegExp("\/Admin\/"+splitArr[0]+"\/"+splitArr[1]+"\.html","gm"))
+        // console.log(match)
         if(match!=null && match[0]){
             $(document).find(".nodeOn").each(function(){
                 if($(this).attr("href")==match[0] && $(this).data("nodeid")>0){
@@ -1144,7 +1144,7 @@ function init_chosen(url,reqType,parental){
         $(this).chosen(option)
         var $thisChosen = $(this)
         $(this).next(".chosen-container").offon("dblclick",function(){
-            console.log('dblclick');
+            // console.log('dblclick');
             $thisChosen.chosen_ajax();
         })
         if($(this).parents(".form-inline").length>0 && $(window).width() > 750){
@@ -1197,6 +1197,7 @@ function upload(option){
     var el = option.el !=undefined ? option.el : ".upload-file"
     urlArr[tabId+el] = url
     // console.log(urlArr);
+    
     $(document).offon("click",tabId+" "+el,function(){
         $fileInput = $(this)
         var onlyread = $(this).attr("onlyread")
@@ -1724,5 +1725,12 @@ var table_tr_active = function($this,type){
     }else{
         tableBox.find("table").eq(otherTable).find("tr").eq($($trs).index($this)).removeClass("tr-active");
     }
-    
+}
+function fsizeFormat(size){
+    if(float(size/1024/1024) < 1){
+        var fileSize = float(size/1024)+"K";
+    }else{
+        var fileSize = float(size/1024/1024)+"M";
+    }
+    return fileSize;
 }

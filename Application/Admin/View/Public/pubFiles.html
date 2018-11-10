@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-body search-body" >
+                        <div class="col-md-12">
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <label class="control-label">文件名称：</label>
+                                    <input class="form-control search-info chosen-fcopy" name="name" placeholder="文件名称" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">文件类别：</label>
+                                    <select class="form-control input-sm search-info chosen-select" title="请选择文件类别" name="file_type" >
+                                        <option value="">所有类别</option>
+                                        <volist name="filesType" id="item">
+                                            <option value="{$key}">{$item}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                </div>
+                                <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 2">
+                                    <div class="form-group">
+                                        <button type="button" data-gettype="Add" data-toggle="modal" data-url="{$url}"  data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info v-showmodal"><i class="fa fa-fw fa-file-text-o"></i> 添加文件</button>
+                                    </div>
+                                </if>
+                                <!-- <div class="form-group">
+                                    {:import_btn(get_defined_vars())}
+                                    {:export_btn(get_defined_vars())} 
+                                </div> -->
+                            </div>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 table-outbox" style="z-index: 1;">
+                <div style="font-size:0.95em;overflow: auto;">
+                    <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;"></div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th class="is-frozen">文件名称</th>
+                                <th >上传者</th>
+                                <th>文件类别</th>
+                                <th>文件大小</th>
+                                <th>上传时间</th>
+                                <!-- <th>状态</th> -->
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="{$controlName}-table">
+                            {$tables}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="dataTables_wrapper">
+            <div class="row">
+                <div class="col-sm-2"><div class="dataTables_length" ><label>显示 <select name="pageSize"  class="form-control input-sm search-info">
+                    <volist name="entries" id="item"><option value="{$item}">{$item}</option></volist>
+                </select> 条</label></div></div>
+                <div  class="{$controlName}-page row page-div col-sm-10" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+                    {$pages}
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="modal fade global-modal" aria-hidden="true" data-backdrop="static" >
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+    <script>
+        /*设置编辑信息*/
+        var pub_files_initInfo = function(){
+            init_chosen("{$url}","getOptionList",".modal-dialog");
+            upload({url:"{:U('Public/upload_filesAdd')}",el:".modal-dialog .upload-file",call:pub_files_upload})
+        }
+        var pub_files_upload = function($this){
+            var name = $($this).attr("name");
+            var thisFile = name.split(".")
+            var thisFile = thisFile[thisFile.length-2].split("/")
+            var fname = $.md5(thisFile[thisFile.length-1].toLowerCase())
+            var fileSize = tempFiles[fname]['size']
+            $(tabId+" .global-modal .modal-info[name='file_size']").val(fileSize);
+            $(tabId+" .global-modal .file-size-desc").text(fsizeFormat(fileSize));
+        }
+        var pub_files_setInfo = function(info){
+            ['id','file_name','file_type','file_path','file_size'].forEach(element => {
+                $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
+                if(element == "file_size"){
+                    $(tabId+" .global-modal .file-size-desc").text(fsizeFormat(info[element]));
+                }
+            });
+            if(info['gids'] != ""){
+                info['gids'].split(",").forEach(ids => {
+                    $(tabId+" .global-modal .modal-info[name='groups']").find("option[value="+ids+"]").prop("selected",true);
+                });
+                $(tabId+" .global-modal .modal-info[name='roleType']").val(1)
+                $(tabId+" .global-modal .modal-info[name='groups']").trigger("chosen:updated");
+                $(tabId+" .global-modal .groups-select").removeClass("none");
+            }else if(info['uids'] != ""){
+                info['uids'].split(",").forEach(ids => {
+                    $(tabId+" .global-modal .modal-info[name='roles']").find("option[value="+ids+"]").prop("selected",true);
+                });
+                $(tabId+" .global-modal .modal-info[name='roleType']").val(2)
+                $(tabId+" .global-modal .modal-info[name='roles']").trigger("chosen:updated");
+                $(tabId+" .global-modal .roles-select").removeClass("none");
+            }
+            set_status_btn($(tabId+" .global-modal .modal-status .status-btn[name='"+info['status']+"']"))
+        }
+        $(function(){
+            init_chosen("{$url}","getOptionList",".search-body");
+            excel_import({url:"{:U('Basic/excel_import')}"})
+            $(tabId+" .search-list").trigger("click");
+            $(tabId+" .global-modal").offon("change",".modal-info[name='roleType']",function(){
+                $(tabId+" .global-modal").find(".groups-roles").addClass("none");
+                if($(this).val()>0){
+                    var $eq = Number($(this).val())-1;
+                    $(tabId+" .global-modal").find(".groups-roles").eq($eq).removeClass("none");
+                }
+            })
+        })
+        
+    </script>
+</body>
+</html>
