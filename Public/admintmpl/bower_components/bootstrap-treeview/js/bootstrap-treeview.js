@@ -95,7 +95,6 @@
 
 			// Options (public access)
 			options: this.options,
-
 			// Initialize / destroy methods
 			init: $.proxy(this.init, this),
 			remove: $.proxy(this.remove, this),
@@ -142,7 +141,9 @@
 
 			// Search methods
 			search: $.proxy(this.search, this),
-			clearSearch: $.proxy(this.clearSearch, this)
+			clearSearch: $.proxy(this.clearSearch, this),
+
+			treeData: $.proxy(this.treeData, this)
 		};
 	};
 
@@ -150,7 +151,7 @@
 
 		this.tree = [];
 		this.nodes = [];
-
+		
 		if (options.data) {
 			if (typeof options.data === 'string') {
 				options.data = $.parseJSON(options.data);
@@ -525,12 +526,17 @@
 				.attr('data-nodeid', node.nodeId)
 				.attr('style', _this.buildStyleOverride(node));
 			// console.log(node)
+			// console.log(node.inputVal)
 			// Add indent/spacer to mimic tree structure
 			for (var i = 0; i < (level - 1); i++) {
 				treeItem.append(_this.template.indent);
 			}
-			if(node.sort!=undefined){
-				treeItem.append('<input type="text" class="node-input" style="width:20px;height:20px;margin:0px 5px;text-align:center;color:#666;" value="'+node.sort+'"/>');
+			if(node.sort!=undefined || _this.options.input){
+				node.sort = node.sort ? node.sort : ''
+				node.sort = node.inputVal ? node.inputVal : node.sort;
+				var data_id =  node.id ? "data-id='"+node.id+"'" : '';
+				var namestr = node.id ? "name='node"+node.id+"'" : '';
+				treeItem.append('<input type="text" '+data_id+' '+namestr+' class="node-input" style="width:22px;height:22px;margin:0px 5px;text-align:center;color:#666;" value="'+node.sort+'"/>');
 			}
 			// Add expand, collapse or empty spacer icons
 			var classList = [];
@@ -665,9 +671,16 @@
 				backColor = this.options.searchResultBackColor;
 			}
 		}
-
-		return 'color:' + color +
-			';background-color:' + backColor + ';';
+		var style = "";
+		if (color){
+			style+='color:' + color+";"
+		}
+		if (backColor){
+			style+='background-color:' + backColor+";"
+		}
+		return style;
+		// return 'color:' + color +
+			// ';background-color:' + backColor + ';'; vition 2018-11-12
 	};
 
 	// Add inline style into head
@@ -1229,6 +1242,10 @@
 			}
 		}
 	};
+	//vition
+	Tree.prototype.treeData = function(obj,attr){
+		return this.nodes
+	}
 
 	var logError = function (message) {
 		if (window.console) {

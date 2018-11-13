@@ -1,0 +1,9 @@
+.auth-val,.node-input{height: 22px!important;width:22px!important;margin:5px 10px!important;text-align: center!important;cursor:pointer!important;}
+.auth-contain ul{margin:0;padding: 0;}
+.auth-contain li{list-style: none;}
+.auth-contain .auth-node-level-2,.auth-contain .auth-node-level-3,.auth-contain .auth-node-level-4{padding-left:40px;}
+.auth-contain .h5title{font-size:1em;}
+.auth-con-btns {position: absolute;top: 0;left: 0;}
+.auth-con-btns tr td{height: 22px;width:22px;text-align: center;border:1px solid #2C3B41;cursor:pointer;color: #fff;background: #605CA8;}
+.auth-con-btns tr td:hover{background: #9795C6;color: #555299;}
+.auth-con-btns .auth-edit{opacity:0.1;}

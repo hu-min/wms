@@ -828,7 +828,7 @@ $(function(){
                 datas.data.db = db
                 datas.data.id = id
                 post(url,datas,function(result){
-                    console.log(result)
+                    // console.log(result)
                     if(result.errCode==0){
                         notice(result.errCode,result.error);
                         url=$(tabId+" .search-list").data("url");
@@ -1647,7 +1647,7 @@ var rest_control = function(info,option,callback){
 
             $(tabId+" .modal-info[name='"+key+"']").after('<span class="badge bg-red" style="white-space:pre-wrap;text-align: left;">'+info['reset_user']+' '+info['reset_date']+' 提交修改为：'+text+'</span>')   
         }
-        console.log(reset_datas)
+        // console.log(reset_datas)
     }
 }
 /** 

@@ -8,17 +8,7 @@
     <eq name="load" value="true">
         <include file="Index/Heads" /> 
     </eq>
-    <style>
-        .auth-val{height: 22px;width:22px;margin:5px 10px;text-align: center;cursor:pointer;}
-        .auth-contain ul{margin:0;padding: 0;}
-        .auth-contain li{list-style: none;}
-        .auth-contain .auth-node-level-2,.auth-contain .auth-node-level-3,.auth-contain .auth-node-level-4{padding-left:40px;}
-        .auth-contain .h5title{font-size:1em;}
-        .auth-con-btns {position: absolute;top: 0;left: 0;}
-        .auth-con-btns tr td{height: 22px;width:22px;text-align: center;border:1px solid #2C3B41;cursor:pointer;color: #fff;background: #605CA8;}
-        .auth-con-btns tr td:hover{background: #9795C6;color: #555299;}
-        .auth-con-btns .auth-edit{opacity:0.1;}
-    </style>
+    <link rel="stylesheet" href="__ADMINT__/dist/css/nodeAuth.css">
 </head>
 <body>
     <div class="auth-contain">
@@ -27,13 +17,13 @@
                 <h3 class="box-title">角色权限管理</h3>
             </div>
             <div class="box-body">
-                <div class="box-group" id="rnaccordion">
+                <div class="box-group rnaccordion">
                     <volist name="nodeTree" id="item1">
                         <div class="panel box box-primary">
                             <div class="box-header with-border">
                                 <span><input class="auth-val" name="node{$item1['id']}" data-id="{$item1['id']}" type="text" value="0"/></span>
                                 <h5 class="box-title h5title">
-                                    <a data-toggle="collapse" data-parent="#rnaccordion" href="#collapse{$item1['id']}">
+                                    <a data-toggle="collapse" data-parent=".rnaccordion" href="#collapse{$item1['id']}">
                                         {$item1['text']}
                                     </a>
                                 </h5>
@@ -92,73 +82,17 @@
             <td class="setauth-btn" title="增删改查导出导入" data-val="6" >入</td>
         </tr>
     </table>
+    <script src="__ADMINT__/dist/js/nodeAuth.js?={:time()}"></script>
     <script>
         var authNodeId=0;
         $(function(){
             var authArr=eval('(' + '{$auth}' + ')');
             setNodeAuth(authArr);
-            //权限编辑
-            $("#rnaccordion .auth-val").on("click",function(){
-                if($(".auth-con-btns").hasClass("none")){
-                    $(".auth-con-btns").removeClass("none")
-                    $(".auth-con-btns").mouseleave(function(){
-                        $(".auth-con-btns").addClass("none")
-                    })
-                }
-                authNodeId=$(this).data("id")
-                var offset = $(this).offset();
-                $(".auth-con-btns").offset({ top: offset.top-22, left: offset.left-22 });
-            })
-            //切换焦点
-            $(".auth-edit").on("click",function(){
-                $("#rnaccordion .auth-val[name='node"+authNodeId+"']").focus();
-            })
-            //点击按钮逻辑
-            $(".auth-con-btns .setauth-btn").on("click",function(){
-                var element= $("#rnaccordion .auth-val[name='node"+authNodeId+"']");
-                element.val($(this).data("val"));
-                setLevelAuth(element);
-            })
-            //权限输入框逻辑
-            $("#rnaccordion .auth-val").on("input",function(){
-                if($(this).val()!=""){
-                    setLevelAuth($(this));
-                }
-            })
         })
-        //设置联级的权限
-        function setLevelAuth(element){
-            //判断值范围在0-7
-            if(element.val()>7){
-                element.val(7)
-            }else if(element.val()<0){
-                element.val(0)
-            }
-            if(element.parents("ul").length>0){
-                // if(element.parents("ul").eq(0).find("ul").length>0){
-                //     element.parents("ul").eq(0).find("ul").find("input").val(element.val())
-                // }
-                level2=element.parents("li").next("li").children("ul");
-                if(level2.length>0){
-                    level2.find("input").val(element.val())
-                }
-                var level2=element.parents("ul").eq(0).parent().prev().find("input")
-                if(level2.val()==0 && element.val()>0){
-                    level2.val(1)
-                }     
-                var nodeId=element.parents(".panel-collapse").attr("id").replace("collapse","");
-                var level1=$("#rnaccordion .auth-val[name='node"+nodeId+"']");
-                if(level1.val()==0 && element.val()>0){
-                    level1.val(1)
-                }
-            }else{
-                $("#collapse"+element.data("id")+" input").val(element.val())
-            }
-        }
         //设置节点权限
         function setNodeAuth(authArr){
             authArr.forEach(element => {
-                $("#rnaccordion .auth-val[name='node"+element.nodeId+"']").val(element.authority);
+                $(".rnaccordion .auth-val[name='node"+element.nodeId+"']").val(element.authority);
             });
         }
     </script>

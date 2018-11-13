@@ -1011,4 +1011,72 @@ class UserController extends BaseController{
         $updateResult=$whiteCom->update($updateInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
+    //根据节点id获取所有对应的角色权限
+    function nodeAuthRoleList(){
+        $node_id = I('nodeId',0);
+        // $parameter=[
+        //     'where'=>['nodeId'=>$node_id],
+        //     'page'=>0,
+        //     'pageSize'=>999999999,
+        //     'orderStr'=>'rnId ASC',
+        // ];
+        // $rNodeResult=$this->rNodeCom->getList($parameter);
+        // $authList=[];
+        // if($rNodeResult){
+        //     $authList=$rNodeResult['list'];
+        // }
+        
+        // $this->ajaxReturn(['errCode'=>0,'error'=>0,'data'=>$authList]);
+        $where=[];
+        $parameter=[
+            'where'=>$where,
+            'fields' => 'roleId,roleName,rolePid,status,CASE WHEN ISNULL(authority) THEN 0	ELSE authority END authority',
+            'page'=>0,
+            'pageSize'=>9999999,
+            'orderStr'=>'rolePid ASC',
+            'joins' => [
+                'LEFT JOIN (SELECT roleId role_id,authority FROM v_role_node WHERE nodeId ='.$node_id.') rn ON rn.role_id=roleId'
+            ],
+        ];
+        $roleTree=[];
+        $roleResult=$this->roleCom->getRoleList($parameter);
+        // echo $this->roleCom->M()->_sql();exit;
+        $level1=[];
+        foreach ($roleResult["list"] as $key => $value) {
+            $backColor=$value["status"]!=1?"#FF8C00":null;
+            $color=$value["status"]!=1?"#FFFF00":null;
+            if($value["rolePid"]==0){
+                array_push($level1,$value["roleId"]);
+                array_push($roleTree,["text"=>$value["roleName"],"icon"=>"fa fa-users",'nodes'=>[],"id"=>$value["roleId"],"status"=>$value["status"],"backColor"=>$backColor,"color"=>$color,"remark"=>$value["remark"],'inputVal'=>$value["authority"]]);
+            }else{
+                array_push($roleTree[array_search($value["rolePid"],$level1)]['nodes'],["text"=>$value["roleName"],"icon"=> "fa fa-user","id"=>$value["roleId"],"status"=>$value["status"],"backColor"=>$backColor,"color"=>$color,"remark"=>$value["remark"],'inputVal'=>$value["authority"]]);
+            }
+        }
+        $this->ajaxReturn(["tree"=>$roleTree]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-11-13 17:35:40 
+     * @Desc: 批量修改指定节点对应的所有角色 
+     */    
+    function nodeAuthRoleEdit(){
+        $node_id = I("nodeId");
+        $authData = I("authData");
+        $this->rNodeCom->startTrans();
+        foreach ($authData as $role_id => $auth) {
+            $where = ['nodeId'=>$node_id,'roleId'=>$role_id];
+            $param = [
+                'where' => $where,
+            ];
+            $result = $this->rNodeCom->getOne($param);
+            if($result){
+                $this->rNodeCom->update($where, ['authority'=>$auth]);
+            }else{
+                $where['authority'] = $auth;
+                $this->rNodeCom->insert($where);
+            }
+        }
+        $this->rNodeCom->commit();
+        $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+    }
 }   

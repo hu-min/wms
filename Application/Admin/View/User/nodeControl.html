@@ -14,35 +14,66 @@
         #modal-icon .modal-content {position: absolute;top: 0;bottom: 0;width: 100%;} 
         #modal-icon .modal-body {overflow-y: scroll;position: absolute;top: 55px;bottom: 65px;width: 100%;} 
     </style>
+    <link rel="stylesheet" href="__ADMINT__/dist/css/nodeAuth.css">
 </head>
 <body>
     <section class="content">
         <div class="row">
-            <div class="box box-success">
-                <div class="box-header">
-                    <i class="fa fa-plus-square"></i>
-                    <h4 class="box-title">节点列表</h4>
-                    <button type="button" class="btn btn-info margin" data-toggle="modal" data-title="新建节点" data-target="#modal-nodeInfo">新建节点</button>
-                </div>
-                <div class='box-body'>
-                    <div class="row">
-                        <div class="col-sm-2">
-                            <div class="form-group">
-                                <input class="form-control input-expand-node" placeholder="搜索节点" value="" type="input">
+            <div class="col-sm-4">
+                <div class="box box-success">
+                    <div class="box-header">
+                        <i class="fa fa-plus-square"></i>
+                        <h4 class="box-title">节点列表</h4>
+                        <button type="button" class="btn btn-info margin" data-toggle="modal" data-title="新建节点" data-target="#modal-nodeInfo">新建节点</button>
+                    </div>
+                    <div class='box-body'>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <input class="form-control input-expand-node" placeholder="搜索节点" value="" type="input">
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <span class="tree-plus handle" data-id="#nodetree"><i class="fa fa-fw fa-plus-square"></i>收起</span>
+                                <span class="tree-minus handle" data-id="#nodetree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
                             </div>
                         </div>
-                        <div class="col-sm-2">
-                            <span class="tree-plus handle" data-id="#nodetree"><i class="fa fa-fw fa-plus-square"></i>收起</span>
-                            <span class="tree-minus handle" data-id="#nodetree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div id="nodetree"></div>
+                            </div>
+                        </div>
+                        <!-- <div class="box-footer">
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="box box-info role-info-edit"  data-url="{$url}" data-reqtype="roleList" data-con="role">
+                    <div class="box-header">
+                        <i class="fa fa-cog"></i>
+        
+                        <h4 class="box-title">节点对应角色权限</h4>
+            
+                        <div class="box-tools pull-right" data-toggle="tooltip" title="" data-original-title="Status">
+                            <span class="tree-plus handle" data-id="#node2roletree"><i class="fa fa-fw fa-plus-square"></i>收起</span>
+                            <span class="tree-minus handle" data-id="#node2roletree"><i class="fa fa-fw fa-minus-square"></i>敞开</span>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <div id="nodetree"></div>
+                    <form class="form-horizontal" >
+                        <div class="box-body">
+                            <div class="rnaccordion" id="node2roletree" data-nodeid="0"></div>
                         </div>
+                        <!-- /.box-body -->
+                        <div class="box-footer">
+                            <button type="button" class="btn btn-info pull-right save-nodeauth" data-con="role" data-gettype="Edit" data-url="{$url}" data-modal="false">修改</button>
+                        </div>
+                        <!-- /.box-footer -->
+                    </form>
+                    <div>
                     </div>
-                    <!-- <div class="box-footer">
-                    </div> -->
+                        <div class="box-footer">
+                    </div>
                 </div>
             </div>
         </div>
@@ -120,6 +151,24 @@
             </div>
         </div>
     </div>
+    <table class="auth-con-btns none">
+        <tr>
+            <td class="setauth-btn" title="只读" data-val="1" >读</td>
+            <td class="setauth-btn" title="读、增" data-val="2" >增</td>
+            <td class="setauth-btn" title="读、增、改" data-val="3" >改</td>
+        </tr>
+        <tr>
+            <td class="setauth-btn" title="无权限" data-val="0" >空</td>
+            <th class="auth-edit"></th>
+            <td class="setauth-btn" title="最大权限" data-val="7" >全</td>
+        </tr>
+        <tr>
+            <td class="setauth-btn" title="增删改查" data-val="4" >删</td>
+            <td class="setauth-btn" title="增删改查导出" data-val="5" >出</td>
+            <td class="setauth-btn" title="增删改查导出导入" data-val="6" >入</td>
+        </tr>
+    </table>
+    <script src="__ADMINT__/dist/js/nodeAuth.js?={:time()}"></script>
     <script>
         //获取节点数据
         function getNodeTree() {
@@ -132,9 +181,31 @@
             intPnodeSelect(tree);
             return tree;
         }
+        //获取角色树数据
+        var  getRoleTreeData = function(node_id) {
+            var tree=[]
+            datas["reqType"]="nodeAuthRoleList";
+            if(node_id>0){
+                datas["nodeId"] = node_id
+            }
+            get("{$url}",datas,function(result){
+                tree=result.tree
+            },false)
+            return tree;
+        }
+        //生成默认角色树
+        var initRoleTree = function(){
+            $(tabId+' #node2roletree').treeview({showButton: false,highlightSelected:false,input:true,data: getRoleTreeData(),levels:1,color: "#428bca",});
+            //权限编辑按钮事件
+        }
          //生成节点树和节点树选中的事件
          function createNodeTree(){
-            $(tabId+' #nodetree').treeview({showButton: true,highlightSelected:false,data: getNodeTree(),levels:1,color: "#428bca",});
+            $(tabId+' #nodetree').treeview({showButton: true,highlightSelected:false,data: getNodeTree(),levels:1,color: "#428bca",
+                onNodeSelected:function(event, node){
+                    $(tabId+' #node2roletree').data("nodeid",node.id)
+                    var gg = $(tabId+' #node2roletree').treeview({showButton: false,highlightSelected:false,input:true,data: getRoleTreeData(node.id),levels:1,color: "#428bca",});
+                }
+            });
             //节点编辑
             $(tabId+' #nodetree').offon("click",'li button',function(){
                 $(tabId+" #modal-nodeInfo h4").text("节点编辑");
@@ -183,6 +254,7 @@
         }
         $(function(){
             createNodeTree()
+            initRoleTree()
             //搜索节点
             $(tabId+' .input-expand-node').on("input",function(){
                 $(tabId+' #nodetree').treeview('collapseAll', { silent: true });
@@ -222,6 +294,38 @@
                 $(tabId+" #modal-nodeInfo .modal-info[name='nodeIcon']").prev().children("i").attr("class",icon+" text-red")
                 $(tabId+" #modal-icon").modal('hide')
             })
+            $(tabId).on("click",".save-nodeauth",function(){
+                datas["reqType"] = "nodeAuthRoleEdit";
+                datas["nodeId"] =  $(tabId+' #node2roletree').data("nodeid");
+                var treeData = $(tabId+' #node2roletree').treeview('treeData')
+                var auth_data = {}
+                treeData.forEach(function(ele,key) {
+                    auth_data[ele['id']] = ele['inputVal']
+                    if(ele['inputVal']>0){
+
+                    }
+                    if(ele['nodes']){
+                        ele['nodes'].forEach(function(subele,subkey) {
+                            auth_data[subele['id']] = subele['inputVal']
+                        })
+                    }
+                })
+                datas["authData"] = auth_data;
+                // console.log(datas)
+                post("{$url}",datas,function(result){
+                    if(result.errCode === 0){
+                        notice(result.errCode,result.error);
+                    }
+                });
+            })
+            // $(tabId).on("change",".rnaccordion .node-input",function(){
+            //     var nodeAuth = {}
+            //     $(tabId).find(".rnaccordion .node-input").each(function(){
+            //         var key = $(this).data("id")
+            //         var val = $(this).val()
+            //         nodeAuth[key] = val
+            //     })                
+            // })
         })
         //初始化父节点的select数据
         function intPnodeSelect(data){
