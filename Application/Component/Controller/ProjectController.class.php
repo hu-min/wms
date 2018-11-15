@@ -123,4 +123,20 @@ class ProjectController extends BaseController{
             $this->ajaxReturn(['errCode'=>77,'error'=>$html]);
         }
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-11-14 19:11:54 
+     * @Desc: 根据projectId 获取对应的数据 
+     */    
+    function getProject($project_id,$fields="*"){
+        $param = [
+            'where'=>["projectId"=>$project_id],
+            'fields' => $fields,
+        ];
+        $result = $this->getOne($param);
+        if($result){
+            return $result['list'];
+        }
+        return false;
+    }
 }

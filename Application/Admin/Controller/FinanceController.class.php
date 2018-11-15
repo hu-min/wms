@@ -9,6 +9,7 @@ namespace Admin\Controller;
 class FinanceController extends BaseController{
 
     public function _initialize() {
+        $this->Aproject=A("Project");
         parent::_initialize();
         $this->basicCom=getComponent('Basic');
         $this->fixExpenCom=getComponent('FixldExpense');
@@ -17,6 +18,9 @@ class FinanceController extends BaseController{
         $this->purchaCom=getComponent('Purcha');
         $this->payCom=getComponent('Pay');
         $this->clearCom=getComponent('Liquidate');
+        $this->moneyAccCom=getComponent('MoneyAccount');
+        $this->flCapLogCom=getComponent('flCapLog');
+        $this->projectCom=getComponent('Project');
         $this->payGradeType = ["1"=>"A级[高]","2"=>"B级[次]","3"=>"C级[中]","4"=>"D级[低]"];
         $this->invoiceType = ["0"=>"无","1"=>"收据","2"=>"增值税普通","3"=>"增值税专用"];
         $this->payType = ['1'=>'公对公','2'=>'现金付款','3'=>'支票付款'];
@@ -1351,5 +1355,271 @@ class FinanceController extends BaseController{
             $this->Redis->set(md5(json_encode($data)),$data,3000);
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0),'url'=>U(CONTROLLER_NAME."/".ACTION_NAME)."?reqType=invoiceEdit&request=".$request]);
         }
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-11-14 09:38:08 
+     * @Desc: 流动资金 
+     */    
+    function float_capital(){
+        $reqType=I('reqType'); 
+        $this->assign("controlName","float_capital");
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    //公司账号显示
+    function float_capital_modalOne(){
+        $title = "新建公司账户";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑公司账户";
+            $btnTitle = "保存数据";
+            $redisName = "fix_expenseList";
+            $resultData = $this->moneyAccCom->redis_one($redisName,"id",$id);
+        }
+
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "template"=>"moneyAccountModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    //获取流动资金
+    function getMoneyAccList(){
+        $tables = [];
+        $param = [
+            'where' => [],
+        ];
+        $result = $this->moneyAccCom->getList($param);
+        $flCapLogNodeId = $this->nodeCom->getNodeInfo("controller","Finance/float_capital_log","nodeId");
+        $this->assign("flCapLogNodeId",$flCapLogNodeId);
+
+        $this->assign('list',$result['list']);
+        foreach (['bank','cash','strongbox'] as $key ) {
+            $this->assign('stockType',$key);
+            $tables[$key.'Table'] = $this->fetch('Finance/financeTable/money_accountList');
+        }
+        $tables['allBank'] = round(array_sum(array_column($result['list'],'bank_stock')),2);
+        $tables['allCash'] = round((array_sum(array_column($result['list'],'cash_stock'))+array_sum(array_column($result['list'],'strongbox'))),2);
+
+        $inOut = ["day-income"=>0,"day-expend"=>0,"month-income"=>0,"month-expend"=>0];
+        $where['happen_time'] = [['egt',strtotime(date("Y-m-d")." 00:00:00")],['lt',strtotime(date("Y-m-d")." 23:59:59")]];
+        $param = [
+            'where' => $where,
+            'fields' => " float_type ,SUM(money) money",
+            'groupBy' => 'float_type',
+        ];
+        $dayResult = $this->flCapLogCom->getList($param);
+        if($dayResult){
+            foreach ($dayResult['list'] as $value) {
+                if($value['float_type'] == 1){
+                    $inOut['day-income'] =  $value['money'];
+                }else if($value['float_type'] == 2){
+                    $inOut['day-expend'] =  $value['money'];
+                }
+            }
+        }
+        $param['where']['happen_time'] = [['egt',strtotime(date("Y-m-")."01 00:00:00")],['lt',strtotime(date("Y-m-d")." 23:59:59")]];
+        $monthResult = $this->flCapLogCom->getList($param);
+        if($monthResult){
+            foreach ($monthResult['list'] as $value) {
+                if($value['float_type'] == 1){
+                    $inOut['month-income'] =  $value['money'];
+                }else if($value['float_type'] == 2){
+                    $inOut['month-expend'] =  $value['money'];
+                }
+            }
+        }
+        $this->ajaxReturn(['tables'=>$tables,'inOut'=>$inOut]);
+    }
+    function manageMoneyAccInfo($param){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
+        if($reqType=="float_capitalAdd"){
+
+            $datas['status']=1;
+            $datas['add_time'] = time();
+            $datas['user_id'] = session("userId");
+            unset($datas['id']);
+            return $datas;
+        }else if($reqType=="float_capitalEdit"){
+            $where=["id"=>$datas['id']];
+            $data=[];
+            foreach (['account','bs_title','cs_title','sb_title'] as $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
+            }
+            return ["where"=>$where,"data"=>$data];
+        }
+        return "";
+    }
+    //公司账户添加
+    function float_capitalAdd(){
+        $Info = $this->manageMoneyAccInfo();
+        $hasData = $this->moneyAccCom->getOne(['where'=>['account'=>$Info['account']]]);
+        if($hasData){
+            $this->ajaxReturn(['errCode'=>117,'error'=>getError(117).":[".$Info['account']."]"]);
+        }
+        if($Info){
+            $insertResult=$this->moneyAccCom->insert($Info);
+            $this->ajaxReturn(['errCode'=>$insertResult->errCode,'error'=>getError($insertResult->errCode)]);
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    }
+    function float_capitalEdit(){}
+    /** 
+     * @Author: vition 
+     * @Date: 2018-11-14 17:19:14 
+     * @Desc: 流动资金明细 
+     */    
+    function float_capital_log(){
+        $reqType=I('reqType'); 
+        $this->assign("controlName","flo_cap_log");
+        $accountResult = $this->moneyAccCom->getList(['fields'=>'id,account','pageSize'=>999999])['list'];
+        $this->assign('accountArr',$accountResult);
+        $this->assign('capTypeArr',["1"=>"银行库存","2"=>"现金库存","3"=>"保险箱","4"=>"现金库存（含保险箱）"]);
+        $this->assign('floatTypeArr',["1"=>"收入","2"=>"支出"]);
+        $this->assign('projectArr',$this->Aproject->_getOption("project_id"));
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    function flo_cap_log_modalOne(){
+        $title = "新增资产明细";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑资产明细";
+            $btnTitle = "保存数据";
+            $redisName = "floCapLogList";
+            $resultData = $this->flCapLogCom->redis_one($redisName,"id",$id);
+        }
+
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "template"=>"floCapLogModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    function flo_cap_logList(){
+        $datas = I("data");
+        $p=I("p")?I("p"):1;
+        $where=[];
+        
+        foreach (['project_id','account_id','log_type','float_type'] as $key ) {
+            if(isset($datas[$key])){
+                if( $key == "log_type" && $datas[$key] == 4){
+                    $where[$key] = ['IN',[2,3]];
+                }else{
+                    $where[$key] = $datas[$key];
+                }
+            }
+        }
+        if(isset($datas['happen_time'])){
+           $date = explode(" - ",$datas['happen_time']);
+           if(count($date)>1){
+                $where['happen_time'] = [['egt',strtotime($date[0]." 00:00:00")],['lt',strtotime($date[1]." 23:59:59")]];
+           }
+        }
+        $parameter=[
+            'fields'=>"*,FROM_UNIXTIME(happen_time,'%Y-%m-%d %H:%i:%s') happen_time,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time",
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$this->pageSize,
+            'orderStr'=>"happen_time DESC",
+            "joins"=>[
+                "LEFT JOIN (SELECT projectId,code project_code,name project_name FROM v_project ) p ON p.projectId = project_id",
+                "LEFT JOIN (SELECT userId,userName user_name FROM v_user) u ON u.userId = user_id",
+            ],
+        ];
+        
+        $listResult=$this->flCapLogCom->getList($parameter);
+        // print_r($listResult);
+        // echo $this->flCapLogCom->M()->_sql();
+        $this->tablePage($listResult,'Finance/financeTable/floCapLogList',"floCapLogList",$pageSize);
+    }
+    function getPcodeOne(){
+        extract($_REQUEST);
+        
+        $result = $this->projectCom->getProject($project_id,"code");
+        if($result){
+            $this->ajaxReturn(['errCode'=>0,'error'=>getError(0),'data' => $result]);
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    }
+    function manageFlCapLogInfo($param){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
+        if(isset($datas['happen_time'])){
+            $datas['happen_time']=strtotime($datas['happen_time']);
+        }
+        if($reqType=="flo_cap_logAdd"){
+            $datas['status']=1;
+            $datas['add_time'] = time();
+            $datas['user_id'] = session("userId");
+            unset($datas['id']);
+            return $datas;
+        }else if($reqType=="flo_cap_logEdit"){
+            $where=["id"=>$datas['id']];
+            $data=[];
+            foreach (['account_id','log_type','project_id','happen_time','subject','inner_detail','bank_detail','object','float_type','remark','status'] as $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
+            }
+            return ["where"=>$where,"data"=>$data];
+        }
+        return "";
+    }
+    function flo_cap_logAdd(){
+        $Info = $this->manageFlCapLogInfo();
+        $this->flCapLogCom->startTrans();
+        if($Info){
+            $insertResult = $this->flCapLogCom->insert($Info);
+            if($insertResult){
+                if($Info['log_type']==1){
+                    $key = 'bank_stock';
+                }elseif($Info['log_type']==2){
+                    $key = 'cash_stock';
+                }elseif($Info['log_type']==3){
+                    $key = 'strongbox';
+                }
+                if($Info['float_type'] == 1){
+                    $updateResult = $this->moneyAccCom->M()->where(['id'=>$Info['account_id']])->setInc($key,$Info['money']); 
+                }elseif($Info['float_type'] == 2){
+                    $updateResult =$this->moneyAccCom->M()->where(['id'=>$Info['account_id']])->setDec($key,$Info['money']); 
+                }
+                if($updateResult){
+                    $this->flCapLogCom->commit();
+                    $this->ajaxReturn(['errCode'=>$insertResult->errCode,'error'=>getError($insertResult->errCode)]);
+                }
+            }
+            
+        }
+        $this->flCapLogCom->rollback();
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    }
+    function flo_cap_logEdit(){
+        $Info = $this->manageFlCapLogInfo();
+        // print_r($Info );
+        $updateResult=$this->flCapLogCom->update($Info);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
 }

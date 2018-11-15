@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-header">
+                        {:add_btn(get_defined_vars(),"新增资产明细")}
+                    </div>
+                    <div class="box-body search-body">
+                        <div class="col-md-12">
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <label class="control-label"> 选择公司账户：</label>
+                                    <select class="form-control search-info" name="account_id" >
+                                        <option value="">全部</option>
+                                        <volist name="accountArr" id="item">
+                                            <option value="{$item.id}">{$item.account}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label"> 选择库存类型：</label>
+                                    <select class="form-control search-info" name="log_type" >
+                                        <option value="">全部</option>
+                                        <volist name="capTypeArr" id="item">
+                                            <option value="{$key}">{$item}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label"> 选择收入/支出：</label>
+                                    <select class="form-control search-info" name="float_type" >
+                                        <option value="">全部</option>
+                                        <option value="1">收入</option>
+                                        <option value="2">支出</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <label >选择项目或非项目：</label>
+                                    <select class="form-control search-info chosen-select" title="选择项目或非项目" data-value="projectId"  data-text="name" name="project_id">
+                                        <option value="">全部</option> 
+                                        <option value="0">非项目</option> 
+                                        <volist name="projectArr" id="item">
+                                            <option value="{$item['projectId']}">{$item['name']}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label"> 发生时间范围：</label>
+                                    <input class="form-control search-info date-input chosen-fcopy" name="happen_time" data-range="true" placeholder="发生时间范围" style="width:200px;" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 table-outbox" style="z-index: 1;">
+                <div style="font-size:0.95em;overflow: auto;">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th class="is-frozen">项目名称</th>
+                                <th>发生日期</th>
+                                <th>记录时间</th>
+                                <th>项目编号</th>
+                                <th>库存类型</th>
+                                <th>内部明细</th>
+                                <th>银行明细</th>
+                                <th>来往单位</th>
+                                <th>收入/支出</th>
+                                <th>变动金额</th>
+                                <th>操作员工</th>
+                                <th>备注</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="{$controlName}-table">
+                            {$tables}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="dataTables_wrapper">
+            <div class="row">
+                <div class="col-sm-2"><div class="dataTables_length" ><label>显示 <select name="pageSize"  class="form-control input-sm search-info">
+                    <volist name="entries" id="item"><option value="{$item}">{$item}</option></volist>
+                </select> 条</label></div></div>
+                <div  class="{$controlName}-page row page-div col-sm-10" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+                    {$pages}
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="modal fade global-modal" aria-hidden="true" data-backdrop="static" >
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+    <script>
+        var float_filter_initInfo = function(_this){
+            var accountid = $(_this).data('accountid');
+            var logtype = $(_this).data('logtype');
+            $(tabId+" .search-body").find(".search-info[name='account_id']").val(accountid);
+            $(tabId+" .search-body").find(".search-info[name='log_type']").val(logtype);
+        }
+        var flo_cap_log_initInfo = function(){
+            init_chosen("{$url}","getOptionList",".global-modal");
+            init_date({theme: '#3C8DBC'},$(tabId+" .global-modal"));
+        }
+        var flo_cap_log_setInfo = function(info){
+            var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
+            if(info["project_id"] > 0){
+                var projectChosen= $(tabId+" .global-modal .modal-info[name='project_id']")
+                var project_id = info["project_id"]
+                if(projectChosen.find("option[value='"+info["project_id"]+"']").length==0){
+                    projectChosen.append("<option value='"+info["project_id"]+"'>"+info["project_name"]+"</option>")
+                }
+                projectChosen.find("option[value='"+project_id+"']").prop("selected",true);
+                projectChosen.trigger("chosen:updated");
+            }
+            ['id',"account_id",'log_type','float_type','project_code','happen_time','object','money','inner_detail','bank_detail','remark'].forEach(element => {
+                if(info[element]!=null){
+                    $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
+                }
+                if(in_array(element,['account_id','log_type','float_type','money']) && info['bank_detail'] == ""){
+                    $(tabId+" .global-modal .modal-info[name='"+element+"']").prop("disabled",true);
+                }
+            });
+            if(info['bank_detail'] != ""){
+                $(tabId+" .global-modal .modal-info").prop("disabled",true);
+                $(tabId+" .global-modal .modal-footer").find(".save-info").remove();
+            }
+            if(info['log_type'] == 1){
+                $(tabId+" .global-modal").find(".bank-form").removeClass("none");
+            }
+        }
+        $(function(){
+            // console.log("here")
+            init_date({theme: '#3C8DBC'});
+            init_chosen("{$url}","getOptionList",".search-body");
+            $(tabId+" .search-list").trigger("click");
+            $(tabId+" .global-modal").on("change",".modal-info[name='project_id']",function(){
+                datas = {}
+                datas["reqType"] = "getPcodeOne"
+                datas["project_id"] = $(this).val()
+                
+                get("{$url}",datas,function(result){
+                    var code = "";
+                    if(result.errCode == 0){
+                       code = result.data.code;
+                    }
+                    $(tabId+" .global-modal").find(".modal-info[name='project_code']").val(code);
+                })
+            })
+            $(tabId+" .global-modal").on("change",".modal-info[name='log_type']",function(){
+                var logType = $(this).val()
+                if(logType == 1){
+                    $(tabId+" .global-modal").find(".bank-form").removeClass("none");
+                }else{
+                    if(!$(tabId+" .global-modal").find(".bank-form").hasClass("none")){
+                        $(tabId+" .global-modal").find(".bank-form").addClass("none");
+                    }
+                }
+            })
+        })
+    </script>
+</body>
+</html>

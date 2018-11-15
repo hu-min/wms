@@ -29,12 +29,16 @@ var setLevelAuth = function (element){
         var nodeId = element.data("id");
         treeData.forEach(function(ele,key) {
             // console.log(key)
-            // console.log(ele)
+            
             if(ele['id'] == nodeId){
                 treeData[key].inputVal = element.val()
-                ele['nodes'].forEach(function(subele,subkey){
-                    treeData[key]['nodes'][subkey].inputVal = element.val()
-                })
+                
+                if(typeof ele['nodes'] !== "undefined"){
+                    ele['nodes'].forEach(function(subele,subkey){
+                        treeData[key]['nodes'][subkey].inputVal = element.val()
+                    })
+                }
+                
             }
         });
 

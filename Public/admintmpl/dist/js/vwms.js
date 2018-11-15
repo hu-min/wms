@@ -1074,8 +1074,12 @@ function init_date(){
         var thisId = tabId.replace("#","")+"-"+name+indexNum
         $(this).attr("id",thisId);
         var type = $(this).data("type")
+        var range = $(this).data("range")
         if(type){
             option["type"] = type
+        }
+        if(range){
+            option["range"] = true
         }
         option["elem"] = option["elem"] ? option["elem"] : "#"+thisId
         if(thisId){

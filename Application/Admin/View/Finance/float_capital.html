@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-header">
+                        <!-- <i class="fa fa-plus-square"></i> -->
+                        <!-- <h4 class="box-title">资金流动</h4> -->
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        {:add_btn(get_defined_vars(),"添加公司账户",7)}
+                        
+                    </div>
+                    <div class="box-body ">
+                 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <table class="table table-bordered table-hover inout-table">
+                    <tbody>
+                        <tr>
+                            <td>本日收入：</td>
+                            <td><span class="day-income">0</span></td>
+                            <td>本月收入：</td>
+                            <td><span class="month-income">0</span></td>
+                        </tr>
+                        <tr>
+                            <td>本日支出：</td>
+                            <td><span class="day-expend">0</span></td>
+                            <td>本月支出：</td>
+                            <td><span class="month-expend">0</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-12">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <th colspan="3">银行账户资金库存：<span class="all-bank"></span></th>
+                    </thead>
+                    <tbody class="bank-table">
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-12">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <th colspan="3">现金账户资金库存：<span class="all-cash"></span></th>
+                    </thead>
+                    <tbody class="cash-table">
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-12 table-outbox" style="z-index: 1;">
+                <div style="font-size:0.95em;overflow: auto;">
+                   
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="modal fade global-modal" aria-hidden="true" data-backdrop="static" >
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+    <script>
+        var float_capital_searchInfo = function(){
+            datas={}
+            datas["reqType"]='getMoneyAccList';
+            get("{$url}",datas,function(result){
+                $(tabId+" table .bank-table").html(result.tables.bankTable);
+                $(tabId+" table .cash-table").html(result.tables.cashTable+result.tables.strongboxTable);
+                $(tabId+" table .all-bank").text(result.tables.allBank);
+                $(tabId+" table .all-cash").text(result.tables.allCash);
+                for (var key in result.inOut) {
+                    $(tabId+" table ."+key).text(result.inOut[key])
+                }
+            })
+        }
+        $(function(){
+            var flCapFilterInfo = {}
+            float_capital_searchInfo()
+            $(tabId+" .global-modal").on("click","input[name='has_sbox']",function(){
+                if($(this).is(":checked")){
+                    $(tabId+" .global-modal").find(".modal-info[name='sb_title']").removeClass("none")
+                }else{
+                    $(tabId+" .global-modal").find(".modal-info[name='sb_title']").addClass("none")
+                }
+            })
+            $(tabId+" .global-modal").on("input","input[name='account']",function(){
+                var account = $(this).val()
+                if(account!=""){
+                    $(tabId+" .global-modal").find(".modal-info[name='bs_title']").val(account+"-银行余额")
+                    $(tabId+" .global-modal").find(".modal-info[name='cs_title']").val(account+"-现金余额")
+                    $(tabId+" .global-modal").find(".modal-info[name='sb_title']").val(account+"-保险箱")
+                }
+            })
+        })
+    </script>
+</body>
+</html>

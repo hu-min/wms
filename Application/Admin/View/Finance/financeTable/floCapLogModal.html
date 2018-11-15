@@ -1,0 +1,111 @@
+<div class="modal-header">
+    <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{$title}</h4>
+</div>
+<div class="modal-body">
+    <form role="form">
+        <div class="box-body">
+            <div class="col-sm-12">
+                <input class="modal-info" value="0" name="id" type="hidden">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label"> 选择公司账户：</label>
+                            <select class="form-control modal-info" required="required" title="请选择项公司账户" name="account_id" >
+                                <option value="">全部</option>
+                                <volist name="accountArr" id="item">
+                                    <option value="{$item.id}">{$item.account}</option>
+                                </volist>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label"> 选择库存类型：</label>
+                            <select class="form-control modal-info" required="required" title="请选择项库存类型" name="log_type" >
+                                <option value="">全部</option>
+                                <volist name="capTypeArr" id="item">
+                                    <if condition="$key lt 4">
+                                        <option value="{$key}">{$item}</option>
+                                    </if>
+                                </volist>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label"> 选择收入/支出：</label>
+                            <select class="form-control modal-info" required="required" title="请选择收入/支出" name="float_type" >
+                                <option value="1">收入</option>
+                                <option value="2">支出</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label >选择项目或非项目：</label>
+                            <select class="form-control modal-info chosen-select" title="选择项目或非项目" data-value="projectId"  data-text="name" name="project_id">
+                                <option value="0">非项目</option>
+                                <volist name="projectArr" id="item">
+                                    <option value="{$item['projectId']}">{$item['name']}</option>
+                                </volist>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group"> 
+                            <label class="control-label">项目编码：</label>
+                            <input class="form-control modal-info" readonly="readonly" name="project_code" title="项目编码" placeholder="项目编码" type="text">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label"> 发生时间：</label>
+                            <input class="form-control modal-info date-input" data-type="datetime" name="happen_time" placeholder="发生时间" type="text">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group"> 
+                            <label class="control-label">来往对象：</label>
+                            <input class="form-control modal-info" required="required" name="object" title="请输入来往对象" placeholder="请输入来往对象" type="text">
+                        </div> 
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group"> 
+                            <label class="control-label">发生金额：</label>
+                            <input class="form-control modal-info" required="required" name="money" title="请输入发生金额" placeholder="请输入发生金额" type="text">
+                        </div> 
+                    </div>
+                    <div class="col-md-4"></div>
+                </div>
+                <div class="form-group"> 
+                    <label class="control-label">内部明细：</label>
+                    <textarea class="form-control  modal-info" rows="2" title="内部明细"  name="inner_detail"></textarea>
+                </div> 
+                <div class="form-group bank-form none"> 
+                    <label class="control-label">银行明细：</label>
+                    <textarea class="form-control  modal-info" rows="2" title="银行明细"  name="bank_detail"></textarea>
+                </div> 
+                <div class="form-group"> 
+                    <label class="control-label">备注：</label>
+                    <textarea class="form-control  modal-info" rows="2" title="备注"  name="remark"></textarea>
+                </div> 
+                <div class="row">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4"></div>
+                </div> 
+            </div>
+        </div>
+    </form>            
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+    {:save_btn(get_defined_vars())}
+</div>

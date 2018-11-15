@@ -1070,7 +1070,7 @@ class UserController extends BaseController{
             ];
             $result = $this->rNodeCom->getOne($param);
             if($result){
-                $this->rNodeCom->update($where, ['authority'=>$auth]);
+                $this->rNodeCom->update(["where"=>$where, "data"=>['authority'=>$auth]]);
             }else{
                 $where['authority'] = $auth;
                 $this->rNodeCom->insert($where);

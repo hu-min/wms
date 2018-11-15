@@ -128,7 +128,7 @@ class UserController extends BaseController{
             return $res;
         }
         $menus=[];
-        $mNodeResult=$this->nodeDB->query("SELECT * FROM v_node n INNER JOIN (SELECT nodeId,authority FROM v_role_node WHERE roleId IN (SELECT roleId FROM v_user WHERE userId={$userId} AND authority>0)) nr ON nr.nodeId=n.nodeId WHERE n.showType=1 AND status=1 ORDER BY n.nodePid ASC, n.`level` ASC, n.`sort` ASC");
+        $mNodeResult=$this->nodeDB->query("SELECT * FROM v_node n INNER JOIN (SELECT nodeId,authority FROM v_role_node WHERE roleId IN (SELECT roleId FROM v_user WHERE userId={$userId} AND authority>0)) nr ON nr.nodeId=n.nodeId WHERE  status=1 ORDER BY n.nodePid ASC, n.`level` ASC, n.`sort` ASC");
         $newAllNodes = array();
         $mNodes=[];
         Vendor("levelTree.levelTree");

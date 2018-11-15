@@ -306,13 +306,13 @@ function save_btn($defind_vars,$always=false,$hide=false){
  * @Date: 2018-06-10 08:59:16 
  * @Desc: 新增的按钮权限 
  */
-function add_btn($defind_vars,$title="新增"){
+function add_btn($defind_vars,$title="新增",$auth = 2,$icon = "fa fa-plus-square"){
     $processAuth = $defind_vars["processAuth"];
     $nodeAuth = $defind_vars["nodeAuth"];
     $url = $defind_vars["url"];
     $controlName = $defind_vars["controlName"];
-    if(($processAuth['level'] > 0 && $nodeAuth >= 2) || $nodeAuth >= 7){
-        echo "<button type='button' data-gettype='Add' data-toggle='modal'  data-url='{$url}' data-vtarget='.global-modal' data-con='{$controlName}' class='btn btn-info info-edit v-showmodal'><i class='fa fa-fw fa-user-plus '></i> {$title} </button>";
+    if(($processAuth['level'] > 0 && $nodeAuth >= $auth ) || $nodeAuth >= 7){
+        echo "<button type='button' data-gettype='Add' data-toggle='modal'  data-url='{$url}' data-vtarget='.global-modal' data-con='{$controlName}' class='btn btn-info info-edit v-showmodal'><i class='{$icon} '></i> {$title} </button>";
     }
 }
 /** 

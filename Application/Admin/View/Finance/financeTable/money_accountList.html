@@ -1,0 +1,35 @@
+<volist name="list" id="item">
+    <if condition=" $stockType eq 'strongbox' and $item.has_sbox eq 0 ">
+    <else/>
+        <tr>
+            <td>
+                <if condition=" $stockType eq 'bank' ">
+                    {$item.bs_title}
+                <elseif condition=" $stockType eq 'cash' "/>
+                    {$item.cs_title}
+                <elseif condition=" $stockType eq 'strongbox'"/>
+                    {$item.sb_title}
+                </if>
+            </td>
+            <td>
+                <if condition=" $stockType eq 'bank' ">
+                    {$item.bank_stock}
+                <elseif condition=" $stockType eq 'cash' "/>
+                    {$item.cash_stock}
+                <elseif condition=" $stockType eq 'strongbox'"/>
+                    {$item.strongbox}
+                </if>
+            </td>
+            <td>
+                <if condition=" $stockType eq 'bank' ">
+                    <button type="button" class="btn btn-info btn-xs nodeOn" data-accountid="{$item.id}" data-logtype="1" data-nodeid="{$flCapLogNodeId}" data-call="float_filter_initInfo" href="{:U('Finance/float_capital_log')}"><i class="fa fa-list-alt"></i> <span> 查看明细 </span> </button>
+                <elseif condition=" $stockType eq 'cash' "/>
+                    <button type="button" class="btn btn-info btn-xs nodeOn" data-accountid="{$item.id}" data-logtype="2" data-nodeid="{$flCapLogNodeId}" data-call="float_filter_initInfo" href="{:U('Finance/float_capital_log')}"><i class="fa fa-list-alt"></i> <span> 查看明细 </span> </button>
+                <elseif condition=" $stockType eq 'strongbox'"/>
+                    <button type="button" class="btn btn-info btn-xs nodeOn" data-accountid="{$item.id}" data-logtype="3" data-nodeid="{$flCapLogNodeId}" data-call="float_filter_initInfo" href="{:U('Finance/float_capital_log')}"><i class="fa fa-list-alt"></i> <span> 查看明细 </span> </button>
+                </if>
+                
+            </td>
+        </tr>
+    </if>
+</volist>

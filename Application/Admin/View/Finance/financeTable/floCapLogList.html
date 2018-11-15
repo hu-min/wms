@@ -1,0 +1,17 @@
+<volist name="list" id="item">
+    <tr>
+        <td>{$item.project_name|default='非项目'}</td>
+        <td>{$item.happen_time}</td>
+        <td>{$item.add_time}</td>
+        <td>{$item.project_code|default='非项目'}</td>
+        <td>{$capTypeArr[$item['log_type']]}</td> 
+        <td>{$item.inner_detail}</td>
+        <td>{$item.bank_detail}</td>
+        <td>{$item.object}</td>
+        <td>{$floatTypeArr[$item['float_type']]}</td>
+        <td>{$item.money}</td>
+        <td>{$item.user_name|default='自动'}</td>
+        <td>{$item.remark}</td>
+        {:list_btn(get_defined_vars(),"id",[],false,false,false)}
+    </tr>
+</volist>

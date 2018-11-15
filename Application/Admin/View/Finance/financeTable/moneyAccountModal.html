@@ -1,0 +1,36 @@
+<div class="modal-header">
+    <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{$title}</h4>
+</div>
+<div class="modal-body">
+    <form role="form">
+        <div class="box-body">
+            <div class="col-sm-12">
+                <input class="modal-info" value="0" name="id" type="hidden">
+                <div class="form-group"> 
+                    <label class="control-label">公司名称：</label>
+                    <input class="form-control modal-info" required="required" name="account" title="请输入公司名称" placeholder="请输入公司名称" type="text">
+                </div>
+                <div class="form-group"> 
+                    <label class="control-label">银行账户名称：</label>
+                    <input class="form-control modal-info" required="required" name="bs_title" title="请输入银行账户名称" placeholder="请输入银行账户名称" type="text">
+                </div>
+                <div class="form-group"> 
+                    <label class="control-label">现金账户名称：</label>
+                    <input class="form-control modal-info" required="required" name="cs_title" title="请输入现金账户名称" placeholder="请输入现金账户名称" type="text">
+                </div> 
+                <div class="form-group"> 
+                    <label class="control-label">开通保险箱：<input class="modal-info" type="checkbox" name="has_sbox"/></label>
+                    <input class="form-control modal-info none" name="sb_title" title="请输入保险箱名称" placeholder="请输入保险箱名称" type="text">
+                </div>  
+                <p class="text-red">注意：账户添加后不可更改！</p>
+            </div>
+        </div>
+    </form>            
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+    {:save_btn(get_defined_vars())}
+</div>
