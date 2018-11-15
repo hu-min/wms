@@ -621,9 +621,10 @@ class BaseController extends \Common\Controller\BaseController{
         if(!file_exists($url)){
             mkdir($url, 0755,true);
         }
-        $viewName = $uploadFile['name'];
-        $name = $viewName;
+        
+        $name = $uploadFile['name'];
         $type =  explode('.',$name)[count(explode('.',$name))-1];
+        $viewName = md5($uploadFile['name'].microtime()).".".$type;
        
         if(PHP_OS=="WINNT"){
             $name = iconv("UTF-8","gb2312",$viewName);
@@ -645,7 +646,7 @@ class BaseController extends \Common\Controller\BaseController{
         if(isset($_FILES['upload'])){
             if($copyState){
                 $url = '/Uploads/'.CONTROLLER_NAME.'/'.date('Ymd',time())."/".$viewName;
-                $this->ajaxReturn(['uploaded'=>1,'fileName'=>$viewName,'url'=>$url]);
+                $this->ajaxReturn(['uploaded'=>1,'fileName'=>$uploadFile['name'],'url'=>$url]);
                 // echo "<script>window.parent.CKEDITOR.tools.callFunction($cb, '$url', '');</script>";
             }else{
                 $this->ajaxReturn(['uploaded'=>0,'error'=>['message'=>'文件上传错误！']]);
@@ -655,7 +656,7 @@ class BaseController extends \Common\Controller\BaseController{
             
         }else{
             if($copyState){
-                $this->ajaxReturn(['errCode'=>0,'fileName'=>$viewName,"url"=>$url,"url2"=>'Uploads/'.CONTROLLER_NAME.'/'.date('Ymd',time())."/".$viewName]);
+                $this->ajaxReturn(['errCode'=>0,'fileName'=>$uploadFile['name'],"url"=>$url,"url2"=>'Uploads/'.CONTROLLER_NAME.'/'.date('Ymd',time())."/".$viewName]);
             }else{
                 $this->ajaxReturn(['errCode'=>100,'error'=>'文件上传错误！']);
             }

@@ -86,9 +86,11 @@
                                 <th>内部明细</th>
                                 <th>银行明细</th>
                                 <th>来往单位</th>
-                                <th>收入/支出</th>
-                                <th>变动金额</th>
+                                <th>收入</th>
+                                <th>支出</th>
+                                <th>余额</th>
                                 <th>操作员工</th>
+                                <th>原始凭证</th>
                                 <th>备注</th>
                                 <th>操作</th>
                             </tr>
@@ -126,6 +128,7 @@
         var flo_cap_log_initInfo = function(){
             init_chosen("{$url}","getOptionList",".global-modal");
             init_date({theme: '#3C8DBC'},$(tabId+" .global-modal"));
+            upload({url:"{:U('Finance/upload_filesAdd')}"})
         }
         var flo_cap_log_setInfo = function(info){
             var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
@@ -138,7 +141,7 @@
                 projectChosen.find("option[value='"+project_id+"']").prop("selected",true);
                 projectChosen.trigger("chosen:updated");
             }
-            ['id',"account_id",'log_type','float_type','project_code','happen_time','object','money','inner_detail','bank_detail','remark'].forEach(element => {
+            ['id',"account_id",'log_type','float_type','project_code','happen_time','object','money','inner_detail','bank_detail','remark','proof'].forEach(element => {
                 if(info[element]!=null){
                     $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
                 }
@@ -146,7 +149,7 @@
                     $(tabId+" .global-modal .modal-info[name='"+element+"']").prop("disabled",true);
                 }
             });
-            if(info['bank_detail'] != ""){
+            if(info['bank_detail'] != "" || info['log_type'] != 1){
                 $(tabId+" .global-modal .modal-info").prop("disabled",true);
                 $(tabId+" .global-modal .modal-footer").find(".save-info").remove();
             }

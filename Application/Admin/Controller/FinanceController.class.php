@@ -1579,7 +1579,7 @@ class FinanceController extends BaseController{
         }else if($reqType=="flo_cap_logEdit"){
             $where=["id"=>$datas['id']];
             $data=[];
-            foreach (['account_id','log_type','project_id','happen_time','subject','inner_detail','bank_detail','object','float_type','remark','status'] as $key) {
+            foreach (['account_id','log_type','project_id','happen_time','subject','inner_detail','bank_detail','object','float_type','remark','status','proof'] as $key) {
                 if(isset($datas[$key])){
                     $data[$key]=$datas[$key];
                 }
@@ -1592,15 +1592,25 @@ class FinanceController extends BaseController{
         $Info = $this->manageFlCapLogInfo();
         $this->flCapLogCom->startTrans();
         if($Info){
+            if($Info['log_type']==1){
+                $key = 'bank_stock';
+            }elseif($Info['log_type']==2){
+                $key = 'cash_stock';
+            }elseif($Info['log_type']==3){
+                $key = 'strongbox';
+            }
+
+            $stockResult = $this->moneyAccCom->getOne(['where'=>['id'=>$Info['account_id']],'fields'=>$key]);
+            if($Info['float_type'] == 1){
+                $Info['balance'] = $stockResult['list'][$key] + $Info['money'];
+            }elseif($Info['float_type'] == 2){
+                $Info['balance'] = $stockResult['list'][$key] - $Info['money'];
+                if($Info['balance'] < 0){
+                    $this->ajaxReturn(['errCode'=>100,'error'=>'账户金额不足。仅剩下：'.$stockResult['list'][$key]]);
+                }
+            }
             $insertResult = $this->flCapLogCom->insert($Info);
             if($insertResult){
-                if($Info['log_type']==1){
-                    $key = 'bank_stock';
-                }elseif($Info['log_type']==2){
-                    $key = 'cash_stock';
-                }elseif($Info['log_type']==3){
-                    $key = 'strongbox';
-                }
                 if($Info['float_type'] == 1){
                     $updateResult = $this->moneyAccCom->M()->where(['id'=>$Info['account_id']])->setInc($key,$Info['money']); 
                 }elseif($Info['float_type'] == 2){
