@@ -622,10 +622,10 @@ class BaseController extends \Common\Controller\BaseController{
             mkdir($url, 0755,true);
         }
         
-        $name = $uploadFile['name'];
-        $type =  explode('.',$name)[count(explode('.',$name))-1];
+        
+        $type =  explode('.',$uploadFile['name'])[count(explode('.',$uploadFile['name']))-1];
         $viewName = md5($uploadFile['name'].microtime()).".".$type;
-       
+        $name = $viewName;
         if(PHP_OS=="WINNT"){
             $name = iconv("UTF-8","gb2312",$viewName);
         }
