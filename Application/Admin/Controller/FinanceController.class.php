@@ -350,6 +350,25 @@ class FinanceController extends BaseController{
                 }
             }
         }
+        $resultData['paid'] = 0; //初始化已支付金额
+
+        $param = [
+            'where' =>['project_id' => $resultData['project_id'] , 'log_type' =>1],
+            'fields'=>"*,FROM_UNIXTIME(happen_time,'%Y-%m-%d %H:%i:%s') happen_time",
+        ];
+
+        $receivaFloatRes = $this->flCapLogCom->getList($param);
+        $this->assign('list',$receivaFloatRes['list']);
+        $this->assign('tables',$this->fetch('Finance/financeTable/receivaFloatLi'));
+
+        // echo $this->flCapLogCom->M()->_sql();
+        
+        if($receivaFloatRes){
+            // print_r($receivaFloatRes);
+            $resultData['paid'] = array_sum(array_column($receivaFloatRes['list'],'money'));
+        }
+        $resultData['surplus'] = $resultData['amount'] - $resultData['paid'];
+        $this->fetch('Purcha/purchaTable/suprfinapayLi');
         $modalPara=[
             "data"=>$resultData,
             "title"=>$title,
@@ -420,7 +439,7 @@ class FinanceController extends BaseController{
             'orderStr'=>"add_time DESC",
             "joins"=>[
                 "LEFT JOIN (SELECT projectId,session_all,code,name,project_time,brand,customer_com,leader,business,type,amount FROM v_project ) p ON p.projectId = project_id ",
-                // "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = p.brand",
+                "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = p.brand",
                 "LEFT JOIN (SELECT companyId company_id,company customer_com_name FROM v_customer_company ) c ON c.company_id = p.customer_com",
                 "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = p.business",
                 "LEFT JOIN (SELECT basicId type_id,name type_name FROM v_basic WHERE class = 'projectType' ) t ON t.type_id = p.type",

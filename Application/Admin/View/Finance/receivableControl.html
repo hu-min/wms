@@ -129,10 +129,10 @@
         }
         function receivable_setInfo(info){
             
-            ["brand_name","project_time","code","name","customer_com_name","business_name","type_name","session_all","amount"].forEach(element => {
+            ["brand_name","project_time","code","name","customer_com_name","business_name","type_name","session_all","amount",'paid','surplus'].forEach(element => {
                 
                 if(!in_array(info[element],["0000-00-00",'1970-01-01'])){
-                    $(tabId+" .project-info[name='"+element+"']").val(info[element]);
+                    $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
                 }
             });
             ["project_id","id","contract_date","pay_amount","pay_date","advance","advance_date","surplus","surplus_date","surplus_date","next_date",'remark','invoice'].forEach(element => {

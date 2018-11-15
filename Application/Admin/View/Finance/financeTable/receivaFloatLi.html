@@ -1,0 +1,14 @@
+<volist name="list" id="item">
+    <tr>
+        <td>{$item.happen_time}</td>
+        <td>{$item.inner_detail}</td>
+        <td>{$item.bank_detail}</td>
+        <td>{$item.money}</td>
+        <td>{$item.balance}</td>
+        <td>
+            <if condition=" $item.proof neq '' ">
+                <input type="hidden" class="upload-file" value="<?php echo $item['proof']?>"> <span class="show-media-btn show-media"><i class="fa fa-eye"></i></span>
+            </if>
+        </td>
+    </tr>
+</volist>

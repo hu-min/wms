@@ -85,6 +85,41 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
+                        <label for="info-title">已收款：</label>
+                        <input class="form-control project-info" readonly="readonly" name="paid" title="已收款" required="required" value="0" placeholder="已收款" type="text">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="info-title">未收款：</label>
+                        <input class="form-control project-info" readonly="readonly" name="surplus" title="未收款" required="required" value="0" placeholder="未收款" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 table-outbox" style="z-index: 1;">
+                    <div style="font-size:0.95em;overflow: auto;max-height: 200px;">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>发生日期</th>
+                                    <th>内部明细</th>
+                                    <th>银行明细</th>
+                                    <th>收入</th>
+                                    <th>余额</th>
+                                    <th>原始凭证</th>
+                                </tr>
+                            </thead>
+                            <tbody class="modal-{$controlName}-table">
+                                {$tables}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
                         <label for="info-title">合同实际支付日期：</label>
                         <div class="input-group date">
                             <div class="input-group-addon">
@@ -172,17 +207,17 @@
                         <input class="form-control modal-info" name="invoice" title="已开发票" required="required" value="" placeholder="已开发票" type="text">
                     </div>
                 </div>
-            </div>
-            <div class="form-group">
+            </div> -->
+            <!-- <div class="form-group">
                 <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
                     <input class="modal-info" value="0" name="status" type="hidden">
                     {:modal_btn(get_defined_vars())}
                 </div>
-            </div>
+            </div> -->
         </div>
     </form>            
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-    {:save_btn(get_defined_vars())}
+    <!-- {:save_btn(get_defined_vars())} -->
 </div>
