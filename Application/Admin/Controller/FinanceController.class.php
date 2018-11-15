@@ -1487,7 +1487,7 @@ class FinanceController extends BaseController{
         $this->assign("controlName","flo_cap_log");
         $accountResult = $this->moneyAccCom->getList(['fields'=>'id,account','pageSize'=>999999])['list'];
         $this->assign('accountArr',$accountResult);
-        $this->assign('capTypeArr',["1"=>"银行库存","2"=>"现金库存","3"=>"保险箱","4"=>"现金库存（含保险箱）"]);
+        $this->assign('capTypeArr',["1"=>"银行存款","2"=>"库存现金","3"=>"保险箱","4"=>"库存现金（含保险箱）"]);
         $this->assign('floatTypeArr',["1"=>"收入","2"=>"支出"]);
         $this->assign('projectArr',$this->Aproject->_getOption("project_id"));
         if($reqType){
@@ -1497,14 +1497,14 @@ class FinanceController extends BaseController{
         }
     }
     function flo_cap_log_modalOne(){
-        $title = "新增资产明细";
+        $title = "新增资金明细";
         $btnTitle = "添加数据";
         $gettype = I("gettype");
         $resultData=[];
         $id = I("id");
         
         if($gettype=="Edit"){
-            $title = "编辑资产明细";
+            $title = "编辑资金明细";
             $btnTitle = "保存数据";
             $redisName = "floCapLogList";
             $resultData = $this->flCapLogCom->redis_one($redisName,"id",$id);
