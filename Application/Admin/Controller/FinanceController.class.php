@@ -361,7 +361,7 @@ class FinanceController extends BaseController{
         $this->assign('list',$receivaFloatRes['list']);
         $this->assign('tables',$this->fetch('Finance/financeTable/receivaFloatLi'));
 
-        echo $this->flCapLogCom->M()->_sql();exit;
+        // echo $this->flCapLogCom->M()->_sql();exit;
         
         if($receivaFloatRes){
             // print_r($receivaFloatRes);
