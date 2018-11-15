@@ -353,7 +353,7 @@ class FinanceController extends BaseController{
         $resultData['paid'] = 0; //初始化已支付金额
 
         $param = [
-            'where' =>['project_id' => $resultData['project_id'] , 'log_type' =>1],
+            'where' =>['project_id' => $resultData['project_id'] , 'float_type' =>1],
             'fields'=>"*,FROM_UNIXTIME(happen_time,'%Y-%m-%d %H:%i:%s') happen_time",
         ];
 
@@ -361,7 +361,7 @@ class FinanceController extends BaseController{
         $this->assign('list',$receivaFloatRes['list']);
         $this->assign('tables',$this->fetch('Finance/financeTable/receivaFloatLi'));
 
-        // echo $this->flCapLogCom->M()->_sql();
+        echo $this->flCapLogCom->M()->_sql();exit;
         
         if($receivaFloatRes){
             // print_r($receivaFloatRes);
