@@ -269,7 +269,7 @@ $(document).on("click",".v-showmodal",function(){
             }
             if(fun_is_exits(con+"_initInfo")){
                 // console.log(gettype)
-                eval(con+"_initInfo(gettype)");//
+                eval(con+"_initInfo(gettype,result.data)");//
             }
         }
     },false)
@@ -1102,7 +1102,9 @@ function init_chosen(url,reqType,parental){
         var $this = $(tabId+parental);
     }
     $this.find(".chosen-select").each(function(){
-        var type = $(this).attr('name')
+        var type = $(this).data('type')
+        type = type != undefined ? type : $(this).attr('name');
+        // var type = $(this).attr('name')
         var value = $(this).data('value')
         var text = $(this).data('text')
         var req =$(this).data('req');

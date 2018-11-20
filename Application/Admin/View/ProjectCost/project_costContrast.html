@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+    <style>
+        .cost_chosen , .cost_chosen_del,.cost_item_del,.class-rowspan{
+            cursor: pointer;
+        }
+        .cost_chosen:hover,.class-rowspan:hover{
+            color:#38677F;
+        }
+        .cost_chosen_del:hover,.cost_item_del:hover{
+            color:#FF0000;
+        }
+        .tax-rate{
+            width: 60px;
+            height: 26px;
+            padding: 6px 12px;
+            font-size: 14px;
+            line-height: 1.42857143;
+            color: #555;
+            background-color: #fff;
+            background-image: none;
+            border: 1px solid #ccc;
+        }
+    </style>
+    <!-- <link rel="stylesheet" href="__ADMINT__/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css"> -->
+    <!-- daterange picker -->
+    <!-- <link rel="stylesheet" href="__ADMINT__/bower_components/bootstrap-daterangepicker/daterangepicker.css"> -->
+    <!-- <link rel="stylesheet" href="__ADMINT__/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css"> -->
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-header">
+                        <i class="fa fa-plus-square"></i>
+                        <h4 class="box-title">成本列表</h4>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <!-- {:add_btn(get_defined_vars(),"新增成本")} -->
+                    </div>
+                    <div class="box-body search-body">
+                        <div class="col-md-12">
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                </div>
+                                <br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 table-outbox" style="z-index: 1;">
+                <div style="font-size:0.95em;overflow: auto;">
+                    <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;">
+                    </div>
+                    <table id="" class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th class="is-frozen">项目名称</th>
+                                <th class="hidden-xs hidden-sm is-frozen">项目编号</th>
+                                <th>报价批次</th>
+                                <th>报价者</th>
+                                <th>报价时间</th>
+                                <th>报价</th>
+                                <th>成本</th>
+                                <th>增值税率</th>
+                                <th>含税报价</th>
+                                <th>利润</th>
+                                <th>利润率</th>
+                                <th>审批记录</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="{$controlName}-table">
+                            {$tables}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="dataTables_wrapper">
+            <div class="row">
+                <div class="col-md-2 col-sm-3 col-xs-12"><div class="dataTables_length" ><label>显示 <select name="pageSize"  class="form-control input-sm search-info">
+                    <volist name="entries" id="item"><option value="{$item}">{$item}</option></volist>
+                </select> 条</label></div></div>
+                <div  class="{$controlName}-page row page-div col-md-10 col-sm-9 col-xs-12" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+                    {$pages}
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="modal fade global-modal" aria-hidden="true" data-backdrop="static" >
+        <div class="modal-dialog modal-lg modal-full">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+    <!-- date-range-picker -->
+    <script>
+        // var poPanel = "";
+        // var poItem = "";
+        // var pcost_control_initInfo = function(gettype,result) {
+        //     //从后端获取poPanel 模板
+        //     // poPanel = result.panel;
+        //     // poItem = result.item;
+        //     init_chosen("{$url}","getOptionList",".global-modal");
+        // }
+        //设置数据
+        var pcost_control_setInfo = function(info){
+            poPanel = info.panel;
+            poItem = info.item;
+            ['project_id','tax_rate'].forEach(element => {
+                $(tabId+" .global-modal").find(" .modal-info[name='"+element+"']").val(info[element])
+            });
+            $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val(info['id'])
+            $(tabId+" .global-modal").find(".all-count").text(info['total']);
+            $(tabId+" .global-modal").find(".cost-all-count").text(info['cost_total']);
+            $(tabId+" .global-modal").find(".taxed-count").text(float((1+float(info['tax_rate']/100))*info['total']));
+            var cost_class = 0;
+            var item_count = {};
+            var item_cost_count = {};
+            info['list'].forEach(subElement => {
+                
+                if(cost_class != subElement['cost_class']){
+                    var poPanelObj = $(poPanel)
+                    var idstr = poPanelObj.find(".cost-class-title").attr("href")
+                    poPanelObj.find(".cost-class-title").attr("href",idstr+subElement['class_sort'])
+                    poPanelObj.find(".cost-class-title").text(subElement['cost_class_name'])
+                    poPanelObj.find(".cost_class_div").addClass('none')
+                    poPanelObj.find(".add-costItem").removeClass('none')
+                    poPanelObj.find(".modal-info[name='class_sort']").val(subElement['class_sort'])
+                    poPanelObj.find(".modal-info[name='cost_class']").val(subElement['cost_class'])
+                    poPanelObj.find(idstr).attr("id",poPanelObj.find(idstr).attr("id")+subElement['class_sort'])
+    
+                    $(tabId+" .global-modal .box-group ").append(poPanelObj);
+                    cost_class = subElement['cost_class']
+                }
+                var poItemOjc = $(poItem);
+                // console.log(poItemOjc.find(".cost_item_del"))
+                // poItemOjc.find(".cost_item_del").remove()
+                ['id','class_notes','classify','sort','item_content','num','unit','act_num','act_unit','price','total','cost_total','profit','profit_ratio'].forEach(modalName => { 
+                    if(modalName == 'sort'){
+                        poItemOjc.find(".modal-info[name='"+modalName+"']").text(subElement[modalName])
+                    }else{
+                        poItemOjc.find(".modal-info[name='"+modalName+"']").val(subElement[modalName])
+                    }
+                });
+                poItemOjc.find(".modal-info[name='cost_price']").val(subElement['cost_price'])
+                if(item_count[subElement['class_sort']] !=undefined){
+                    item_count[subElement['class_sort']] += float(subElement['total'])
+                    item_cost_count[subElement['class_sort']] += float(subElement['cost_total'])
+                }else{
+                    item_count[subElement['class_sort']] = float(subElement['total'])
+                    item_cost_count[subElement['class_sort']] = float(subElement['cost_total'])
+                }
+                
+                if(subElement['class_sub']>1){
+                    poItemOjc.find('td').eq(1).prop('rowspan',subElement['class_sub'])
+                }else if(subElement['class_sub'] == 0){
+                    poItemOjc.find('td').eq(1).remove();
+                }
+                poItemOjc.find('.cost_item_del').remove();
+                
+                $(tabId+" .global-modal .box-group ").find(".panel").eq(subElement['class_sort']).find(".table-items").append(poItemOjc);
+                // $this.find(".table-items").append(poItemOjc);
+            });
+            // console.log(item_count)
+            for (var key in item_count) {
+                $(tabId+" .global-modal .box-group ").find(".panel").eq(key).find('.class-count').text(item_count[key]);
+                $(tabId+" .global-modal .box-group ").find(".panel").eq(key).find('.cost-class-count').text(item_cost_count[key]);
+            }
+            $(tabId+" .global-modal").find('.modal-info').prop("disabled",true)
+            $(tabId+" .global-modal").find(".add-costClass").remove()
+            $(tabId+" .global-modal").find(".box-title .cost_chosen_del").remove()
+            $(tabId+" .global-modal").find(".box-title .add-costItem,tbody .class-rowspan").remove()
+            $(tabId+" .global-modal").find("table .cost_item_del").remove()
+            $(tabId+" .global-modal").find(".box-title .cost_chosen").remove()
+
+        }
+        // //计算总价
+        // var cost_compute_count = function(){
+        //     $allCount = 0
+        //     $(tabId+" .global-modal").find(".class-count").each(function(){
+        //         var count = $(this).text()
+        //         if(count){
+        //             $allCount += float(count);
+        //         }
+        //     })
+        //     // console.log($allCount)
+        //     $(tabId+" .global-modal").find(".all-count").text($allCount);
+
+        //     var taxRate = $(tabId+" .global-modal").find(".tax-rate").val(); 
+        //     // console.log(taxRate)
+        //     $(tabId+" .global-modal").find(".taxed-count").text(float((1+float(taxRate/100))*$allCount));
+
+        //     $costAllCount = 0
+        //     $(tabId+" .global-modal").find(".cost-class-count").each(function(){
+        //         var count = $(this).text()
+        //         if(count){
+        //             $costAllCount += float(count);
+        //         }
+        //     })
+        //     // console.log($allCount)
+        //     $(tabId+" .global-modal").find(".cost-all-count").text($costAllCount);
+
+        //     // var taxRate = $(tabId+" .global-modal").find(".tax-rate").val(); 
+        //     // console.log(taxRate)
+        //     // $(tabId+" .global-modal").find(".taxed-count").text(float((1+float(taxRate/100))*$allCount));
+        // }
+        // //获取数据
+        // var pcost_control_getInfo = function(){
+        //     datas["data"] = {};
+        //     // datas["data"]['project_id'] = $(tabId+" .global-modal").find(".modal-info[name='project_id']").val()
+        //     // datas["data"]['tax_rate'] = $(tabId+" .global-modal").find(".modal-info[name='tax_rate']").val();
+        //     datas["data"]['total'] = $(tabId+" .global-modal").find(".all-count").text();
+        //     datas["data"]['cost_total'] = $(tabId+" .global-modal").find(".cost-all-count").text();
+        //     datas["data"]['id'] = $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val();
+        //     datas["data"]['list'] = []
+
+        //     $(tabId+" .global-modal").find(".panel").each(function(){
+                
+        //         var class_sort = $(this).find(".modal-info[name='class_sort']").val();
+        //         var cost_class = $(this).find(".modal-info[name='cost_class']").val();                
+        //         $(this).find("tbody tr").each(function(){
+        //             var temp = {class_sort:class_sort,cost_class:cost_class,class_sub:0};
+        //             $(this).find(".modal-info").each(function(){
+        //                 var name =$(this).attr("name");
+        //                 var required=$(this).attr("required");
+        //                 var title=$(this).attr("title");
+        //                 if($(this).attr("type")=='checkbox'){
+        //                     if($(this).is(":checked")){
+        //                         val = 1;
+        //                     }else{
+        //                         val = 0;
+        //                     }
+        //                 }else if(name == 'sort'){
+        //                     var val =$(this).text();
+        //                 }else{
+        //                     var val =$(this).val();
+        //                 }
+                        
+        //                 if(name=="class_notes"){
+        //                     var rowspan = $(this).parents("td").prop("rowspan");
+        //                     if(rowspan>1){
+        //                         temp['class_sub'] = rowspan;
+        //                     }else{
+        //                         temp['class_sub'] = 1;
+        //                     }
+        //                 }
+        //                 if(required && (val=="" || val == "0")){
+        //                     notice(110,title,"输入异常");
+        //                     throw title
+        //                 }else{
+        //                     if(name == "id" || (temp['id'] == 0 && name != "id") || (temp['id'] > 0 && in_array(name,['cost_price','cost_total','total']))){
+        //                         temp[name] = val;
+        //                     }
+        //                 }
+        //             })
+        //             datas["data"]['list'].push(temp)
+        //         })
+                
+        //     })
+        //     // console.log(datas)
+        // }
+        $(function(){
+            $(tabId+" .search-list").trigger("click");
+        //     //添加主分类按钮事件
+        //     $(tabId+" .global-modal").on("click",".add-costClass",function(){
+        //         var num = $(tabId+" .global-modal .box-group ").find(".panel").length;
+
+        //         var poPanelObj = $(poPanel)
+        //         var idstr = poPanelObj.find(".cost-class-title").attr("href")
+        //         poPanelObj.find(".cost-class-title").attr("href",idstr+num)
+        //         poPanelObj.find(".modal-info[name='class_sort']").val(num)
+        //         poPanelObj.find(idstr).attr("id",poPanelObj.find(idstr).attr("id")+num)
+  
+        //         $(tabId+" .global-modal .box-group ").append(poPanelObj);
+        //         init_chosen("{$url}","getOptionList",$(tabId+" .global-modal .box-group ").find(".panel").eq(num));
+        //     })
+        //     //当分类更改时触发事件
+        //     $(tabId+" .global-modal").on("change",".modal-info[name='cost_class']",function(){
+        //         if($(this).val()!="" || $(this).val()>0){
+        //             $(this).parents(".box-title").find(".cost-class-title").text($(this).find('option:selected').text());
+        //             $(this).parents(".cost_class_div").addClass("none")
+        //             $(this).parents(".box-title").find(".add-costItem ").removeClass("none");
+        //         }
+                
+        //     })
+        //     //分类图标事件
+        //     $(tabId+" .global-modal").on("click",".box-title .cost_chosen",function(){
+        //         if($(this).parents(".box-title").find(".cost_class_div").hasClass("none")){
+        //             $(this).parents(".box-title").find(".cost_class_div").removeClass("none");
+        //             $(this).parents(".box-title").find(".add-costItem ").addClass("none");
+        //         }else{
+        //             $(this).parents(".box-title").find(".cost_class_div").addClass("none");
+        //             $(this).parents(".box-title").find(".add-costItem ").removeClass("none");
+        //         }
+        //     })
+        //     //分类删除
+        //     $(tabId+" .global-modal").on("click",".box-title .cost_chosen_del",function(){
+        //         $(this).parents(".panel").remove()
+        //     })
+        //     //添加子项事件
+        //     $(tabId+" .global-modal").on("click",".box-title .add-costItem,tbody .class-rowspan",function(){
+        //         // var sort = $(this).parents(".panel").find(".table-items tr").length
+        //         // sort = Number(sort) + 1;
+        //         if($(this).parents(".panel").find(".panel-collapse").css("display") == "none"){
+        //             $(this).parents(".panel").find(".panel-collapse").collapse('toggle')
+        //         }
+        //         var poItemOjc = $(poItem);
+        //         init_chosen("{$url}","getOptionList",poItemOjc);
+        //         if($(this).hasClass("class-rowspan")){
+        //             var rows = $(this).parents("td").prop("rowspan");
+        //             rows = Number(rows) + 1;
+        //             $(this).parents("td").prop("rowspan",rows)
+        //             poItemOjc.find("td:nth-child(2)").remove();
+        //             var index = $(this).parents("tbody").find("tr").index($(this).parents("tr"))
+        //             $(this).parents("tbody").find("tr").eq(Number(rows)+Number(index)-2).after(poItemOjc);
+        //         }else{
+        //             $(this).parents(".panel").find(".table-items").append(poItemOjc);
+        //         }
+        //         $(this).parents(".panel").find("tbody tr").each(function(sort,tr){
+        //             $(tr).find("td:first-child").find(".modal-info[name='sort']").text(Number(sort) + 1)
+        //         })
+                
+        //     })
+        //     //删除子项
+        //     $(tabId+" .global-modal").on("click","table .cost_item_del",function(){
+        //         var $parents = $(this).parents(".panel");
+        //         var $prevAll = $(this).parents("tr").prevAll()
+        //         var $nextr = $(this).parents("tr").next()
+        //         var tdNum = $(this).parents("tr").find('td').length
+        //         var curRowspan = $(this).parents("tr").find('td').eq(1).attr('rowspan')
+        //         $(this).parents("tr").remove()
+        //         $parents.find("tbody tr").each(function(sort,tr){
+        //             $(tr).find("td:first-child").find(".modal-info[name='sort']").text(Number(sort) + 1)
+        //         })
+        //         if(tdNum > 0 && tdNum < 10){
+        //             $prevAll.each(function(){
+        //                 var rowspan = $(this).find('td').eq(1).attr('rowspan')
+        //                 if(rowspan){
+        //                     if(rowspan==1){
+        //                         $(this).find('td').eq(1).prop("rowspan",false)
+        //                     }else{
+        //                         $(this).find('td').eq(1).prop("rowspan",Number(rowspan)-1)
+        //                     }
+        //                     return false
+        //                 }
+        //             })
+        //         }else{
+        //             tdNum = $nextr.find('td').length
+        //             if(tdNum > 0 && tdNum < 10){
+        //                 if(curRowspan > 1){
+        //                     var poItemOjc = $(poItem);
+        //                     $nextr.find('td').eq(0).after(poItemOjc.find('td').eq(1))
+        //                 }
+        //                 if(curRowspan > 2){
+        //                     $nextr.find('td').eq(1).prop("rowspan",Number(curRowspan)-1)
+        //                 }
+        //             }
+        //         }
+                
+        //     })
+        //     //合计金额计算
+        //     $(tabId+" .global-modal").on("input",".modal-info[name='price'],.modal-info[name='cost_price']",function(){ 
+        //         var $tr = $(this).parents("tr")
+        //         var num = Number($tr.find(".modal-info[name='num']").val());
+        //         var act_num = Number($tr.find(".modal-info[name='act_num']").val());
+        //         var price = float($tr.find(".modal-info[name='price']").val());
+        //         if(num > 0 &&  act_num > 0 && price > 0){
+        //             $tr.find(".modal-info[name='total']").val(float(num * act_num * price,2));
+        //         }else{
+        //             $tr.find(".modal-info[name='total']").val(0);
+        //         }
+        //         var cost_price = float($tr.find(".modal-info[name='cost_price']").val());
+        
+        //         if(num > 0 &&  act_num > 0 && cost_price > 0){
+        //             $tr.find(".modal-info[name='cost_total']").val(float(num * act_num * cost_price,2));
+        //         }else{
+        //             $tr.find(".modal-info[name='cost_total']").val(0);
+        //         }
+        //         var costCount = 0
+        //         $(this).parents("tbody").find(".modal-info[name='cost_total']").each(function(){
+        //             costCount += float($(this).val());
+        //         })
+        //         $(this).parents(".panel").find(".cost-class-count").text(costCount);
+
+        //         var classCount = 0
+        //         $(this).parents("tbody").find(".modal-info[name='total']").each(function(){
+        //             classCount += float($(this).val());
+        //         })
+        //         $(this).parents(".panel").find(".class-count").text(classCount);
+        //         cost_compute_count()
+        //     })        
+        })
+    </script>
+</body>
+</html>

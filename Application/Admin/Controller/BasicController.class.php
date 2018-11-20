@@ -1639,4 +1639,316 @@ class BasicController extends BaseController{
         return $exportData ;
     } 
     //报销类别结束
+    //成本分类开始
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-20 22:30:14 
+     * @Desc: 成本分类 
+     */    
+    function costClassControl(){
+        $reqType=I('reqType');
+        $this->assign("controlName","basic_costClass");
+        // $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    function basic_costClass_modalOne(){
+        $title = "新建成本分类";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑成本分类";
+            $btnTitle = "保存数据";
+            $redisName="costClassList";
+            $resultData=$this->basicCom->redis_one($redisName,"basicId",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "template"=>"costClassModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-20 22:45:25 
+     * @Desc: 成本分类列表 
+     */    
+    function basic_costClassList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $export = I('export');
+        $where=["class"=>"costClass"];
+
+        foreach (['name','alias'] as $key) {
+            if($data[$key]){
+                $where[$key]=['LIKE','%'.$data[$key].'%'];
+            }
+        }
+        if(isset($data['status'])){
+            $where['status']=$data['status'];
+        }else{
+            $where['status']=["lt",3];
+        }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
+        $parameter=[
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$pageSize,
+            'orderStr'=>"basicId DESC",
+        ];
+        if($export){
+            $config = ['control'=>CONTROLLER_NAME];
+        }
+        $basicResult=$this->basicCom->getBasicList($parameter);
+        $this->tablePage($basicResult,'Basic/basicTable/costClassList',"costClassList",$pageSize,'',$config);
+    }
+    function managecostClassInfo($param=[]){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
+        if($reqType=="basic_costClassAdd"){
+            $datas['class']="costClass";
+            $datas['status']=1;
+            unset($datas['basicId']);
+            return $datas;
+        }else if($reqType=="basic_costClassEdit"){
+            $where=["basicId"=>$datas['basicId']];
+            $data=[];
+            foreach (['name','alias','remark','status'] as $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
+            }
+            return ["where"=>$where,"data"=>$data];
+        }
+        return "";
+    }
+    function basic_costClassAdd(){
+        $costClassInfo=$this->managecostClassInfo();
+        if($costClassInfo){
+            $insertResult=$this->basicCom->insertBasic($costClassInfo);
+            if($insertResult && $insertResult->errCode==0){
+                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+            }
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    } 
+    function basic_costClassEdit(){
+        $costClassInfo=$this->managecostClassInfo();
+        $updateResult=$this->basicCom->updateBasic($costClassInfo);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-03 08:58:30 
+     * @Desc: 成本分类导入 
+     */    
+    function basic_costClass_import($excelData){
+        $insertData = [];
+        foreach ($excelData as $index => $excelRow) {
+            if($index>0){
+                $temp = [];
+                foreach ($excelData[0] as $i=>$key) {
+                    $temp[$key] = $excelRow[$i];
+                }
+                $tempData = $this->managecostClassInfo(["data"=>$temp,"reqType"=>"basic_costClassAdd"]);
+                if(isset($temp["basicId"])){
+                    $tempData["basicId"] = $temp["basicId"];
+                }
+                $result = $this->basicCom->getOne(['where'=>['class'=>'costClass','name'=>$temp["name"]]]);
+                if(!$result){
+                    array_push($insertData,$tempData);
+                }
+            }
+        }
+        return $insertData;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-10-04 08:48:49 
+     * @Desc: 成本分类导出 
+     */    
+    function basic_costClass_export($excelData){
+        $schema=[
+            'basicId' => ['name'=>'成本分类id'],
+            'name' => ['name'=>'成本分类名称'],
+            'alias' => ['name'=>'成本分类别名'],
+            'remark' => ['name'=>'备注'],
+            'sort' => ['name'=>'排序'],
+            'status' => ['name'=>'状态'],
+        ];
+        foreach ($excelData as $index => $val) {
+            foreach ($val as $key => $value) {
+                if($key=="status"){
+                    $excelData[$index][$key] = $this->statusType[$value];
+                }
+            }
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'成本分类数据表'];
+        return $exportData ;
+    } 
+    //成本分类结束
+    //单位开始
+    /** 
+        * @Author: vition 
+        * @Date: 2018-05-20 22:30:14 
+        * @Desc: 单位
+        */    
+    function unitControl(){
+        $reqType=I('reqType');
+        $this->assign("controlName","basic_unit");
+        // $this->assign('tableName',$this->basicCom->tableName());//删除数据的时候需要
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    function basic_unit_modalOne(){
+        $title = "新建单位";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        
+        if($gettype=="Edit"){
+            $title = "编辑单位";
+            $btnTitle = "保存数据";
+            $redisName="unitList";
+            $resultData=$this->basicCom->redis_one($redisName,"basicId",$id);
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "template"=>"unitModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    /** 
+        * @Author: vition 
+        * @Date: 2018-05-20 22:45:25 
+        * @Desc: 单位列表 
+        */    
+    function basic_unitList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $export = I('export');
+        $where=["class"=>"unit"];
+
+        foreach (['name','alias'] as $key) {
+            if($data[$key]){
+                $where[$key]=['LIKE','%'.$data[$key].'%'];
+            }
+        }
+        if(isset($data['status'])){
+            $where['status']=$data['status'];
+        }else{
+            $where['status']=["lt",3];
+        }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
+        $parameter=[
+            'where'=>$where,
+            'page'=>$p,
+            'pageSize'=>$pageSize,
+            'orderStr'=>"basicId DESC",
+        ];
+        if($export){
+            $config = ['control'=>CONTROLLER_NAME];
+        }
+        $basicResult=$this->basicCom->getBasicList($parameter);
+        $this->tablePage($basicResult,'Basic/basicTable/unitList',"unitList",$pageSize,'',$config);
+    }
+    function manageunitInfo($param=[]){
+        $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
+        $datas = $param['data'] ? $param['data'] : I("data");
+        if($reqType=="basic_unitAdd"){
+            $datas['class']="unit";
+            $datas['status']=1;
+            unset($datas['basicId']);
+            return $datas;
+        }else if($reqType=="basic_unitEdit"){
+            $where=["basicId"=>$datas['basicId']];
+            $data=[];
+            foreach (['name','alias','remark','status'] as $key) {
+                if(isset($datas[$key])){
+                    $data[$key]=$datas[$key];
+                }
+            }
+            return ["where"=>$where,"data"=>$data];
+        }
+        return "";
+    }
+    function basic_unitAdd(){
+        $info=$this->manageunitInfo();
+        if($info){
+            $insertResult=$this->basicCom->insert($info);
+            if($insertResult && $insertResult->errCode==0){
+                $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+            }
+        }
+        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+    } 
+    function basic_unitEdit(){
+        $info=$this->manageunitInfo();
+        $updateResult=$this->basicCom->update($info);
+        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+    /** 
+        * @Author: vition 
+        * @Date: 2018-10-03 08:58:30 
+        * @Desc: 单位导入 
+        */    
+    function basic_unit_import($excelData){
+        $insertData = [];
+        foreach ($excelData as $index => $excelRow) {
+            if($index>0){
+                $temp = [];
+                foreach ($excelData[0] as $i=>$key) {
+                    $temp[$key] = $excelRow[$i];
+                }
+                $tempData = $this->manageunitInfo(["data"=>$temp,"reqType"=>"basic_unitAdd"]);
+                if(isset($temp["basicId"])){
+                    $tempData["basicId"] = $temp["basicId"];
+                }
+                $result = $this->basicCom->getOne(['where'=>['class'=>'unit','name'=>$temp["name"]]]);
+                if(!$result){
+                    array_push($insertData,$tempData);
+                }
+            }
+        }
+        return $insertData;
+    }
+    /** 
+        * @Author: vition 
+        * @Date: 2018-10-04 08:48:49 
+        * @Desc: 单位导出 
+        */    
+    function basic_unit_export($excelData){
+        $schema=[
+            'basicId' => ['name'=>'单位id'],
+            'name' => ['name'=>'单位名称'],
+            'alias' => ['name'=>'单位别名'],
+            'remark' => ['name'=>'备注'],
+            'sort' => ['name'=>'排序'],
+            'status' => ['name'=>'状态'],
+        ];
+        foreach ($excelData as $index => $val) {
+            foreach ($val as $key => $value) {
+                if($key=="status"){
+                    $excelData[$index][$key] = $this->statusType[$value];
+                }
+            }
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'单位数据表'];
+        return $exportData ;
+    } 
+    //单位结束
 }

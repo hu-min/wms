@@ -1,7 +1,7 @@
 <volist name="list" id="item">
     <tr>
         <!-- <td>{$item['brand_name']}</td> -->
-        <td class="hidden-xs">{$item['code']}</td>
+        <td class="hidden-xs">{$item['code']|pcode_format}</td>
         <td>{$item['project_time']}</td>
         <td title="{$item['name']}">{$item['name']}</td>
         <td>{$item['customer_com_name']}</td>

@@ -1,0 +1,23 @@
+<volist name="list" id="item">
+    <tr>
+        <td>{$item['project_name']}</td>
+        <td>{$item['project_code']|pcode_format}</td>
+        <td>{$item['section']}</td>
+        <td>{$item['ouser_name']}</td>
+        <td>{$item['add_time']}</td>
+        <td>{$item['total']}</td>
+        <if condition="$listType eq 'cost' or $listType eq 'contrast'">
+            <td>{$item['cost_total']|default=0}</td>
+        </if>
+        <td>{$item['tax_rate']}</td>
+        <td>{:round($item['total']*(1+$item['tax_rate']/100),2)}</td>  
+        <if condition="$listType eq 'contrast'">
+            <td>{$item['profit']|default=0}</td>
+            <td>{$item['profit_ratio']|default=0}</td>
+        </if>        
+        <td>
+            {:approve_btn($tableName,$item['id'],$item['place'],$item['process_level'],$item['status'])}
+        </td>
+        {:list_btn(get_defined_vars(),"id")}
+    </tr>
+</volist>

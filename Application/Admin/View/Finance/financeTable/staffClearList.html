@@ -1,6 +1,6 @@
 <volist name="list" id="item">
     <tr>
-        <td class="hidden-xs">{$item.code}</td>
+        <td class="hidden-xs">{$item.code|pcode_format}</td>
         <td>{$item.name}</td>
         <td>{$item.add_time}</td>
         <td class="modal-info" name="debit_num" >{$item.debit_num|default=0}</td>

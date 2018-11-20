@@ -46,6 +46,7 @@ class BaseController extends \Common\Controller\BaseController{
             }
         }
         $this->userCom=getComponent('User');
+        $this->Com=getComponent('Common'); // 公共调用的控件
         $this->LogCom=getComponent('Log');
         $this->ApprLogCom=getComponent('ApproveLog');
         $this->nodeCom=getComponent('Node');
@@ -791,7 +792,7 @@ class BaseController extends \Common\Controller\BaseController{
     }
     function template_down(){
         $con = I('con');
-        if(in_array($con,['Basic_basic_brand','Basic_basic_stage','Basic_basic_projectType','Basic_expenClas','Basic_basic_expense_type','Public_pub_files_type'])){
+        if(in_array($con,['Basic_basic_brand','Basic_basic_stage','Basic_basic_projectType','Basic_expenClas','Basic_basic_expense_type','Public_pub_files_type','Basic_basic_unit','Basic_basic_costClass'])){
             $con = 'Basic_bsme';
         }
         //模板中文名配置

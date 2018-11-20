@@ -1,0 +1,69 @@
+<tr>
+    <td class="serial_num" >
+        <input class="modal-info" name="id" type="hidden" value="0">
+        <span class="modal-info" name="sort"></span>
+        <i class="fa fa-times cost_item_del"></i>
+    </td>
+    <td style="max-width: 180px;min-width: 180px;">
+        <div class="input-group">
+            <input type="text" class="form-control timepicker modal-info" name="class_notes" placeholder="允许多个分类归类">
+            <div class="input-group-addon class-rowspan">
+                <i class="fa fa-plus-square"></i>
+            </div>
+        </div>
+    </td>
+    <td style="min-width:100px;max-width:200px;">
+        <select class="form-control modal-info chosen-select" title="承接模块" data-value="basicId" data-req="getModuleList" data-text="name" data-type="module" name="classify"  >
+            <!-- <option value="999999999">全部承接模块</option> -->
+            <volist name="moduleArr" id="item">
+                <option value="{$item['basicId']}">{$item['name']}</option>
+            </volist>
+        </select>
+    </td>
+    <td style="min-width: 300px;">
+        <input type="text" class="form-control modal-info" name="item_content" placeholder="子项的内容说明">
+    </td>
+    <td>
+        <input type="text" class="form-control modal-info" name="num" placeholder="项的数量">
+    </td>
+    <td>
+        <select class="form-control modal-info chosen-select" title="单位" data-value="basicId" data-req="getModuleList" data-text="name" name="unit" >
+            <volist name="unitArr" id="item">
+                <option value="{$item['basicId']}">{$item['name']}</option>
+            </volist>
+        </select>
+    </td>
+    <td>
+        <input type="text" class="form-control modal-info" name="act_num" placeholder="重复项数量，默认1" value="1">
+    </td>
+    <td>
+        <select class="form-control modal-info chosen-select" title="单位" data-value="basicId" data-req="getModuleList" data-text="name" name="act_unit" >
+            <volist name="unitArr" id="item">
+                <option value="{$item['basicId']}">{$item['name']}</option>
+            </volist>
+        </select>
+    </td>
+    <td>
+        <input type="text" class="form-control modal-info" name="price" value="1" placeholder="单价金额">
+    </td>
+    <td>
+        <input type="text" class="form-control modal-info" readonly="readonly" name="total" placeholder="金额合计">
+    </td>
+    <if condition="$listType eq 'cost' or $listType eq 'contrast'">
+        <td>
+            <input type="text" class="form-control modal-info" name="cost_price" placeholder="成本单价">
+        </td>
+        <td>
+            <input type="text" class="form-control modal-info" readonly="readonly" name="cost_total" placeholder="成本合计">
+        </td>
+    </if>
+
+    <if condition="$listType eq 'contrast'">
+        <td>
+            <input type="text" class="form-control modal-info" readonly="readonly" name="profit" placeholder="利润">
+        </td>
+        <td>
+            <input type="text" class="form-control modal-info" readonly="readonly" name="profit_ratio" placeholder="利润百分比">
+        </td>
+    </if>
+</tr>

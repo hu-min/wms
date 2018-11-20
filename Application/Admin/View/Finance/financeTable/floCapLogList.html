@@ -3,7 +3,13 @@
         <td>{$item.project_name|default='非项目'}</td>
         <td>{$item.happen_time}</td>
         <td>{$item.add_time}</td>
-        <td>{$item.project_code|default='非项目'}</td>
+        <td>
+            <if condition="$item.project_code neq false ">
+                {$item.project_code|pcode_format}
+            <else/>
+                非项目
+            </if>
+        </td>
         <td>{$capTypeArr[$item['log_type']]}</td> 
         <td>{$item.inner_detail}</td>
         <td>{$item.bank_detail}</td>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{:C('admintitle')}</title>
+    <eq name="load" value="true">
+        <include file="Index/Heads" /> 
+    </eq>
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-body search-body" >
+                        <div class="col-md-12">
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <label class="control-label">单位名称：</label>
+                                    <input class="form-control search-info" name="name" placeholder="单位名称" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">单位别名：</label>
+                                    <input class="form-control search-info" name="alias" placeholder="单位别名" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label >状态：</label>
+                                    <select class="form-control search-info input-sm" title="状态" name="status">
+                                        <option value="">全部</option>
+                                        <volist name="statusType" id="item">
+                                            <option value="{$key}">{$item}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
+                                    <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
+                                </div>
+                                <if condition="$processAuth['level'] gt 0 or $nodeAuth egt 2">
+                                    <div class="form-group">
+                                        <button type="button" data-gettype="Add" data-toggle="modal" data-url="{$url}"  data-vtarget=".global-modal" data-con="{$controlName}" class="btn btn-info v-showmodal"><i class="fa fa-fw fa-user-plus"></i> 添加单位</button>
+                                    </div>
+                                </if>
+                                <div class="form-group">
+                                    {:import_btn(get_defined_vars())}
+                                    {:export_btn(get_defined_vars())} 
+                                </div>
+                            </div>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 table-outbox" style="z-index: 1;">
+                <div style="font-size:0.95em;overflow: auto;">
+                    <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;"></div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th class="is-frozen">单位名称</th>
+                                <th>单位别名</th>
+                                <th>单位备注</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="{$controlName}-table">
+                            {$tables}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="dataTables_wrapper">
+            <div class="row">
+                <div class="col-sm-2"><div class="dataTables_length" ><label>显示 <select name="pageSize"  class="form-control input-sm search-info">
+                    <volist name="entries" id="item"><option value="{$item}">{$item}</option></volist>
+                </select> 条</label></div></div>
+                <div  class="{$controlName}-page row page-div col-sm-10" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+                    {$pages}
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="modal fade global-modal" aria-hidden="true" data-backdrop="static" >
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+    <script>
+        $(function(){
+            excel_import({url:"{:U('Basic/excel_import')}"})
+            $(tabId+" .search-list").trigger("click");
+        })
+        /*设置编辑信息*/
+        function basic_unit_setInfo(info){
+            $(tabId+" .modal-info[name='basicId']").val(info['basicId']);
+            $(tabId+" .modal-info[name='name']").val(info['name']);
+            $(tabId+" .modal-info[name='alias']").val(info['alias']);
+            $(tabId+" .modal-info[name='remark']").val(info['remark']);
+            set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
+        }
+    </script>
+</body>
+</html>

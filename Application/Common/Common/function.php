@@ -405,10 +405,10 @@ function time_format($dateStr){
 /** 
  * @Author: vition 
  * @Date: 2018-10-29 12:40:14 
- * @Desc: 格式化项目名称 包含-的隔开分两行 
+ * @Desc: 格式化项目编码 包含-的隔开分两行 
  */
-function pname_format($project_name){
-    $pnameArr = explode("-",$project_name);
+function pcode_format($project_code){
+    $pnameArr = explode("-",$project_code);
     if(count($pnameArr) > 1){
         return '<div>'.$pnameArr[0].'</div><div>'.$pnameArr[1].'</div>';
     }
