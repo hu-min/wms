@@ -1,0 +1,64 @@
+<div class="modal-header">
+    <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{$title}</h4>
+</div>
+<div class="modal-body">
+    <form role="form">
+        
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label >选择项目：</label>
+                        <select class="form-control modal-info chosen-project chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
+                            <volist name="projectArr" id="item">
+                                <option value="{$item['projectId']}">{$item['name']}</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-info btn-xs add-costClass"><i class="fa fa-plus-square"></i> <span> 添加主分类 </span> </button>
+                </div>
+                <div class="col-md-6 text-red">
+                    合计（金额合计）= 数量（单项）X 数量（重复项）X 金额（单价）
+                </div>
+            </div>
+            <div class="box box-solid">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    
+                    <div class="box-group" id="{$vtabId}-accordion">
+                        
+                    </div>
+                    <div class="row" style="text-align: right;font-size: 1.2em;font-weight: bold;padding-right: 50px;">
+                        报价总计：<span class="all-count">0</span> | 
+                        增值税率：<span ><input class="tax-rate modal-info" name="tax_rate" type="text" placeholder="税率" value="6" /> % </span> | 
+                        报价含税总计：<span class="taxed-count">0</span>
+                        <if condition="$listType eq 'cost' or $listType eq 'contrast'">
+                            |    成本总计：<span class="cost-all-count">0</span>
+                        </if>
+                    </div>
+                </div>
+            <!-- /.box-body -->
+            </div>
+        </div>
+    </form>            
+</div>
+<div class="modal-footer">
+    <input class="modal-info" name="status" value="0" type="hidden">
+    <input class="modal-info" name="id" value="0" type="hidden">
+    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+    <if condition="$listType neq 'contrast'">
+        {:save_btn(get_defined_vars())}
+    </if>
+    
+    <!-- {:approve_btn($tableName)} -->
+</div>
