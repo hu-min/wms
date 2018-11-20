@@ -79,8 +79,8 @@ class ProjectCostController extends BaseController{
             $resultData['list'] = $this->pCostSubCom->getList($sParam)['list'];
             // $resultData=[];
         }
-        $resultData['panel'] = $this->fetch('ProjectCost/projectCostTable/panel');
-        $resultData['item'] = $this->fetch('ProjectCost/projectCostTable/item');
+        $resultData['panel'] = $this->fetch('ProjectCost/projectcostTable/panel');
+        $resultData['item'] = $this->fetch('ProjectCost/projectcostTable/item');
         $modalPara=[
             "data"=>$resultData,
             "title"=>$title,
@@ -115,7 +115,7 @@ class ProjectCostController extends BaseController{
         // }else if($type == 'cost'){
         //     $listTemplate = 'project_costList';
         // }
-        $this->tablePage($listResult,'ProjectCost/projectCostTable/project_offerList',"project_offerList",$pageSize);
+        $this->tablePage($listResult,'ProjectCost/projectcostTable/project_offerList',"project_offerList",$pageSize);
     }
     function project_offerMange($param){
         $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
