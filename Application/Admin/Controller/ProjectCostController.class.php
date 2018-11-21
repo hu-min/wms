@@ -301,7 +301,10 @@ class ProjectCostController extends BaseController{
             }else{//新增
                 $infoData = $this->project_offerMange(['data'=>$subData,'reqType'=>'project_offerAdd']);
                 $infoData['parent_id'] = $parent_id;
-                $infoData['read_type'] = 2;
+                if($infoData['price'] <= 0){
+                    $infoData['read_type'] = 2;
+                }
+                
                 $upateResult = $this->pCostSubCom->insert($infoData);
                 // print_r($infoData);
             }

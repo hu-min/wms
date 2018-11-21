@@ -125,7 +125,7 @@
             });
             $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val(info['id'])
             $(tabId+" .global-modal").find(".all-count").text(info['total']);
-            $(tabId+" .global-modal").find(".cost-all-count").text(info['cost_total']);
+            $(tabId+" .global-modal").find(".cost-all-count").text(info['cost_total'] ? info['cost_total'] : "0.00");
             $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(info['tax_rate']/100))*info['total']));
             var cost_class = "";
             var item_count = {};
@@ -216,7 +216,7 @@
                     $costAllCount += float(count);
                 }
             })
-            // console.log($allCount)
+            // console.log($costAllCount)
             $(tabId+" .global-modal").find(".cost-all-count").text(float_format($costAllCount));
 
             // var taxRate = $(tabId+" .global-modal").find(".tax-rate").val(); 
@@ -351,8 +351,9 @@
                 $parents.find("tbody tr").each(function(sort,tr){
                     $(tr).find("td:first-child").find(".modal-info[name='sort']").text(Number(sort) + 1)
                 })
-                if(tdNum > 0 && tdNum < 10){
+                if(tdNum > 0 && tdNum < 12){
                     $prevAll.each(function(){
+                        
                         var rowspan = $(this).find('td').eq(1).attr('rowspan')
                         if(rowspan){
                             if(rowspan==1){
@@ -365,7 +366,7 @@
                     })
                 }else{
                     tdNum = $nextr.find('td').length
-                    if(tdNum > 0 && tdNum < 10){
+                    if(tdNum > 0 && tdNum < 12){
                         if(curRowspan > 1){
                             var poItemOjc = $(poItem);
                             $nextr.find('td').eq(0).after(poItemOjc.find('td').eq(1))
