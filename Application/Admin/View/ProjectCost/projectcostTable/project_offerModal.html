@@ -45,6 +45,10 @@
                         <if condition="$listType eq 'cost' or $listType eq 'contrast'">
                             |    成本总计：<span class="cost-all-count">0</span>
                         </if>
+                        <if condition="$listType eq 'contrast'">
+                            |    利润：<span class="profit-all-count">0</span>
+                            |    利润百分比：<span class="profitrat-all-count">0</span>%
+                        </if>
                     </div>
                 </div>
             <!-- /.box-body -->

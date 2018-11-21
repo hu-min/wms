@@ -123,7 +123,7 @@
             });
             $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val(info['id'])
             $(tabId+" .global-modal").find(".all-count").text(info['total']);
-            $(tabId+" .global-modal").find(".taxed-count").text(float((1+float(info['tax_rate']/100))*info['total']));
+            $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(info['tax_rate']/100))*info['total']));
             var cost_class = 0;
             var item_count = {};
             info['list'].forEach(subElement => {
@@ -166,7 +166,7 @@
             });
             // console.log(item_count)
             for (var key in item_count) {
-                $(tabId+" .global-modal .box-group ").find(".panel").eq(key).find('.class-count').text(item_count[key]);
+                $(tabId+" .global-modal .box-group ").find(".panel").eq(key).find('.class-count').text(float_format(item_count[key]));
             }
 
             if(( info['status'] > 0 || info['ouser_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3){
@@ -189,11 +189,11 @@
                 }
             })
             // console.log($allCount)
-            $(tabId+" .global-modal").find(".all-count").text($allCount);
+            $(tabId+" .global-modal").find(".all-count").text(float_format($allCount));
 
             var taxRate = $(tabId+" .global-modal").find(".tax-rate").val(); 
             // console.log(taxRate)
-            $(tabId+" .global-modal").find(".taxed-count").text(float((1+float(taxRate/100))*$allCount));
+            $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(taxRate/100))*$allCount));
         }
         //获取数据
         var project_offer_getInfo = function(){
@@ -354,7 +354,7 @@
                 var act_num = Number($tr.find(".modal-info[name='act_num']").val());
                 var price = float($tr.find(".modal-info[name='price']").val());
                 if(num > 0 &&  act_num > 0 && price > 0){
-                    $tr.find(".modal-info[name='total']").val(float(num * act_num * price,2));
+                    $tr.find(".modal-info[name='total']").val(float_format(num * act_num * price,2));
                 }else{
                     $tr.find(".modal-info[name='total']").val(0);
                 }
@@ -362,7 +362,7 @@
                 $(this).parents("tbody").find(".modal-info[name='total']").each(function(){
                     classCount += float($(this).val());
                 })
-                $(this).parents(".panel").find(".class-count").text(classCount);
+                $(this).parents(".panel").find(".class-count").text(float_format(classCount));
                 compute_count()
             })
             //更改税率

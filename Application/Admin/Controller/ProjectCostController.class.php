@@ -185,6 +185,7 @@ class ProjectCostController extends BaseController{
         }else{
             $pOfferData['process_level'] = $examines["place"] > 0 ? $examines["place"] : 1;
         }
+        // print_r($pOfferData);exit;
         $this->pCostCom->startTrans();
         $pInsertResult = $this->pCostCom->insert($pOfferData);
         if(isset($pInsertResult->errCode) && $pInsertResult->errCode==0){
@@ -315,7 +316,7 @@ class ProjectCostController extends BaseController{
      */    
     function project_costContrast(){
         $reqType=I('reqType');
-        $this->assign("controlName","pcost_control");
+        $this->assign("controlName","project_costCon");
         $this->assign("listType","contrast");
         $this->assign("tableName",$this->pCostCom->tableName());
         
@@ -324,5 +325,11 @@ class ProjectCostController extends BaseController{
         }else{
             $this->returnHtml();
         }
+    }
+    function project_costConList(){
+        $this->project_offerList('contrast');
+    }
+    function  project_costCon_modalOne(){
+        $this->project_offer_modalOne('contrast');
     }
 }

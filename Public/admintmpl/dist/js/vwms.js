@@ -1191,8 +1191,16 @@ function float(num,place) {
     while (s_x.length <= pos_decimal + place) {
       s_x += '0';
     }
-    return parseFloat(s_x);
+    return Math.round(s_x*Math.pow(10, place))/Math.pow(10, place);
+    // return parseFloat(s_x);
   }
+function float_format(num,place){
+    if(num.toString().indexOf(".")>0){
+        return float(num);
+    }else{
+        return num+".00";
+    }
+}
 var $fileInput = ""//当前文件input
 function upload(option){
     var url = option.url

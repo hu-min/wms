@@ -23,38 +23,38 @@
     <td style="min-width: 300px;">
         <input type="text" class="form-control modal-info" name="item_content" placeholder="子项的内容说明">
     </td>
-    <td>
-        <input type="text" class="form-control modal-info" name="num" placeholder="项的数量">
+    <td style="width: 50px;text-align: center;">
+        <input type="text" class="form-control modal-info" style="text-align: center;" name="num" placeholder="项的数量">
     </td>
-    <td>
+    <td style="width: 50px;text-align: center;">
         <select class="form-control modal-info chosen-select" title="单位" data-value="basicId" data-req="getModuleList" data-text="name" name="unit" >
             <volist name="unitArr" id="item">
                 <option value="{$item['basicId']}">{$item['name']}</option>
             </volist>
         </select>
     </td>
-    <td>
-        <input type="text" class="form-control modal-info" name="act_num" placeholder="重复项数量，默认1" value="1">
+    <td style="width: 50px;text-align: center;">
+        <input type="text" class="form-control modal-info" name="act_num" style="text-align: center;" placeholder="重复项数量，默认1" value="1">
     </td>
-    <td>
+    <td style="width: 100px;">
         <select class="form-control modal-info chosen-select" title="单位" data-value="basicId" data-req="getModuleList" data-text="name" name="act_unit" >
             <volist name="unitArr" id="item">
                 <option value="{$item['basicId']}">{$item['name']}</option>
             </volist>
         </select>
     </td>
-    <td>
+    <td style="width: 150px;">
         <input type="text" class="form-control modal-info" name="price" value="1" placeholder="单价金额">
     </td>
-    <td>
+    <td style="width: 150px;">
         <input type="text" class="form-control modal-info" readonly="readonly" name="total" placeholder="金额合计">
     </td>
     <if condition="$listType eq 'cost' or $listType eq 'contrast'">
-        <td>
-            <input type="text" class="form-control modal-info" name="cost_price" placeholder="成本单价">
+        <td style="background: #D2D6DE;">
+            <input type="text" class="form-control modal-info" style="background: #D2D6DE;" name="cost_price" placeholder="成本单价">
         </td>
-        <td>
-            <input type="text" class="form-control modal-info" readonly="readonly" name="cost_total" placeholder="成本合计">
+        <td style="background: #D2D6DE;">
+            <input type="text" class="form-control modal-info" style="background: #D2D6DE;" readonly="readonly" name="cost_total" placeholder="成本合计">
         </td>
     </if>
 

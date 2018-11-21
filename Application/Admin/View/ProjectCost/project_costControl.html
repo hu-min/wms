@@ -126,7 +126,7 @@
             $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val(info['id'])
             $(tabId+" .global-modal").find(".all-count").text(info['total']);
             $(tabId+" .global-modal").find(".cost-all-count").text(info['cost_total']);
-            $(tabId+" .global-modal").find(".taxed-count").text(float((1+float(info['tax_rate']/100))*info['total']));
+            $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(info['tax_rate']/100))*info['total']));
             var cost_class = 0;
             var item_count = {};
             var item_cost_count = {};
@@ -179,8 +179,8 @@
             });
             // console.log(item_count)
             for (var key in item_count) {
-                $(tabId+" .global-modal .box-group ").find(".panel").eq(key).find('.class-count').text(item_count[key]);
-                $(tabId+" .global-modal .box-group ").find(".panel").eq(key).find('.cost-class-count').text(item_cost_count[key]);
+                $(tabId+" .global-modal .box-group ").find(".panel").eq(key).find('.class-count').text(float_format(item_count[key]));
+                $(tabId+" .global-modal .box-group ").find(".panel").eq(key).find('.cost-class-count').text(float_format(item_cost_count[key]));
             }
 
             if(( info['status'] > 0 || info['ouser_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3){
@@ -203,11 +203,11 @@
                 }
             })
             // console.log($allCount)
-            $(tabId+" .global-modal").find(".all-count").text($allCount);
+            $(tabId+" .global-modal").find(".all-count").text(float_format($allCount));
 
             var taxRate = $(tabId+" .global-modal").find(".tax-rate").val(); 
             // console.log(taxRate)
-            $(tabId+" .global-modal").find(".taxed-count").text(float((1+float(taxRate/100))*$allCount));
+            $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(taxRate/100))*$allCount));
 
             $costAllCount = 0
             $(tabId+" .global-modal").find(".cost-class-count").each(function(){
@@ -217,7 +217,7 @@
                 }
             })
             // console.log($allCount)
-            $(tabId+" .global-modal").find(".cost-all-count").text($costAllCount);
+            $(tabId+" .global-modal").find(".cost-all-count").text(float_format($costAllCount));
 
             // var taxRate = $(tabId+" .global-modal").find(".tax-rate").val(); 
             // console.log(taxRate)
@@ -391,7 +391,7 @@
                 var cost_price = float($tr.find(".modal-info[name='cost_price']").val());
         
                 if(num > 0 &&  act_num > 0 && cost_price > 0){
-                    $tr.find(".modal-info[name='cost_total']").val(float(num * act_num * cost_price,2));
+                    $tr.find(".modal-info[name='cost_total']").val(float_format(num * act_num * cost_price,2));
                 }else{
                     $tr.find(".modal-info[name='cost_total']").val(0);
                 }
@@ -399,13 +399,13 @@
                 $(this).parents("tbody").find(".modal-info[name='cost_total']").each(function(){
                     costCount += float($(this).val());
                 })
-                $(this).parents(".panel").find(".cost-class-count").text(costCount);
+                $(this).parents(".panel").find(".cost-class-count").text(float_format(costCount));
 
                 var classCount = 0
                 $(this).parents("tbody").find(".modal-info[name='total']").each(function(){
                     classCount += float($(this).val());
                 })
-                $(this).parents(".panel").find(".class-count").text(classCount);
+                $(this).parents(".panel").find(".class-count").text(float_format(classCount));
                 cost_compute_count()
             })        
         })

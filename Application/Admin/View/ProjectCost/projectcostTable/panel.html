@@ -1,9 +1,7 @@
 <div class="panel box box-primary">
     <div class="box-header with-border">
         <h4 class="box-title">
-            <a class="cost-class-title" data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#{$vtabId}-panel">
-            
-            </a>
+            <a class="cost-class-title" data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#{$vtabId}-panel"></a>
             <i class="fa fa-wrench cost_chosen"></i>
             <i class="fa fa-times cost_chosen_del"></i>
             <div class="cost_class_div">
@@ -17,16 +15,23 @@
             <input class="modal-info" name="class_sort" type="hidden">
             <button type="button" class="btn bg-olive btn-xs add-costItem none"><i class="fa fa-plus-square"></i> <span> 添加子项 </span> </button>
         </h4>
+        <div style="text-align: right;font-size: 1.2em;font-weight: bold;display: inline-block;position: absolute;right: 10px;">
+            报价合计：<span class="class-count">0</span>
+            <if condition="$listType eq 'cost' or $listType eq 'contrast'">
+                |    成本合计：<span class="cost-class-count">0</span>
+            </if>
+            <if condition="$listType eq 'contrast'">
+                |    利润：<span class="profit-class-count">0</span>
+                |    利润百分比：<span class="profitrat-class-count">0</span>%
+            </if>
+        </div>
     </div>
     <div id="{$vtabId}-panel" class="panel-collapse collapse">
         <div class="box-body">
             <div class="col-sm-12 table-outbox" style="z-index: 1;">
                 <div style="font-size:0.95em;overflow: auto;">
-                    <div class="count-div {$controlName}-count" style="margin:10px;font-weight: 800;text-align: right;font-size: 1.2em;font-weight: bold;">
-                        报价合计：<span class="class-count">0</span>
-                        <if condition="$listType eq 'cost' or $listType eq 'contrast'">
-                            |    成本合计：<span class="cost-class-count">0</span>
-                        </if>
+                    <div class="count-div {$controlName}-count" >
+                        
                         
                     </div>
                     <table class="table table-bordered table-hover">
@@ -40,11 +45,11 @@
                                 <th class="">单位（单项）</th>
                                 <th class="">数量（重复项）</th>
                                 <th class="">单位（重复项）</th>
-                                <th class="">金额（单价）</th>
-                                <th class="">合计（金额合计）</th>
+                                <th class="">单价</th>
+                                <th class="">合计</th>
                                 <if condition="$listType eq 'cost' or $listType eq 'contrast'">
-                                    <th>成本单价</th>
-                                    <th>成本合计</th>
+                                    <th style="background: #D2D6DE;">成本单价</th>
+                                    <th style="background: #D2D6DE;">成本合计</th>
                                 </if>
                                 <if condition="$listType eq 'contrast'">
                                     <th>利润</th>
