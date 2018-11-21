@@ -139,6 +139,10 @@
                     poPanelObj.find(".cost-class-title").text(subElement['cost_class_name'])
                     poPanelObj.find(".cost_class_div").addClass('none')
                     poPanelObj.find(".add-costItem").removeClass('none')
+
+                    poPanelObj.find(".cost_chosen").remove()
+                    poPanelObj.find(".cost_chosen_del").remove()
+                    
                     poPanelObj.find(".modal-info[name='class_sort']").val(subElement['class_sort'])
                     poPanelObj.find(".modal-info[name='cost_class']").val(subElement['cost_class'])
                     poPanelObj.find(idstr).attr("id",poPanelObj.find(idstr).attr("id")+subElement['class_sort'])
