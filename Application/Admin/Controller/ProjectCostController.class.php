@@ -43,7 +43,7 @@ class ProjectCostController extends BaseController{
             $this->returnHtml();
         }
     }
-    function project_offer_modalOne($listType='offer'){
+    function project_offer_modalOne($listType='offer',$fixedTitle=false){
         $title = "新增报价";
         $btnTitle = "添加数据";
         $gettype = I("gettype");
@@ -82,6 +82,7 @@ class ProjectCostController extends BaseController{
         }
         $resultData['panel'] = $this->fetch('ProjectCost/projectcostTable/panel');
         $resultData['item'] = $this->fetch('ProjectCost/projectcostTable/item');
+        $title = $fixedTitle ? $fixedTitle : $title;
         $modalPara=[
             "data"=>$resultData,
             "title"=>$title,
@@ -269,7 +270,7 @@ class ProjectCostController extends BaseController{
         $this->project_offerList('cost');
     }
     function  pcost_control_modalOne(){
-        $this->project_offer_modalOne('cost');
+        $this->project_offer_modalOne('cost','查看/编辑成本');
     }
     function pcost_controlEdit(){
         extract($_POST);
@@ -331,6 +332,6 @@ class ProjectCostController extends BaseController{
         $this->project_offerList('contrast');
     }
     function  project_costCon_modalOne(){
-        $this->project_offer_modalOne('contrast');
+        $this->project_offer_modalOne('contrast','查看成本对照');
     }
 }

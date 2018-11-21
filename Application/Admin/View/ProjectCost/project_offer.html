@@ -119,7 +119,7 @@
             poPanel = info.panel;
             poItem = info.item;
             ['project_id','tax_rate'].forEach(element => {
-                $(tabId+" .global-modal").find(" .modal-footer .modal-info[name='"+element+"']").val(info[element])
+                $(tabId+" .global-modal").find(" .modal-info[name='"+element+"']").val(info[element])
             });
             $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val(info['id'])
             $(tabId+" .global-modal").find(".all-count").text(info['total']);
