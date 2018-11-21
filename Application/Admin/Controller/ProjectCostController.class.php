@@ -71,12 +71,13 @@ class ProjectCostController extends BaseController{
             }
             $sParam =[
                 'where'=>$where,
-                'orderStr'=>"cost_class ASC , sort ASC",
+                'orderStr'=>"class_sort ASC , sort ASC",
                 'joins' => [
                     'LEFT JOIN (SELECT basicId, name cost_class_name FROM v_basic WHERE class ="costClass" ) bc ON bc.basicId = cost_class'
                 ],
             ];
             $resultData['list'] = $this->pCostSubCom->getList($sParam)['list'];
+            // echo $this->pCostSubCom->M()->_sql();exit;
             // $resultData=[];
         }
         $resultData['panel'] = $this->fetch('ProjectCost/projectcostTable/panel');
@@ -218,7 +219,7 @@ class ProjectCostController extends BaseController{
     //报价编辑
     function project_offerEdit(){
         extract($_POST);
-        // print_r($data['list']);
+        // print_r($data['list']);exit;
         $this->pCostCom->startTrans();
         
         $pOfferData = [

@@ -139,7 +139,7 @@
             // var item_profit_count = {};
             info['list'].forEach(subElement => {
                 
-                if(cost_class != subElement['cost_class']){
+                if(cost_class != subElement['class_sort']+"-"+subElement['cost_class']){
                     var poPanelObj = $(poPanel)
                     var idstr = poPanelObj.find(".cost-class-title").attr("href")
                     poPanelObj.find(".cost-class-title").attr("href",idstr+subElement['class_sort'])
@@ -151,7 +151,7 @@
                     poPanelObj.find(idstr).attr("id",poPanelObj.find(idstr).attr("id")+subElement['class_sort'])
     
                     $(tabId+" .global-modal .box-group ").append(poPanelObj);
-                    cost_class = subElement['cost_class']
+                    cost_class = subElement['class_sort']+"-"+subElement['cost_class']
                 }
                 var poItemOjc = $(poItem);
                 // console.log(poItemOjc.find(".cost_item_del"))

@@ -124,11 +124,11 @@
             $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val(info['id'])
             $(tabId+" .global-modal").find(".all-count").text(info['total']);
             $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(info['tax_rate']/100))*info['total']));
-            var cost_class = 0;
+            var cost_class = "";
             var item_count = {};
             info['list'].forEach(subElement => {
-                
-                if(cost_class != subElement['cost_class']){
+                // console.log(subElement['class_sort']+"-"+subElement['cost_class'])
+                if(cost_class != subElement['class_sort']+"-"+subElement['cost_class']){
                     var poPanelObj = $(poPanel)
                     var idstr = poPanelObj.find(".cost-class-title").attr("href")
                     poPanelObj.find(".cost-class-title").attr("href",idstr+subElement['class_sort'])
@@ -140,7 +140,7 @@
                     poPanelObj.find(idstr).attr("id",poPanelObj.find(idstr).attr("id")+subElement['class_sort'])
     
                     $(tabId+" .global-modal .box-group ").append(poPanelObj);
-                    cost_class = subElement['cost_class']
+                    cost_class = subElement['class_sort']+"-"+subElement['cost_class']
                 }
                 var poItemOjc = $(poItem);
                 ['id','class_notes','classify','sort','item_content','num','unit','act_num','act_unit','price','total'].forEach(modalName => { 
