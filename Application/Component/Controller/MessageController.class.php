@@ -53,7 +53,7 @@ class MessageController extends BaseController{
      */    
     function noRead($userId=NULL){
         $userId = $userId ? $userId : session("userId") ;
-        return $this->M()->countList(["to_user"=>$userId,"status"=>0]);
+        return $this->countList(["to_user"=>$userId,"status"=>0]);
     }
     function newMesg($userId=NULL){
         $userId = $userId ? $userId : session("userId") ;
