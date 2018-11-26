@@ -20,6 +20,7 @@ class PurchaController extends BaseController{
         $this->purchaCom=getComponent('Purcha');
         $this->payCom=getComponent('Pay');
         $this->InvoiceCom=getComponent('Invoice');
+        $this->pCostSubCom=getComponent('ProjectCostSub');
         $this->payGradeType = ["1"=>"A级[高]","2"=>"B级[次]","3"=>"C级[中]","4"=>"D级[低]"];
         $this->invoiceType = ["0"=>"无","1"=>"收据","2"=>"增值税普通","3"=>"增值税专用"];
         $this->payType = ['1'=>'公对公','2'=>'现金付款','3'=>'支票付款'];
@@ -583,5 +584,63 @@ class PurchaController extends BaseController{
         $this->assign('rows',$rows);
         $html=$this->fetch('Purcha/purchaTable/invoiceLi');  
         $this->ajaxReturn(['html'=>$html]);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-11-26 10:20:34 
+     * @Desc: 采购成本列表 
+     */    
+    function purchase_details(){
+        $reqType=I('reqType');
+        $this->assign("controlName","purchase_details");
+        $this->assign("tableName",$this->pCostSubCom->tableName());
+        if($reqType){
+            $this->$reqType();
+        }else{
+            $this->returnHtml();
+        }
+    }
+    function purchase_detailsList(){
+        $data=I("data");
+        $p=I("p")?I("p"):1;
+        $roleId = session("roleId");
+        $where=[];
+        // if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+        //     $where['ouser_id'] = session('userId');
+        // }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
+        $sql = 'SELECT *,COUNT(id) item_num,"供应商" suprtype FROM v_project_cost_sub WHERE scompany_id > 0  GROUP BY parent_id  UNION ALL SELECT *,COUNT(id) item_num,"非供应商" suprtype FROM v_project_cost_sub WHERE scompany_id = 0 GROUP BY parent_id';
+        $sqlLimit= 'SELECT *,FROM_UNIXTIME(add_time,"%Y-%m-%d") add_time FROM ('.$sql.') pcs LEFT JOIN (SELECT id pId,project_id,section FROM v_project_cost) pc ON pId = pcs.parent_id LEFT JOIN (SELECT projectId,code project_code,name project_name FROM v_project ) p ON p.projectId = pc.project_id LEFT JOIN (SELECT userId, userName ouser_name FROM v_user ) u ON u.userId = pcs.ouser_id LEFT JOIN (SELECT userId, userName cuser_name FROM v_user ) u1 ON u1.userId = pcs.cuser_id ORDER BY add_time DESC LIMIT '.$p.','.$pageSize;
+        $sqlCount= 'SELECT COUNT(id) v_count FROM ('.$sql.') pcs';
+        if(isset($data['suprtype'])){
+            if($data['suprtype']==1){
+                // $sql = ''
+            }
+        }else{
+
+        }
+        //SELECT *,COUNT(DISTINCT scompany_id) num FROM v_project_cost_sub WHERE scompany_id > 0  GROUP BY parent_id  UNION ALL SELECT *,COUNT(id) num FROM v_project_cost_sub WHERE scompany_id = 0 GROUP BY parent_id ;
+        
+        // $parameter=[
+        //     'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_time,COUNT(DISTINCT scompany_id) num",
+        //     'where'=>$where,
+        //     'page'=>$p,
+        //     'pageSize'=>$pageSize,
+        //     'orderStr'=>"id DESC",
+        //     "joins"=>[
+                // "LEFT JOIN (SELECT projectId,code project_code,name project_name FROM v_project ) p ON p.projectId = project_id ",
+                // "LEFT JOIN (SELECT userId, userName ouser_name FROM v_user ) u ON u.userId = ouser_id ",
+            // ]
+        // ];
+        $listResult['list']=$this->pCostSubCom->M()->query($sqlLimit);
+        $listResult['count']=$this->pCostSubCom->M()->query($sqlCount)[0]['v_count'];
+        // print_r( $listResult);exit;
+        // $this->
+        // if($type == 'offer'){
+        //     $listTemplate = 'project_offerList';
+        // }else if($type == 'cost'){
+        //     $listTemplate = 'project_costList';
+        // }
+        $this->tablePage($listResult,'Purcha/purchaTable/purchase_detailsList',"purchase_detailsList",$pageSize);
     }
 }

@@ -44,8 +44,6 @@
                         报价含税总计：<span class="taxed-count">0</span>
                         <if condition="$listType eq 'cost' or $listType eq 'contrast'">
                             |    成本总计：<span class="cost-all-count">0</span>
-                        </if>
-                        <if condition="$listType eq 'contrast'">
                             |    利润：<span class="profit-all-count">0</span>
                             |    利润百分比：<span class="profitrat-all-count">0</span>%
                         </if>
@@ -61,8 +59,11 @@
     <input class="modal-info" name="id" value="0" type="hidden">
     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
     <if condition="$listType neq 'contrast'">
-        {:save_btn(get_defined_vars())}
+        <!-- <button type="button" class="btn btn-sm btn-warning save-info draft-btn" data-con="{$controlName}" data-savetype="draft" data-gettype="{$gettype}" data-url="{$url}" data-modal="true">保存草稿</button> -->
+        {:save_btn(get_defined_vars(),true)}
+    </if>
+    <if condition="$listType eq 'contrast'">
+        {:approve_btn($tableName)}
     </if>
     
-    <!-- {:approve_btn($tableName)} -->
 </div>

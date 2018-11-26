@@ -128,7 +128,9 @@
             $(tabId+" .global-modal").find(".all-count").text(info['total']);
             $(tabId+" .global-modal").find(".cost-all-count").text(info['cost_total']);
             $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(info['tax_rate']/100))*info['total']));
-
+            if(info['id']){
+                $(tabId+" .global-modal").find(".modal-footer .approve-group").data("id",info['id'])
+            }
             var profitAllCount = float(float(info['total']) - float(info['cost_total']));
             var profitratAllCount = float(profitAllCount / float(info['total'])*100);
             $(tabId+" .global-modal").find(".profit-all-count").text(float_format(profitAllCount));

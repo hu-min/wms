@@ -86,9 +86,7 @@ class BaseController extends \Common\Controller\BaseController{
                 }
             }
         }
-        if($_GET['isWechat']){
-            session('is_wechat',true);
-        }
+ 
         // print_r($this->nodeAuth);
         // $this->setLogin();
         
@@ -96,16 +94,15 @@ class BaseController extends \Common\Controller\BaseController{
         if(in_array($nowConAct,$this->exemption) || ( in_array(ACTION_NAME,['excel_import','upload_filesAdd','excel_export','template_down','reset_apply']) && $this->isLogin())){
             if(!$this->isLogin() && !in_array(ACTION_NAME,['checkLogin','Login','lock'])){
                 session("history",domain(false).__SELF__);
-                if(session('is_wechat')){
+                if(is_wechat()){
                     redirect('https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx650b23fa694c8ff7&redirect_uri=http://twsh.twoway.com.cn/Admin/Index/Login&response_type=code&scope=SCOPE&state=STATE#wechat_redirect');
                 }else{
                     $this->redirect('Index/Login');
                 }
                 
             }elseif($this->isLogin() && ACTION_NAME=='Login'){
-                if(session('is_wechat')){
+                if(is_wechat()){
                     $this->vlog(9);
-                    session('is_wechat',Null);
                 }
                 $this->redirect('Index/Main');
             }
@@ -261,19 +258,18 @@ class BaseController extends \Common\Controller\BaseController{
             }else{
                 $userInfo['avatar'] = imge2thumb($userInfo['avatar']);
             }
-            foreach (['userId','loginName','userName','roleId','rolePid','avatar','usertype','roleId','rolePid'] as $key ) {
+            foreach (['userId','loginName','userName','roleId','rolePid','avatar','usertype','rolePid'] as $key ) {
                 if(isset($userInfo[$key])){
                     session($key,$userInfo[$key]);
                 }
             }
             session("userInfo",$userInfo);
             session('isLogin',1);
-            if(session('is_wechat')){
+            if(is_wechat()){
                 $this->vlog(9);
             }else{
                 $this->vlog(1);
             }
-            session('is_wechat',NULL);
             $this->userCom->logIORec($userInfo['userId']);
         }
     }

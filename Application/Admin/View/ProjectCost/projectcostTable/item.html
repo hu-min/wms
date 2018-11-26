@@ -13,7 +13,7 @@
         </div>
     </td>
     <td style="min-width:100px;max-width:200px;">
-        <select class="form-control modal-info chosen-select" title="承接模块" data-value="basicId" data-req="getModuleList" data-text="name" data-type="module" name="classify"  >
+        <select class="form-control modal-info chosen-select" title="承接模块" data-value="basicId" data-req="getOptionList" data-text="name" data-type="module" name="classify"  >
             <!-- <option value="999999999">全部承接模块</option> -->
             <volist name="moduleArr" id="item">
                 <option value="{$item['basicId']}">{$item['name']}</option>
@@ -27,7 +27,7 @@
         <input type="text" class="form-control modal-info" style="text-align: center;" name="num" placeholder="项的数量">
     </td>
     <td style="width: 50px;text-align: center;">
-        <select class="form-control modal-info chosen-select" title="单位" data-value="basicId" data-req="getModuleList" data-text="name" name="unit" >
+        <select class="form-control modal-info chosen-select" title="单位" data-value="basicId" data-req="getOptionList" data-text="name" name="unit" >
             <volist name="unitArr" id="item">
                 <option value="{$item['basicId']}">{$item['name']}</option>
             </volist>
@@ -37,7 +37,7 @@
         <input type="text" class="form-control modal-info" name="act_num" style="text-align: center;" placeholder="重复项数量，默认1" value="1">
     </td>
     <td style="width: 100px;">
-        <select class="form-control modal-info chosen-select" title="单位" data-value="basicId" data-req="getModuleList" data-text="name" name="act_unit" >
+        <select class="form-control modal-info chosen-select" title="单位" data-value="basicId" data-req="getOptionList" data-text="name" name="act_unit" >
             <volist name="unitArr" id="item">
                 <option value="{$item['basicId']}">{$item['name']}</option>
             </volist>
@@ -57,8 +57,20 @@
             <input type="text" class="form-control modal-info" style="background: #D2D6DE;" readonly="readonly" name="cost_total" placeholder="成本合计">
         </td>
     </if>
-
-    <if condition="$listType eq 'contrast'">
+    <if condition="$listType eq 'cost' ">
+        <td>
+            <select class="form-control modal-info chosen-select" title="供应商名称" data-value="companyId" data-req="getOptionList" data-pname="classify" data-text="company"  name="scompany_id" data-type="module_supplier"  data-cname="scompany_cid">
+                <option value="">选择供应商</option>
+            </select>
+        </td>
+        <td>
+            <select class="form-control modal-info chosen-select" title="供应商联系人" data-value="contactId" data-req="getOptionList" data-pname="scompany_id" data-text="contact" name="scompany_cid" data-type="supplier_cont">
+                <option value="">选择供应商联系人</option>
+                <!-- <volist name="suprcontArr" id="item">
+                    <option value="{$item['contactId']}">{$item['contact']}</option>
+                </volist> -->
+            </select>
+        </td>
         <td>
             <input type="text" class="form-control modal-info" readonly="readonly" name="profit" placeholder="利润">
         </td>

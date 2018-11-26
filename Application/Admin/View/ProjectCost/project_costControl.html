@@ -44,6 +44,9 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">成本列表</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
+                        <if condition="$nodeAuth egt 6 ">
+                            {:add_btn(get_defined_vars(),"新增报价成本")}
+                        </if>
                         <!-- {:add_btn(get_defined_vars(),"新增成本")} -->
                     </div>
                     <div class="box-body search-body">
@@ -113,7 +116,12 @@
             //从后端获取poPanel 模板
             // poPanel = result.panel;
             // poItem = result.item;
-            init_chosen("{$url}","getOptionList",".global-modal");
+            if(gettype == "Add"){
+                poPanel = result.panel;
+                poItem = result.item;
+                init_chosen("{$url}","getOptionList",".global-modal");
+            }
+            // init_chosen("{$url}","getOptionList",".global-modal");
         }
         //设置数据
         var pcost_control_setInfo = function(info){
@@ -127,6 +135,12 @@
             $(tabId+" .global-modal").find(".all-count").text(info['total']);
             $(tabId+" .global-modal").find(".cost-all-count").text(info['cost_total'] ? info['cost_total'] : "0.00");
             $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(info['tax_rate']/100))*info['total']));
+
+            var profitAllCount = float(float(info['total']) - float(info['cost_total']));
+            var profitratAllCount = float(profitAllCount / float(info['total'])*100);
+            $(tabId+" .global-modal").find(".profit-all-count").text(float_format(profitAllCount));
+            $(tabId+" .global-modal").find(".profitrat-all-count").text(float_format(profitratAllCount));
+
             var cost_class = "";
             var item_count = {};
             var item_cost_count = {};
@@ -153,7 +167,7 @@
                 var poItemOjc = $(poItem);
                 // console.log(poItemOjc.find(".cost_item_del"))
                 // poItemOjc.find(".cost_item_del").remove()
-                ['id','class_notes','classify','sort','item_content','num','unit','act_num','act_unit','price','total','cost_total'].forEach(modalName => { 
+                ['id','class_notes','classify','sort','item_content','num','unit','act_num','act_unit','price','total','cost_total','profit','profit_ratio'].forEach(modalName => { 
                     if(modalName == 'sort'){
                         poItemOjc.find(".modal-info[name='"+modalName+"']").text(subElement[modalName])
                     }else{
@@ -162,6 +176,29 @@
                     
                     poItemOjc.find(".modal-info[name='"+modalName+"']").prop("disabled",true)
                 });
+                // console.log(subElement['scompany_id'])
+                //供应商和供应商联系人
+                var option = "<option value=''>没有供应商</option>";
+                if(subElement['scompany_ids']){
+                    var option = "<option value=''>选择供应商</option>";
+                    scompany_name = subElement['scompany_names'].split(",")
+                    
+                    subElement['scompany_ids'].split(",").forEach(function(company,index) {
+                        // console.log(subElement['scompany_id'])
+                        if(subElement['scompany_id'] > 0 && company == subElement['scompany_id']){
+                            option += '<option value="'+company+'" selected="selected">'+scompany_name[index]+'</option>'
+                        }else{
+                            option += '<option value="'+company+'">'+scompany_name[index]+'</option>'
+                        }
+                    });
+                    poItemOjc.find(".modal-info[name='scompany_id']").html(option);
+                }
+                if(subElement['scontact_name']){
+                    var option = "<option value=''>选择供应商</option>";
+                    option += '<option value="'+subElement['scompany_cid']+'" selected="selected">'+subElement['scontact_name']+'</option>'
+                    poItemOjc.find(".modal-info[name='scompany_cid']").html(option);
+                }
+
                 poItemOjc.find(".modal-info[name='cost_price']").val(subElement['cost_price'])
                 if(item_count[subElement['class_sort']] !=undefined){
                     item_count[subElement['class_sort']] += float(subElement['total'])
@@ -179,15 +216,22 @@
                 poItemOjc.find('.cost_item_del').remove();
                 
                 $(tabId+" .global-modal .box-group ").find(".panel").eq(subElement['class_sort']).find(".table-items").append(poItemOjc);
+                init_chosen("{$url}","getOptionList",poItemOjc);
                 // $this.find(".table-items").append(poItemOjc);
             });
             // console.log(item_count)
             for (var key in item_count) {
                 $(tabId+" .global-modal .box-group ").find(".panel").eq(key).find('.class-count').text(float_format(item_count[key]));
                 $(tabId+" .global-modal .box-group ").find(".panel").eq(key).find('.cost-class-count').text(float_format(item_cost_count[key]));
+                var profitCount = float(float(item_count[key]) - float(item_cost_count[key]));
+                var profitratCount = float(profitCount / float(item_count[key])*100);
+                $(tabId+" .global-modal .box-group ").find(".panel").eq(key).find('.profit-class-count').text(float_format(profitCount));
+                $(tabId+" .global-modal .box-group ").find(".panel").eq(key).find('.profitrat-class-count').text(float_format(profitratCount));
             }
-
-            if(( info['status'] > 0 || info['ouser_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3){
+            if((info['status'] > 0 && info['status'] !=3 && "{$nodeAuth}"<7)){    
+                $(tabId+" .global-modal").find(".modal-footer .save-info").remove()
+            }
+            if(( info['status'] > 0 ) && "{$nodeAuth}" < 7 && info['status'] !=3){
                 $(tabId+" .global-modal").find('.modal-info').prop("disabled",true)
                 $(tabId+" .global-modal").find(".add-costClass").remove()
                 $(tabId+" .global-modal").find(".box-title .cost_chosen_del").remove()
@@ -195,7 +239,8 @@
                 $(tabId+" .global-modal").find("table .cost_item_del").remove()
                 $(tabId+" .global-modal").find(".box-title .cost_chosen").remove()
             }
-
+            $(tabId+" .global-modal").find(".chosen-select").trigger('chosen:updated')
+            
         }
         //计算总价
         var cost_compute_count = function(){
@@ -223,12 +268,21 @@
             // console.log($costAllCount)
             $(tabId+" .global-modal").find(".cost-all-count").text(float_format($costAllCount));
 
+            var allProfit = float($allCount) - float($costAllCount)
+            var allProfitRat = (float(allProfit)/float($allCount))*100;
+            $(tabId+" .global-modal").find(".profit-all-count").text(float_format(allProfit));
+            $(tabId+" .global-modal").find(".profitrat-all-count").text(float_format(allProfitRat));
+
             // var taxRate = $(tabId+" .global-modal").find(".tax-rate").val(); 
             // console.log(taxRate)
             // $(tabId+" .global-modal").find(".taxed-count").text(float((1+float(taxRate/100))*$allCount));
         }
         //获取数据
-        var pcost_control_getInfo = function(){
+        var pcost_control_getInfo = function($this){
+            datas["status"] = 2
+            if($($this).data('savetype') && $($this).data('savetype') == "draft"){
+                datas["status"] = 10;
+            }
             datas["data"] = {};
             // datas["data"]['project_id'] = $(tabId+" .global-modal").find(".modal-info[name='project_id']").val()
             // datas["data"]['tax_rate'] = $(tabId+" .global-modal").find(".modal-info[name='tax_rate']").val();
@@ -271,7 +325,7 @@
                             notice(110,title,"输入异常");
                             throw title
                         }else{
-                            if(name == "id" || (temp['id'] == 0 && name != "id") || (temp['id'] > 0 && in_array(name,['cost_price','cost_total','total']))){
+                            if(name == "id" || (temp['id'] == 0 && name != "id") || (temp['id'] > 0 && in_array(name,['cost_price','cost_total','total','scompany_id','scompany_cid']))){
                                 temp[name] = val;
                             }
                         }
@@ -388,17 +442,21 @@
                 var num = Number($tr.find(".modal-info[name='num']").val());
                 var act_num = Number($tr.find(".modal-info[name='act_num']").val());
                 var price = float($tr.find(".modal-info[name='price']").val());
+                var total = 0
                 if(num > 0 &&  act_num > 0 && price > 0){
-                    $tr.find(".modal-info[name='total']").val(float(num * act_num * price,2));
+                    total = float_format(num * act_num * price,2)
+                    $tr.find(".modal-info[name='total']").val(total);
                 }else{
-                    $tr.find(".modal-info[name='total']").val(0);
+                    $tr.find(".modal-info[name='total']").val(total);
                 }
                 var cost_price = float($tr.find(".modal-info[name='cost_price']").val());
         
+                var cost_total = 0
                 if(num > 0 &&  act_num > 0 && cost_price > 0){
-                    $tr.find(".modal-info[name='cost_total']").val(float_format(num * act_num * cost_price,2));
+                    cost_total = float_format(num * act_num * cost_price,2)
+                    $tr.find(".modal-info[name='cost_total']").val(cost_total);
                 }else{
-                    $tr.find(".modal-info[name='cost_total']").val(0);
+                    $tr.find(".modal-info[name='cost_total']").val(cost_total);
                 }
                 var costCount = 0
                 $(this).parents("tbody").find(".modal-info[name='cost_total']").each(function(){
@@ -411,6 +469,17 @@
                     classCount += float($(this).val());
                 })
                 $(this).parents(".panel").find(".class-count").text(float_format(classCount));
+
+                var profit =  float(total) - float(cost_total);
+                $tr.find(".modal-info[name='profit']").val(float_format(profit));
+                var profit_ratio =  (float(profit)/float(total))*100;
+                
+                var classProfit = float(classCount) - float(costCount)
+                var classProfitRat = (float(classProfit)/float(classCount))*100;
+                $(this).parents(".panel").find(".profit-class-count").text(float_format(classProfit));
+                $(this).parents(".panel").find(".profitrat-class-count").text(float_format(classProfitRat));
+
+                $tr.find(".modal-info[name='profit_ratio']").val(float_format(profit_ratio));
                 cost_compute_count()
             })        
         })

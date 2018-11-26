@@ -172,6 +172,8 @@ class IndexController extends BaseController{
                 $project_id = "`projectId` project_id";
             }elseif(in_array($npInfo["db_table"],["v_work_order"])){
                 $project_id = "`relation_project` project_id";
+            }elseif(in_array($npInfo["db_table"],["v_project_cost"])){
+                $user_id = "ouser_id `user_id`";
             }
             if(isset($nodeAuth[$npInfo["controller"]]) && $nodeAuth[$npInfo["controller"]] > 0){
                 $s = "SELECT '{$npInfo["nodeId"]}' nodeId , {$project_id} ,'{$npInfo["nodeTitle"]}' `moudle_name`,{$user_id},`process_level`,`status`,{$add_time},'{$npInfo["controller"]}' controller,examine FROM {$npInfo['db_table']} WHERE `status` IN (0,2) AND process_level = FIND_IN_SET({$roleId},examine) AND process_level > 0";

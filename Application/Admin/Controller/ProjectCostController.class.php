@@ -8,10 +8,14 @@ namespace Admin\Controller;
  */
 class ProjectCostController extends BaseController{
     public function _initialize() {
+        $this->statusLabel[10] = 'maroon';
+        $this->statusType[10] = '草稿';
         parent::_initialize();
         $this->projectCom=getComponent('Project');
         $this->pCostCom=getComponent('ProjectCost');
         $this->pCostSubCom=getComponent('ProjectCostSub');
+        
+
         // $this->supplierCom=getComponent('Supplier');
         // $this->purchaCom=getComponent('Purcha');
         // $this->fieldCom=getComponent('Field');
@@ -56,7 +60,7 @@ class ProjectCostController extends BaseController{
         
         if($gettype=="Edit"){
             $title = "编辑报价";
-            $btnTitle = "保存数据";
+            $btnTitle = "保存提交";
             $redisName="project_offerList";
             $param = [
                 'where'=>['id'=>$id],
@@ -70,10 +74,13 @@ class ProjectCostController extends BaseController{
                 $where['read_type'] = ['EGT',1];
             }
             $sParam =[
+                'fields'=>'*',
                 'where'=>$where,
                 'orderStr'=>"class_sort ASC , sort ASC",
                 'joins' => [
-                    'LEFT JOIN (SELECT basicId, name cost_class_name FROM v_basic WHERE class ="costClass" ) bc ON bc.basicId = cost_class'
+                    'LEFT JOIN (SELECT basicId, name cost_class_name FROM v_basic WHERE class ="costClass" ) bc ON bc.basicId = cost_class',
+                    'LEFT JOIN (SELECT classify module_id , GROUP_CONCAT(companyId) scompany_ids , GROUP_CONCAT(company) scompany_names FROM (SELECT classify FROM v_project_cost_sub WHERE `parent_id` = "'.$resultData['id'].'" AND `read_type` >= 1) pc LEFT JOIN (SELECT module,companyId,company FROM v_supplier_company) sc ON FIND_IN_SET(pc.classify,sc.module) GROUP BY pc.classify) m ON m.module_id = classify',
+                    'LEFT JOIN (SELECT contactId,companyId,contact scontact_name FROM v_supplier_contact ) suc ON suc.companyId = scompany_id AND suc.contactId = scompany_cid '
                 ],
             ];
             $resultData['list'] = $this->pCostSubCom->getList($sParam)['list'];
@@ -94,13 +101,14 @@ class ProjectCostController extends BaseController{
     function project_offerList($type='offer'){
         $data=I("data");
         $p=I("p")?I("p"):1;
+        $roleId = session("roleId");
         $where=[];
         // if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
         //     $where['ouser_id'] = session('userId');
         // }
         $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
-            'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_time",
+            'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_time,FIND_IN_SET({$roleId},examine) place",
             'where'=>$where,
             'page'=>$p,
             'pageSize'=>$pageSize,
@@ -137,7 +145,7 @@ class ProjectCostController extends BaseController{
         }else if($reqType=="project_offerEdit"){
             $where=["id"=>$datas['id']];
             $data=[];
-            foreach (['class_notes','class_sort','cost_class','sort','classify','item_content','num','unit','act_num','act_unit','price','total','status','class_sub','cost_price','cost_total','profit','profit_ratio'] as $key) {
+            foreach (['class_notes','class_sort','cost_class','sort','classify','item_content','num','unit','act_num','act_unit','price','total','status','class_sub','cost_price','cost_total','profit','profit_ratio','scompany_id','scompany_cid'] as $key) {
                 if(isset($datas[$key])){
                     $data[$key]=$datas[$key];
                 }
@@ -177,18 +185,19 @@ class ProjectCostController extends BaseController{
         $roleId = session("roleId");
         $rolePlace = $examines['place'];
         $pOfferData['status'] = 0;
-        if($rolePlace!==false){
-            $pOfferData['process_level']=$rolePlace+2;
-            if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
-                $pOfferData['status'] = 1;
-            }else{
-                $pOfferData['status'] = 2;
-            }
-        }else{
-            $pOfferData['process_level'] = $examines["place"] > 0 ? $examines["place"] : 1;
-        }
+        // if($rolePlace!==false){
+        //     $pOfferData['process_level']=$rolePlace+2;
+        //     if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
+        //         $pOfferData['status'] = 1;
+        //     }else{
+        //         $pOfferData['status'] = 2;
+        //     }
+        // }else{
+        //     $pOfferData['process_level'] = $examines["place"] > 0 ? $examines["place"] : 1;
+        // }
         // print_r($pOfferData);exit;
         $this->pCostCom->startTrans();
+        // $pOfferData['status'] = $status ? $status : $pOfferData['status'];
         $pInsertResult = $this->pCostCom->insert($pOfferData);
         if(isset($pInsertResult->errCode) && $pInsertResult->errCode==0){
             $this->pCostSubCom->startTrans();
@@ -236,6 +245,11 @@ class ProjectCostController extends BaseController{
         // print_r($pOfferData);exit;
         $this->pCostCom->startTrans();
         $this->pCostSubCom->startTrans();
+        
+        if($status){
+            $pOfferData['data']['status'] = $status;
+        }
+  
         $pInsertResult = $this->pCostCom->update($pOfferData);
 
         foreach ($data['list'] as  $subData) {
@@ -272,6 +286,10 @@ class ProjectCostController extends BaseController{
     function  pcost_control_modalOne(){
         $this->project_offer_modalOne('cost','查看/编辑成本');
     }
+    function pcost_controlAdd(){
+        extract($_POST);
+        print_r($data);
+    }
     function pcost_controlEdit(){
         extract($_POST);
         // print_r($data['list']);
@@ -291,6 +309,25 @@ class ProjectCostController extends BaseController{
         // print_r($pOfferData);exit;
         $this->pCostCom->startTrans();
         $this->pCostSubCom->startTrans();
+        // if($status){
+        //     $pOfferData['data']['status'] = $status;
+        // }
+        $pResult = $this->projectCom->getOne(['where'=>['project_id' => $data['id']],'leader'])['list'];
+        $examines = getComponent('Process')->getExamine($vtabId,$pResult['leader']);
+        $pOfferData['data']['process_id'] = $examines["process_id"];
+        $pOfferData['data']['examine'] = $examines["examine"];
+        $roleId = session("roleId");
+        $rolePlace = $examines['place'];
+        $pOfferData['data']['status'] = 2;
+        if($rolePlace!==false){
+            $pOfferData['data']['process_level']=$rolePlace+2;
+            if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
+                $pOfferData['data']['status'] = 1;
+            }
+        }else{
+            $pOfferData['data']['process_level'] = $examines["place"] > 0 ? $examines["place"] : 1;
+        }
+        // print_r($pOfferData);exit;
         $pInsertResult = $this->pCostCom->update($pOfferData);
 
         foreach ($data['list'] as  $subData) {

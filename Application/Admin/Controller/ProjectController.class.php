@@ -337,10 +337,29 @@ class ProjectController extends BaseController{
                     'fields'=>'contactId,contact',
                     'orderStr'=>"contactId DESC",
                 ];
-                $result = $this->supplierCom->getSupplierList($parameter);
+                $result = $this->supplierCom->getSuprContList($parameter);
                 if($result){
                     return $result["list"];
                 }
+                break;
+            case 'module_supplier':
+                $pid=I("pid");
+                if($pid){
+                    $where["_string"] = "FIND_IN_SET({$pid},module)";
+                }
+                if ($key!=""){
+                    $where["company"]=["LIKE","%{$key}%"];
+                }
+                $parameter=[
+                    'where'=>$where,
+                    'fields'=>'companyId,company',
+                    'orderStr'=>"companyId DESC",
+                ];
+                $result = $this->supplierCom->getCompanyList($parameter);
+                if($result){
+                    return $result["list"];
+                }
+                //SELECT companyId,company FROM v_supplier_company WHERE FIND_IN_SET(199,module);
                 break;
             case 'cost_id':
                 $where['status'] = 1;

@@ -259,9 +259,10 @@ function modal_btn($defind_vars,$status=false){
 function approve_btn($tableName,$id=0,$place=false,$level=0,$status=0){
     echo '<div class="approve-group" data-table="'.$tableName.'" data-id="'.$id.'" >
         <button type="button" data-url="'.U('Tools/getApproveList').'" class="btn btn-xs bg-black approve-log">记录</button> ';
-    // echo $place,",",$level;
+    // echo $level,',',$place,',',$status;
     if($place===false || $place > 0){
         $disabled = "";
+        
         // if(($place !== false && $level >= $place) || $status == 3){
         if(( $level > $place) || $status == 3 || $status == 1){
             $disabled = "disabled";
@@ -623,4 +624,14 @@ function fsizeFormat($size){
         $fileSize = round($size/1024/1024,2)."M";
     }
     return $fileSize;
+}
+/** 
+ * @Author: vition 
+ * @Date: 2018-11-26 09:31:47 
+ * @Desc: 判断时候微信浏览器 
+ */
+function is_wechat() { 
+    if (strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false) { 
+        return true; 
+    } return false; 
 }
