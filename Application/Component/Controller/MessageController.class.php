@@ -9,7 +9,7 @@ class MessageController extends BaseController{
         $datas['add_time'] = time();
         $datas['from_user'] = session("userId");
         
-        $datas['content'] = urldecode($datas['content']);
+        $datas['content'] = stripslashes(htmlspecialchars_decode(urldecode($datas['content'])));
         $relationArray = $datas['to_user'];
         $allNum = count($relationArray);
         $current = 0;
@@ -21,6 +21,8 @@ class MessageController extends BaseController{
             $datas['relation_uname'] = $relationRes["list"]["relation_uname"];
         }
         $touser = A("Component/User")->getQiyeId($relationArray);
+        // print_r($datas);exit;
+        // echo stripslashes(htmlspecialchars_decode($datas['content']));exit;
         $this->startTrans();
         foreach ($relationArray as $to_user) {
             $datas['to_user'] = $to_user;

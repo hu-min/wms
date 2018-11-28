@@ -339,7 +339,7 @@
                             throw title
                         }else{
                             if(name=="content"){
-                                datas["data"][name]=encodeURI(CKEDITOR.instances['compose-textarea'].getData(''));
+                                datas["data"][name]=encodeURI(CKEDITOR.instances['compose-textarea'].getData('').replace(/&#39;/g, "'").replace(/&quot;/ig, '"'));
                                 
                             }else{
                                 datas["data"][name]=val;

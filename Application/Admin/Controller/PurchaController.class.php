@@ -21,6 +21,7 @@ class PurchaController extends BaseController{
         $this->payCom=getComponent('Pay');
         $this->InvoiceCom=getComponent('Invoice');
         $this->pCostSubCom=getComponent('ProjectCostSub');
+        $this->pCostCom=getComponent('ProjectCost');
         $this->payGradeType = ["1"=>"A级[高]","2"=>"B级[次]","3"=>"C级[中]","4"=>"D级[低]"];
         $this->invoiceType = ["0"=>"无","1"=>"收据","2"=>"增值税普通","3"=>"增值税专用"];
         $this->payType = ['1'=>'公对公','2'=>'现金付款','3'=>'支票付款'];
@@ -414,6 +415,13 @@ class PurchaController extends BaseController{
         if($reqType){
             $this->$reqType();
         }else{
+            //自动计算成本
+            $sql = "SELECT s_parent_id , s_scompany_id,s_cost_total,s_scompany_cid,item_num FROM (SELECT parent_id s_parent_id , scompany_id s_scompany_id,SUM(cost_total) s_cost_total, scompany_cid s_scompany_cid,COUNT(id) item_num  FROM v_project_cost_sub WHERE scompany_id > 0 GROUP BY parent_id,scompany_cid) pcs LEFT JOIN (SELECT id wid , cost_id,supplier_id FROM v_wouldpay) w ON w.cost_id = pcs.s_parent_id AND w.supplier_id = pcs.s_scompany_id  WHERE ISNULL(wid)";
+            
+            $listResult =M()->query($sql);
+            foreach ($listResult as  $supplierCost) {
+                $insertResult = $this->wouldpayCom->insert(['cost_id'=>$supplierCost['s_parent_id'],'supplier_id'=>$supplierCost['s_scompany_id'],'contract_money'=>$supplierCost['s_cost_total'],'add_time'=>time(),'status'=>1,'supplier_cid'=>$supplierCost['s_scompany_cid'],'item_num'=>$supplierCost['item_num']]);
+            }
             $this->returnHtml();
         }
     }
@@ -422,46 +430,67 @@ class PurchaController extends BaseController{
         $data=I("data");
         $p=I("p")?I("p"):1;
         $where=[];
-        foreach (['project_name','code','supplier_cont_name','supplier_com_name','business_name','leader_name'] as $key) {
-            if(isset($data[$key])){
-                $where[$key]=['LIKE','%'.$data[$key].'%'];
-            }
-        }
-        $roleId = session('roleId');
-        if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
-            // $whereSub['user_id'] = session('userId');
-            // $whereSub['_string'] = "FIND_IN_SET({$roleId},examine)>0";
-            // $where['_logic'] = 'or';
-            // $where['_complex'] = $whereSub;
 
-            $where["_string"] = "FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0 OR user_id = ".session('userId');
-        }
+        // foreach (['project_name','code','supplier_cont_name','supplier_com_name','business_name','leader_name'] as $key) {
+        //     if(isset($data[$key])){
+        //         $where[$key]=['LIKE','%'.$data[$key].'%'];
+        //     }
+        // }
+        // $roleId = session('roleId');
+        // if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
+        //     // $whereSub['user_id'] = session('userId');
+        //     // $whereSub['_string'] = "FIND_IN_SET({$roleId},examine)>0";
+        //     // $where['_logic'] = 'or';
+        //     // $where['_complex'] = $whereSub;
+
+        //     $where["_string"] = "FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0 OR user_id = ".session('userId');
+        // }
+        // $parameter=[
+        //     'where'=>$where,
+        //     'fields'=>"*,FIND_IN_SET({$roleId},examine) place",
+        //     'page'=>$p,
+        //     'pageSize'=>$this->pageSize,
+        //     'orderStr'=>"id DESC",
+        //     "joins"=>[
+        //         "LEFT JOIN (SELECT projectId, name project_name,code,business,leader,brand ,project_time project_date,days FROM v_project) p ON p.projectId = project_id",
+        //         "LEFT JOIN (SELECT userId uuser_id,userName user_name FROM v_user) u ON u.uuser_id = user_id",
+        //         "LEFT JOIN (SELECT userId buser_id,userName business_name FROM v_user) bu ON bu.buser_id = p.business",
+        //         "LEFT JOIN (SELECT userId luser_id,userName leader_name FROM v_user) lu ON lu.luser_id = p.leader",
+        //         "LEFT JOIN (SELECT companyId cid,company supplier_com_name,supr_type,provinceId,cityId FROM v_supplier_company WHERE status=1) c ON c.cid=supplier_com",
+        //         "LEFT JOIN (SELECT contactId cid,contact supplier_cont_name,phone supplier_cont_phone,email supplier_cont_email FROM v_supplier_contact WHERE status=1) ct ON ct.cid=supplier_cont",
+        //         "LEFT JOIN (SELECT basicId,name type_name FROM v_basic WHERE class='supType') st ON st.basicId=c.supr_type",
+        //         "LEFT JOIN (SELECT basicId,name module_name FROM v_basic WHERE class='module') bm ON bm.basicId=module",
+        //         "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = p.brand",
+        //         "LEFT JOIN (SELECT pid ,province province_name FROM v_province) pr ON pr.pid=c.provinceId",
+        //         "LEFT JOIN (SELECT cid,city city_name,pid FROM v_city) ci ON ci.cid=c.cityId",
+        //         "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='v_purcha' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id",
+        //         "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
+        //     ],
+        // ];
+        
+        // $listResult=$this->purchaCom->getList($parameter);
+        // // echo $this->purchaCom->M()->_sql();exit;
+        // $this->tablePage($listResult,'Purcha/purchaTable/purapplyList',"purapplyList");
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
+        $where=['status'=>1];
         $parameter=[
             'where'=>$where,
-            'fields'=>"*,FIND_IN_SET({$roleId},examine) place",
+            'fields'=>"*",
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"id DESC",
-            "joins"=>[
-                "LEFT JOIN (SELECT projectId, name project_name,code,business,leader,brand ,project_time project_date,days FROM v_project) p ON p.projectId = project_id",
-                "LEFT JOIN (SELECT userId uuser_id,userName user_name FROM v_user) u ON u.uuser_id = user_id",
-                "LEFT JOIN (SELECT userId buser_id,userName business_name FROM v_user) bu ON bu.buser_id = p.business",
-                "LEFT JOIN (SELECT userId luser_id,userName leader_name FROM v_user) lu ON lu.luser_id = p.leader",
-                "LEFT JOIN (SELECT companyId cid,company supplier_com_name,supr_type,provinceId,cityId FROM v_supplier_company WHERE status=1) c ON c.cid=supplier_com",
-                "LEFT JOIN (SELECT contactId cid,contact supplier_cont_name,phone supplier_cont_phone,email supplier_cont_email FROM v_supplier_contact WHERE status=1) ct ON ct.cid=supplier_cont",
-                "LEFT JOIN (SELECT basicId,name type_name FROM v_basic WHERE class='supType') st ON st.basicId=c.supr_type",
-                "LEFT JOIN (SELECT basicId,name module_name FROM v_basic WHERE class='module') bm ON bm.basicId=module",
-                "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = p.brand",
-                "LEFT JOIN (SELECT pid ,province province_name FROM v_province) pr ON pr.pid=c.provinceId",
-                "LEFT JOIN (SELECT cid,city city_name,pid FROM v_city) ci ON ci.cid=c.cityId",
-                "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='v_purcha' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id",
-                "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
+            'joins' => [
+                'LEFT JOIN (SELECT id pcid,project_id FROM v_project_cost ) pc ON pc.pcid = cost_id',
+                'LEFT JOIN (SELECT companyId company_id,company supplier_name,supr_type,module,provinceId,cityId FROM v_supplier_company ) sc ON sc.company_id = supplier_id',
+                'LEFT JOIN (SELECT projectId,code project_code,name project_name,FROM_UNIXTIME(project_time,"%Y-%m-%d") project_date,DATE_ADD(FROM_UNIXTIME(project_time,"%Y-%m-%d"),INTERVAL days day) end_date,leader FROM v_project ) p ON p.projectId = pc.project_id',
+                "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
+                "LEFT JOIN (SELECT project_id f_project_id,supplier_id f_supplier_id,SUM(money) f_money FROM v_float_capital_log WHERE log_type = 1 AND float_type = 2 AND supplier_id > 0  GROUP BY project_id,supplier_id) f ON f.f_project_id = pc.project_id AND f.f_supplier_id = supplier_id"
             ],
         ];
-        
-        $listResult=$this->purchaCom->getList($parameter);
-        // echo $this->purchaCom->M()->_sql();exit;
-        $this->tablePage($listResult,'Purcha/purchaTable/purapplyList',"purapplyList");
+        $listResult = $this->wouldpayCom->getList($parameter);
+        // echo $this->wouldpayCom->M()->_sql();exit;
+        // print_r($listResult);exit;
+        $this->tablePage($listResult,'Purcha/purchaTable/supplierpayList',"supplierpayList");
     }
 
     function purcha_apply_modalOne(){
@@ -471,58 +500,113 @@ class PurchaController extends BaseController{
         $resultData=[];
         $id = I("id");
         
+        // if($gettype=="Edit"){
+        //     $title = "采购成本审批";
+        //     $btnTitle = "保存数据";
+        //     $redisName="purapplyList";
+        //     $resultData=$this->purchaCom->redis_one($redisName,"id",$id);
+        // }
+        // // $resultData["project_date"] = date("Y-m-d",$resultData["project_time"]);
+        // foreach (["project_date","sign_date"] as  $date) {
+        //     if(isset($resultData[$date])){
+        //         $resultData[$date] = date("Y-m-d",$resultData[$date]);
+        //     }
+        // }
+        // $resultData["tableData"] = [];
+        // $resultData["tableData"]["suprpay-list"] = ["list"=>$this->payCom->getList(["where"=>["purcha_id"=>$id,"insert_type"=>1],"fields"=>"*,FROM_UNIXTIME(pay_date,'%Y-%m-%d') pay_date"])["list"],"template"=>$this->fetch('Purcha/purchaTable/suprpayLi')];
+        // $resultData["tableData"]["suprfina-list"] = ["list"=>$this->payCom->getList(["where"=>["purcha_id"=>$id,"insert_type"=>2],"fields"=>"*,FROM_UNIXTIME(pay_date,'%Y-%m-%d') pay_date"])["list"],"template"=>$this->fetch('Purcha/purchaTable/suprfinapayLi')];
+        // $resultData["tableData"]["invoice-list"] = ["list"=>$this->InvoiceCom->getList(["where"=>["relation_id"=>$id,"relation_type"=>1],"fields"=>"*,FROM_UNIXTIME(invoice_date,'%Y-%m-%d') invoice_date"])["list"],"template"=>$this->fetch('Purcha/purchaTable/invoiceLi')];
+
+        // $resultData["end_date"] = date("Y-m-d",strtotime($resultData["project_date"]." +".$resultData["days"]."day"));
+        // $modalPara=[
+        //     "data"=>$resultData,
+        //     "title"=>$title,
+        //     "btnTitle"=>$btnTitle,
+        //     "template"=>"purchaModal",
+        // ];
+        // $this->modalOne($modalPara);
+        $this->assign('fin_accountArr',A("Project")->_getOption("fin_account"));
         if($gettype=="Edit"){
             $title = "采购成本审批";
             $btnTitle = "保存数据";
             $redisName="purapplyList";
-            $resultData=$this->purchaCom->redis_one($redisName,"id",$id);
-        }
-        // $resultData["project_date"] = date("Y-m-d",$resultData["project_time"]);
-        foreach (["project_date","sign_date"] as  $date) {
-            if(isset($resultData[$date])){
-                $resultData[$date] = date("Y-m-d",$resultData[$date]);
+            $parameter=[
+                'fields'=>"*,FROM_UNIXTIME(sign_date,'%Y-%m-%d') sign_date ",
+                'where'=>['id'=>$id],
+                "joins"=>[
+                    'LEFT JOIN (SELECT id s_id , read_type s_read_type , parent_id s_parent_id , class_sort s_class_sort , cost_class s_cost_class , class_sub s_class_sub , class_notes s_class_notes , classify s_classify , sort s_sort , item_content s_item_content , num s_num , unit s_unit , price s_price , act_num s_act_num , act_unit s_act_unit , total s_total , cost_price s_cost_price ,SUM(cost_total) s_cost_total , profit s_profit , profit_ratio s_profit_ratio , remark s_remark , ouser_id s_ouser_id , cuser_id s_cuser_id , add_time s_add_time , update_time s_update_time , status s_status , scompany_id s_scompany_id , scompany_cid s_scompany_cid,COUNT(id) item_num FROM v_project_cost_sub WHERE scompany_id > 0 GROUP BY parent_id,scompany_cid) pcs ON pcs.s_parent_id = cost_id AND pcs.s_scompany_id = supplier_id',
+                    'LEFT JOIN (SELECT id pcid,project_id FROM v_project_cost ) pc ON pc.pcid = cost_id',
+                    'LEFT JOIN (SELECT projectId,code project_code,name project_name,FROM_UNIXTIME(project_time,"%Y-%m-%d") project_date,DATE_ADD(FROM_UNIXTIME(project_time,"%Y-%m-%d"),INTERVAL days day) end_date,leader FROM v_project ) p ON p.projectId = pc.project_id',
+                    "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
+                    'LEFT JOIN (SELECT companyId company_id,company supplier_com_name,supr_type,module,provinceId,cityId FROM v_supplier_company ) sc ON sc.company_id = pcs.s_scompany_id',
+                    'LEFT JOIN (SELECT contactId contact_id,contact supplier_cont_name,phone supplier_cont_phone, email supplier_cont_email FROM v_supplier_contact ) suco ON suco.contact_id = pcs.s_scompany_cid',
+                    "LEFT JOIN (SELECT basicId type_id,name type_name FROM v_basic WHERE class = 'supType' ) t ON t.type_id = sc.supr_type",
+                    "LEFT JOIN (SELECT pid ,province province_name FROM v_province) pr ON pr.pid=sc.provinceId",
+                    "LEFT JOIN (SELECT cid,city city_name,pid FROM v_city) ci ON ci.cid=sc.cityId",
+                    // 'LEFT JOIN (SELECT id wid , cost_id,supplier_id,contract_file FROM v_wouldpay) w ON w.cost_id = pcs.s_parent_id AND w.supplier_id = pcs.s_scompany_id',
+                ],
+            ];
+            $resultData = $this->wouldpayCom->getOne($parameter)['list'];
+            if($resultData['module']){
+                $param = [
+                    'fields'=>"GROUP_CONCAT(name) modules",
+                    'where' => ['class'=>'module','basicId'=>['IN',explode(',',$resultData['module'])]],
+                ];
+                $moduleResult = $this->basicCom->getOne($param);
+                if($moduleResult){
+                    $resultData['modules'] = $moduleResult['list']['modules'];
+                }
+                if(strpos($resultData['module'], '999999999') !== false){
+                    $resultData['modules'].=',全部承接模块';
+                }
             }
+            $resultData["tableData"] = [];
+            $resultData["tableData"]["suprpay-list"] = ["list"=>$this->payCom->getList(["where"=>["purcha_id"=>$id,"insert_type"=>1],"fields"=>"*,FROM_UNIXTIME(pay_date,'%Y-%m-%d') pay_date"])["list"]];
+            // $resultData["tableData"]["suprfina-list"] = ["list"=>$this->payCom->getList(["where"=>["purcha_id"=>$id,"insert_type"=>2],"fields"=>"*,FROM_UNIXTIME(pay_date,'%Y-%m-%d') pay_date"])["list"],"template"=>$this->fetch('Purcha/purchaTable/suprfinapayLi')];
+            $resultData["tableData"]["invoice-list"] = ["list"=>$this->InvoiceCom->getList(["where"=>["relation_id"=>$id,"relation_type"=>1],"fields"=>"*,FROM_UNIXTIME(invoice_date,'%Y-%m-%d') invoice_date"])["list"]];
         }
-        $resultData["tableData"] = [];
-        $resultData["tableData"]["suprpay-list"] = ["list"=>$this->payCom->getList(["where"=>["purcha_id"=>$id,"insert_type"=>1],"fields"=>"*,FROM_UNIXTIME(pay_date,'%Y-%m-%d') pay_date"])["list"],"template"=>$this->fetch('Purcha/purchaTable/suprpayLi')];
-        $resultData["tableData"]["suprfina-list"] = ["list"=>$this->payCom->getList(["where"=>["purcha_id"=>$id,"insert_type"=>2],"fields"=>"*,FROM_UNIXTIME(pay_date,'%Y-%m-%d') pay_date"])["list"],"template"=>$this->fetch('Purcha/purchaTable/suprfinapayLi')];
-        $resultData["tableData"]["invoice-list"] = ["list"=>$this->InvoiceCom->getList(["where"=>["relation_id"=>$id,"relation_type"=>1],"fields"=>"*,FROM_UNIXTIME(invoice_date,'%Y-%m-%d') invoice_date"])["list"],"template"=>$this->fetch('Purcha/purchaTable/invoiceLi')];
+        $resultData['getSuprpayLiItem'] = $this->fetch('Purcha/purchaTable/suprpayitem');
+        $resultData['suprInvoiceLiItem'] = $this->fetch('Purcha/purchaTable/invoiceLi');
 
-        $resultData["end_date"] = date("Y-m-d",strtotime($resultData["project_date"]." +".$resultData["days"]."day"));
         $modalPara=[
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "template"=>"purchaModal",
+            "template"=>"supplierPayModal",
         ];
         $this->modalOne($modalPara);
     }
     function purcha_applyEdit(){
-        exit;
+        // exit;
         // $data=I("data");
         extract($_POST);
-        // $contract_file=I("contract_file");
-        // $pay_grade=I("pay_grade");
-        // $purcha_id=I("purcha_id");
+
         $isUpdate = false;
-        $dataInfo=["id" => $purcha_id];
-        foreach (["contract_file","pay_grade","contract_amount","company","sign_date","remark"] as $key) {
+        $dataInfo = ["where"=>["id" => $purcha_id],"data"=>[]];
+        foreach (["contract_file","pay_grade","contract_money","finance_id","sign_date","remark"] as $key) {
             if(isset($$key) && $$key!=""){
                 if($key=="sign_date"){
-                    $dataInfo[$key] = strtotime($$key);
+                    $dataInfo['data'][$key] = strtotime($$key);
                 }else{
-                    $dataInfo[$key] = $$key;
+                    $dataInfo['data'][$key] = $$key;
                 }
             }
         }
+
         if(!isset($data) || !is_array($data)){ 
             $this->ajaxReturn(['errCode'=>114,'error'=>getError(114)]);
         }
-        if(count($dataInfo)>1){
-            $isUpdate =true;
-            $updateResult=$this->purchaCom->update($dataInfo);
-            if($updateResult->errCode==0){
-                $this->ApprLogCom->updateStatus($this->purchaCom->tableName(),$dataInfo["id"]);
+
+        // print_r($dataInfo);exit;
+
+        if(count($dataInfo['data']) > 1){
+
+            $isUpdate = true;
+            $updateResult=$this->wouldpayCom->update($dataInfo);
+            // $updateResult=$this->purchaCom->update($dataInfo);
+            if($updateResult->errCode == 0){
+                $this->ApprLogCom->updateStatus($this->wouldpayCom->tableName(),$dataInfo['where']["id"]);
+                // $this->ApprLogCom->updateStatus($this->purchaCom->tableName(),$dataInfo["id"]);
             }
         }
         foreach (["suprpay-list","suprfina-list","invoice-list"] as $itemInfoList) {

@@ -246,6 +246,9 @@ $(document).on("click",".v-showmodal",function(){
     datas.title = title
     datas.con = con
     datas.reqType = con+"_modalOne"
+    if(fun_is_exits(con+"_showInfo")){
+        eval(con+"_showInfo(this)");//对不同的模块设置不同的响应数据
+    }
     // var hasData = $(tabId+" "+vtarget+" .modal-content").find(".modal-footer .save-info").data("gettype");
     // if(hasData !== undefined && datas.gettype  == 'Add' && hasData == "Add"){
     //     $(tabId+" "+vtarget).modal('toggle');
@@ -1195,11 +1198,16 @@ function float(num,place) {
     // return parseFloat(s_x);
   }
 function float_format(num,place){
-    if(num.toString().indexOf(".")>0){
-        return float(num);
+    if(num){
+        if(num.toString().indexOf(".")>0){
+            return float(num);
+        }else{
+            return num+".00";
+        }
     }else{
-        return num+".00";
+        return "0.00";
     }
+    
 }
 var $fileInput = ""//当前文件input
 function upload(option){

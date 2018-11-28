@@ -1,0 +1,311 @@
+<div class="modal-header">
+    <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{$title}</h4>
+</div>
+<div class="modal-body">
+    <form role="form">
+        <div class="box-body">
+            <div class="box box-solid">
+                <div class="box-body">
+                    <div class="box-group" id="{$vtabId}-accordion">
+                        <div class="panel box box-primary">
+                            <div class="box-header with-border">
+                                <h4 class="box-title">
+                                    <a data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#{$vtabId}-collapseOne">
+                                        项目基本信息 
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="{$vtabId}-collapseOne" class="panel-collapse collapse in">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">项目编号：</label>
+                                                <input class="form-control project-info" readonly="readonly" name="project_code" title="项目编号"  value="" placeholder="项目编号" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">项目日期：</label>
+                                                <input class="form-control project-info" readonly="readonly" name="project_date" title="项目日期"  value="" placeholder="项目日期" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">项目名称：</label>
+                                                <input class="form-control project-info" readonly="readonly" name="project_name" title="项目名称"  value="" placeholder="项目名称" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">结束日期：</label>
+                                                <input class="form-control project-info" readonly="readonly" name="end_date" title="结束日期"  value="" placeholder="结束日期" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">项目主担：</label>
+                                                <input class="form-control project-info" readonly="readonly" name="leader_name" title="项目主担"  value="" placeholder="项目主担" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel box box-danger">
+                            <div class="box-header with-border">
+                                <h4 class="box-title">
+                                    <a data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#{$vtabId}-collapseTwo">
+                                        供应商信息【付】 
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="{$vtabId}-collapseTwo" class="panel-collapse collapse">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">供应商全称：</label>
+                                                <input class="form-control project-info" readonly="readonly" name="supplier_com_name" title="供应商全称"  value="" placeholder="供应商全称" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">供应商类型：</label>
+                                                <input class="form-control project-info" readonly="readonly" name="type_name" title="供应商类型"  value="" placeholder="供应商类型" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">供应商联系人：</label>
+                                                <input class="form-control project-info" readonly="readonly" name="supplier_cont_name" title="供应商联系人"  value="" placeholder="供应商联系人" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">联系人电话：</label>
+                                                <input class="form-control project-info" readonly="readonly" name="supplier_cont_phone" title="联系人电话"  value="" placeholder="联系人电话" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">联系人邮箱：</label>
+                                                <input class="form-control project-info" readonly="readonly" name="supplier_cont_email" title="联系人邮箱"  value="" placeholder="联系人邮箱" type="text">
+                                            </div>
+                                        </div>
+                                        <!-- <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">支付优先级：</label>
+                                                <select class="form-control modal-info" disabled="disabled" title="立项或添加场次" name="pay_grade">
+                                                    <option value="">支付优先级</option>
+                                                    <volist name="payGradeType" id="item">
+                                                        <option value="{$key}">{$item}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
+                                        </div> -->
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">承接类别：</label>
+                                                <input class="form-control project-info" readonly="readonly" name="modules" title="承接类别"  value="" placeholder="承接类别" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">供应商所在地：</label>
+                                                <input class="form-control project-info" readonly="readonly" name="supplier_com_region" title="供应商所在地"  value="" placeholder="供应商所在地" type="text">
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel box box-info">
+                            <div class="box-header with-border">
+                                <h4 class="box-title">
+                                    <a data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#{$vtabId}-collapseThree">
+                                        供应商合同相关【应付】 
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="{$vtabId}-collapseThree" class="panel-collapse collapse">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">合同上传/查看：</label>
+                                                <div class="input-group">
+                                                    <input class="form-control modal-info upload-file project-info" readonly="readonly" name="contract_file" title="合同上传/查看"  type="text">
+                                                    <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">合同总额：</label>
+                                                <input class="form-control project-info" readonly="readonly" name="contract_money" title="合同总额"  value="" placeholder="合同总额" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">签约日期：</label>
+                                                <input class="form-control project-info date-input" readonly="readonly" name="sign_date" title="签约日期"  value="" placeholder="签约日期" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">签约公司：</label>
+                                                <select class="form-control modal-info chosen-select project-info" title="选择签约公司" name="finance_id">
+                                                    <option value="">选择签约公司</option>
+                                                    <volist name="fin_accountArr" id="item">
+                                                        <option value="{$item.id}">{$item.account}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">采购部备注：</label>
+                                                <input class="form-control project-info" name="remark" title="采购部备注"  value="" placeholder="采购部备注" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel box box-warring">
+                            <div class="box-header with-border">
+                                <h4 class="box-title">
+                                    <a data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#{$vtabId}-collapseFifth">
+                                        付款安排 
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="{$vtabId}-collapseFifth" class="panel-collapse collapse">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-12"> <h5 class="box-title"><i class="fa fa-plus-square text-aqua add-purpay" title="添加付款计划" data-target=".bankstock-tab" style="cursor: pointer;"> 添加付款计划</i></h5></div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12 table-outbox" style="z-index: 1;">
+                                            <div style="font-size:0.95em;overflow: auto;">
+                                                <table class="table table-bordered table-hover suprpay-list">
+                                                    <!-- <div>合同付款次数 </div> -->
+                                                    <thead>
+                                                        <tr>
+                                                            <th>操作</th>
+                                                            <th>计划付款日期</th>
+                                                            <th>计划付款金额</th>
+                                                            <th>计划付款比例</th>
+                                                            <th>备注</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody >
+                                                        
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">已付款 统计：</label>
+                                                <input class="form-control project-info" readonly="readonly" name="paid" title="已付款 统计"  value="" placeholder="已付款 统计" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">未付款 统计：</label>
+                                                <input class="form-control project-info" readonly="readonly" name="surplus" title="未付款 统计"  value="" placeholder="未付款 统计" type="text">
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel box box-info">
+                            <div class="box-header with-border">
+                                <h4 class="box-title">
+                                    <a data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#{$vtabId}-collapseSixth">
+                                        发票列表
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="{$vtabId}-collapseSixth" class="panel-collapse collapse">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-12"> <h5 class="box-title"><i class="fa fa-plus-square text-aqua add-invoice" title="添加发票信息" data-target=".bankstock-tab" style="cursor: pointer;"> 添加发票信息</i></h5></div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <table class="table table-bordered table-hover invoice-list">
+                                                <thead>
+                                                    <tr>
+                                                        <th>操作</th>
+                                                        <th>上传查看发票</th>
+                                                        <th>发票金额</th>
+                                                        <th>发票开具日期</th>
+                                                        <th>发票类别</th>
+                                                        <th>发票税率</th>
+                                                        <th>备注</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">需要提交发票总额：</label>
+                                                <input class="form-control project-info"  name="all_invoice" title="需要提交发票总额"  value="" placeholder="需要提交发票总额" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">已提交发票总额：</label>
+                                                <input class="form-control project-info" readonly="readonly" name="invoiced" title="已提交发票总额"  value="" placeholder="已提交发票总额" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">未提交发票总额：</label>
+                                                <input class="form-control project-info" readonly="readonly" name="invoice_supr" title="未提交发票总额"  value="" placeholder="未提交发票总额" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
+                    <input class="modal-info" value="0" name="status" type="hidden">
+                    <!-- {:modal_btn(get_defined_vars())} -->
+                </div>
+            </div>
+        </div>
+    </form>            
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+    <input class="modal-info purcha-id project-info" value="0" name="id" type="hidden">
+    {:save_btn(get_defined_vars(),true)}
+</div>

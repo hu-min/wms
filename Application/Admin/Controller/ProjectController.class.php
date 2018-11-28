@@ -20,6 +20,7 @@ class ProjectController extends BaseController{
         $this->whiteCom=getComponent('White');
         $this->InvoiceCom=getComponent('Invoice');
         $this->payCom=getComponent('Pay');
+        $this->moneyAccCom=getComponent('MoneyAccount');
         $this->processArr=["0"=>"沟通","1"=>"完结","2"=>"裁决","3"=>"提案","4"=>"签约","5"=>"LOST","6"=>"筹备","7"=>"执行","8"=>"完成"];
         $this->dateArr=["0"=>"立项日期","1"=>"提案日期","2"=>"项目日期","3"=>"结束日期"];
 
@@ -408,6 +409,20 @@ class ProjectController extends BaseController{
                 if($result){
                     return $result["list"];
                 }                               
+                break;
+            case 'fin_account':
+                if ($key!=""){
+                    $where["account"]=["LIKE","%{$key}%"];
+                }
+                $parameter=[
+                    'where'=>$where,
+                    'fields'=>'id,account',
+                    'orderStr'=>"id DESC",
+                ];
+                $result = $this->moneyAccCom->getList($parameter);
+                if($result){
+                    return $result["list"];
+                }                     
                 break;
             default:
                 # code...

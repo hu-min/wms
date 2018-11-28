@@ -92,6 +92,19 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label >选择供应商：</label>
+                            <select class="form-control modal-info chosen-select" title="选择供应商" data-value="companyId"  data-text="company" name="supplier_id" data-type="supplier_com">
+                                <option value="0">无供应商</option>
+                                <volist name="supplierArr" id="item">
+                                    <option value="{$item['companyId']}">{$item['company']}</option>
+                                </volist>
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 <div class="form-group"> 
                     <label class="control-label">内部明细：</label>
                     <textarea class="form-control  modal-info" rows="2" title="内部明细"  name="inner_detail"></textarea>
