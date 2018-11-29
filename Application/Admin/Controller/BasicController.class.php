@@ -1105,7 +1105,7 @@ class BasicController extends BaseController{
         $parameter=[
             'where'=>["class"=>"feeType"],
             'page'=>0,
-            'pageSize'=>9999,
+            'pageSize'=>999999,
             'orderStr'=>'level DESC',
         ];
         $feeTypeResult=$this->basicCom->getBasicList($parameter);

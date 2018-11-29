@@ -11,7 +11,7 @@ class CostController extends BaseController{
     protected $accountType = ["1"=>"现金","2"=>"微信支付","3"=>"支付宝","4"=>"银行卡","5"=>"支票","6"=>"其它"];
     protected $expVouchType = ["无","收据","签收单+身份证","发票","其他"];
     public function _initialize() {
-        $this->ABasic=A("Basic");
+
         $this->project=A('Project');
         parent::_initialize();
         $this->projectCom=getComponent('Project');
@@ -23,7 +23,7 @@ class CostController extends BaseController{
         $this->expenseCom=getComponent('Expense');
         $this->expenseSubCom=getComponent('ExpenseSub');
         $this->whiteCom=getComponent('White');
-        
+        $this->pCostCom=getComponent('ProjectCost');
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
         $this->accounts = ["2"=>session("userInfo.wechat"),"3"=>session("userInfo.alipay"),"4"=>session("userInfo.bank_card")];
@@ -125,8 +125,9 @@ class CostController extends BaseController{
             "template"=>"debitModal",
         ];
         $option='<option value="0">费用类别</option>';
-        foreach ($this->ABasic->getFeeTypeTree() as $key => $value) {
-            $option.=$this->ABasic->getfeeType($value,0);
+        // print_r(A("Basic")->getFeeTypeTree());exit;
+        foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
+            $option.=A("Basic")->getfeeType($value,0);
         }
         $this->assign("pidoption",$option);
         $this->modalOne($modalPara);
@@ -262,9 +263,27 @@ class CostController extends BaseController{
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
     function getProjectOne(){
-        // print_r($option);
-        
-        $this->ajaxReturn(["data"=>A("Purcha")->getProjectOne()["list"]]);
+      
+        $data = A("Purcha")->getProjectOne(true);
+
+        $data['modules'] = [];
+        $param = [
+            'fields' => 'cs.classify classify,SUM(cs.cost_total) cost_total,mname',
+            'page'=>1,
+            'pageSize'=>999999999,
+            'where' => ['project_id'=> $data['projectId']],
+            'groupBy' => 'cs.classify',
+            'isCount' => false,
+            'joins' => [
+                'LEFT JOIN (SELECT parent_id,cost_class,classify,cost_total FROM v_project_cost_sub WHERE scompany_id = 0) cs ON cs.parent_id = id',
+                'LEFT JOIN (SELECT basicId cid,name mname FROM v_basic WHERE class="module") m ON m.cid = cs.classify',
+            ],
+        ];
+        $result = $this->pCostCom->getList($param);
+        if($result){
+            $data['modules'] = $result['list'];
+        }
+        $this->ajaxReturn(["data" => $data]);
     }
     /** 
      * @Author: vition 
@@ -374,8 +393,8 @@ class CostController extends BaseController{
         $id = I("id");
         $this->assign("provinceArr",$this->basicCom->get_provinces());
         $option='<option value="0">费用类别</option>';
-        foreach ($this->ABasic->getFeeTypeTree() as $key => $value) {
-            $option.=$this->ABasic->getfeeType($value,0);
+        foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
+            $option.=A("Basic")->getfeeType($value,0);
         }
         $this->assign("pidoption",$option);
 
@@ -688,8 +707,8 @@ class CostController extends BaseController{
         $nodeId = getTabId(I("vtabId"));
         $this->assign("provinceArr",$this->basicCom->get_provinces());
         $option='<option value="0">费用类别</option>';
-        foreach ($this->ABasic->getFeeTypeTree() as $key => $value) {
-            $option.=$this->ABasic->getfeeType($value,0);
+        foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
+            $option.=A("Basic")->getfeeType($value,0);
         }
         $this->assign("pidoption",$option);
         // print_r($process);
@@ -729,8 +748,8 @@ class CostController extends BaseController{
         $rows = I("rows");
         $this->assign("provinceArr",$this->basicCom->get_provinces());
         $option='<option value="0">费用类别</option>';
-        foreach ($this->ABasic->getFeeTypeTree() as $key => $value) {
-            $option.=$this->ABasic->getfeeType($value,0);
+        foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
+            $option.=A("Basic")->getfeeType($value,0);
         }
         $this->assign("pidoption",$option);
         $this->assign('rows',$rows);

@@ -8,7 +8,7 @@
     <form role="form">
         <div class="box-body">
             <input class="modal-info" value="0" name="id" type="hidden">
-            <input class="modal-info" value="0" name="project_id" type="hidden">
+            <!-- <input class="modal-info" value="0" name="project_id" type="hidden"> -->
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-group">
@@ -62,14 +62,22 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
+                        <label >承接类型：</label>
+                        <select class="form-control modal-info chosen-select"  multiple="multiple" title="承接类型"  name="modules">
+                            
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
                         <label >费用类别：</label>
                         <select class="form-control modal-info chosen-select" required="required" title="费用类别"  name="free_type">
                             {$pidoption}
                         </select>
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="info-title">要求放款日期：</label>
@@ -94,6 +102,8 @@
                         <input class="form-control modal-info" name="account" title="收款账户详细"  value="" placeholder="收款账户详细" type="text">
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="info-title">借支说明：</label>

@@ -109,6 +109,7 @@
         </div>
     </div>
     <script>
+        var modules_data = []
         function debit_initInfo(){
             init_chosen("{$url}","getOptionList",".global-modal");
             init_date();
@@ -135,10 +136,34 @@
                 $(tabId+" .modal-info").prop("disabled",true)
             }
         }
+        var compute_modebit = function (){
+            var modules = $(tabId+" .global-modal").find(".modal-info[name='modules']");
+            var debit_money = $(tabId+" .global-modal").find(".modal-info[name='debit_money']").val();
+            var limitMoney = 0;
+            
+            modules_data.forEach(subData => {
+                if(in_array(subData.classify,modules.val())){
+                    limitMoney+=float(subData.cost_total)
+                    if(limitMoney>0 && debit_money>limitMoney){
+                        notice(100,'<div>选择的承接模块成本限制为：'+limitMoney+'</div>','借支超额');
+                        $(tabId+" .global-modal").find(".modal-info[name='debit_money']").val(limitMoney)
+                        throw '借支超额';
+                    }
+                }
+            });
+
+            if(limitMoney <= 0){
+                notice(100,'<div>选择的承接模块成本异常，为：【0】</div>','借支超额');
+                $(tabId+" .global-modal").find(".modal-info[name='debit_money']").val('')
+            }
+            
+        }
         $(function(){
             $(tabId+" .search-list").trigger("click");
             $(tabId).offon("change"," .project-info[name='project_id']",function(){
                 var project_id = $(this).val()
+                var modules = $(tabId+" .global-modal").find(".modal-info[name='modules']");
+                
                 if(Number(project_id)>0){
                     datas["reqType"]='getProjectOne';
                     datas["onlydata"]='true';
@@ -148,18 +173,43 @@
                         if(result.data){
                             result.data['project_id'] = result.data['projectId'];
                             debit_setInfo(result.data)
+                            var option = '<option></option>'
+                            result.data.modules.forEach(element => {
+                                option += '<option value="'+element.classify+'">'+element.mname+'</option>'
+                            });
+
+                            modules.html(option);
+                            modules.trigger("chosen:updated")
+                            modules_data = result.data.modules
                         }
                     })
+                    $(tabId+" .global-modal").find(".modal-info[name='modules']").prop("required",true)
                 }else{
+                    modules.html('');
+                    modules.trigger("chosen:updated")
+                    modules_data = [];
+                    $(tabId+" .global-modal").find(".modal-info[name='modules']").prop("required",false)
                     ["code","project_name","project_date","business_name","leader_name","leader"].forEach(element=>{
                         $(tabId+" .global-modal .project-info[name='"+element+"']").val("");
                     })
                 }
+                
+                
             });
             $(tabId+" .global-modal").on("change",".modal-info[name='account_type']",function(){
                 var accKey = $(this).val();
                 var accounts = JSON.parse('{$accounts}')
                 $(this).parents(".row").find(".modal-info[name='account']").val(accounts[accKey]);
+            })
+            $(tabId+" .global-modal").on("change",".modal-info[name='modules']",function(){
+                compute_modebit()
+            })
+            $(tabId+" .global-modal").on("input",".modal-info[name='debit_money']",function(){
+                
+                var project_id = $(tabId+" .global-modal").find(".modal-info[name='project_id']").val();
+                if(project_id>0){
+                    compute_modebit()
+                }
             })
         })
     </script>
