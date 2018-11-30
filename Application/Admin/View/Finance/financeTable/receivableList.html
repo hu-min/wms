@@ -10,13 +10,13 @@
         <td>{$item['session_all']}</td>
         <td>{$item['amount']|number_format}</td>
         <td>{$item['contract_date']|time_format}</td>
-        <td>{$item['pay_amount']|number_format}</td>
-        <td>{$item['pay_date']|date="Y-m-d",###|time_format}</td>
-        <td>{$item['advance']|number_format}</td>
-        <td>{$item['advance_date']|date="Y-m-d",###|time_format}</td>
-        <td>{$item['surplus']|number_format}</td>
-        <td>{$item['surplus_date']|date="Y-m-d",###|time_format}</td>
-        <td>{$item['next_date']|date="Y-m-d",###|time_format}</td>
+        <td>{$item['f_money']|number_format}</td>
+        <td>{$item['happen_time']}</td>
+        <!-- <td>{$item['advance']|number_format}</td>
+        <td>{$item['advance_date']|date="Y-m-d",###|time_format}</td> -->
+        <td>{:round($item['amount']-$item['f_money'],2)}</td>
+        <!-- <td>{$item['surplus_date']|date="Y-m-d",###|time_format}</td> -->
+        <!-- <td>{$item['next_date']|date="Y-m-d",###|time_format}</td> -->
         <td>{$item['remark']}</td>
         {:list_btn(get_defined_vars(),"id",[],false,false,false)}
     </tr>

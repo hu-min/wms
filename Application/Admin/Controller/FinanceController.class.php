@@ -444,9 +444,11 @@ class FinanceController extends BaseController{
                 "LEFT JOIN (SELECT companyId company_id,company customer_com_name FROM v_customer_company ) c ON c.company_id = p.customer_com",
                 "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = p.business",
                 "LEFT JOIN (SELECT basicId type_id,name type_name FROM v_basic WHERE class = 'projectType' ) t ON t.type_id = p.type",
+                "LEFT JOIN (SELECT project_id f_project_id,supplier_id f_supplier_id,SUM(money) f_money ,FROM_UNIXTIME(happen_time,'%Y-%m-%d') happen_time FROM v_float_capital_log WHERE log_type = 1 AND float_type = 1 GROUP BY project_id,supplier_id) f ON f.f_project_id = project_id"
             ],
         ];
-        
+        // 'where' =>['project_id' => $resultData['project_id'] , 'float_type' =>1],
+        //     'fields'=>"*,FROM_UNIXTIME(happen_time,'%Y-%m-%d %H:%i:%s') happen_time",
         $listResult=$this->receivableCom->getList($parameter);
         // echo $this->receivableCom->M()->_sql();exit;
         $this->tablePage($listResult,'Finance/financeTable/receivableList',"receivableList",$pageSize);
