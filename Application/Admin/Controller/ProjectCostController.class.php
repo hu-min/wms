@@ -268,6 +268,29 @@ class ProjectCostController extends BaseController{
         $this->pCostSubCom->commit();
         $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
     }
+    //报价导出
+    function project_offer_export($excelData){
+        $schema=[
+            'basicId' => ['name'=>'承接模块id'],
+            'name' => ['name'=>'承接模块名称'],
+            'alias' => ['name'=>'承接模块别名'],
+            'pId' => ['name'=>'供应商类别'],
+            'remark' => ['name'=>'备注'],
+            'sort' => ['name'=>'排序'],
+            'status' => ['name'=>'状态'],
+        ];
+        foreach ($excelData as $index => $val) {
+            foreach ($val as $key => $value) {
+                if($key=="pId"){
+                    $excelData[$index][$key] = $this->basicCom->getOne(['where'=>['basicId'=>$value]])['list']['name'];
+                }else if($key=="status"){
+                    $excelData[$index][$key] = $this->statusType[$value];
+                }
+            }
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'供应商承接模块表'];
+        return $exportData ;
+    } 
     function  project_costControl(){
         $reqType=I('reqType');
         $this->assign("controlName","pcost_control");

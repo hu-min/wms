@@ -1618,7 +1618,7 @@ class FinanceController extends BaseController{
             'where'=>$where,
             'page'=>$p,
             'pageSize'=>$this->pageSize,
-            'orderStr'=>"happen_time DESC",
+            'orderStr'=>"add_time DESC",
             "joins"=>[
                 "LEFT JOIN (SELECT projectId,code project_code,name project_name FROM v_project ) p ON p.projectId = project_id",
                 "LEFT JOIN (SELECT userId,userName user_name FROM v_user) u ON u.userId = user_id",

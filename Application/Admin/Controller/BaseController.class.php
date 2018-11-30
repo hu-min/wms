@@ -786,6 +786,11 @@ class BaseController extends \Common\Controller\BaseController{
             excelExport(["data"=>$data,'schema'=>$schema,'fileName'=>$fileName,'template'=>$template,'callback'=>$callback]);
         }
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-11-30 09:49:28 
+     * @Desc: 模板下载 
+     */    
     function template_down(){
         $con = I('con');
         if(in_array($con,['Basic_basic_brand','Basic_basic_stage','Basic_basic_projectType','Basic_expenClas','Basic_basic_expense_type','Public_pub_files_type','Basic_basic_unit','Basic_basic_costClass'])){
