@@ -1559,6 +1559,7 @@ class FinanceController extends BaseController{
     function float_capital_log(){
         $reqType=I('reqType'); 
         $this->assign("controlName","flo_cap_log");
+        $this->assign('tableName',$this->flCapLogCom->tableName());//删除数据的时候需要
         $accountResult = $this->moneyAccCom->getList(['fields'=>'id,account','pageSize'=>999999])['list'];
         $this->assign('accountArr',$accountResult);
         $this->assign('capTypeArr',["1"=>"银行存款","2"=>"库存现金","3"=>"保险箱","4"=>"库存现金（含保险箱）"]);
