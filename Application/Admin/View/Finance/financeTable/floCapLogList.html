@@ -32,6 +32,9 @@
             </if>
         </td>
         <td>{$item.remark}</td>
-        {:list_btn(get_defined_vars(),"id",[],false,false,false)}
+        <td>
+            {:approve_btn($tableName,$item['id'],$item['place'],$item['process_level'],$item['status'])}
+        </td>
+        {:list_btn(get_defined_vars(),"id",[],false,false,true)}
     </tr>
 </volist>

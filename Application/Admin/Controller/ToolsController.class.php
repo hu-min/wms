@@ -102,6 +102,7 @@ class ToolsController extends BaseController{
         if(!$tableInfo){
             $this->ajaxReturn(['errCode'=>100,'error'=>'当前数据表异常，请联系管理员']);
         }
+    
         $title = $tableInfo['list']['nodeTitle'];
         $controller = $tableInfo['list']['controller'];
         
@@ -206,6 +207,8 @@ class ToolsController extends BaseController{
                 }else if($table=="v_project" && $state==1){
                     $this->ReceCom=getComponent('Receivable');
                     $this->ReceCom->createOrder($tableId,session('userId'));
+                }else if($table=="v_float_capital_log" && $state==1){
+                    getComponent('FlCapLog')->computeFloat($id);
                 }
                 $examineRes = $db ->field("process_level,examine")->where([$db->getPk()=>$id])->find();
                                

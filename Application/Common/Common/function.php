@@ -107,6 +107,19 @@ function base64Img($data,$scr="",$name=""){
 }
 /** 
  * @Author: vition 
+ * @Date: 2018-11-30 15:45:00 
+ * @Desc: 图片转base64 
+ */
+function base64Encode ($image_file) {
+    $base64_image = '';
+    $image_info = getimagesize($image_file);
+    $image_data = fread(fopen($image_file, 'r'), filesize($image_file));
+    $base64_image = 'data:' . $image_info['mime'] . ';base64,' . chunk_split(base64_encode($image_data));
+    return $base64_image;
+}
+
+/** 
+ * @Author: vition 
  * @Date: 2018-02-26 22:38:16 
  * @Desc: 设置节点树 
  */
@@ -174,7 +187,7 @@ function status_label($defind_vars){
  * @Date: 2018-06-09 23:01:13 
  * @Desc: list列表中的按钮状态 
  */
-function list_btn($defind_vars,$idStr,$inlink=[],$onlycat=false,$onlyState=false,$hasState=true){
+function list_btn($defind_vars,$idStr,$inlink=[],$onlycat=false,$onlyState=false,$hasState=true,$text = '查看'){
     $statusLabel = $defind_vars["statusLabel"];
     $statusType = $defind_vars["statusType"];
     $item = $defind_vars["item"];
@@ -192,13 +205,13 @@ function list_btn($defind_vars,$idStr,$inlink=[],$onlycat=false,$onlyState=false
     }
     if($nodeAuth >= 1 && !$onlyState){
         if(empty($inlink)){
-            echo "<button type='button' data-gettype='Edit' data-toggle='modal' data-vtarget='.global-modal' class='btn btn-xs btn-primary v-showmodal'>查看</button>";
+            echo "<button type='button' data-gettype='Edit' data-toggle='modal' data-vtarget='.global-modal' class='btn btn-xs btn-primary v-showmodal'>{$text}</button>";
         }else{
             if(isset($inlink["title"])){
                 $title = 'data-title="'.$inlink["title"].'"';
             }
 
-            echo '<a class="btn btn-xs btn-primary nodeOn" role="button" data-id="'.$item[$idStr].'" '.$title.' data-nodeid="'.$inlink["nodeid"].'" href="'.$inlink["href"].'"><span>查看</span></a>';
+            echo '<a class="btn btn-xs btn-primary nodeOn" role="button" data-id="'.$item[$idStr].'" '.$title.' data-nodeid="'.$inlink["nodeid"].'" href="'.$inlink["href"].'"><span>'.$text.'</span></a>';
         }
         
     }

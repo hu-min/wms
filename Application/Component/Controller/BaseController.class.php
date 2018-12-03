@@ -83,7 +83,9 @@ class BaseController extends \Common\Controller\BaseController{
         }else{
             $classList=$this->selfDB->getOne($parameter);
         }
-        
+        if(isset($parameter['one']) && $parameter['one']){
+            return $classList;
+        }
         if($classList){
             return ['list'=>$classList];
         }

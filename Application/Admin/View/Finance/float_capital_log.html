@@ -92,6 +92,8 @@
                                 <th>操作员工</th>
                                 <th>原始凭证</th>
                                 <th>备注</th>
+                                <th>审批记录</th>
+                                <th>状态</th>
                                 <th>操作</th>
                             </tr>
                         </thead>
@@ -149,7 +151,7 @@
                     $(tabId+" .global-modal .modal-info[name='"+element+"']").prop("disabled",true);
                 }
             });
-            if(info['bank_detail'] != "" || info['log_type'] != 1){
+            if("{$nodeAuth}" < 3 && info['status'] != 0){
                 $(tabId+" .global-modal .modal-info").prop("disabled",true);
                 $(tabId+" .global-modal .modal-footer").find(".save-info").remove();
             }

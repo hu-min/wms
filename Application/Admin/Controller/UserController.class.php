@@ -730,6 +730,7 @@ class UserController extends BaseController{
     function manageProcessInfo(){
         $reqType=I("reqType");
         $datas=I("data");
+        // print_r($datas);
         if(empty($datas['Option'][0]['type']) || empty($datas['Option'][0]['type'])){
             $this->ajaxReturn(['errCode'=>100,'error'=>getError(100).";请认真填写！"]);
         }
@@ -737,15 +738,16 @@ class UserController extends BaseController{
         if(count($datas['Option'])<2){
             $this->ajaxReturn(['errCode'=>100,'error'=>getError(100).";最少要有一个审批者！"]);
         }
-        $datas["Depict"][0]["role"] = array_values(array_filter($datas["Depict"][0]["role"],function($var){if($var!="") return $var;}));
+        // print_r();exit;
+        if(is_array($datas["Option"][0]["role"])){
+            $datas["Depict"][0]["role"] = array_values(array_filter($datas["Depict"][0]["role"],function($var){if($var!="") return $var;}));
+            $datas["Option"][0]["role"] = array_values(array_filter($datas["Option"][0]["role"],function($var){if($var!="") return $var;}));
+        }
         $datas["processDepict"]=json_encode($datas["Depict"],JSON_UNESCAPED_UNICODE);
+        $datas["processOption"]=json_encode($datas["Option"],JSON_UNESCAPED_UNICODE);
         unset($datas["Depict"]);
         
-        $datas["Option"][0]["role"] = array_values(array_filter($datas["Option"][0]["role"],function($var){if($var!="") return $var;}));
-        $datas["processOption"]=json_encode($datas["Option"],JSON_UNESCAPED_UNICODE);
-        // print_r($datas);
         foreach ($datas["Option"] as $key => $value) {
-
             if($value["type"]==1){
                 $where = ['rolePid'=>["IN",$value['role']]];
             }else{
@@ -790,7 +792,9 @@ class UserController extends BaseController{
     }
 
     function user_processAdd(){
-	    $Info=$this->manageProcessInfo();
+        $Info = $this->manageProcessInfo();
+        // print_r($Info);
+        // exit;
         $insertResult=$this->processCom->insertProcess($Info);
         if($insertResult->errCode==0){
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);

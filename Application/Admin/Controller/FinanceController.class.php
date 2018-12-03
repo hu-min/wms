@@ -1381,6 +1381,53 @@ class FinanceController extends BaseController{
         // $basicResult=$this->LogCom->getList($parameter);
         $this->tablePage($basicResult,'Finance/financeTable/invoiceConList',"invoiceConList",$pageSize,'',$config);
     }
+    function invoiceCon_modalOne(){
+        $title = "发票验证";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $resultData=[];
+        $id = I("id");
+        $invoiceImg = '';
+        vendor('leshui.leshui');//引入乐税
+        $this->leshui = new \leshui('7161669b874d451c8a4c9886eb118ec5','d6759b14-8b28-4b8f-af2d-9317f066b298');
+        if($gettype=="Edit"){
+            $redisName = "invoiceConList";
+            $invoiceConList = $this->Redis->get($redisName);
+            foreach ($invoiceConList as $invoice) {
+                if($invoice['id'] == $id && $invoice['invoice'] != ''){
+                    $invoiceImg = $invoice['invoice'];
+                    break;
+                }
+            }
+            // $base64 = base64Encode($invoiceImg);
+            // $param = [
+            //     'image' => base64Encode($invoiceImg),
+            // ];
+            // invoiceCode	String	是	发票代码（长度10位或者12位）
+            // invoiceNumber	String	是	发票号码（长度8位）
+            // billTime	String	是	开票时间（时间格式必须为：2017-05-11，不支持其他格式）           
+            // checkCode	String	否	校验码（检验码必须是后六位！，增值税专用发票，增值税机动车发票，二手车统一发票可以不传）            
+            // invoiceAmount	String	否	开具金额、不含税价（增值税普通发票，增值税电子发票，卷式发票，电子普通[通行费]发票可以不传）            
+            $param = [
+                'invoiceCode' => '043001800104',
+                'invoiceNumber' => '24147627',
+                'billTime' => '2018-11-28',
+                'checkCode' => '375684',
+                'invoiceAmount' => '9631.07',
+            ];
+            $result = $this->leshui->codeQuery($param);
+            // $result = $this->leshui->orcQuery($param);
+            print_r($result);
+            exit;
+        }
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "template"=>"invoiceCheckModal",
+        ];
+        $this->modalOne($modalPara);
+    }
     function invoiceEdit(){
         $request = I('request');
         $reqType = I('reqType');
@@ -1489,6 +1536,7 @@ class FinanceController extends BaseController{
 
         $inOut = ["day-income"=>0,"day-expend"=>0,"month-income"=>0,"month-expend"=>0];
         $where['happen_time'] = [['egt',strtotime(date("Y-m-d")." 00:00:00")],['lt',strtotime(date("Y-m-d")." 23:59:59")]];
+        $where['status'] = 1;
         $param = [
             'where' => $where,
             'fields' => " float_type ,SUM(money) money",
@@ -1599,7 +1647,8 @@ class FinanceController extends BaseController{
         $datas = I("data");
         $p=I("p")?I("p"):1;
         $where=[];
-        
+        $roleId = session('roleId');
+
         foreach (['project_id','account_id','log_type','float_type'] as $key ) {
             if(isset($datas[$key])){
                 if( $key == "log_type" && $datas[$key] == 4){
@@ -1616,7 +1665,7 @@ class FinanceController extends BaseController{
            }
         }
         $parameter=[
-            'fields'=>"*,FROM_UNIXTIME(happen_time,'%Y-%m-%d %H:%i:%s') happen_time,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time",
+            'fields'=>"*,FROM_UNIXTIME(happen_time,'%Y-%m-%d %H:%i:%s') happen_time,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time,FIND_IN_SET({$roleId},examine) place",
             'where'=>$where,
             'page'=>$p,
             'pageSize'=>$this->pageSize,
@@ -1652,6 +1701,23 @@ class FinanceController extends BaseController{
             $datas['add_time'] = time();
             $datas['user_id'] = session("userId");
             unset($datas['id']);
+            $examines = getComponent('Process')->getExamine(I("vtabId"),0);
+            $datas['examine'] = $examines['examine'];
+            $datas['process_id'] = $examines['process_id'];
+            $roleId = session("roleId");
+            $rolePlace = $examines['place'];
+            $datas['status'] = 0;
+            if($rolePlace!==false){
+                $datas['process_level']=$rolePlace+2;
+                if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
+                    $status = 1;
+                }else{
+                    $status = 2;
+                }
+            }else{
+                $datas['process_level'] = $examines["place"] > 0 ? $examines["place"] : 1;
+            }
+
             return $datas;
         }else if($reqType=="flo_cap_logEdit"){
             $where=["id"=>$datas['id']];
@@ -1667,34 +1733,47 @@ class FinanceController extends BaseController{
     }
     function flo_cap_logAdd(){
         $Info = $this->manageFlCapLogInfo();
+        // print_r($Info);
+        // exit;
         $this->flCapLogCom->startTrans();
         if($Info){
-            if($Info['log_type']==1){
-                $key = 'bank_stock';
-            }elseif($Info['log_type']==2){
-                $key = 'cash_stock';
-            }elseif($Info['log_type']==3){
-                $key = 'strongbox';
-            }
-
-            $stockResult = $this->moneyAccCom->getOne(['where'=>['id'=>$Info['account_id']],'fields'=>$key]);
-            if($Info['float_type'] == 1){
-                $Info['balance'] = $stockResult['list'][$key] + $Info['money'];
-            }elseif($Info['float_type'] == 2){
-                $Info['balance'] = $stockResult['list'][$key] - $Info['money'];
-                if($Info['balance'] < 0){
-                    $this->ajaxReturn(['errCode'=>100,'error'=>'账户金额不足。仅剩下：'.$stockResult['list'][$key]]);
+            if($Info['status'] == 1){
+                if($Info['log_type']==1){
+                    $key = 'bank_stock';
+                }elseif($Info['log_type']==2){
+                    $key = 'cash_stock';
+                }elseif($Info['log_type']==3){
+                    $key = 'strongbox';
                 }
-            }
-            $insertResult = $this->flCapLogCom->insert($Info);
-            if($insertResult){
+    
+                $stockResult = $this->moneyAccCom->getOne(['where'=>['id'=>$Info['account_id']],'fields'=>$key]);
                 if($Info['float_type'] == 1){
-                    $updateResult = $this->moneyAccCom->M()->where(['id'=>$Info['account_id']])->setInc($key,$Info['money']); 
+                    $Info['balance'] = $stockResult['list'][$key] + $Info['money'];
                 }elseif($Info['float_type'] == 2){
-                    $updateResult =$this->moneyAccCom->M()->where(['id'=>$Info['account_id']])->setDec($key,$Info['money']); 
+                    $Info['balance'] = $stockResult['list'][$key] - $Info['money'];
+                    if($Info['balance'] < 0){
+                        $this->ajaxReturn(['errCode'=>100,'error'=>'账户金额不足。仅剩下：'.$stockResult['list'][$key]]);
+                    }
                 }
-                if($updateResult){
+                $insertResult = $this->flCapLogCom->insert($Info);
+                if($insertResult){
+                    if($Info['float_type'] == 1){
+                        $updateResult = $this->moneyAccCom->M()->where(['id'=>$Info['account_id']])->setInc($key,$Info['money']); 
+                    }elseif($Info['float_type'] == 2){
+                        $updateResult =$this->moneyAccCom->M()->where(['id'=>$Info['account_id']])->setDec($key,$Info['money']); 
+                    }
+                    if($updateResult){
+                        $this->flCapLogCom->commit();
+                        $this->ajaxReturn(['errCode'=>$insertResult->errCode,'error'=>getError($insertResult->errCode)]);
+                    }
+                }
+            }else{
+                $insertResult = $this->flCapLogCom->insert($Info);
+                if($insertResult){
                     $this->flCapLogCom->commit();
+                    if($insertResult && $insertResult->errCode==0){
+                        $this->ApprLogCom->createApp($this->flCapLogCom->tableName(),$insertResult->data,session("userId"),"");
+                    }
                     $this->ajaxReturn(['errCode'=>$insertResult->errCode,'error'=>getError($insertResult->errCode)]);
                 }
             }

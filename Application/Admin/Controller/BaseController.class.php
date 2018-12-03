@@ -436,6 +436,9 @@ class BaseController extends \Common\Controller\BaseController{
         if($db=='v_user'){
             $qiye_id = $dbObject->field('qiye_id')->where([$dbObject->getPk()=>$id])->find()['qiye_id'];
         }
+        if($db == 'v_float_capital_log' && ($statusType=="del" || $statusType=="deepDel")){
+            getComponent('FlCapLog')->computeFloat($id,true);
+        }
         if($statusType=="del"){
             if($db!='v_purcha'){
                 $conResult=$dbObject->save([$dbObject->getPk()=>$id,"status"=>$status]);
