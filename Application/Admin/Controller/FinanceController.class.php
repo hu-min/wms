@@ -1646,7 +1646,7 @@ class FinanceController extends BaseController{
     function flo_cap_logList(){
         $datas = I("data");
         $p=I("p")?I("p"):1;
-        $where=[];
+        $where=['status'=>1];
         $roleId = session('roleId');
 
         foreach (['project_id','account_id','log_type','float_type'] as $key ) {
