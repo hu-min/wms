@@ -51,6 +51,7 @@ class ProjectCostController extends BaseController{
         $title = "新增报价";
         $btnTitle = "添加数据";
         $gettype = I("gettype");
+        $export = I('export');
         $this->assign('costClassArr',$this->Com ->get_option('costClass'));
         $this->assign('moduleArr',$this->Com ->get_option('module'));
         $this->assign('unitArr',$this->Com ->get_option('unit'));
@@ -80,10 +81,18 @@ class ProjectCostController extends BaseController{
                 'joins' => [
                     'LEFT JOIN (SELECT basicId, name cost_class_name FROM v_basic WHERE class ="costClass" ) bc ON bc.basicId = cost_class',
                     'LEFT JOIN (SELECT classify module_id , GROUP_CONCAT(companyId) scompany_ids , GROUP_CONCAT(company) scompany_names FROM (SELECT classify FROM v_project_cost_sub WHERE `parent_id` = "'.$resultData['id'].'" AND `read_type` >= 1) pc LEFT JOIN (SELECT module,companyId,company FROM v_supplier_company) sc ON FIND_IN_SET(pc.classify,sc.module) GROUP BY pc.classify) m ON m.module_id = classify',
-                    'LEFT JOIN (SELECT contactId,companyId,contact scontact_name FROM v_supplier_contact ) suc ON suc.companyId = scompany_id AND suc.contactId = scompany_cid '
+                    'LEFT JOIN (SELECT contactId,companyId,contact scontact_name FROM v_supplier_contact ) suc ON suc.companyId = scompany_id AND suc.contactId = scompany_cid ',
+                    'LEFT JOIN (SELECT basicId unit_id, name unit_name FROM v_basic WHERE class ="unit" ) un ON un.unit_id = unit',
+                    'LEFT JOIN (SELECT basicId aunit_id, name aunit_name FROM v_basic WHERE class ="unit" ) aun ON aun.aunit_id = act_unit',
+                    'LEFT JOIN (SELECT basicId mid, name module_name FROM v_basic WHERE class ="module" ) mo ON mo.mid = m.module_id',
                 ],
             ];
             $resultData['list'] = $this->pCostSubCom->getList($sParam)['list'];
+            if($export){
+                $sql = explode("LIMIT",$this->pCostSubCom->M()->_sql())[0];
+                $this->Redis->set(md5($sql),$sql,300);
+                $this->ajaxReturn(['sql'=>md5($sql),'url'=>U(CONTROLLER_NAME.'/excel_export')."?sql=".md5($sql)]);
+            }
             // echo $this->pCostSubCom->M()->_sql();exit;
             // $resultData=[];
         }
@@ -97,6 +106,131 @@ class ProjectCostController extends BaseController{
             "template"=>"project_offerModal",
         ];
         $this->modalOne($modalPara);
+    }
+    function pcost_control_export($excelData){
+        // print_r($excelData);exit;
+        $schema=[
+            'cost_class_name' => ['name'=>'分类'],
+            'item_content' => ['name'=>'项目内容'],
+            'num' => ['name'=>'数量'],
+            'unit_name' => ['name'=>'单位'],
+            'act_num' => ['name'=>'数量'],
+            'aunit_name' => ['name'=>'单位'],
+            'price' => ['name'=>'单价'],
+            'total' => ['name'=>'合计'],
+        ];
+        foreach ($excelData as $index => $val) {
+            foreach ($val as $key => $value) {
+                if($key=="status"){
+                    $excelData[$index][$key] = $this->statusType[$value];
+                }
+            }
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'报价数据','template'=>'Public/excel_template/offer-template.xlsx','callback'=>'pcost_control_exportcall'];
+        return $exportData ;
+        // print_r($excelData);exit;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-12-04 13:39:17 
+     * @Desc: 根据模板导出数据 
+     */    
+    function pcost_control_exportcall($excelData,&$objExcel,&$objActSheet){
+        $param = [
+            'fields' => '*',
+            'where' => ['id'=>$excelData[0]['parent_id']],
+            'one' => true,
+            'joins' => [
+                'LEFT JOIN (SELECT projectId,code project_code,name project_name,FROM_UNIXTIME(project_time,"%Y/%m/%d") project_date,DATE_ADD(FROM_UNIXTIME(project_time,"%Y/%m/%d"),INTERVAL days day) end_date FROM v_project ) p ON p.projectId = project_id ',
+            ]
+        ];
+        $projectCostData = $this->pCostCom->getOne($param);
+        // print_r($projectCostData);exit;
+        $objActSheet->setTitle ( '运营报价表' );
+        $objActSheet->setCellValue ( 'D3', date("Y/m/d") );
+        // $objActSheet->setCellValue ( 'D6', $projectCostData['project_date'].'-'.$projectCostData['end_date'] );
+        $objActSheet->setCellValue ( 'B9', $projectCostData['project_name']);
+        $cost_class = "";
+        $item_count = [];
+        $all_count = 0;
+        $sRow = 13;
+        $countRow = 0;
+        
+        foreach ($excelData as $subData) {
+            if($cost_class !=  $subData['class_sort']+"-"+ $subData['cost_class']){
+                $objActSheet->mergeCells("B{$sRow}:K{$sRow}");
+                $objActSheet->getStyle("B{$sRow}")->getFont()->setBold(true);
+                $objActSheet->getStyle( "B{$sRow}:K{$sRow}")->getFill()->getStartColor()->setARGB("FF969696");
+                $title = chinese_num(($subData["class_sort"]+1))."、";
+                $objActSheet->setCellValue ( "B{$sRow}", $title.$subData["cost_class_name"]);
+                $cost_class = $subData['class_sort']+"-"+ $subData['cost_class'];
+                
+                $countRow = $sRow + 1;
+                $sRow+=2;
+            }
+            $styleThinBlackBorderOutline = array(
+                'borders' => array(
+                    'allborders' => array( //设置全部边框
+                        'style' => \PHPExcel_Style_Border::BORDER_THIN //粗的是thick
+                    ),
+                ),
+            );
+            $classCol = "D";
+            if($subData["class_sub"]>1){
+                $objActSheet->mergeCells("C{$sRow}:C".($sRow+$subData["class_sub"]-1));
+                $objActSheet->setCellValue("C{$sRow}",$subData["class_notes"]);
+                $objActSheet->getStyle("C{$sRow}")->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            }elseif($subData["class_sub"] == 1){
+                $objActSheet->mergeCells("C{$sRow}:D{$sRow}");
+                $classCol = "C";
+            }
+            $objActSheet->getStyle( "B{$sRow}:K{$sRow}")->applyFromArray($styleThinBlackBorderOutline);
+            $objActSheet->getStyle("B{$sRow}:K{$sRow}")->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objActSheet->setCellValue("B{$sRow}",$subData["sort"]);
+            $objActSheet->setCellValue($classCol."{$sRow}",$subData["module_name"]);
+            $objActSheet->setCellValue("E{$sRow}",$subData["item_content"]);
+            $objActSheet->setCellValue("F{$sRow}",$subData["num"]);
+            $objActSheet->setCellValue("G{$sRow}",$subData["unit_name"]);
+            $objActSheet->setCellValue("H{$sRow}",$subData["act_num"]);
+            $objActSheet->setCellValue("I{$sRow}",$subData["aunit_name"]);
+            $objActSheet->setCellValue("J{$sRow}",$subData["price"]);
+            $objActSheet->setCellValue("K{$sRow}",$subData["total"]);
+            $sRow++;
+            $item_count[$countRow] += round($subData['total'],2);
+            $all_count += round($subData['total'],2);
+        }
+        // print_r($item_count);exit;
+        foreach ($item_count as $row => $countVal) {
+            $objActSheet->mergeCells("B{$row}:J{$row}");
+            $objActSheet->getStyle("K{$row}")->getFont()->setBold(true);
+            $objActSheet->getStyle("K{$row}")->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objActSheet->getStyle( "B{$row}:K{$row}")->getFill()->getStartColor()->setARGB("FFC0C0C0");
+            $styleThinBlackBorderOutline = array(
+                'borders' => array(
+                    'allborders' => array( //设置全部边框
+                        'style' => \PHPExcel_Style_Border::BORDER_THIN //粗的是thick
+                    ),
+                ),
+            );
+            $objActSheet->getStyle( "B{$row}:K{$row}")->applyFromArray($styleThinBlackBorderOutline);
+            $objActSheet->setCellValue("K{$row}",$countVal);
+        }
+        $sRow++;
+        $objActSheet->getStyle( "B{$sRow}:K{$sRow}")->getFill()->getStartColor()->setARGB("FF000000");
+        $sRow++;
+
+        $objActSheet->getStyle("J{$sRow}:K".($sRow+3))->getFont()->setBold(true);
+        $objActSheet->getStyle("J{$sRow}:K".($sRow+3))->getFont()->setSize(11);
+        $objActSheet->getStyle("J{$sRow}:K".($sRow+3))->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objActSheet->setCellValue("K{$sRow}",$all_count);
+        $objActSheet->setCellValue("J{$sRow}",'以上合计');
+        $sRow++;
+        $all_rateCount = round($all_count*($projectCostData['tax_rate']/100),2);
+        $objActSheet->setCellValue("J{$sRow}","增值税{$projectCostData['tax_rate']}%");
+        $objActSheet->setCellValue("K{$sRow}",$all_rateCount);
+        $sRow++;
+        $objActSheet->setCellValue("J{$sRow}",'总计');
+        $objActSheet->setCellValue("K{$sRow}",round($all_count+$all_rateCount,2));
     }
     function project_offerList($type='offer'){
         $data=I("data");

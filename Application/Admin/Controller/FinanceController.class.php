@@ -1646,7 +1646,7 @@ class FinanceController extends BaseController{
     function flo_cap_logList(){
         $datas = I("data");
         $p=I("p")?I("p"):1;
-        $where=['status'=>1];
+        $where=['status'=>['elt',1]];
         $roleId = session('roleId');
 
         foreach (['project_id','account_id','log_type','float_type'] as $key ) {
@@ -1700,6 +1700,9 @@ class FinanceController extends BaseController{
             $datas['status']=1;
             $datas['add_time'] = time();
             $datas['user_id'] = session("userId");
+            if(!isset($datas['happen_time'])){
+                $datas['happen_time']=time();
+            }
             unset($datas['id']);
             $examines = getComponent('Process')->getExamine(I("vtabId"),0);
             $datas['examine'] = $examines['examine'];

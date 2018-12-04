@@ -103,5 +103,12 @@ class Redis extends Cache {
     public function clear() {
         return $this->handler->flushDB();
     }
+    public function R()
+    {
+        return $this->handler;
+    }
+    function prefix(){
+        return $this->options['prefix'];
+    }
 
 }

@@ -54,6 +54,7 @@
                 <div class="box box-primary box-solid">
                     <div class="box-header with-border">
                         <h3 class="box-title">最新登录 TOP100</h3>
+                        <span class="text-yellow">&nbsp;&nbsp;当前在线：<span class="online_num"></span></span>
                         <div class="box-tools">
                         <button type="button" name="lastLoginList" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
                         </button>
@@ -272,7 +273,9 @@
 				self.find("tbody").html(result.table);
 				self.find(".page-div").html(result.page);
                 if(req=="projectDescList"){
-                    $(tabId+" .refresh[name='projectDescList']").parents('.box-header').find(".project_num").text(result.count)
+                    $(tabId+" .refresh[name='"+req+"']").parents('.box-header').find(".project_num").text(result.count)
+                }else if(req=='lastLoginList'){
+                    $(tabId+" .refresh[name='"+req+"']").parents('.box-header').find(".online_num").text(result.count)
                 }
                 // console.log(result);
             },false)

@@ -243,7 +243,9 @@ class IndexController extends BaseController{
         ];
         $listResult = $this->LogCom->getList($param);
         $listResult["count"] = $listResult["count"]>100 ? 100 : $listResult["count"];
-        $this->tablePage($listResult,'Index/table/lastLoginList',"lastLoginList",5,"",["rollPage"=>5,"onlyPage"=>true,"bigSize"=>false]);
+        $onlineData = $this->redisCom->onlineList();
+        $countStr = $onlineData['count'];
+        $this->tablePage($listResult,'Index/table/lastLoginList',"lastLoginList",5,$countStr,["rollPage"=>5,"onlyPage"=>true,"bigSize"=>false]);
     }
     /** 
      * @Author: vition 

@@ -123,6 +123,11 @@
             }
             // init_chosen("{$url}","getOptionList",".global-modal");
         }
+        //搜索
+        var pcost_control_searchInfo = function (){
+            datas['gettype'] = 'Edit'
+            datas['id'] = $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val();
+        }
         //设置数据
         var pcost_control_setInfo = function(info){
             poPanel = info.panel;

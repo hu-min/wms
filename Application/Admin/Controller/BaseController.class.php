@@ -54,6 +54,7 @@ class BaseController extends \Common\Controller\BaseController{
         $this->nodeAuth=session('nodeAuth');
         $this->basicCom=getComponent('Basic');
         $this->resetCom=getComponent('ResetApply');
+        $this->redisCom=getComponent('Redis');
         $this->QiyeCom=getComponent('Qiye');
         $this->whiteCom=getComponent('White');
         $this->exemption=[//排除的控制器
@@ -89,7 +90,9 @@ class BaseController extends \Common\Controller\BaseController{
  
         // print_r($this->nodeAuth);
         // $this->setLogin();
-        
+        if($this->isLogin()){
+            $this->redisCom->addOnline(session('userId'));
+        }
 
         if(in_array($nowConAct,$this->exemption) || ( in_array(ACTION_NAME,['excel_import','upload_filesAdd','excel_export','template_down','reset_apply']) && $this->isLogin())){
             if(!$this->isLogin() && !in_array(ACTION_NAME,['checkLogin','Login','lock'])){
@@ -249,8 +252,10 @@ class BaseController extends \Common\Controller\BaseController{
             session("history",NULL);
             session('web_lock_password',NULL);
             cookie('identify',null);
+            $this->redisCom->offline(session('userId'));
             $this->clearRedis('config_web_lock');
             $this->redirect('Index/Login');
+
         }elseif(!session('userId')){
             //登录设置
             if($userInfo['avatar']=="" || !file_exists($userInfo['avatar'])){
@@ -775,19 +780,24 @@ class BaseController extends \Common\Controller\BaseController{
         $sqlmd5 = I("sql");
         $con = I("con");
         $sql = $this->Redis->get($sqlmd5);
-        $resultData = M()->query($sql);
-        if(method_exists($this,$con."_export")){
-            $method = $con."_export";
-            //返回必须为数据格式['data'=>[],'schema'=>[],'fileName'=>'','template'=>false,'callback'=>false] 数据和表头
-            $excelData = $this->$method($resultData);
+        if($sql){
+            $resultData = M()->query($sql);
+            if(method_exists($this,$con."_export")){
+                $method = $con."_export";
+                //返回必须为数据格式['data'=>[],'schema'=>[],'fileName'=>'','template'=>false,'callback'=>false] 数据和表头
+                $excelData = $this->$method($resultData);
+            }else{
+                $excelData = ['data'=>$resultData,'schema'=>$resultData[0],'fileName'=>'excel','template'=>false,'callback'=>false];
+            }
+            extract($excelData);
+            if(isset($excelData['data']) && isset($excelData['schema']) && isset($excelData['fileName'])){
+                $this->LogCom->log(7);
+                excelExport(["data"=>$data,'schema'=>$schema,'fileName'=>$fileName,'template'=>$template,'callback'=>$callback]);
+            }
         }else{
-            $excelData = ['data'=>$resultData,'schema'=>$resultData[0],'fileName'=>'excel','template'=>false,'callback'=>false];
+            echo "请求超时!";
         }
-        extract($excelData);
-        if(isset($excelData['data']) && isset($excelData['schema']) && isset($excelData['fileName'])){
-            $this->LogCom->log(7);
-            excelExport(["data"=>$data,'schema'=>$schema,'fileName'=>$fileName,'template'=>$template,'callback'=>$callback]);
-        }
+        
     }
     /** 
      * @Author: vition 

@@ -348,12 +348,14 @@ function import_btn($defind_vars){
  * @Date: 2018-10-02 12:40:27 
  * @Desc: 导入按钮 
  */
-function export_btn($defind_vars){
+function export_btn($defind_vars,$config=[]){
     $nodeAuth = $defind_vars["nodeAuth"];
     $tableName = $defind_vars["tableName"];
     $controlName = $defind_vars["controlName"];
+    $controlPrefix = $config['controlPrefix'] ? $config['controlPrefix'] : 'List';
+    $title = $config['title'] ? $config['title'] : '导出';
     if($nodeAuth >= 1){//6
-        echo "<button type='button' data-url='".$defind_vars["url"]."' data-export='export' data-con='{$controlName}' data-reqtype='{$controlName}List'  class='btn bg-maroon excel-export'><i class='fa fa-fw fa-cloud-download'></i> 导出 </button>";
+        echo "<button type='button' data-url='".$defind_vars["url"]."' data-export='export' data-con='{$controlName}' data-reqtype='{$controlName}{$controlPrefix}'  class='btn bg-maroon excel-export'><i class='fa fa-fw fa-cloud-download'></i> {$title} </button>";
     }
 }
 //各类权限按钮全局函数结束
@@ -450,32 +452,17 @@ function excelExport(array $param){
     }
     $objWriter =  PHPExcel_IOFactory::createWriter($objExcel, 'Excel2007');
     $objExcel->setActiveSheetIndex(0);
+    // $objExcel->getDefaultStyle()->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
     $objActSheet = $objExcel->getActiveSheet();
 
     if($template){
-        $control = A(CONTROLLER_NAME."122");
+        $control = A(CONTROLLER_NAME);
         if($control && $callback && method_exists($control,$callback)){
-            $control->$callback();
+            $control->$callback($data,$objExcel,$objActSheet);
         }else{
             echo '调用控制器失败';
             exit;
         }
-        // $objActSheet->setTitle ( '演示工作表' );
-        // $objActSheet->setCellValue ( 'A1', '这个是PHPExcel演示标题' );
-        // $objActSheet->setCellValue ( 'A2', '日期：' . date ( 'Y年m月d日', time () ));
-        // $objActSheet->setCellValue ( 'F2', '导出时间：' . date ( 'H:i:s' ) );
-        // //我现在就开始输出列头了
-        // $objActSheet->setCellValue ( 'A3', '序号' );
-        // $objActSheet->setCellValue ( 'B3', '姓名' );
-        // //具体有多少列 看你的数据走 会涉及到计算
-        // //现在就开始填充数据了 （从数据库中） $data
-        // $baseRow = 4; //数据从N-1行开始往下输出 这里是避免头信息被覆盖
-        // foreach ( $data as $r => $dataRow ) {
-        // $row = $baseRow + $r;
-        // //将数据填充到相对应的位置
-        // $objExcel->getActiveSheet ()->setCellValue ( 'A' . $row, $dataRow ['id'] ); //学员编号
-        // $objExcel->getActiveSheet ()->setCellValue ( 'B' . $row, $dataRow ['name'] ); //真实姓名
-        // }
     }else{
         $colA = ord('A');
         $colLen = count($schema);
@@ -647,4 +634,31 @@ function is_wechat() {
     if (strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false) { 
         return true; 
     } return false; 
+}
+/** 
+ * @Author: vition 
+ * @Date: 2018-12-04 14:50:51 
+ * @Desc: 一百以内数字转中文 
+ */
+function chinese_num($num){
+    if( $num<0 || $num > 99){
+        return '只支持零到九十九的数字';
+    }
+    $chinesArr = ['零','一','二','三','四','五','六','七','八','九','十'];
+    $chinesNum = "";
+    if(strlen($num)>1){
+        $ten = substr($num,0,1);
+        $single = substr($num,1,1);
+        if($ten==1){
+            $chinesNum = "十";
+        }else{
+            $chinesNum = $chinesArr[$ten]."十";
+        }
+        if($single!=0){
+            $chinesNum .= $chinesArr[$single];
+        }
+    }else{
+        $chinesNum = $chinesArr[$num];
+    }
+    return $chinesNum;
 }
