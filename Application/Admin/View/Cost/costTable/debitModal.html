@@ -13,7 +13,7 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label >选择项目：</label>
-                        <select class="form-control project-info modal-info chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
+                        <select class="form-control project-info modal-info chosen-select" title="选择项目" data-type="cost_relation_project" data-value="projectId"  data-text="name" name="project_id">
                             <option value="0">非项目借支</option>
                             <volist name="projectArr" id="item">
                                 <option value="{$item['projectId']}">{$item['name']}</option>

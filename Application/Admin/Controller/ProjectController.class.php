@@ -207,6 +207,46 @@ class ProjectController extends BaseController{
                     return $result["list"];
                 }
                 break;
+            case 'cost_project':
+                $where['status'] = 1;
+                if($key!=""){
+                    $where["name"]=["LIKE","%{$key}%"];
+                }
+                $parameter=[
+                    'where'=>$where,
+                    'fields'=>"project_id projectId,name",
+                    'orderStr'=>"add_time DESC",
+                    'groupBy'=>"project_id",
+                    'joins' => [
+                        "RIGHT JOIN (SELECT projectId,name FROM v_project) p ON p.projectId = project_id",
+                    ],
+                ];
+                $result=getComponent('ProjectCost')->getList($parameter);
+                // echo getComponent('ProjectCost')->M()->_sql();
+                if($result){
+                    return $result["list"];
+                }
+                break;
+            case 'cost_relation_project':
+                $where['status'] = 1;
+                if($key!=""){
+                    $where["name"]=["LIKE","%{$key}%"];
+                }
+                $parameter=[
+                    'where'=>$where,
+                    'fields'=>"project_id projectId,name",
+                    'orderStr'=>"add_time DESC",
+                    'groupBy'=>"project_id",
+                    'joins' => [
+                        "RIGHT JOIN (SELECT projectId,name FROM v_project WHERE (FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (author = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 ) ) p ON p.projectId = project_id",
+                    ],
+                ];
+                $result=getComponent('ProjectCost')->getList($parameter);
+                // echo getComponent('ProjectCost')->M()->_sql();
+                if($result){
+                    return $result["list"];
+                }
+                break;
             case 'relation_project':
                 $where["project_id"]=0;
                 $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (author = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 )";

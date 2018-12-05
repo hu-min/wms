@@ -160,7 +160,12 @@ class ProjectCostController extends BaseController{
             ]
         ];
         $projectCostData = $this->pCostCom->getOne($param);
-        $newFileName = $projectCostData['project_name'].date('Ymd', time()) ;
+        if($con == "pcost_control" || $con == "project_costCon"){
+            $newFileName = $projectCostData['project_name'].date('Ymd', time()) ;
+        }else{
+
+        }
+        
         // print_r($projectCostData);exit;
         $objActSheet->setTitle ( '运营报价表' );
         $objActSheet->setCellValue ( 'D1', $projectCostData['customer_com_name']);
@@ -286,7 +291,39 @@ class ProjectCostController extends BaseController{
         $objActSheet->setCellValue("J{$sRow}",'总计');
         $objActSheet->setCellValue("K{$sRow}",round($all_count+$all_rateCount,2));
     }
+    function pcost_control_import(){
+        exit;
+    }
+    //导入项目报价 自定义调用函数
+    function pcost_control_importcall($objPHPExcel){
+        $objActSheet = $objPHPExcel->getSheet(0);
+        $highestRow = $objActSheet->getHighestRow();
+        $project_name = $objActSheet->getCell("D5")->getValue();//获取活动名称，和项目名称一致，不然会出错
+        $merges = $objActSheet->getMergeCells();
+        $cost_class = [];
+        $sub_class = [];
+        foreach ($merges as $mCells) {
+            $rows = explode(":", preg_replace("/[A-Z]*/","",$mCells));
+            $cols = explode(":", preg_replace("/[0-9]*/","",$mCells));
+            if(count($rows) < 2 || count($cols)<2 ){
+                // 异常
+                $this->ajaxReturn(['errCode'=>408,'error'=>getError(408)]);
+            }
+            $colsCha = ord($cols[1]) - ord($cols[0]);
+            if($colsCha>=7 && $rows[0]==$rows[1] && $rows[1]>12){
+                $className = $objActSheet->getCell("B".$rows[1])->getValue();
+                if($className){
+                    array_push($cost_class,[$rows[1],$className]);
+                }
 
+            }else if($cols[0] == "C" && $cols[1] == "C" && $rows[1] > $rows[0]){
+                array_push($sub_class,$rows);
+            }
+        }
+        print_r($cost_class);
+        print_r($sub_class);
+        exit;
+    }
     function project_offerList($type='offer'){
         $data=I("data");
         $p=I("p")?I("p"):1;

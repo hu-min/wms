@@ -707,7 +707,11 @@ class BaseController extends \Common\Controller\BaseController{
         $table = I("db");
         $con = I("con");
         if(isset($_FILES["excel"])){
-            $excelData = excelImport(["file"=>$_FILES["excel"]["tmp_name"]]);
+            $param = ["file"=>$_FILES["excel"]["tmp_name"]];
+            if(method_exists($this,$con."_importcall")){
+                $param['callback'] = $con."_importcall";
+            }
+            $excelData = excelImport($param);
             // print_r($excelData);exit;
             if($excelData){
                 

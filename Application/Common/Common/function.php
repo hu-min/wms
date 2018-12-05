@@ -515,6 +515,7 @@ function excelImport($parameter=[]){
             return [];
         }
     }
+    $callback = $parameter['callback'] ? $parameter['callback'] : false;
     require(ROOT_PATH.'ThinkPHP/Library/Vendor/PHPExcel/PHPExcel.php');
     // $objExcel = new PHPExcel();
     $objReader =  PHPExcel_IOFactory::createReader('Excel2007');
@@ -523,18 +524,28 @@ function excelImport($parameter=[]){
     $dataArray = [];
     $objPHPExcel = $objReader->load($filename); //$filename可以是上传的文件，或者是指定的文件
     $sheet = $objPHPExcel->getSheet(0);
-    $highestRow = $sheet->getHighestRow(); // 取得总行数
-    $highestColumn = $sheet->getHighestColumn(); // 取得总列数
-    for($row=1;$row<=$highestRow;$row++){
-        $rowData = [];
-        for ($col=1; $col <= alphaIndex($highestColumn); $col++) { 
-            $cell = $objPHPExcel->getActiveSheet()->getCell(alphaIndex(false,$col).$row)->getValue();
-            if(is_object($cell))  $cell = $cell->__toString();
-            array_push($rowData,$cell);
+    if($callback){
+        $control = A(CONTROLLER_NAME);
+        if($control && $callback && method_exists($control,$callback)){
+            $control->$callback($objPHPExcel);
+        }else{
+            echo '调用控制器失败';
+            exit;
         }
-        array_push($dataArray,$rowData);
+    }else{
+        $highestRow = $sheet->getHighestRow(); // 取得总行数
+        $highestColumn = $sheet->getHighestColumn(); // 取得总列数
+        for($row=1;$row<=$highestRow;$row++){
+            $rowData = [];
+            for ($col=1; $col <= alphaIndex($highestColumn); $col++) { 
+                $cell = $objPHPExcel->getActiveSheet()->getCell(alphaIndex(false,$col).$row)->getValue();
+                if(is_object($cell))  $cell = $cell->__toString();
+                array_push($rowData,$cell);
+            }
+            array_push($dataArray,$rowData);
+        }
+        return $dataArray;
     }
-    return $dataArray;
 }
 /** 
  * @Author: vition 

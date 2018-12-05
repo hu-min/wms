@@ -50,7 +50,8 @@ class CostController extends BaseController{
 
         $reqType=I('reqType');
         $this->assign('accountType',$this->accountType);
-        $this->assign('projectArr',$this->project->_getOption("project_id"));
+        // print_r($this->project->_getOption("cost_project"));exit;
+        $this->assign('projectArr',$this->project->_getOption("cost_relation_project"));
         $this->assign("controlName","debit");
         $this->assign("tableName",$this->debitCom->tableName()); 
         $nodeId = getTabId(I("vtabId"));
@@ -294,7 +295,7 @@ class CostController extends BaseController{
     function finance_debitControl(){
         $reqType=I('reqType');
         $this->assign('accountType',$this->accountType);
-        $this->assign('projectArr',$this->project->_getOption("project_id"));
+        $this->assign('projectArr',$this->project->_getOption("cost_relation_project"));
 
         $this->assign("controlName","finance_debit");
         $this->assign("tableName",$this->debitCom->tableName()); 
@@ -376,7 +377,7 @@ class CostController extends BaseController{
         $this->assign("controlName","expense");
         $this->assign("tableName",$this->expenseSubCom->tableName());
         $this->assign('accountType',$this->accountType);
-        $this->assign('projectArr',$this->project->_getOption("project_id"));
+        $this->assign('projectArr',$this->project->_getOption("cost_relation_project"));
         $this->assign('expTypeArr',$this->project->_getOption("expense_type"));
         $this->assign('expVouchType',$this->expVouchType);
         $this->assign('accounts',json_encode($this->accounts));
@@ -641,7 +642,7 @@ class CostController extends BaseController{
         $reqType=I('reqType');
         $this->assign("controlName","fin_expense");
         $this->assign("tableName",$this->expenseSubCom->tableName());
-        $this->assign('projectArr',$this->project->_getOption("project_id"));
+        $this->assign('projectArr',$this->project->_getOption("cost_relation_project"));
         $this->assign('userArr',$this->project->_getOption("create_user"));
         $this->assign('accountType',$this->accountType);
         $this->assign('expTypeArr',$this->project->_getOption("expense_type"));
