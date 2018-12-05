@@ -108,6 +108,7 @@
         </div>
     </div>
     <!-- date-range-picker -->
+    <script src="__ADMINT__/dist/js/cost.js?={:time()}"></script>
     <script>
         // var poPanel = "";
         // var poItem = "";
@@ -116,6 +117,11 @@
             // poPanel = result.panel;
             // poItem = result.item;
             init_chosen("{$url}","getOptionList",".global-modal");
+        }
+        //搜索
+        var project_costCon_searchInfo = function (){
+            datas['gettype'] = 'Edit'
+            datas['id'] = $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val();
         }
         //设置数据
         var project_costCon_setInfo = function(info){
@@ -146,6 +152,7 @@
                     var idstr = poPanelObj.find(".cost-class-title").attr("href")
                     poPanelObj.find(".cost-class-title").attr("href",idstr+subElement['class_sort'])
                     poPanelObj.find(".cost-class-title").text(subElement['cost_class_name'])
+                    poPanelObj.find(".cost-class-alpha").text(alpha(subElement['class_sort']))
                     poPanelObj.find(".cost_class_div").addClass('none')
                     poPanelObj.find(".add-costItem").removeClass('none')
                     poPanelObj.find(".modal-info[name='class_sort']").val(subElement['class_sort'])
@@ -160,7 +167,7 @@
                 // poItemOjc.find(".cost_item_del").remove()
                 ['id','class_notes','classify','sort','item_content','num','unit','act_num','act_unit','price','total','cost_total','profit','profit_ratio'].forEach(modalName => { 
                     if(modalName == 'sort'){
-                        poItemOjc.find(".modal-info[name='"+modalName+"']").text(subElement[modalName])
+                        poItemOjc.find(".modal-info[name='"+modalName+"']").text(alpha(subElement['class_sort'])+subElement[modalName])
                     }else{
                         poItemOjc.find(".modal-info[name='"+modalName+"']").val(subElement[modalName])
                     }

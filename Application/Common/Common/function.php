@@ -442,6 +442,7 @@ function excelExport(array $param){
     $fileName = $param['fileName'] ? $param['fileName'] : 'excel';
     $template = $param['template'] ? $param['template'] : false;
     $callback = $param['callback'] ? $param['callback'] : false;
+    $newFileName = false;
     require(ROOT_PATH.'ThinkPHP/Library/Vendor/PHPExcel/PHPExcel.php');
 
     if($template){
@@ -458,7 +459,7 @@ function excelExport(array $param){
     if($template){
         $control = A(CONTROLLER_NAME);
         if($control && $callback && method_exists($control,$callback)){
-            $control->$callback($data,$objExcel,$objActSheet);
+            $control->$callback($data,$objExcel,$objActSheet,$newFileName);
         }else{
             echo '调用控制器失败';
             exit;
@@ -487,7 +488,7 @@ function excelExport(array $param){
         }
     }
     
-    $fileName = $fileName. date('YmdHis', time()) . '.xlsx';
+    $fileName = $newFileName ? $newFileName. '.xlsx' : $fileName. date('YmdHis', time()) . '.xlsx';
     header("Pragma: public");
     header("Expires: 0");
     header("Cache-Control:must-revalidate,post-check=0,pre-check=0");
@@ -661,4 +662,8 @@ function chinese_num($num){
         $chinesNum = $chinesArr[$num];
     }
     return $chinesNum;
+}
+function num_alpha($num){
+    $alphas = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+    return $alphas[$num];
 }

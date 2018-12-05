@@ -104,6 +104,7 @@
         </div>
     </div>
     <!-- date-range-picker -->
+    <script src="__ADMINT__/dist/js/cost.js?={:time()}"></script>
     <script>
         var poPanel = "";
         var poItem = "";
@@ -112,6 +113,11 @@
             poPanel = result.panel;
             poItem = result.item;
             init_chosen("{$url}","getOptionList",".global-modal");
+        }
+        //搜索
+        var project_offer_searchInfo = function (){
+            datas['gettype'] = 'Edit'
+            datas['id'] = $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val();
         }
         //设置数据
         var project_offer_setInfo = function(info){
@@ -136,6 +142,7 @@
                     var idstr = poPanelObj.find(".cost-class-title").attr("href")
                     poPanelObj.find(".cost-class-title").attr("href",idstr+subElement['class_sort'])
                     poPanelObj.find(".cost-class-title").text(subElement['cost_class_name'])
+                    poPanelObj.find(".cost-class-alpha").text(alpha(subElement['class_sort']))
                     poPanelObj.find(".cost_class_div").addClass('none')
                     poPanelObj.find(".add-costItem").removeClass('none')
                     poPanelObj.find(".modal-info[name='class_sort']").val(subElement['class_sort'])
@@ -148,7 +155,7 @@
                 var poItemOjc = $(poItem);
                 ['id','class_notes','classify','sort','item_content','num','unit','act_num','act_unit','price','total'].forEach(modalName => { 
                     if(modalName == 'sort'){
-                        poItemOjc.find(".modal-info[name='"+modalName+"']").text(subElement[modalName])
+                        poItemOjc.find(".modal-info[name='"+modalName+"']").text(alpha(subElement['class_sort'])+subElement[modalName])
                     }else{
                         poItemOjc.find(".modal-info[name='"+modalName+"']").val(subElement[modalName])
                     }
@@ -230,7 +237,7 @@
                                 val = 0;
                             }
                         }else if(name == 'sort'){
-                            var val =$(this).text();
+                            var val =$(this).text().replace(/^[A-Z]*/,'');
                         }else{
                             var val =$(this).val();
                         }
@@ -278,7 +285,7 @@
                     $(this).parents(".cost_class_div").addClass("none")
                     $(this).parents(".box-title").find(".add-costItem ").removeClass("none");
                 }
-                
+                cost_class_title()
             })
             //分类图标事件
             $(tabId+" .global-modal").on("click",".box-title .cost_chosen",function(){
@@ -314,7 +321,8 @@
                     $(this).parents(".panel").find(".table-items").append(poItemOjc);
                 }
                 $(this).parents(".panel").find("tbody tr").each(function(sort,tr){
-                    $(tr).find("td:first-child").find(".modal-info[name='sort']").text(Number(sort) + 1)
+                    var alpha = $(this).parents(".panel").find('.cost-class-alpha').text();
+                    $(tr).find("td:first-child").find(".modal-info[name='sort']").text(alpha+(Number(sort) + 1))
                 })
                 
             })
@@ -328,7 +336,8 @@
                 var curRowspan = $(this).parents("tr").find('td').eq(1).attr('rowspan')
                 $(this).parents("tr").remove()
                 $parents.find("tbody tr").each(function(sort,tr){
-                    $(tr).find("td:first-child").find(".modal-info[name='sort']").text(Number(sort) + 1)
+                    var alpha = $(this).parents(".panel").find('.cost-class-alpha').text();
+                    $(tr).find("td:first-child").find(".modal-info[name='sort']").text(alpha+(Number(sort) + 1))
                 })
                 if(tdNum > 0 && tdNum < 10){
                     $prevAll.each(function(){

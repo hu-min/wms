@@ -107,8 +107,14 @@ class ProjectCostController extends BaseController{
         ];
         $this->modalOne($modalPara);
     }
+    function project_offer_export($excelData){
+        return $this->pcost_control_export($excelData);
+    }
+    function project_costCon_export($excelData){
+        return $this->pcost_control_export($excelData);
+    }
     function pcost_control_export($excelData){
-        // print_r($excelData);exit;
+        
         $schema=[
             'cost_class_name' => ['name'=>'分类'],
             'item_content' => ['name'=>'项目内容'],
@@ -126,7 +132,12 @@ class ProjectCostController extends BaseController{
                 }
             }
         }
-        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'报价数据','template'=>'Public/excel_template/offer-template.xlsx','callback'=>'pcost_control_exportcall'];
+        $con = I('con');
+        $template = "offer-template";
+        if($con == "pcost_control" || $con == "project_costCon"){
+            $template = "costCon-template";
+        }
+        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'报价数据','template'=>'Public/excel_template/'.$template.'.xlsx','callback'=>'pcost_control_exportcall'];
         return $exportData ;
         // print_r($excelData);exit;
     }
@@ -135,46 +146,61 @@ class ProjectCostController extends BaseController{
      * @Date: 2018-12-04 13:39:17 
      * @Desc: 根据模板导出数据 
      */    
-    function pcost_control_exportcall($excelData,&$objExcel,&$objActSheet){
+    function pcost_control_exportcall($excelData,&$objExcel,&$objActSheet,&$newFileName){
+        $con = I('con');
         $param = [
             'fields' => '*',
             'where' => ['id'=>$excelData[0]['parent_id']],
             'one' => true,
             'joins' => [
-                'LEFT JOIN (SELECT projectId,code project_code,name project_name,FROM_UNIXTIME(project_time,"%Y/%m/%d") project_date,DATE_ADD(FROM_UNIXTIME(project_time,"%Y/%m/%d"),INTERVAL days day) end_date FROM v_project ) p ON p.projectId = project_id ',
+                'LEFT JOIN (SELECT projectId,code project_code,name project_name,FROM_UNIXTIME(project_time,"%Y/%m/%d") project_date,DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(project_time,"%Y/%m/%d"),INTERVAL days day),"%Y/%m/%d") end_date,province,customer_com,city FROM v_project ) p ON p.projectId = project_id ',
+                "LEFT JOIN (SELECT companyId company_id,company customer_com_name FROM v_customer_company ) c ON c.company_id = p.customer_com",
+                "LEFT JOIN (SELECT pid ,province province_name FROM v_province ) pr ON pr.pid =  p.province",
+                "LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct ON ct.ctid = p.city AND ct.cpid =  p.province",
             ]
         ];
         $projectCostData = $this->pCostCom->getOne($param);
+        $newFileName = $projectCostData['project_name'].date('Ymd', time()) ;
         // print_r($projectCostData);exit;
         $objActSheet->setTitle ( '运营报价表' );
+        $objActSheet->setCellValue ( 'D1', $projectCostData['customer_com_name']);
         $objActSheet->setCellValue ( 'D3', date("Y/m/d") );
-        // $objActSheet->setCellValue ( 'D6', $projectCostData['project_date'].'-'.$projectCostData['end_date'] );
+        $objActSheet->setCellValue ( 'D5', $projectCostData['project_name'] );
+        $objActSheet->setCellValue ( 'D6', $projectCostData['project_date'].'-'.$projectCostData['end_date'] );
+        $objActSheet->setCellValue ( 'D7', $projectCostData['province_name'].'-'.$projectCostData['city_name'] );
         $objActSheet->setCellValue ( 'B9', $projectCostData['project_name']);
         $cost_class = "";
         $item_count = [];
+        $item_cost_count = [];
         $all_count = 0;
+        $all_cost_count = 0;
         $sRow = 13;
         $countRow = 0;
-        
+        $styleThinBlackBorderOutline = array(
+            'borders' => array(
+                'allborders' => array( //设置全部边框
+                    'style' => \PHPExcel_Style_Border::BORDER_THIN //粗的是thick
+                ),
+            ),
+        );
         foreach ($excelData as $subData) {
+            // $rolAhpa = "K";
             if($cost_class !=  $subData['class_sort']+"-"+ $subData['cost_class']){
+                
                 $objActSheet->mergeCells("B{$sRow}:K{$sRow}");
                 $objActSheet->getStyle("B{$sRow}")->getFont()->setBold(true);
                 $objActSheet->getStyle( "B{$sRow}:K{$sRow}")->getFill()->getStartColor()->setARGB("FF969696");
-                $title = chinese_num(($subData["class_sort"]+1))."、";
-                $objActSheet->setCellValue ( "B{$sRow}", $title.$subData["cost_class_name"]);
+                if($con == "pcost_control" || $con == "project_costCon"){
+                    $objActSheet->getStyle( "N{$sRow}:Q{$sRow}")->getFill()->getStartColor()->setARGB("FF969696");
+                }
+                $title = num_alpha($subData["class_sort"]);
+                $objActSheet->setCellValue ( "B{$sRow}", $title."、".$subData["cost_class_name"]);
                 $cost_class = $subData['class_sort']+"-"+ $subData['cost_class'];
                 
                 $countRow = $sRow + 1;
                 $sRow+=2;
             }
-            $styleThinBlackBorderOutline = array(
-                'borders' => array(
-                    'allborders' => array( //设置全部边框
-                        'style' => \PHPExcel_Style_Border::BORDER_THIN //粗的是thick
-                    ),
-                ),
-            );
+            
             $classCol = "D";
             if($subData["class_sub"]>1){
                 $objActSheet->mergeCells("C{$sRow}:C".($sRow+$subData["class_sub"]-1));
@@ -184,9 +210,10 @@ class ProjectCostController extends BaseController{
                 $objActSheet->mergeCells("C{$sRow}:D{$sRow}");
                 $classCol = "C";
             }
+            
             $objActSheet->getStyle( "B{$sRow}:K{$sRow}")->applyFromArray($styleThinBlackBorderOutline);
             $objActSheet->getStyle("B{$sRow}:K{$sRow}")->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            $objActSheet->setCellValue("B{$sRow}",$subData["sort"]);
+            $objActSheet->setCellValue("B{$sRow}",$title.$subData["sort"]);
             $objActSheet->setCellValue($classCol."{$sRow}",$subData["module_name"]);
             $objActSheet->setCellValue("E{$sRow}",$subData["item_content"]);
             $objActSheet->setCellValue("F{$sRow}",$subData["num"]);
@@ -195,9 +222,21 @@ class ProjectCostController extends BaseController{
             $objActSheet->setCellValue("I{$sRow}",$subData["aunit_name"]);
             $objActSheet->setCellValue("J{$sRow}",$subData["price"]);
             $objActSheet->setCellValue("K{$sRow}",$subData["total"]);
+            if($con == "pcost_control" || $con == "project_costCon"){
+                $objActSheet->getStyle("N{$sRow}:Q{$sRow}")->applyFromArray($styleThinBlackBorderOutline);
+                $objActSheet->getStyle("N{$sRow}:Q{$sRow}")->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objActSheet->setCellValue("N{$sRow}",$subData["cost_price"]);
+                $objActSheet->setCellValue("O{$sRow}",$subData["cost_total"]);
+                $objActSheet->setCellValue("P{$sRow}",$subData["profit_ratio"]."%");
+                $objActSheet->setCellValue("Q{$sRow}",$subData["profit"]);
+                
+            }
+            
             $sRow++;
             $item_count[$countRow] += round($subData['total'],2);
+            $item_cost_count[$countRow] += round($subData['cost_total'],2);
             $all_count += round($subData['total'],2);
+            $all_cost_count += round($subData['cost_total'],2);
         }
         // print_r($item_count);exit;
         foreach ($item_count as $row => $countVal) {
@@ -205,25 +244,40 @@ class ProjectCostController extends BaseController{
             $objActSheet->getStyle("K{$row}")->getFont()->setBold(true);
             $objActSheet->getStyle("K{$row}")->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
             $objActSheet->getStyle( "B{$row}:K{$row}")->getFill()->getStartColor()->setARGB("FFC0C0C0");
-            $styleThinBlackBorderOutline = array(
-                'borders' => array(
-                    'allborders' => array( //设置全部边框
-                        'style' => \PHPExcel_Style_Border::BORDER_THIN //粗的是thick
-                    ),
-                ),
-            );
+
             $objActSheet->getStyle( "B{$row}:K{$row}")->applyFromArray($styleThinBlackBorderOutline);
             $objActSheet->setCellValue("K{$row}",$countVal);
+
+            if($con == "pcost_control" || $con == "project_costCon"){
+                $objActSheet->getStyle("N{$row}:Q{$row}")->getFill()->getStartColor()->setARGB("FFC0C0C0");
+                $objActSheet->getStyle("N{$row}:Q{$row}")->applyFromArray($styleThinBlackBorderOutline);
+                $objActSheet->getStyle("O{$row}")->getFont()->setBold(true);
+                $objActSheet->getStyle("N{$row}:Q{$row}")->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objActSheet->setCellValue("O{$row}",$item_cost_count[$row]);
+            }
         }
+        // exit;
         $sRow++;
         $objActSheet->getStyle( "B{$sRow}:K{$sRow}")->getFill()->getStartColor()->setARGB("FF000000");
         $sRow++;
-
+        $objActSheet->mergeCells("B{$sRow}:I".($sRow+2));
+        $objActSheet->getStyle("B{$sRow}:K".($sRow+2))->applyFromArray($styleThinBlackBorderOutline);
         $objActSheet->getStyle("J{$sRow}:K".($sRow+3))->getFont()->setBold(true);
         $objActSheet->getStyle("J{$sRow}:K".($sRow+3))->getFont()->setSize(11);
         $objActSheet->getStyle("J{$sRow}:K".($sRow+3))->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $objActSheet->setCellValue("K{$sRow}",$all_count);
         $objActSheet->setCellValue("J{$sRow}",'以上合计');
+
+        if($con == "pcost_control" || $con == "project_costCon"){
+            $objActSheet->getStyle("N{$sRow}:Q".($sRow+2))->applyFromArray($styleThinBlackBorderOutline);
+            $objActSheet->getStyle( "N".($sRow-1).":Q".($sRow-1))->getFill()->getStartColor()->setARGB("FF000000");
+            $objActSheet->getStyle("O{$sRow}:Q{$sRow}")->getFont()->setBold(true);
+            $objActSheet->getStyle("O{$sRow}:Q{$sRow}")->getFont()->setSize(11);
+            $objActSheet->getStyle("O{$sRow}:Q{$sRow}")->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objActSheet->setCellValue("O{$sRow}",$all_cost_count);
+            $objActSheet->setCellValue("P{$sRow}",$projectCostData['profit_ratio']."%");
+            $objActSheet->setCellValue("Q{$sRow}",$projectCostData['profit']);
+        }
         $sRow++;
         $all_rateCount = round($all_count*($projectCostData['tax_rate']/100),2);
         $objActSheet->setCellValue("J{$sRow}","增值税{$projectCostData['tax_rate']}%");
@@ -232,6 +286,7 @@ class ProjectCostController extends BaseController{
         $objActSheet->setCellValue("J{$sRow}",'总计');
         $objActSheet->setCellValue("K{$sRow}",round($all_count+$all_rateCount,2));
     }
+
     function project_offerList($type='offer'){
         $data=I("data");
         $p=I("p")?I("p"):1;
@@ -402,29 +457,6 @@ class ProjectCostController extends BaseController{
         $this->pCostSubCom->commit();
         $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
     }
-    //报价导出
-    function project_offer_export($excelData){
-        $schema=[
-            'basicId' => ['name'=>'承接模块id'],
-            'name' => ['name'=>'承接模块名称'],
-            'alias' => ['name'=>'承接模块别名'],
-            'pId' => ['name'=>'供应商类别'],
-            'remark' => ['name'=>'备注'],
-            'sort' => ['name'=>'排序'],
-            'status' => ['name'=>'状态'],
-        ];
-        foreach ($excelData as $index => $val) {
-            foreach ($val as $key => $value) {
-                if($key=="pId"){
-                    $excelData[$index][$key] = $this->basicCom->getOne(['where'=>['basicId'=>$value]])['list']['name'];
-                }else if($key=="status"){
-                    $excelData[$index][$key] = $this->statusType[$value];
-                }
-            }
-        }
-        $exportData = ['data'=>$excelData,'schema'=> $schema,'fileName'=>'供应商承接模块表'];
-        return $exportData ;
-    } 
     function  project_costControl(){
         $reqType=I('reqType');
         $this->assign("controlName","pcost_control");
