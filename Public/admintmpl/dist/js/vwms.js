@@ -1253,7 +1253,7 @@ function upload(option){
                     })
                     $(tabId+"-upload-modal").offon("click",".modal-footer .upload-file-btn",function(){
                         if(Object.getOwnPropertyNames(tempFiles).length>0){
-                            for (const fileName in tempFiles) {
+                            for (var fileName in tempFiles) {
                                 uploadData = new FormData();
                                 uploadData.append("file",tempFiles[fileName])
                                 $.ajax({
