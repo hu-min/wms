@@ -941,7 +941,7 @@ $(document).on("click",".full-screen",function(e){
 function getArtClsNode(element,level){
     var option=""
     var strs="";
-    for (let index = 0; index < level; index++) {
+    for (var index = 0; index < level; index++) {
         strs+="——";
     }
     if(typeof(element.nodes)=='object'){
