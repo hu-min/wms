@@ -1298,7 +1298,7 @@ function upload(option){
                     $(tabId+"-upload-modal .upload-item-file").each(function(){
                         var uploadItem = ""
                         var errorMes = "";
-                        for (let index = 0; index < this.files.length; index++){
+                        for (var index = 0; index < this.files.length; index++){
                            
                             var element = this.files[index];
                             // 限制文件不能大于10M
