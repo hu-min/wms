@@ -200,6 +200,7 @@ class CostController extends BaseController{
             //如果自己处于某个申请阶段，直接跳过下级;
             // $datas['process_level']=$this->processAuth["level"];
             $datas['examine'] = getComponent('Process')->filterExamine(session('roleId'),$datas['examine']);
+            unset($datas['id']);
             return $datas;
         }else if($reqType=="debitEdit"){
             $where=["id"=>$datas['id']];
