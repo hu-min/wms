@@ -97,7 +97,7 @@ class BaseController extends \Common\Controller\BaseController{
         if(in_array($nowConAct,$this->exemption) || ( in_array(ACTION_NAME,['excel_import','upload_filesAdd','excel_export','template_down','reset_apply']) && $this->isLogin())){
             if(!$this->isLogin() && !in_array(ACTION_NAME,['checkLogin','Login','lock'])){
                 session("history",domain(false).__SELF__);
-                if(is_wechat()){
+                if($_GET['isWechat']){
                     redirect('https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx650b23fa694c8ff7&redirect_uri=http://twsh.twoway.com.cn/Admin/Index/Login&response_type=code&scope=SCOPE&state=STATE#wechat_redirect');
                 }else{
                     $this->redirect('Index/Login');
@@ -226,6 +226,7 @@ class BaseController extends \Common\Controller\BaseController{
         if($isLogin && $loginName && $roleId){
             return true;
         }
+        session(null);
         return false;
     }
     /** 
@@ -234,7 +235,6 @@ class BaseController extends \Common\Controller\BaseController{
      * @Desc: 设置登录和退出 
      */    
     protected function setLogin($userInfo=[]){
-        // $this->log($userInfo);
         if(empty($userInfo)){
 	        $this->vlog(0);
             //退出设置
@@ -533,7 +533,7 @@ class BaseController extends \Common\Controller\BaseController{
      * @Desc: 获取城市 
      */    
     function getCityList(){
-        $this->ajaxReturn(["data"=>A("Project")->_getOption("city")]);
+        $this->ajaxReturn(["data"=>$this->Com ->get_option("city")]);
     }
     /** 
      * @Author: vition 
@@ -693,10 +693,10 @@ class BaseController extends \Common\Controller\BaseController{
         // }
     }
     function getOptionList(){
-        $this->AProject=A("Project");
+        // $this->AProject=A("Project");
         $key=I("key");
         $type=I("type");
-        $this->ajaxReturn(["data"=>$this->AProject->_getOption($type,$key)]);
+        $this->ajaxReturn(["data"=>$this->Com->get_option($type,$key)]);
     }
     /** 
      * @Author: vition 
