@@ -268,6 +268,7 @@
             $(tabId+" .search-list").trigger("click");
             $(tabId).offon("change"," .project-info[name='project_id']",function(){
                 var project_id = $(this).val()
+                var flags = $(tabId+" .global-modal").find(".modal-info[name='section']");
                 if(Number(project_id)>0){
                     datas["reqType"]='getProjectOne';
                     datas["onlydata"]='true';
@@ -275,6 +276,14 @@
                     datas["id"]=project_id;
                     get("{$url}",datas,function(result){
                         if(result.data){
+                            var option = '<option></option>'
+                            result.data.flags.forEach(element => {
+                                option += '<option value="'+element.section+'">'+element.flag+'</option>'
+                            });
+                            flags.html(option);
+                            flags.trigger("chosen:updated")
+                            flags_data = result.data.flags
+
                             result.data['project_id'] = result.data['projectId'];
                             expense_setInfo(result.data)
                         }
@@ -284,6 +293,26 @@
                         $(tabId+" .global-modal .project-info[name='"+element+"']").val("");
                     });
                 }
+            });
+            $(tabId).offon("change"," .modal-info[name='section']",function(){
+                // var project_id = $(tabId+" .global-modal").find(" .modal-info[name='project_id']").val()
+                // var flag_id = $(this).val()
+                // if(Number(project_id)>0 && Number(flag_id)>0){
+                //     datas["reqType"]='getPCostOne';
+                //     datas["project_id"]=project_id;
+                //     datas["flag_id"]=flag_id;
+
+                //     get("{$url}",datas,function(result){
+                //         $(tabId+" .global-modal .box-group ").html("")
+                //         // pedbit_compute()
+                //         if(result.data.list){
+                //             // project_debit_set(result.data.list);
+       
+                //         }else{
+                //             notice(100,'<div>当前没有可借支项</div>','借支限制');
+                //         }
+                //     })
+                // }
             });
             [["add-expense","getExpenseLiOne","expense-list"]].forEach(element => {
                 $(tabId).offon("click","."+element[0],function(){
