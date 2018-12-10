@@ -27,5 +27,9 @@ return [
         '6'=>['List','One','Add','Edit','Del','Export','Import'],
         '7'=>['All'],
     ],
+    'finan_table' => [
+        'v_debit',
+        // 'v_liquidate',
+    ],
 ];
 //7 最大权限，6 增删改查导入导出 5 增删改查导出 4 增删改查 3 增改查 2 增查 1 查 ',

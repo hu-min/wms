@@ -55,6 +55,7 @@ class ToolsController extends BaseController{
         $examineRes = $db ->field("process_level,examine,status")->where([$db->getPk()=>$id])->find();
         $examine = explode(",",$examineRes["examine"]);
         $allProcess = count($examine);
+        
         if(in_array($examineRes["status"],[3,5])){
             $nextExamine = "已".$this->statusType[$examineRes["status"]];
         }else{
@@ -90,7 +91,7 @@ class ToolsController extends BaseController{
      * @Desc: 审核 
      */    
     function approveEdit(){
-        extract($_REQUEST);
+        extract($_POST);
         $this->nodeCom=getComponent('Node');
         if($table=="v_expense_sub"){
             $tableInfo = $this->nodeCom->getOne(['db_table'=>"v_expense","nodeType"=>2]);
@@ -104,14 +105,6 @@ class ToolsController extends BaseController{
         $title = $tableInfo['list']['nodeTitle'];
         $controller = $tableInfo['list']['controller'];
         
-        // [table] => v_expense_sub
-        // [id] => 8
-        // [tableId] => 5
-        // [remark] => 
-        // [place] => 2
-        // [status] => 1
-        // [vtabId] => #vtabs33
-        
         // table:v_project
         // id:13
         // remark:尝试着驳回
@@ -119,7 +112,23 @@ class ToolsController extends BaseController{
         // vtabId:#vtabs57
         
         $db = M($table,NULL);
-        
+        //这里判断下财务资金库存的数据
+        if(in_array($table,C('finan_table'))){
+            $this->moneyAccCom=getComponent('MoneyAccount');
+            $param = [
+                'fields'=>'cash_stock',
+                'where' => ['id'=>$monacc_id],
+                'one' => true,
+            ];
+            $MAresult = $this->moneyAccCom->getOne($param);
+
+            $debitResult = $db ->field("*")->where([$db->getPk()=>$id])->join("LEFT JOIN (SELECT projectId, code project_code,name project_name FROM v_project ) p ON p.projectId = project_id ")->join('LEFT JOIN (SELECT userId,userName user_name FROM v_user) u ON u.userId = author')->find();
+            if($debitResult['debit_money']>$MAresult['cash_stock']){
+                $this->ajaxReturn(['errCode'=>100,'error'=>'当前现金库存金额不足【'.$MAresult['cash_stock'].'元】，无法操作']);
+            }
+            $debit_money = $debitResult['debit_money'];
+        }
+   
         $tableId = $tableId ? $tableId : $id;
         $this->approveCom=getComponent('ApproveLog');
         // $allItem = $db ->where(["parent_id"=>$tableId])->count();
@@ -206,6 +215,19 @@ class ToolsController extends BaseController{
                     $this->ReceCom->createOrder($tableId,session('userId'));
                 }else if($table=="v_float_capital_log" && $state==1){
                     getComponent('FlCapLog')->computeFloat($id);
+                }else if(in_array($table,C('finan_table')) && $state==1){
+                    $data = [
+                        'account_id' => $monacc_id,
+                        'float_type' => 2,
+                        'happen_time' => date("Y-m-d H:i:s"),
+                        'inner_detail' => $debitResult['debit_cause'],
+                        'log_type' => 2,
+                        'money' => $debitResult['debit_money'],
+                        'object' =>  $debitResult['user_name'],
+                        'project_code' => $debitResult['project_code'],
+                        'project_id' =>$debitResult['project_id'],
+                    ];
+                    getComponent('FlCapLog')->flo_cap_logAdd($data,true);
                 }
                 $examineRes = $db ->field("process_level,examine")->where([$db->getPk()=>$id])->find();
                                
@@ -281,5 +303,21 @@ class ToolsController extends BaseController{
         Vendor("pinyin.pinyin");
         $pinyin=new \pinyin();
         echo $pinyin->pinyin("来点中文");
+    }
+    //获取金额
+    function getMoneyAccountList(){
+        $table =  I('table');
+        if(in_array($table,C('finan_table'))){
+            $this->moneyAccCom=getComponent('MoneyAccount');
+            $param = [
+                'fields'=>'id,cs_title,cash_stock',
+                'where' => [],
+            ];
+            $result = $this->moneyAccCom->getList($param);
+            if($result){
+                $this->ajaxReturn(['data'=>$result['list']]);
+            }
+        }
+        $this->ajaxReturn(['data'=>false]);
     }
 }

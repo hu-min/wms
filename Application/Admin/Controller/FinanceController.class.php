@@ -1732,55 +1732,70 @@ class FinanceController extends BaseController{
         return "";
     }
     function flo_cap_logAdd(){
-        $Info = $this->manageFlCapLogInfo();
-        // print_r($Info);
-        // exit;
-        $this->flCapLogCom->startTrans();
-        if($Info){
-            if($Info['status'] == 1){
-                if($Info['log_type']==1){
-                    $key = 'bank_stock';
-                }elseif($Info['log_type']==2){
-                    $key = 'cash_stock';
-                }elseif($Info['log_type']==3){
-                    $key = 'strongbox';
-                }
-    
-                $stockResult = $this->moneyAccCom->getOne(['where'=>['id'=>$Info['account_id']],'fields'=>$key]);
-                if($Info['float_type'] == 1){
-                    $Info['balance'] = $stockResult['list'][$key] + $Info['money'];
-                }elseif($Info['float_type'] == 2){
-                    $Info['balance'] = $stockResult['list'][$key] - $Info['money'];
-                    if($Info['balance'] < 0){
-                        $this->ajaxReturn(['errCode'=>100,'error'=>'账户金额不足。仅剩下：'.$stockResult['list'][$key]]);
-                    }
-                }
-                $insertResult = $this->flCapLogCom->insert($Info);
-                if($insertResult){
-                    if($Info['float_type'] == 1){
-                        $updateResult = $this->moneyAccCom->M()->where(['id'=>$Info['account_id']])->setInc($key,$Info['money']); 
-                    }elseif($Info['float_type'] == 2){
-                        $updateResult =$this->moneyAccCom->M()->where(['id'=>$Info['account_id']])->setDec($key,$Info['money']); 
-                    }
-                    if($updateResult){
-                        $this->flCapLogCom->commit();
-                        $this->ajaxReturn(['errCode'=>$insertResult->errCode,'error'=>getError($insertResult->errCode)]);
-                    }
-                }
-            }else{
-                $insertResult = $this->flCapLogCom->insert($Info);
-                if($insertResult){
-                    $this->flCapLogCom->commit();
-                    if($insertResult && $insertResult->errCode==0){
-                        $this->ApprLogCom->createApp($this->flCapLogCom->tableName(),$insertResult->data,session("userId"),"");
-                    }
-                    $this->ajaxReturn(['errCode'=>$insertResult->errCode,'error'=>getError($insertResult->errCode)]);
-                }
-            }
-            
+        extract($_POST);
+        $result = $this->flCapLogCom->flo_cap_logAdd($data);
+        if(isset($result['errCode']) && $result['errCode'] == 0){
+            $addData = [
+                'examine'=>$result['data']['examine'],
+                'title'=>session('userName')."添加了资金明细",
+                'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."添加了资金明细，@你了，点击进入审批吧！</div>",
+                'url'=>C('qiye_url')."/Admin/Index/Main.html?action=Finance/float_capital_log",
+                'tableName'=>$this->flCapLogCom->tableName(),
+                'tableId'=>$result['id'],
+            ];
+            $this->add_push($addData);
+            unset($result['data']);
         }
-        $this->flCapLogCom->rollback();
-        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+        $this->ajaxReturn($result);
+        // $Info = $this->manageFlCapLogInfo();
+        // // print_r($Info);
+        // // exit;
+        // $this->flCapLogCom->startTrans();
+        // if($Info){
+        //     if($Info['status'] == 1){
+        //         if($Info['log_type']==1){
+        //             $key = 'bank_stock';
+        //         }elseif($Info['log_type']==2){
+        //             $key = 'cash_stock';
+        //         }elseif($Info['log_type']==3){
+        //             $key = 'strongbox';
+        //         }
+    
+        //         $stockResult = $this->moneyAccCom->getOne(['where'=>['id'=>$Info['account_id']],'fields'=>$key]);
+        //         if($Info['float_type'] == 1){
+        //             $Info['balance'] = $stockResult['list'][$key] + $Info['money'];
+        //         }elseif($Info['float_type'] == 2){
+        //             $Info['balance'] = $stockResult['list'][$key] - $Info['money'];
+        //             if($Info['balance'] < 0){
+        //                 $this->ajaxReturn(['errCode'=>100,'error'=>'账户金额不足。仅剩下：'.$stockResult['list'][$key]]);
+        //             }
+        //         }
+        //         $insertResult = $this->flCapLogCom->insert($Info);
+        //         if($insertResult){
+        //             if($Info['float_type'] == 1){
+        //                 $updateResult = $this->moneyAccCom->M()->where(['id'=>$Info['account_id']])->setInc($key,$Info['money']); 
+        //             }elseif($Info['float_type'] == 2){
+        //                 $updateResult =$this->moneyAccCom->M()->where(['id'=>$Info['account_id']])->setDec($key,$Info['money']); 
+        //             }
+        //             if($updateResult){
+        //                 $this->flCapLogCom->commit();
+        //                 $this->ajaxReturn(['errCode'=>$insertResult->errCode,'error'=>getError($insertResult->errCode)]);
+        //             }
+        //         }
+        //     }else{
+        //         $insertResult = $this->flCapLogCom->insert($Info);
+        //         if($insertResult){
+        //             $this->flCapLogCom->commit();
+        //             if($insertResult && $insertResult->errCode==0){
+        //                 $this->ApprLogCom->createApp($this->flCapLogCom->tableName(),$insertResult->data,session("userId"),"");
+        //             }
+        //             $this->ajaxReturn(['errCode'=>$insertResult->errCode,'error'=>getError($insertResult->errCode)]);
+        //         }
+        //     }
+            
+        // }
+        // $this->flCapLogCom->rollback();
+        // $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
     }
     function flo_cap_logEdit(){
         $Info = $this->manageFlCapLogInfo();

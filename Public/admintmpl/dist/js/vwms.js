@@ -6,6 +6,7 @@ var tabId="";//定义当前tab指定的id
 var delList = null;//定义要删除的列表位置
 var sourceData = {};
 var resetData = {};
+var moneyAccount = [];
 $.fn.extend({offon:function(){
     var event =  arguments[0]
     var select =  typeof(arguments[1]) == 'string' ? arguments[1] : false
@@ -612,10 +613,13 @@ $(function(){
         if(!$(this).hasClass("disabled") && ($("#approve-log-modal").css("display")=="none" || $("#approve-log-modal").css("display")==undefined)){
             var table = $(this).parents(".approve-group").data("table")
             var id = $(this).parents(".approve-group").data("id")
+            var place = $(this).parents(".approve-group").data("place")
+            var level = $(this).parents(".approve-group").data("level")
+            var maurl = $(this).parents(".approve-group").data("maurl")
             var url = $(this).data("url")
             var tableId =  $(tabId+" .global-modal .table-id[name='table-id']").val();
             var indata = {table:table,id:id,tableId:tableId}
-            var place = $(tabId+" .global-modal .place-id[name='place-id']").val();
+            var place_id = $(tabId+" .global-modal .place-id[name='place-id']").val();
             var apl_id = "approve-log-modal";
             if($("#approve-log-modal").html() == undefined){
                 var html='<div class="modal fade in" id="'+apl_id+'" style="display: block; padding-right: 17px;"><div class="modal-dialog" style="top: 10%;"><div class="modal-content"><div class="modal-header"><button type="button" class="close modal-close" data-dismiss="modal" aria-label="关闭"><span aria-hidden="true"> × </span></button><h4 class="modal-title"></h4></div><div class="modal-body"></div><div class="modal-footer"><button type="button" class="btn btn-default pull-left modal-close" data-dismiss="modal">关闭</button></div></div></div></div>'
@@ -637,7 +641,7 @@ $(function(){
                 var body = '<p class="text-yellow" style="font-weight: bold;">下一个审批者：<span class="next-examine"></span></p><table class="table table-bordered"><thead><tr><th>操作人</th><th>职务</th><th>状态</th><th>时间</th><th>备注</th></tr></thead><tbody></tbody></table><div><div class="progress progress-striped active"><div class="progress-bar progress-bar-primary" style="width: 0%"></div></div></div>'
             }else{
                 var title = "审批操作"
-                var body ='<div class="form-group"><label>审批内容</label><textarea class="form-control approve-remark" rows="3" placeholder="如果驳回或拒绝请写明理由"></textarea></div><div style="text-align: right;"> <button type="button" class="btn bg-olive approve-btn btn-sm" data-status="1">通过</button> <button type="button" class="btn bg-orange approve-btn btn-sm" data-status="3">驳回</button> <button type="button" class="btn btn-danger approve-btn btn-sm" data-status="5">拒绝</button></div>';
+                var body ='<div class="form-group"><label>审批内容</label><textarea class="form-control approve-remark" rows="3" placeholder="如果驳回或拒绝请写明理由"></textarea></div><div class="form-group money-account"></div><div style="text-align: right;"> <button type="button" class="btn bg-olive approve-btn btn-sm" data-status="1">通过</button> <button type="button" class="btn bg-orange approve-btn btn-sm" data-status="3">驳回</button> <button type="button" class="btn btn-danger approve-btn btn-sm" data-status="5">拒绝</button></div>';
             }
             $("#"+apl_id+" .modal-title").text(title);
             $("#"+apl_id+" .modal-body").html(body);
@@ -655,6 +659,7 @@ $(function(){
                             }
                         });
                         // console.log(result.nextExamine)
+                        
                         $("#"+apl_id+" .modal-body .next-examine").text(result.nextExamine)
                         if(result.nextExamine=="已完成" && current != allProcess){
                             current = current > 0 ? current : 1
@@ -674,6 +679,8 @@ $(function(){
                             $("#"+apl_id+" .modal-body .progress .progress-bar").text("当前进度："+current+" / "+allProcess+final);
                         }
                         
+                    }else if(result.errCode == 115){
+                        $("#"+apl_id+" .modal-body .next-examine").text('系统生成所以无记录')
                     }
                 },false)
             }else{
@@ -683,11 +690,22 @@ $(function(){
                         notice(110,$(this).text()+"必须写明理由","操作异常");
                         return false
                     }
+
+                    if(JSON.stringify(moneyAccount) !="[]"){
+                        var monacc_id = $("#approve-log-modal").find(".modal-body select[name='monacc_id']").val();
+                        if(monacc_id>0){
+                            indata['monacc_id'] = monacc_id;
+                        }else{
+                            notice(110,"涉及资金库存，必须选择其中之一","操作异常");
+                        }
+                        
+                    }
+                    
                     if($fileInput!=""){
                         indata["file"]={key:$fileInput.attr("name"),file:$fileInput.val()}
                     }
                     indata["remark"] = approve_remark
-                    indata["place"] = place;
+                    indata["place"] = place_id;
                     indata["status"] = $(this).data("status")
                     post(url,indata,function(result){
                         if(result.errCode==0){
@@ -717,6 +735,25 @@ $(function(){
                     })
                 })
             }
+            //获取一些财务的东西
+            if(place==level){
+                if($(this).hasClass("approve-con")){
+                    moneyAccount = []
+                    $("#approve-log-modal").find(".modal-body .money-account").html("");
+                    maData = {table:table}
+                    get(maurl,maData,function(result){
+                        if(result.data){
+                            moneyAccount = result.data
+                            var option = ''
+                            result.data.forEach(element => {
+                                option+='<option value="'+element.id+'">'+element.cs_title+'</option>'
+                            });
+                            var money_account ='<div class="form-group"><label>涉及资金库存，需要选择现金库存(谨慎操作)：</label><select class="form-control input-sm" name="monacc_id">'+option+'</select></div>';
+                            $("#approve-log-modal").find(".modal-body .money-account").html(money_account);
+                        }
+                    })
+                }
+            }            
             //调整样式    width: 600px;    height: 376px;
             // $("#"+apl_id).css({width:"600px"});
             var width = $(window).width()

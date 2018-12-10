@@ -269,10 +269,14 @@ function modal_btn($defind_vars,$status=false){
         echo "  <button type='button' class='btn btn-danger btn-sm status-info' data-status='4' data-reqtype='Del'  >{$statusType[4]}</button>";
     }
 }
-function approve_btn($tableName,$id=0,$place=false,$level=0,$status=0){
-    echo '<div class="approve-group" data-table="'.$tableName.'" data-id="'.$id.'" >
+function approve_btn($tableName,$id=0,$place=false,$level=0,$status=0,$param=[]){
+    $all_level = 0;
+    if($param['examine']){
+        $all_level = count(explode(",",$param['examine']));
+    }
+    $levelStr = ' data-place="'.$place.'" data-level="'.$all_level.'" data-maurl="'.U('Tools/getMoneyAccountList').'"';
+    echo '<div class="approve-group" '.$levelStr.' data-table="'.$tableName.'" data-id="'.$id.'" >
         <button type="button" data-url="'.U('Tools/getApproveList').'" class="btn btn-xs bg-black approve-log">记录</button> ';
-    // echo $level,',',$place,',',$status;
     if($place===false || $place > 0){
         $disabled = "";
         
