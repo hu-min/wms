@@ -860,6 +860,7 @@ class BaseController extends \Common\Controller\BaseController{
     function add_push($param){
         //检查下一个审批者是否存在白名单中，和当前用户判断，如果当前用户在白名单中，指定用户未在白名单中将不会发送信息
         $roleId=session('roleId');
+        $touserRoleId = 0 ;
         $touserRoleIds = explode(',',$param['examine']);
         foreach ($touserRoleIds as $role) {
             if($roleId != $role){
