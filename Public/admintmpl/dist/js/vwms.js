@@ -1360,6 +1360,9 @@ function read_file(){
     })
 }
 function in_array(val,array){
+    if(array == undefined){
+        return false;
+    }
     for (var index = 0; index < array.length; index++) {
         if (val == array[index]){
             if(arguments[2]){

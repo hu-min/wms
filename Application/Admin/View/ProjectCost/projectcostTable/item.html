@@ -57,25 +57,33 @@
             <input type="text" class="form-control modal-info" style="background: #D2D6DE;" readonly="readonly" name="cost_total" placeholder="成本合计">
         </td>
     </if>
-    <if condition="$listType eq 'cost' ">
+    <if condition="$listType eq 'cost' or $listType eq 'contrast'">
         <td>
-            <select class="form-control modal-info chosen-select" title="供应商名称" data-value="companyId" data-req="getOptionList" data-pname="classify" data-text="company"  name="scompany_id" data-type="module_supplier"  data-cname="scompany_cid">
-                <option value="">选择供应商</option>
+            <select class="form-control modal-info chosen-select" title="请选择供应商名称" data-value="companyId" data-req="getOptionList" data-pname="classify" data-text="company"  name="scompany_id" data-type="module_supplier"  data-cname="scompany_cid">
+                <option value="0">非供应商</option>
             </select>
         </td>
         <td>
-            <select class="form-control modal-info chosen-select" title="供应商联系人" data-value="contactId" data-req="getOptionList" data-pname="scompany_id" data-text="contact" name="scompany_cid" data-type="supplier_cont">
-                <option value="">选择供应商联系人</option>
+            <select class="form-control modal-info chosen-select" title="请选择供应商联系人" data-value="contactId" data-req="getOptionList" data-pname="scompany_id" data-text="contact" name="scompany_cid" data-type="supplier_cont">
+                <option value="0">无供应商联系人</option>
                 <!-- <volist name="suprcontArr" id="item">
                     <option value="{$item['contactId']}">{$item['contact']}</option>
                 </volist> -->
+            </select>
+        </td>
+        <td style="min-width: 150px;">
+            <select class="form-control modal-info chosen-select" title="选择内部员工" data-value="userId"  data-text="userName" name="auth_user_id" data-type="create_user" >
+                <option value="0">默认不选择</option>
+                <volist name="userArr" id="item">
+                    <option value="{$item['userId']}">{$item['userName']}</option>
+                </volist>
             </select>
         </td>
         <td>
             <input type="text" class="form-control modal-info" readonly="readonly" name="profit" placeholder="利润">
         </td>
         <td>
-            <input type="text" class="form-control modal-info" readonly="readonly" name="profit_ratio" placeholder="利润百分比">
+            <input type="text" class="form-control modal-info" readonly="readonly" name="profit_ratio" placeholder="利润%">
         </td>
     </if>
 </tr>

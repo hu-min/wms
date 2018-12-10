@@ -13,6 +13,7 @@ class Urllib{
 	}
 
 	function post($url,$dataArray=array()) {
+		return $this->curlPost($url,$dataArray);
 		$postDataJson = json_encode($dataArray,JSON_UNESCAPED_UNICODE);
 		$options = array(
 		'http' => array(
@@ -32,18 +33,27 @@ class Urllib{
 	 * @return [type]
 	 */
 	function curlPost($url,$dataArray=array()){
-		$o='';
-		foreach ($dataArray as $k=>$v){
-			$o.="$k=".urlencode($v).'&';
-		}
-		$postData=substr($o,0,-1);
+		$postDataJson = json_encode($dataArray,JSON_UNESCAPED_UNICODE);
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE); 
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
 		curl_setopt($ch, CURLOPT_URL,$url);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $postDataJson);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //如果需要将结果直接返回到变量里，那加上这句。
 		return curl_exec($ch);
+	}
+	function curlGet($url){
+		$ch = curl_init(); // 创建一个 cURL 资源 
+		curl_setopt($ch, CURLOPT_URL, $url); // CURLOPT_URL 目标 url 地址 
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE); 
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // CURLOPT_RETURNTRANSFER 返回原生的（Raw）输出 
+		$output = curl_exec($ch); 
+		curl_close($ch);
+
+		return $output;
 	}
 	/** 
 	 * @Author: vition 

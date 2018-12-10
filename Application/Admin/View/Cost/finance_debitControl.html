@@ -18,6 +18,8 @@
                     <div class="box-header">
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">借支管理</h4>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+
                         
                     </div>
                     <div class="box-body search-body company-search-box">
@@ -25,35 +27,25 @@
                             <div class="form-inline">
                                 <div class="form-group">
                                     <label >项目名称：</label>
-                                    <select class="form-control search-info input-sm" data-city="search-info" title="项目名称" name="provinceId">
-                                        <option value="">项目名称</option>
-                                        <volist name="province" id="item">
-                                            <option value="{$item.pid}">{$item.province}</option>
-                                        </volist>
-                                    </select>
+                                    <input class="form-control search-info input-sm"  name="project_name" placeholder="项目名称" type="text">
                                 </div>
                                 <div class="form-group">
-                                    <label >借支类别：</label>
-                                    <select class="form-control search-info input-sm" data-city="search-info" title="借支类别" name="provinceId">
-                                        <option value="">借支类别</option>
-                                        <volist name="province" id="item">
-                                            <option value="{$item.pid}">{$item.province}</option>
-                                        </volist>
+                                    <label >清算状态：</label>
+                                    <select class="form-control search-info input-sm" name="clear_status">
+                                        <option value="">所有状态</option>
+                                        <option value="0">未清算</option>
+                                        <option value="1">已清算</option>
+                                        <option value="2">清算中</option>
                                     </select>
                                 </div>
-                                <div class="form-group">
-                                    <label >状态：</label>
-                                    <select class="form-control search-info input-sm" data-city="search-info" title="状态" name="provinceId">
-                                        <option value="">状态</option>
-                                        <volist name="province" id="item">
-                                            <option value="{$item.pid}">{$item.province}</option>
-                                        </volist>
-                                    </select>
+                                <!-- <div class="form-group">
+                                    <label class="control-label">目前借支：</label>
+                                    <input class="form-control search-info input-sm" readonly="readonly" name="company" placeholder="目前借支" type="text">
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label">员工姓名：</label>
-                                    <input class="form-control search-info input-sm" name="company" placeholder="员工姓名" type="text">
-                                </div>
+                                    <label class="control-label">借支金额：</label>
+                                    <input class="form-control search-info input-sm" readonly="readonly" name="company" placeholder="借支金额" type="text">
+                                </div> -->
                                 <div class="form-group">
                                     <button type="button" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}" class="btn search-list btn-primary"><i class="fa fa-fw fa-search"></i> 搜索 </button>
                                     <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
@@ -73,8 +65,7 @@
                     <table class="table table-bordered table-hover">
                         <thead>
                             <tr>
-                                <th class="hidden-xs is-frozen">申请人</th>
-                                <th class="hidden-xs is-frozen">项目编号</th>
+                                <th class="hidden-xs is-frozen">员工姓名</th>
                                 <th class="is-frozen">项目名称</th>
                                 <th>项目日期</th>
                                 <th>营业主担</th>
@@ -88,12 +79,13 @@
                                 <th>放款日期</th>
                                 <th>支付凭证</th>
                                 <th>备注</th>
+                                <th>审批备注</th>
                                 <th>审批记录</th>
                                 <th>状态</th>
                                 <th>操作</th>
                             </tr>
                         </thead>
-                        <tbody class="{$controlName}-table">
+                        <tbody class="{$controlName}-table p{$controlName}-table">
                             {$tables}
                         </tbody>
                     </table>
@@ -105,7 +97,7 @@
                 <div class="col-md-2 col-sm-3 col-xs-12"><div class="dataTables_length" ><label>显示 <select name="pageSize"  class="form-control input-sm search-info">
                     <volist name="entries" id="item"><option value="{$item}">{$item}</option></volist>
                 </select> 条</label></div></div>
-                <div  class="{$controlName}-page row page-div col-md-10 col-sm-9 col-xs-12" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
+                <div  class="{$controlName}-page p{$controlName}-page row page-div col-md-10 col-sm-9 col-xs-12" data-url="{$url}" data-reqtype="{$controlName}List" data-con="{$controlName}">
                     {$pages}
                 </div>
             </div>
@@ -117,11 +109,26 @@
         </div>
     </div>
     <script>
-        function finance_debit_initInfo(){
+        var fin_flags_data = [];
+        var fin_pdebitPanel = "";
+        var fin_pdebitItem = "";
+        var finance_debit_initInfo = function(){
             init_chosen("{$url}","getOptionList",".global-modal");
             init_date();
             upload({url:"{:U('Project/upload_filesAdd')}"})
         }
+        var fin_pdebit_initInfo = function (gettype,result){
+            // init_chosen("{$url}","getOptionList",".global-modal");
+            init_date();
+            upload({url:"{:U('Project/upload_filesAdd')}"})
+            if(gettype == "Add"){
+                fin_pdebitPanel = result.panel;
+                fin_pdebitItem = result.item;
+                init_chosen("{$url}","getOptionList",".global-modal");
+            }
+        }
+ 
+        //非项目成本读取
         function finance_debit_setInfo(info){
             ["project_id","code","project_name","project_date","business_name","leader_name"].forEach(element=>{
                 if(element == "project_id"){
@@ -133,33 +140,175 @@
                 }
                 $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
             });
-            ["id","debit_money","free_type","require_date","account_type","account","debit_cause","voucher_file","status"].forEach(element=>{
+            ["id","debit_money","free_type","require_date","account_type","account","debit_cause","status","leader"].forEach(element=>{
                 if(info[element]!="" || info[element]!="0"){
                     $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
                 }
             })
-            
-            if(( info['status'] > 0 || info['author'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 ){
-                $(tabId+" .modal-info").prop("disabled",true)
-            }
-            //控制按钮权限
+            var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
+            $(tabId+" .modal-info").prop("disabled",true)
+        }
+        /** 
+         * @Author: vition 
+         * @Date: 2018-12-09 22:17:57 
+         * @Desc: 项目借支设置
+         */        
+        function fin_pdebit_setInfo(info){
+            fin_pdebitPanel = info.panel;
+            fin_pdebitItem = info.item;
+            init_chosen("{$url}","getOptionList",".global-modal");
+            var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
+            ['id','project_name','flag','require_date','account_type','account','debit_money'].forEach(key => {
+                $(tabId+" .global-modal").find(".common-info[name='"+key+"']").val(info[key])
+            });
             $(tabId+" .global-modal").find(".approve-group").data("id",info['id'])
-            // console.log(info['process_level'])
-            // console.log("{$place}")
-            if(info['process_level'] > info['place'] || info['status'] ==3){
-                $(tabId+" .global-modal").find(".approve-group .approve-con").addClass("disabled")
-                $(tabId+" .global-modal").find(".approve-group .approve-con").prop("disabled",true)
-                $(tabId+" .modal-info[name='voucher_file']").parent(".input-group").find(".clear-media").remove();
-            }else{
-                if(info['place']==0){
+            fin_project_debit_set(info.list);
+            fin_pedbit_compute()
+
+            $(tabId+" .global-modal .modal-info").prop("disabled",true)
+            $(tabId+" .global-modal .common-info").prop("disabled",true)
+            if(info['process_level'] > info['place'] || info['status'] == 3){
+                if(info["user_id"] == "{$Think.session.userId}"){
                     $(tabId+" .global-modal").find(".approve-group .approve-con").remove();
+                }else{
+                    $(tabId+" .global-modal").find(".approve-group .approve-con").addClass("disabled");
+                    $(tabId+" .global-modal").find(".approve-group .approve-con").prop("disabled",true);
                 }
-                $(tabId+" .modal-info[name='voucher_file']").prop("disabled",false)
             }
         }
+        var fin_pedbit_compute = function(){
+            var all_debit = 0;
+            $(tabId+" .global-modal .box-group ").find(".panel").each(function(){
+                var class_debit = 0;
+                $(this).find(".modal-info[name='debit_money']").each(function(){
+                    class_debit += float($(this).val())
+                    all_debit += float($(this).val())
+                })
+                $(this).find(".class-count").text(float_format(class_debit));
+            })
+            $(tabId+" .global-modal .all-count").val(float_format(all_debit));
+        }
+        var compute_modebit = function (){
+            var modules = $(tabId+" .global-modal").find(".modal-info[name='modules']");
+            var debit_money = $(tabId+" .global-modal").find(".modal-info[name='debit_money']").val();
+            var limitMoney = 0;
+            
+            fin_flags_data.forEach(subData => {
+                if(in_array(subData.classify,modules.val())){
+                    limitMoney+=float(subData.cost_total)
+                    if(limitMoney>0 && debit_money>limitMoney){
+                        notice(100,'<div>选择的承接模块成本限制为：'+limitMoney+'</div>','借支超额');
+                        $(tabId+" .global-modal").find(".modal-info[name='debit_money']").val(limitMoney)
+                        throw '借支超额';
+                    }
+                }
+            });
+
+            if(limitMoney <= 0){
+                notice(100,'<div>选择的承接模块成本异常，为：【0】</div>','借支超额');
+                $(tabId+" .global-modal").find(".modal-info[name='debit_money']").val('')
+            }
+            
+        }
+        //项目借支的数据
+        var fin_project_debit_set = function (list){
+            var cost_class = "";
+            var panel_index = 0;
+            list.forEach(subElement => {
+                if(cost_class != subElement['class_sort']+"-"+subElement['cost_class']){
+                    var fin_pdebitPanelObj = $(fin_pdebitPanel)
+                    var idstr = fin_pdebitPanelObj.find(".cost-class-title").attr("href")
+                    fin_pdebitPanelObj.find(".cost-class-title").attr("href",idstr+subElement['class_sort'])
+                    fin_pdebitPanelObj.find(".cost-class-title").text(subElement['cost_class_name'])
+                    fin_pdebitPanelObj.find(".cost-class-alpha").text(alpha(subElement['class_sort']))
+                    fin_pdebitPanelObj.find(".cost_class_div").addClass('none')
+                    fin_pdebitPanelObj.find(".modal-info[name='class_sort']").val(subElement['class_sort'])
+                    fin_pdebitPanelObj.find(".modal-info[name='cost_class']").val(subElement['cost_class'])
+                    fin_pdebitPanelObj.find(idstr).attr("id",fin_pdebitPanelObj.find(idstr).attr("id")+subElement['class_sort'])
+                    
+                    $(tabId+" .global-modal .box-group ").append(fin_pdebitPanelObj);
+                    cost_class = subElement['class_sort']+"-"+subElement['cost_class']
+                    panel_index = $(tabId+" .global-modal .box-group ").find(".panel").length - 1
+                }
+                var fin_pdebitPanelOjc = $(fin_pdebitItem);
+                ['id','class_notes','classify','sort','item_content','cost_surplus','costed','auth_user_id','debit_money'].forEach(modalName => {
+                    if(modalName == 'sort'){
+                        fin_pdebitPanelOjc.find(".modal-info[name='"+modalName+"']").text(alpha(subElement['class_sort'])+subElement[modalName])
+                    }else{
+                        if(modalName == 'cost_surplus'){
+
+                            fin_pdebitPanelOjc.find(".modal-info[name='cost_surplus']").val(float(subElement['cost_total'])-float(subElement['costed']))
+                        }else{
+                            fin_pdebitPanelOjc.find(".modal-info[name='"+modalName+"']").val(subElement[modalName])
+                        }
+                    }
+                    if(modalName != 'debit_money'){
+                        fin_pdebitPanelOjc.find(".modal-info[name='"+modalName+"']").prop("disabled",true)
+                    }
+                    
+                });
+                $(tabId+" .global-modal .box-group ").find(".panel").eq(panel_index).find(".table-items").append(fin_pdebitPanelOjc);
+            })
+        }
         $(function(){
-            upload({url:"{:U('Project/upload_filesAdd')}"})
             $(tabId+" .search-list").trigger("click");
+            //切换项目获取成本标识
+            $(tabId).offon("change"," .project-info[name='project_id']",function(){
+                var project_id = $(this).val()
+                var flags = $(tabId+" .global-modal").find(".modal-info[name='section']");
+                
+                if(Number(project_id)>0){
+                    datas["reqType"]='getProjectOne';
+                    datas["onlydata"]='true';
+                    datas["gettype"]='Edit';
+                    datas["id"]=project_id;
+
+                    get("{$url}",datas,function(result){
+                        if(result.data){
+                            result.data['project_id'] = result.data['projectId'];
+                            // debit_setInfo(result.data)
+                            var option = '<option></option>'
+                            result.data.flags.forEach(element => {
+                                option += '<option value="'+element.section+'">'+element.flag+'</option>'
+                            });
+                            flags.html(option);
+                            flags.trigger("chosen:updated")
+                            fin_flags_data = result.data.flags
+                        }
+                    },false)
+                    
+                    $(tabId+" .global-modal").find(".modal-info[name='section']").prop("required",true)
+                }else{
+                    flags.html('');
+                    flags.trigger("chosen:updated")
+                    fin_flags_data = [];
+                    $(tabId+" .global-modal").find(".modal-info[name='section']").prop("required",false)
+                    // ["code","project_name","project_date","business_name","leader_name","leader"].forEach(element=>{
+                    //     $(tabId+" .global-modal .project-info[name='"+element+"']").val("");
+                    // })
+                }
+            });
+            $(tabId).offon("change"," .modal-info[name='section']",function(){
+                var project_id = $(tabId+" .global-modal").find(" .modal-info[name='project_id']").val()
+                var flag_id = $(this).val()
+                if(Number(project_id)>0 && Number(flag_id)>0){
+                    datas["reqType"]='getPCostOne';
+                    datas["project_id"]=project_id;
+                    datas["flag_id"]=flag_id;
+
+                    get("{$url}",datas,function(result){
+                        $(tabId+" .global-modal .box-group ").html("")
+                        fin_pedbit_compute()
+                        if(result.data.list){
+                            fin_project_debit_set(result.data.list);
+                        }else{
+                            notice(100,'<div>当前没有可借支项</div>','借支限制');
+                        }
+                    })
+                }
+            })
+
+
         })
     </script>
 </body>

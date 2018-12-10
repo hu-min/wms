@@ -19,11 +19,17 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-5">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label >报价&成本唯一标识【方便借支调用选择】：</label>
+                        <input type="text" class="form-control modal-info input-sm" name="flag" placeholder="同个项目不同报价&成本唯一标识">
+                    </div>
+                </div>
+                <div class="col-md-6">
                     <!-- {:import_btn(get_defined_vars())} -->
                     {:export_btn(get_defined_vars(),['controlPrefix'=>'_modalOne'])} 
                 </div>
-                <div class="col-md-4"></div>
+                
             </div>
             <div class="row">
                 <div class="col-md-2">

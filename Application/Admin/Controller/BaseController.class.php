@@ -851,4 +851,27 @@ class BaseController extends \Common\Controller\BaseController{
         $this->ajaxReturn(['errCode'=>$result->errCode,'error'=>getError($result->errCode)]);
         // $this->resetCom->a();
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-12-09 16:08:22 
+     * @Desc: 添加数据的时候推送公共方法 
+     * add_push(['examine','title','desc','url','tableName','tableId'])
+     */    
+    function add_push($param){
+        //检查下一个审批者是否存在白名单中，和当前用户判断，如果当前用户在白名单中，指定用户未在白名单中将不会发送信息
+        $touserRoleId = explode(',',$param['examine'])[0];
+        $limitWhite = $this->whiteCom->limitWhite(session('roleId'),$touserRoleId,true);
+        $title = $param['title'];
+        $desc = $param['desc'];
+        $url = $param['url'];
+        $tableName = $param['tableName'];
+        $tableId = $param['tableId'];
+        if(!$limitWhite){
+            $touser = $this->userCom->getQiyeId($touserRoleId,true);
+            if(!empty($touser)){
+                $msgResult = $this->QiyeCom-> textcard($touser,$title,$desc,$url);
+            }
+        }
+        $this->ApprLogCom->createApp($tableName,$tableId,session("userId"),"");
+    }
 }

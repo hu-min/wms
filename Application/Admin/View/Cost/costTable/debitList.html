@@ -12,7 +12,7 @@
         <td>{$item['business_name']}</td>
         <td>{$item['leader_name']}</td>
         <td>{$item['debit_date']}</td>
-        <td>{$item['require_date']}</td>
+        <td>{$item['require_date']|time_format}</td>
         <td>{$item['free_name']}</td>
         <td>{$item['debit_cause']}</td>
         <td>{$item['debit_money']}</td>
@@ -31,6 +31,11 @@
         <td>
             {:approve_btn($tableName,$item['id'],0,0)}
         </td>
-        {:list_btn(get_defined_vars(),"id")}
+        <if condition="$item['project_id'] GT 0">
+            {:list_btn(get_defined_vars(),"id",[],false,false,true,'查看',["controlName"=>"pdebit"])}
+        <else/>
+            {:list_btn(get_defined_vars(),"id")}
+        </if>
+        
     </tr>
 </volist>

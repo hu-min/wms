@@ -57,9 +57,7 @@ class BaseController extends \Common\Controller\BaseController{
         if($isCount){
             $count=$this->selfDB->countList($where,$joins,$groupBy,$having);
         }
-        $classList=$this->selfDB->getList($where , $fields, $orderStr, $page, $pageNum, $groupBy,$joins,$having);
-        // $this->log($this->selfDB->_sql());
-        
+        $classList=$this->selfDB->getList($where , $fields, $orderStr, $page, $pageNum, $groupBy,$joins,$having);       
         if($classList){
             return ['list'=>$classList,'count'=>$count];
         }

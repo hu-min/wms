@@ -12,7 +12,7 @@ class CostController extends BaseController{
     protected $expVouchType = ["无","收据","签收单+身份证","发票","其他"];
     public function _initialize() {
 
-        $this->project=A('Project');
+        // $this->project=A('Project');
         parent::_initialize();
         $this->projectCom=getComponent('Project');
         
@@ -20,10 +20,12 @@ class CostController extends BaseController{
         $this->customerCom=getComponent('Customer');
         $this->costCom=getComponent('Cost');
         $this->debitCom=getComponent('Debit');
+        $this->debitSubCom=getComponent('DebitSub');
         $this->expenseCom=getComponent('Expense');
         $this->expenseSubCom=getComponent('ExpenseSub');
         $this->whiteCom=getComponent('White');
         $this->pCostCom=getComponent('ProjectCost');
+        $this->pCostSubCom=getComponent('ProjectCostSub');
         Vendor("levelTree.levelTree");
         $this->levelTree=new \levelTree();
         $this->accounts = ["2"=>session("userInfo.wechat"),"3"=>session("userInfo.alipay"),"4"=>session("userInfo.bank_card")];
@@ -50,8 +52,8 @@ class CostController extends BaseController{
 
         $reqType=I('reqType');
         $this->assign('accountType',$this->accountType);
-        // print_r($this->project->_getOption("cost_project"));exit;
-        $this->assign('projectArr',$this->project->_getOption("cost_relation_project"));
+        // print_r($this->Com ->get_option("cost_project"));exit;
+        $this->assign('projectArr',$this->Com ->get_option("cost_relation_project"));
         $this->assign("controlName","debit");
         $this->assign("tableName",$this->debitCom->tableName()); 
         $nodeId = getTabId(I("vtabId"));
@@ -106,14 +108,14 @@ class CostController extends BaseController{
         $this->tablePage($listResult,'Cost/costTable/debitList',"debitList",$pageSize);
     }
     function debit_modalOne(){
-        $title = "新增借支";
+        $title = "新增借支（非项目）";
         $btnTitle = "添加数据";
         $gettype = I("gettype");
         $resultData=[];
         $id = I("id");
         
         if($gettype=="Edit"){
-            $title = "编辑借支";
+            $title = "编辑借支（非项目）";
             $btnTitle = "保存数据";
             $redisName="debitList";
             $resultData=$this->debitCom->redis_one($redisName,"id",$id);
@@ -133,18 +135,245 @@ class CostController extends BaseController{
         $this->assign("pidoption",$option);
         $this->modalOne($modalPara);
     }
-    function manageDebitInfo(){
+    
+    //项目的借支
+    function pdebit_modalOne($type="pdebit"){
+        $title = "新增项目借支";
+        $btnTitle = "添加数据";
+        $gettype = I("gettype");
+        $roleId = session("roleId");
+        $resultData=[];
+        $id = I("id");
+        $this->assign("controlName",$type);
+        $this->assign('moduleArr',$this->Com ->get_option('module'));
+        $this->assign('unitArr',$this->Com ->get_option('unit'));
+        
+        if($gettype=="Edit"){
+            $title = "编辑项目借支";
+            $btnTitle = "保存数据";
+            $redisName="debitList";
+            $param = [
+                'fields'=>"*,FROM_UNIXTIME(require_date,'%Y-%m-%d') require_date,FIND_IN_SET({$roleId},examine) place",
+                'where'=>["id"=>$id],
+                'one'=>true,
+                'joins'=>[
+                    "LEFT JOIN (SELECT projectId,name project_name FROM v_project ) p ON p.projectId = project_id ",
+                    "LEFT JOIN (SELECT section section_id, flag FROM v_project_cost ) pc ON pc.section_id = section ",
+                ],
+            ];
+            $resultData=$this->debitCom->getOne($param);
+            $param = [
+                'where'=>["parent_id"=>$id],
+                'orderStr'=>"class_sort ASC , sort ASC",
+                'joins' => [
+                    'LEFT JOIN (SELECT id cid,class_sort,cost_class,class_sub,class_notes,classify,sort,item_content,cost_total,costed FROM v_project_cost_sub) pcs ON pcs.cid = cost_id',
+                    'LEFT JOIN (SELECT basicId, name cost_class_name FROM v_basic WHERE class ="costClass" ) bc ON bc.basicId = cost_class',
+                ],
+            ];
+            $resultData['list']=$this->debitSubCom->getList($param)['list'];
+            // $resultData=[];
+        }
+        $template = 'pdebitModal';
+        if($type=="finpdebit"){
+           $template = 'finpdebitModal';
+        }
+        
+        $resultData['panel'] = $this->fetch('Cost/costTable/panel');
+        $resultData['item'] = $this->fetch('Cost/costTable/item');
+        $modalPara=[
+            "data"=>$resultData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "template"=>$template,
+        ];
+        // $option='<option value="0">费用类别</option>';
+        // // print_r(A("Basic")->getFeeTypeTree());exit;
+        // foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
+        //     $option.=A("Basic")->getfeeType($value,0);
+        // }
+        // $this->assign("pidoption",$option);
+        $this->modalOne($modalPara);
+    }
+    //借用pdebit_modalOne
+    function fin_pdebit_modalOne(){
+        $this->pdebit_modalOne("finpdebit");
+    }
+    function getPCostOne(){
+        extract($_GET);
+        if($project_id > 0 && $flag_id > 0 ){
+            $param =[
+                'fields'=>'*',
+                'where'=>[
+                    'project_id' => $project_id,
+                    'section' => $flag_id,
+                ],
+                'one' => true,
+            ];
+            $pCostResult = $this->pCostCom->getOne($param);
+            $where =[
+                'parent_id'=>$pCostResult['id'],
+                'auth_user_id' => [["EQ",session('userId')],["EQ",0],"OR"],
+                '_string' => '(cost_total > 0 AND cost_total <> costed)',
+            ];
+            $sParam =[
+                'fields'=>'*',
+                'where'=>$where,
+                'orderStr'=>"class_sort ASC , sort ASC",
+                'joins' => [
+                    'LEFT JOIN (SELECT basicId, name cost_class_name FROM v_basic WHERE class ="costClass" ) bc ON bc.basicId = cost_class',
+                    'LEFT JOIN (SELECT classify module_id , GROUP_CONCAT(companyId) scompany_ids , GROUP_CONCAT(company) scompany_names FROM (SELECT classify FROM v_project_cost_sub WHERE `parent_id` = "'.$pCostResult['id'].'" AND `read_type` >= 1) pc LEFT JOIN (SELECT module,companyId,company FROM v_supplier_company) sc ON FIND_IN_SET(pc.classify,sc.module) GROUP BY pc.classify) m ON m.module_id = classify',
+                    // 'LEFT JOIN (SELECT contactId,companyId,contact scontact_name FROM v_supplier_contact ) suc ON suc.companyId = scompany_id AND suc.contactId = scompany_cid ',
+                    // 'LEFT JOIN (SELECT basicId unit_id, name unit_name FROM v_basic WHERE class ="unit" ) un ON un.unit_id = unit',
+                    // 'LEFT JOIN (SELECT basicId aunit_id, name aunit_name FROM v_basic WHERE class ="unit" ) aun ON aun.aunit_id = act_unit',
+                    // 'LEFT JOIN (SELECT basicId mid, name module_name FROM v_basic WHERE class ="module" ) mo ON mo.mid = m.module_id',
+                ],
+            ];
+            $pCostResult["list"] = $this->pCostSubCom->getList($sParam)['list'];
+            $this->ajaxReturn(['data'=> $pCostResult]); 
+        } 
+        $this->ajaxReturn(['errCode'=>408,'error'=>getError(408)]);       
+    }
+    function managepDebitInfo(){
+
+    }
+    function pdebitAdd(){
         $reqType=I("reqType");
-        $datas=I("data");
-        if($datas["project_id"]>0){
-            if($reqType=="debitEdit"){
-                $ids = [$datas["id"]];
-                $dbCom = "debit";
-            }else{
-                $dbCom="";
-                $ids=[];
+        extract($_POST);
+        if(count($data["list"]) == 0 || $data['debit_money'] <= 0 ){
+            $this->ajaxReturn(['errCode'=>408,'error'=>getError(408)]);
+        }
+        $num = count($data["list"]);
+        $updateNum = 0;
+        $debitData = $this->manageDebitInfo($data,'debitAdd');
+        unset($debitData['list']);
+        $this->debitCom->startTrans();
+        $this->debitSubCom->startTrans();
+        $this->pCostSubCom->startTrans();
+        $insertResult = $this->debitCom->insert($debitData);
+        if(isset($insertResult->errCode) && $insertResult->errCode==0){
+            $subData = [
+                'parent_id' => $insertResult->data,
+                'add_time' => time(),
+            ];
+            foreach ($data["list"] as $subInfo) {
+                $subData['cost_id'] = $subInfo['id'];
+                $subData['debit_money'] = $subInfo['debit_money'];
+                $result = $this->pCostSubCom->getOne(['where'=>['id'=>$subInfo['id']],'one'=>true]);
+                // echo $subData['debit_money'],'>=',($result['cost_total'] - $result['costed']),'\n';
+                if($subData['debit_money'] <=  ($result['cost_total'] - $result['costed']) ){
+
+                    $inresult = $this->debitSubCom->insert($subData);
+                    
+                    if(isset($inresult->errCode) && $inresult->errCode==0){
+                        $dateUpdate = [
+                            'where' =>['id'=>$subInfo['id']],
+                            'data' => ['costed'=>($result['costed']+$subData['debit_money'])],
+                        ];
+                        $updateResult = $this->pCostSubCom->update($dateUpdate);
+                        if($updateResult){
+                            $updateNum++;
+                        }
+                    }
+                }
             }
-            $this->projectCom->checkCost($datas["project_id"],$datas["debit_money"],$dbCom,$ids);
+        }
+        if($num > 0 && $num == $updateNum){
+
+            $this->debitCom->commit();
+            $this->debitSubCom->commit();
+            $this->pCostSubCom->commit();
+            $addData = [
+                'examine'=>$debitData['examine'],
+                'title'=>session('userName')."申请了借支",
+                'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."申请借支，@你了，点击进入审批吧！</div>",
+                'url'=>C('qiye_url')."/Admin/Index/Main.html?action=Cost/debitControl",
+                'tableName'=>$this->debitCom->tableName(),
+                'tableId'=>$insertResult->data,
+            ];
+            $this->add_push($addData);
+
+            $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+        }else{
+            $this->debitCom->rollback();
+            $this->debitSubCom->rollback();
+            $this->pCostSubCom->rollback();
+            $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+        }
+    }
+    function pdebitEdit(){
+        $reqType=I("reqType");
+        extract($_POST);
+        $debitData = $this->manageDebitInfo($data,'debitEdit');
+
+        $num = count($data["list"]);
+        $updateNum = 0;
+        $this->debitCom->startTrans();
+        $this->debitSubCom->startTrans();
+        $this->pCostSubCom->startTrans();
+        $updateResult = $this->debitCom->update($debitData);
+        if($updateResult){
+            // $subData = [
+            //     'parent_id' => $data["id"],
+            //     'update_time' => time(),
+            // ];
+            foreach ($data["list"] as $subInfo) {
+                if($subInfo['debit_money']<=0){
+                    $this->debitSubCom->del(['id'=>$subInfo['id']]);
+                }else{
+                    $debitSub = $this->debitSubCom->getOne(['where'=>['id'=>$subInfo['id']],'one'=>true]);
+                    $newData = [
+                        'where' =>['id'=>$subInfo['id']],
+                        'data' => ['debit_money'=>$subInfo['debit_money'],'update_time'=>time()],
+                    ];
+                    // print_r($newData);
+                    $upresult = $this->debitSubCom->update($newData);
+                    
+                    if(isset($upresult->errCode) && $upresult->errCode==0){
+                        $costParam = [
+                            'where' =>['id'=>$debitSub['cost_id']],
+                        ];
+                        $costResult = $this->pCostSubCom->getOne(array_merge($costParam,['one'=>true]));
+                        
+                        if($subInfo['debit_money']<$debitSub['debit_money']){
+                            $costParam['data'] = ['costed'=>($costResult['costed'] -( $debitSub['debit_money'] - $subInfo['debit_money']))];
+                        }elseif($subInfo['debit_money']>$debitSub['debit_money']){
+                            $costParam['data'] = ['costed'=>($costResult['costed'] + ( $subInfo['debit_money'] - $debitSub['debit_money']))];
+                        }
+                        $updateResult = $this->pCostSubCom->update($dateUpdate);
+                        if($updateResult){
+                            $updateNum++;
+                        }
+                    }
+                    
+                }
+            }
+        }
+        if($num > 0 && $updateNum > 0 ){
+
+            $this->debitCom->commit();
+            $this->debitSubCom->commit();
+            $this->pCostSubCom->commit();
+            $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+        }else{
+            $this->debitCom->rollback();
+            $this->debitSubCom->rollback();
+            $this->pCostSubCom->rollback();
+            $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+        }
+    }
+    function manageDebitInfo($datas,$reqType=false){
+        $reqType = $reqType ? $reqType : I("reqType");
+        $datas= $datas ? $datas : I("data");
+        // if($datas["project_id"]>0){
+            // if($reqType=="debitEdit"){
+            //     $ids = [$datas["id"]];
+            //     $dbCom = "debit";
+            // }else{
+            //     $dbCom="";
+            //     $ids=[];
+            // }
+            // $this->projectCom->checkCost($datas["project_id"],$datas["debit_money"],$dbCom,$ids);
+
             // $costBudget = $this->projectCom->getCostBudget($datas["project_id"]);
             // $allCost = $this->projectCom->getCosts($datas["project_id"]);
             // // print_r($allCost);
@@ -154,7 +383,7 @@ class CostController extends BaseController{
             //     $html='<p>成本预算超支:</p><p>该项目立项成本预算【'.$costBudget.'】</p><p>当前使用已使用成本：【'.$allCost['allCost'].'】</p><p>请联系管理员修改成本预算</p>';
             //     $this->ajaxReturn(['errCode'=>77,'error'=>$html]);
             // }
-        }
+        // }
         $roleId = session("roleId");
         if($datas["debit_date"] == 0){
             unset($datas["debit_date"] );
@@ -228,24 +457,33 @@ class CostController extends BaseController{
      */    
     function debitAdd(){
         $info=$this->manageDebitInfo();
+        // print_r($info);exit;
         if($info){
-            
             $insertResult=$this->debitCom->insert($info);
             if(isset($insertResult->errCode) && $insertResult->errCode==0){
                 //检查下一个审批者是否存在白名单中，和当前用户判断，如果当前用户在白名单中，指定用户未在白名单中将不会发送信息
-                $touserRoleId = explode(',',$info['examine'])[0];
-                $limitWhite = $this->whiteCom->limitWhite(session('roleId'),$touserRoleId,true);
-                if(!$limitWhite){
-                    $touser = $this->userCom->getQiyeId($touserId,true);
-                    if(!empty($touser)){
-                        $desc = "<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."申请借支，@你了，点击进入审批吧！</div>";
-                        $url = C('qiye_url')."/Admin/Index/Main.html?action=Cost/debitControl";
-                        $msgResult = $this->QiyeCom-> textcard($touser,session('userName')."申请了借支",$desc,$url);
-                    }
-                }
-               
-                
-                $this->ApprLogCom->createApp($this->debitCom->tableName(),$insertResult->data,session("userId"),"");
+                // $touserRoleId = explode(',',$info['examine'])[0];
+                // $limitWhite = $this->whiteCom->limitWhite(session('roleId'),$touserRoleId,true);
+                // if(!$limitWhite){
+                //     $touser = $this->userCom->getQiyeId($touserId,true);
+                    
+                //     if(!empty($touser)){
+                //         $desc = "<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."申请借支，@你了，点击进入审批吧！</div>";
+                //         $url = C('qiye_url')."/Admin/Index/Main.html?action=Cost/debitControl";
+                //         $msgResult = $this->QiyeCom-> textcard($touser,session('userName')."申请了借支",$desc,$url);
+                //         $this->log($this->QiyeCom);
+                //     }
+                // }
+                // $this->ApprLogCom->createApp($this->debitCom->tableName(),$insertResult->data,session("userId"),"");
+                $addData = [
+                    'examine'=>$info['examine'],
+                    'title'=>session('userName')."申请了借支",
+                    'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."申请借支，@你了，点击进入审批吧！</div>",
+                    'url'=>C('qiye_url')."/Admin/Index/Main.html?action=Cost/debitControl",
+                    'tableName'=>$this->debitCom->tableName(),
+                    'tableId'=>$insertResult->data,
+                ];
+                $this->add_push($addData);
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
         }
@@ -268,22 +506,17 @@ class CostController extends BaseController{
       
         $data = A("Purcha")->getProjectOne(true);
 
-        $data['modules'] = [];
+        $data['flags'] = [];
         $param = [
-            'fields' => 'cs.classify classify,SUM(cs.cost_total) cost_total,mname',
+            'fields' => 'section,flag',
             'page'=>1,
             'pageSize'=>999999999,
-            'where' => ['project_id'=> $data['projectId']],
-            'groupBy' => 'cs.classify',
+            'where' => ['project_id'=> $data['projectId'],'status'=>1],
             'isCount' => false,
-            'joins' => [
-                'LEFT JOIN (SELECT parent_id,cost_class,classify,cost_total FROM v_project_cost_sub WHERE scompany_id = 0) cs ON cs.parent_id = id',
-                'LEFT JOIN (SELECT basicId cid,name mname FROM v_basic WHERE class="module") m ON m.cid = cs.classify',
-            ],
         ];
         $result = $this->pCostCom->getList($param);
         if($result){
-            $data['modules'] = $result['list'];
+            $data['flags'] = $result['list'];
         }
         $this->ajaxReturn(["data" => $data]);
     }
@@ -295,7 +528,7 @@ class CostController extends BaseController{
     function finance_debitControl(){
         $reqType=I('reqType');
         $this->assign('accountType',$this->accountType);
-        $this->assign('projectArr',$this->project->_getOption("cost_relation_project"));
+        $this->assign('projectArr',$this->Com ->get_option("cost_relation_project"));
 
         $this->assign("controlName","finance_debit");
         $this->assign("tableName",$this->debitCom->tableName()); 
@@ -353,6 +586,12 @@ class CostController extends BaseController{
         $gettype = I("gettype");
         $resultData=[];
         $id = I("id");
+        $option='<option value="0">费用类别</option>';
+        // print_r(A("Basic")->getFeeTypeTree());exit;
+        foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
+            $option.=A("Basic")->getfeeType($value,0);
+        }
+        $this->assign("pidoption",$option);
         
         if($gettype=="Edit"){
             $title = "编辑借支";
@@ -366,7 +605,7 @@ class CostController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "template"=>"financedebitModal",
+            "template"=>"debitModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -377,8 +616,8 @@ class CostController extends BaseController{
         $this->assign("controlName","expense");
         $this->assign("tableName",$this->expenseSubCom->tableName());
         $this->assign('accountType',$this->accountType);
-        $this->assign('projectArr',$this->project->_getOption("cost_relation_project"));
-        $this->assign('expTypeArr',$this->project->_getOption("expense_type"));
+        $this->assign('projectArr',$this->Com ->get_option("cost_relation_project"));
+        $this->assign('expTypeArr',$this->Com ->get_option("expense_type"));
         $this->assign('expVouchType',$this->expVouchType);
         $this->assign('accounts',json_encode($this->accounts));
         if($reqType){
@@ -616,6 +855,7 @@ class CostController extends BaseController{
                 'where' => ["basicId"=>$datas['feeType']],
             ];
             $feeRes = $this->basicCom->getOne($param)['list'];
+
             $baseLimit = $feeRes['remark'];
             $where = ["class"=>'regLimit','pId'=>$datas['feeType']];
             if($datas['city']){
@@ -629,7 +869,7 @@ class CostController extends BaseController{
             $limit_money = $reLimit > 0 ? $reLimit : $baseLimit;
             if(($datas['money']>$limit_money && $limit_money > 0) || ($datas['money']>100000 && $limit_money <= 0)){
                 $limit_money = $limit_money > 0 ? $limit_money : 100000;
-                $this->ajaxReturn(['errCode'=>100,'error'=>$feeRes['name'].'报销金额不能超过'.$limit_money,'data'=>['limit_money'=>$limit_money]]);
+                $this->ajaxReturn(['errCode'=>100,'error'=>$feeRes['name'].'借支/报销金额不能超过'.$limit_money,'data'=>['limit_money'=>$limit_money]]);
             }else{
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
@@ -642,10 +882,10 @@ class CostController extends BaseController{
         $reqType=I('reqType');
         $this->assign("controlName","fin_expense");
         $this->assign("tableName",$this->expenseSubCom->tableName());
-        $this->assign('projectArr',$this->project->_getOption("cost_relation_project"));
-        $this->assign('userArr',$this->project->_getOption("create_user"));
+        $this->assign('projectArr',$this->Com ->get_option("cost_relation_project"));
+        $this->assign('userArr',$this->Com ->get_option("create_user"));
         $this->assign('accountType',$this->accountType);
-        $this->assign('expTypeArr',$this->project->_getOption("expense_type"));
+        $this->assign('expTypeArr',$this->Com ->get_option("expense_type"));
         $this->assign('expVouchType',$this->expVouchType);
         if($reqType){
             $this->$reqType();

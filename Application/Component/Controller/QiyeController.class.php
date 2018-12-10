@@ -19,7 +19,6 @@ class QiyeController extends \Common\Controller\BaseController{
         ];
         $this->Wxqy->secret($secret);
         $return = $this->Wxqy->message()->send($msgData);
-        $this->log($return);
         return $return;
     }
 }

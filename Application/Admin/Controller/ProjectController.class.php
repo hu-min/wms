@@ -59,15 +59,15 @@ class ProjectController extends BaseController{
         $this->assign("controlName","project");
         $this->assign("gettype","Add");
         //一堆立项初始化数据开始了
-        $this->assign('projectArr',$this->_getOption("project_id"));
-        $this->assign('brandArr',$this->_getOption("brand"));
-        $this->assign('fieldArr',$this->_getOption("field"));
+        $this->assign('projectArr',$this->Com ->get_option("project_id"));
+        $this->assign('brandArr',$this->Com ->get_option("brand"));
+        $this->assign('fieldArr',$this->Com ->get_option("field"));
         $this->assign('exeRootdArr',$this->basicCom->get_exe_root());
-        // $this->assign('executedArr',$this->_getOption("execute_sub"));
-        $this->assign('cusComArr',$this->_getOption("customer_com"));
-        $this->assign('userArr',$this->_getOption("create_user"));
-        $this->assign('ptypeArr',$this->_getOption("projectType"));
-        $this->assign('stageArr',$this->_getOption("stage"));
+        // $this->assign('executedArr',$this->Com ->get_option("execute_sub"));
+        $this->assign('cusComArr',$this->Com ->get_option("customer_com"));
+        $this->assign('userArr',$this->Com ->get_option("create_user"));
+        $this->assign('ptypeArr',$this->Com ->get_option("projectType"));
+        $this->assign('stageArr',$this->Com ->get_option("stage"));
         $this->assign("provinceArr",$this->basicCom->get_provinces());
         //一堆立项初始化数据结束了
         $this->assign("project",$project);
@@ -88,15 +88,15 @@ class ProjectController extends BaseController{
         $this->assign("tableName",$this->projectCom->tableName());
         // $this->assign("gettype","Add");
         //一堆立项初始化数据开始了
-        $this->assign('projectArr',$this->_getOption("project_id"));
-        $this->assign('brandArr',$this->_getOption("brand"));
-        $this->assign('fieldArr',$this->_getOption("field"));
+        $this->assign('projectArr',$this->Com ->get_option("project_id"));
+        $this->assign('brandArr',$this->Com ->get_option("brand"));
+        $this->assign('fieldArr',$this->Com ->get_option("field"));
         $this->assign('exeRootdArr',$this->basicCom->get_exe_root());
-        // $this->assign('executedArr',$this->_getOption("execute_sub"));
-        $this->assign('cusComArr',$this->_getOption("customer_com"));
-        $this->assign('userArr',$this->_getOption("create_user"));
-        $this->assign('ptypeArr',$this->_getOption("projectType"));
-        $this->assign('stageArr',$this->_getOption("stage"));
+        // $this->assign('executedArr',$this->Com ->get_option("execute_sub"));
+        $this->assign('cusComArr',$this->Com ->get_option("customer_com"));
+        $this->assign('userArr',$this->Com ->get_option("create_user"));
+        $this->assign('ptypeArr',$this->Com ->get_option("projectType"));
+        $this->assign('stageArr',$this->Com ->get_option("stage"));
         $this->assign("provinceArr",$this->basicCom->get_provinces());
        
         $this->assign("nodeAuth",$this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]);
@@ -185,291 +185,291 @@ class ProjectController extends BaseController{
     function getOptionList(){
         $key=I("key");
         $type=I("type");
-        $this->ajaxReturn(["data"=>$this->_getOption($type,$key)]);
+        $this->ajaxReturn(["data"=>$this->Com ->get_option($type,$key)]);
     }
-    function _getOption($type,$key="",$option=[]){
-        $roleId = session("roleId");
-        $userId = session("userId");
-        $where=["status"=>1];
-        switch ($type) {
-            case 'project_id':
-                $where["project_id"]=0;
-                if($key!=""){
-                    $where["name"]=["LIKE","%{$key}%"];
-                }
-                $parameter=[
-                    'where'=>$where,
-                    'fields'=>"projectId,name",
-                    'orderStr'=>"addTime DESC",
-                ];
-                $result=$this->projectCom->getProjectList($parameter);
-                if($result){
-                    return $result["list"];
-                }
-                break;
-            case 'cost_project':
-                $where['status'] = 1;
-                if($key!=""){
-                    $where["name"]=["LIKE","%{$key}%"];
-                }
-                $parameter=[
-                    'where'=>$where,
-                    'fields'=>"project_id projectId,name",
-                    'orderStr'=>"add_time DESC",
-                    'groupBy'=>"project_id",
-                    'joins' => [
-                        "RIGHT JOIN (SELECT projectId,name FROM v_project) p ON p.projectId = project_id",
-                    ],
-                ];
-                $result=getComponent('ProjectCost')->getList($parameter);
-                // echo getComponent('ProjectCost')->M()->_sql();
-                if($result){
-                    return $result["list"];
-                }
-                break;
-            case 'cost_relation_project':
-                $where['status'] = 1;
-                if($key!=""){
-                    $where["name"]=["LIKE","%{$key}%"];
-                }
-                $parameter=[
-                    'where'=>$where,
-                    'fields'=>"project_id projectId,name",
-                    'orderStr'=>"add_time DESC",
-                    'groupBy'=>"project_id",
-                    'joins' => [
-                        "RIGHT JOIN (SELECT projectId,name FROM v_project WHERE (FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (author = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 ) ) p ON p.projectId = project_id",
-                    ],
-                ];
-                $result=getComponent('ProjectCost')->getList($parameter);
-                // echo getComponent('ProjectCost')->M()->_sql();
-                if($result){
-                    return $result["list"];
-                }
-                break;
-            case 'relation_project':
-                $where["project_id"]=0;
-                $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (author = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 )";
-                $key_type = "name";
-                if($option['key_type'] == "code"){
-                    $key_type = "code";
-                }
-                if($key!=""){
-                    $where[$key_type]=["LIKE","%{$key}%"];
-                }
-                $parameter=[
-                    'where'=>$where,
-                    'fields'=>"projectId,name",
-                    'orderStr'=>"addTime DESC",
-                ];
-                // print_r($key);exit;
-                $result=$this->projectCom->getProjectList($parameter);
-                // echo $this->projectCom->M()->_sql();exit;
-                if($result){
-                    return $result["list"];
-                }
-            break;
-            case 'brand': case 'execute_sub':  case 'projectType': case 'stage': case 'finance_id': case 'expense_type':
-                if($type=="execute_sub"){
-                    $type = "execute";
-                }elseif($type == 'finance_id'){
-                    $type = "bankstock";
-                }
-                $where["class"]=$type;
-                $pid = I("pid");
-                if(isset($pid) && $pid >0){
-                    $where["pId"]=$pid;
-                }
-                if($key!=""){
-                    $where["name"]=["LIKE","%{$key}%"];
-                }
-                $parameter=[
-                    'where'=>$where,
-                    'fields'=>"basicId,name",
-                    'orderStr'=>"basicId DESC",
-                ];
-                $result=$this->basicCom->getBasicList($parameter);
-                if($result){
-                    return $result["list"];
-                }
-                break;
-            case 'customer_com':
-                if ($key!=""){
-                    $where["company"]=["LIKE","%{$key}%"];
-                }
-                $parameter=[
-                    'where'=>$where,
-                    'fields'=>'companyId,company',
-                    'orderStr'=>"companyId DESC",
-                ];
-                $result = $this->customerCom->getCompanyList($parameter);
-                if($result){
-                    return $result["list"];
-                }
-                break;
-            case 'customer_cont':
-                $where["companyId"]=I("pid");
-                if ($key!=""){
-                    $where["contact"]=["LIKE","%{$key}%"];
-                }
-                $parameter=[
-                    'where'=>$where,
-                    'fields'=>'contactId,contact',
-                    'orderStr'=>"contactId DESC",
-                ];
-                $result = $this->customerCom->getCustomerList($parameter);
-                if($result){
-                    return $result["list"];
-                }
-                break;
-            case 'city': case 'cityId':
-                $result = $this->basicCom->get_citys(I("pid"));
-                if($result){
-                    return $result;
-                }
-                break;
-            case 'create_user': case 'business': case 'leader': case 'earlier_user': case 'scene_user': case 'author' : case 'to_user' :
-                if($key!=""){
-                    $where["userName"]=["LIKE","%{$key}%"];
-                }
-                $parameter=[
-                    'where'=>$where,
-                    'fields'=>"userId,userName,roleName",
-                    'orderStr'=>"userId DESC",
-                    'pageSize' => 50,
-                    'joins'=>'LEFT JOIN (SELECT roleId rid,roleName FROM v_role ) r ON r.rid = roleId',
-                ];
-                $result=$this->userCom->getUserList($parameter);
-                if($result){
-                    if($type=="to_user"){
-                        foreach ($result["list"] as $key => $value) {
-                            $result["list"][$key]['userName'] =  "【{$value['roleName']}】{$value['userName']}";
-                        }
-                    }
-                    return $result["list"];
-                }
-                break;
-            case 'supplier_com':
-                if ($key!=""){
-                    $where["company"]=["LIKE","%{$key}%"];
-                }
-                $parameter=[
-                    'where'=>$where,
-                    'fields'=>'companyId,company,supr_type,typename,provinceId,province,cityId,city',
-                    'orderStr'=>"companyId DESC",
-                    'joins'=>[
-                        "LEFT JOIN (SELECT basicId,name typename FROM v_basic WHERE class='supType') b ON b.basicId=supr_type",
-                        "LEFT JOIN (SELECT pid ,province FROM v_province ) p ON p.pid = provinceId",
-                        "LEFT JOIN (SELECT cid ctid ,city,pid cpid FROM v_city ) ct ON ct.ctid = cityId AND ct.cpid = provinceId",
-                    ]
-                ];
-                $result = $this->supplierCom->getCompanyList($parameter);
-                if($result){
-                    return $result["list"];
-                }
-                break;
-            case 'supplier_cont':
-                $where["companyId"]=I("pid");
-                if ($key!=""){
-                    $where["contact"]=["LIKE","%{$key}%"];
-                }
-                $parameter=[
-                    'where'=>$where,
-                    'fields'=>'contactId,contact',
-                    'orderStr'=>"contactId DESC",
-                ];
-                $result = $this->supplierCom->getSuprContList($parameter);
-                if($result){
-                    return $result["list"];
-                }
-                break;
-            case 'module_supplier':
-                $pid=I("pid");
-                if($pid){
-                    $where["_string"] = "FIND_IN_SET({$pid},module)";
-                }
-                if ($key!=""){
-                    $where["company"]=["LIKE","%{$key}%"];
-                }
-                $parameter=[
-                    'where'=>$where,
-                    'fields'=>'companyId,company',
-                    'orderStr'=>"companyId DESC",
-                ];
-                $result = $this->supplierCom->getCompanyList($parameter);
-                if($result){
-                    return $result["list"];
-                }
-                //SELECT companyId,company FROM v_supplier_company WHERE FIND_IN_SET(199,module);
-                break;
-            case 'cost_id':
-                $where['status'] = 1;
-                if ($key!=""){
-                    $map["project_name"]=["LIKE","%{$key}%"];
-                    $map["supplier_com_name"]=["LIKE","%{$key}%"];
-                    $map['_logic'] = 'or';
-                    $where['_complex'] = $map;
-                }
-                $parameter=[
-                    'where'=>$where,
-                    'fields'=>'id,project_name,supplier_com,supplier_com_name',
-                    'orderStr'=>"id DESC",
-                    "joins"=>[
-                        "LEFT JOIN (SELECT projectId,name project_name FROM v_project ) p ON p.projectId = project_id ",
-                        "LEFT JOIN (SELECT companyId company_id,company supplier_com_name FROM v_supplier_company ) c ON c.company_id = supplier_com",
-                    ],
-                ];
-                $result = $this->purchaCom->getList($parameter);
-                if($result){
-                    $costs = [];
-                    foreach ($result["list"] as $key => $item) {
-                        $costs[$key] = ["id"=>$item["id"],"name"=>$item['project_name']."-".$item['supplier_com_name']];
-                    }
-                    return $costs;
-                }
-                break;
-            case 'field':
-                $where['status'] = 1;
-                $pid = I("pid");
-                if(isset($pid) && $pid >0){
-                    $where["city"]=$pid;
-                }
-                if ($key!=""){
-                    $map["name"]=["LIKE","%{$key}%"];
-                    $map["remark"]=["LIKE","%{$key}%"];
-                    $map['_logic'] = 'or';
-                    $where['_complex'] = $map;
-                }
-                $parameter=[
-                    'where'=>$where,
-                    'fields'=>'id,name',
-                    'orderStr'=>"id DESC",
-                ];
-                $result = $this->fieldCom->getList($parameter);
-                if($result){
-                    return $result["list"];
-                }                               
-                break;
-            case 'fin_account':
-                if ($key!=""){
-                    $where["account"]=["LIKE","%{$key}%"];
-                }
-                $parameter=[
-                    'where'=>$where,
-                    'fields'=>'id,account',
-                    'orderStr'=>"id DESC",
-                ];
-                $result = $this->moneyAccCom->getList($parameter);
-                if($result){
-                    return $result["list"];
-                }                     
-                break;
-            default:
-                # code...
-                break;
-        }
-        return [];
-    }
+    // function _getOption($type,$key="",$option=[]){
+    //     $roleId = session("roleId");
+    //     $userId = session("userId");
+    //     $where=["status"=>1];
+    //     switch ($type) {
+    //         case 'project_id':
+    //             $where["project_id"]=0;
+    //             if($key!=""){
+    //                 $where["name"]=["LIKE","%{$key}%"];
+    //             }
+    //             $parameter=[
+    //                 'where'=>$where,
+    //                 'fields'=>"projectId,name",
+    //                 'orderStr'=>"addTime DESC",
+    //             ];
+    //             $result=$this->projectCom->getProjectList($parameter);
+    //             if($result){
+    //                 return $result["list"];
+    //             }
+    //             break;
+    //         case 'cost_project':
+    //             $where['status'] = 1;
+    //             if($key!=""){
+    //                 $where["name"]=["LIKE","%{$key}%"];
+    //             }
+    //             $parameter=[
+    //                 'where'=>$where,
+    //                 'fields'=>"project_id projectId,name",
+    //                 'orderStr'=>"add_time DESC",
+    //                 'groupBy'=>"project_id",
+    //                 'joins' => [
+    //                     "RIGHT JOIN (SELECT projectId,name FROM v_project) p ON p.projectId = project_id",
+    //                 ],
+    //             ];
+    //             $result=getComponent('ProjectCost')->getList($parameter);
+    //             // echo getComponent('ProjectCost')->M()->_sql();
+    //             if($result){
+    //                 return $result["list"];
+    //             }
+    //             break;
+    //         case 'cost_relation_project':
+    //             $where['status'] = 1;
+    //             if($key!=""){
+    //                 $where["name"]=["LIKE","%{$key}%"];
+    //             }
+    //             $parameter=[
+    //                 'where'=>$where,
+    //                 'fields'=>"project_id projectId,name",
+    //                 'orderStr'=>"add_time DESC",
+    //                 'groupBy'=>"project_id",
+    //                 'joins' => [
+    //                     "RIGHT JOIN (SELECT projectId,name FROM v_project WHERE (FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (author = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 ) ) p ON p.projectId = project_id",
+    //                 ],
+    //             ];
+    //             $result=getComponent('ProjectCost')->getList($parameter);
+    //             // echo getComponent('ProjectCost')->M()->_sql();
+    //             if($result){
+    //                 return $result["list"];
+    //             }
+    //             break;
+    //         case 'relation_project':
+    //             $where["project_id"]=0;
+    //             $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (author = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 )";
+    //             $key_type = "name";
+    //             if($option['key_type'] == "code"){
+    //                 $key_type = "code";
+    //             }
+    //             if($key!=""){
+    //                 $where[$key_type]=["LIKE","%{$key}%"];
+    //             }
+    //             $parameter=[
+    //                 'where'=>$where,
+    //                 'fields'=>"projectId,name",
+    //                 'orderStr'=>"addTime DESC",
+    //             ];
+    //             // print_r($key);exit;
+    //             $result=$this->projectCom->getProjectList($parameter);
+    //             // echo $this->projectCom->M()->_sql();exit;
+    //             if($result){
+    //                 return $result["list"];
+    //             }
+    //         break;
+    //         case 'brand': case 'execute_sub':  case 'projectType': case 'stage': case 'finance_id': case 'expense_type':
+    //             if($type=="execute_sub"){
+    //                 $type = "execute";
+    //             }elseif($type == 'finance_id'){
+    //                 $type = "bankstock";
+    //             }
+    //             $where["class"]=$type;
+    //             $pid = I("pid");
+    //             if(isset($pid) && $pid >0){
+    //                 $where["pId"]=$pid;
+    //             }
+    //             if($key!=""){
+    //                 $where["name"]=["LIKE","%{$key}%"];
+    //             }
+    //             $parameter=[
+    //                 'where'=>$where,
+    //                 'fields'=>"basicId,name",
+    //                 'orderStr'=>"basicId DESC",
+    //             ];
+    //             $result=$this->basicCom->getBasicList($parameter);
+    //             if($result){
+    //                 return $result["list"];
+    //             }
+    //             break;
+    //         case 'customer_com':
+    //             if ($key!=""){
+    //                 $where["company"]=["LIKE","%{$key}%"];
+    //             }
+    //             $parameter=[
+    //                 'where'=>$where,
+    //                 'fields'=>'companyId,company',
+    //                 'orderStr'=>"companyId DESC",
+    //             ];
+    //             $result = $this->customerCom->getCompanyList($parameter);
+    //             if($result){
+    //                 return $result["list"];
+    //             }
+    //             break;
+    //         case 'customer_cont':
+    //             $where["companyId"]=I("pid");
+    //             if ($key!=""){
+    //                 $where["contact"]=["LIKE","%{$key}%"];
+    //             }
+    //             $parameter=[
+    //                 'where'=>$where,
+    //                 'fields'=>'contactId,contact',
+    //                 'orderStr'=>"contactId DESC",
+    //             ];
+    //             $result = $this->customerCom->getCustomerList($parameter);
+    //             if($result){
+    //                 return $result["list"];
+    //             }
+    //             break;
+    //         case 'city': case 'cityId':
+    //             $result = $this->basicCom->get_citys(I("pid"));
+    //             if($result){
+    //                 return $result;
+    //             }
+    //             break;
+    //         case 'create_user': case 'business': case 'leader': case 'earlier_user': case 'scene_user': case 'author' : case 'to_user' :
+    //             if($key!=""){
+    //                 $where["userName"]=["LIKE","%{$key}%"];
+    //             }
+    //             $parameter=[
+    //                 'where'=>$where,
+    //                 'fields'=>"userId,userName,roleName",
+    //                 'orderStr'=>"userId DESC",
+    //                 'pageSize' => 50,
+    //                 'joins'=>'LEFT JOIN (SELECT roleId rid,roleName FROM v_role ) r ON r.rid = roleId',
+    //             ];
+    //             $result=$this->userCom->getUserList($parameter);
+    //             if($result){
+    //                 if($type=="to_user"){
+    //                     foreach ($result["list"] as $key => $value) {
+    //                         $result["list"][$key]['userName'] =  "【{$value['roleName']}】{$value['userName']}";
+    //                     }
+    //                 }
+    //                 return $result["list"];
+    //             }
+    //             break;
+    //         case 'supplier_com':
+    //             if ($key!=""){
+    //                 $where["company"]=["LIKE","%{$key}%"];
+    //             }
+    //             $parameter=[
+    //                 'where'=>$where,
+    //                 'fields'=>'companyId,company,supr_type,typename,provinceId,province,cityId,city',
+    //                 'orderStr'=>"companyId DESC",
+    //                 'joins'=>[
+    //                     "LEFT JOIN (SELECT basicId,name typename FROM v_basic WHERE class='supType') b ON b.basicId=supr_type",
+    //                     "LEFT JOIN (SELECT pid ,province FROM v_province ) p ON p.pid = provinceId",
+    //                     "LEFT JOIN (SELECT cid ctid ,city,pid cpid FROM v_city ) ct ON ct.ctid = cityId AND ct.cpid = provinceId",
+    //                 ]
+    //             ];
+    //             $result = $this->supplierCom->getCompanyList($parameter);
+    //             if($result){
+    //                 return $result["list"];
+    //             }
+    //             break;
+    //         case 'supplier_cont':
+    //             $where["companyId"]=I("pid");
+    //             if ($key!=""){
+    //                 $where["contact"]=["LIKE","%{$key}%"];
+    //             }
+    //             $parameter=[
+    //                 'where'=>$where,
+    //                 'fields'=>'contactId,contact',
+    //                 'orderStr'=>"contactId DESC",
+    //             ];
+    //             $result = $this->supplierCom->getSuprContList($parameter);
+    //             if($result){
+    //                 return $result["list"];
+    //             }
+    //             break;
+    //         case 'module_supplier':
+    //             $pid=I("pid");
+    //             if($pid){
+    //                 $where["_string"] = "FIND_IN_SET({$pid},module)";
+    //             }
+    //             if ($key!=""){
+    //                 $where["company"]=["LIKE","%{$key}%"];
+    //             }
+    //             $parameter=[
+    //                 'where'=>$where,
+    //                 'fields'=>'companyId,company',
+    //                 'orderStr'=>"companyId DESC",
+    //             ];
+    //             $result = $this->supplierCom->getCompanyList($parameter);
+    //             if($result){
+    //                 return $result["list"];
+    //             }
+    //             //SELECT companyId,company FROM v_supplier_company WHERE FIND_IN_SET(199,module);
+    //             break;
+    //         case 'cost_id':
+    //             $where['status'] = 1;
+    //             if ($key!=""){
+    //                 $map["project_name"]=["LIKE","%{$key}%"];
+    //                 $map["supplier_com_name"]=["LIKE","%{$key}%"];
+    //                 $map['_logic'] = 'or';
+    //                 $where['_complex'] = $map;
+    //             }
+    //             $parameter=[
+    //                 'where'=>$where,
+    //                 'fields'=>'id,project_name,supplier_com,supplier_com_name',
+    //                 'orderStr'=>"id DESC",
+    //                 "joins"=>[
+    //                     "LEFT JOIN (SELECT projectId,name project_name FROM v_project ) p ON p.projectId = project_id ",
+    //                     "LEFT JOIN (SELECT companyId company_id,company supplier_com_name FROM v_supplier_company ) c ON c.company_id = supplier_com",
+    //                 ],
+    //             ];
+    //             $result = $this->purchaCom->getList($parameter);
+    //             if($result){
+    //                 $costs = [];
+    //                 foreach ($result["list"] as $key => $item) {
+    //                     $costs[$key] = ["id"=>$item["id"],"name"=>$item['project_name']."-".$item['supplier_com_name']];
+    //                 }
+    //                 return $costs;
+    //             }
+    //             break;
+    //         case 'field':
+    //             $where['status'] = 1;
+    //             $pid = I("pid");
+    //             if(isset($pid) && $pid >0){
+    //                 $where["city"]=$pid;
+    //             }
+    //             if ($key!=""){
+    //                 $map["name"]=["LIKE","%{$key}%"];
+    //                 $map["remark"]=["LIKE","%{$key}%"];
+    //                 $map['_logic'] = 'or';
+    //                 $where['_complex'] = $map;
+    //             }
+    //             $parameter=[
+    //                 'where'=>$where,
+    //                 'fields'=>'id,name',
+    //                 'orderStr'=>"id DESC",
+    //             ];
+    //             $result = $this->fieldCom->getList($parameter);
+    //             if($result){
+    //                 return $result["list"];
+    //             }                               
+    //             break;
+    //         case 'fin_account':
+    //             if ($key!=""){
+    //                 $where["account"]=["LIKE","%{$key}%"];
+    //             }
+    //             $parameter=[
+    //                 'where'=>$where,
+    //                 'fields'=>'id,account',
+    //                 'orderStr'=>"id DESC",
+    //             ];
+    //             $result = $this->moneyAccCom->getList($parameter);
+    //             if($result){
+    //                 return $result["list"];
+    //             }                     
+    //             break;
+    //         default:
+    //             # code...
+    //             break;
+    //     }
+    //     return [];
+    // }
     /** 
      * @Author: vition 
      * @Date: 2018-05-06 11:00:23 
@@ -975,15 +975,15 @@ class ProjectController extends BaseController{
         $project=$this->configCom->get_val("project");
         // $this->assign("gettype","Add");
         //一堆立项初始化数据开始了
-        $this->assign('projectArr',$this->_getOption("project_id"));
-        $this->assign('brandArr',$this->_getOption("brand"));
-        $this->assign('fieldArr',$this->_getOption("field"));
+        $this->assign('projectArr',$this->Com ->get_option("project_id"));
+        $this->assign('brandArr',$this->Com ->get_option("brand"));
+        $this->assign('fieldArr',$this->Com ->get_option("field"));
         $this->assign('exeRootdArr',$this->basicCom->get_exe_root());
-        // $this->assign('executedArr',$this->_getOption("execute_sub"));
-        $this->assign('cusComArr',$this->_getOption("customer_com"));
-        $this->assign('userArr',$this->_getOption("create_user"));
-        $this->assign('ptypeArr',$this->_getOption("projectType"));
-        $this->assign('stageArr',$this->_getOption("stage"));
+        // $this->assign('executedArr',$this->Com ->get_option("execute_sub"));
+        $this->assign('cusComArr',$this->Com ->get_option("customer_com"));
+        $this->assign('userArr',$this->Com ->get_option("create_user"));
+        $this->assign('ptypeArr',$this->Com ->get_option("projectType"));
+        $this->assign('stageArr',$this->Com ->get_option("stage"));
         $this->assign("provinceArr",$this->basicCom->get_provinces());
         if($reqType){
             $this->$reqType();
@@ -1000,15 +1000,15 @@ class ProjectController extends BaseController{
         $project=$this->configCom->get_val("project");
         // $this->assign("gettype","Add");
         //一堆立项初始化数据开始了
-        $this->assign('projectArr',$this->_getOption("project_id"));
-        $this->assign('brandArr',$this->_getOption("brand"));
-        $this->assign('fieldArr',$this->_getOption("field"));
+        $this->assign('projectArr',$this->Com ->get_option("project_id"));
+        $this->assign('brandArr',$this->Com ->get_option("brand"));
+        $this->assign('fieldArr',$this->Com ->get_option("field"));
         $this->assign('exeRootdArr',$this->basicCom->get_exe_root());
-        // $this->assign('executedArr',$this->_getOption("execute_sub"));
-        $this->assign('cusComArr',$this->_getOption("customer_com"));
-        $this->assign('userArr',$this->_getOption("create_user"));
-        $this->assign('ptypeArr',$this->_getOption("projectType"));
-        $this->assign('stageArr',$this->_getOption("stage"));
+        // $this->assign('executedArr',$this->Com ->get_option("execute_sub"));
+        $this->assign('cusComArr',$this->Com ->get_option("customer_com"));
+        $this->assign('userArr',$this->Com ->get_option("create_user"));
+        $this->assign('ptypeArr',$this->Com ->get_option("projectType"));
+        $this->assign('stageArr',$this->Com ->get_option("stage"));
         $this->assign("provinceArr",$this->basicCom->get_provinces());
         if($reqType){
             $this->$reqType();

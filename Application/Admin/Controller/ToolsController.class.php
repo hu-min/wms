@@ -90,9 +90,7 @@ class ToolsController extends BaseController{
      * @Desc: 审核 
      */    
     function approveEdit(){
-        
         extract($_REQUEST);
-        $this->log($_REQUEST);
         $this->nodeCom=getComponent('Node');
         if($table=="v_expense_sub"){
             $tableInfo = $this->nodeCom->getOne(['db_table'=>"v_expense","nodeType"=>2]);
@@ -183,7 +181,6 @@ class ToolsController extends BaseController{
                     $allItem = 1;
                     $approveSql = "SELECT count(*) all_approve FROM v_approve_log WHERE user_id = {$userId} AND table_name = '{$table}' AND  table_id = {$tableId} AND status = 1 AND effect = 1";
                 }
-                // $this->log($approveSql);
                 $approveRes = $this->approveCom->M()->query($approveSql);
                 $allApprove = 0;
  
@@ -213,8 +210,6 @@ class ToolsController extends BaseController{
                 $examineRes = $db ->field("process_level,examine")->where([$db->getPk()=>$id])->find();
                                
                 if(isset($examine[$place-1]) && $examine[$place-1] > 0){
-                    $this->log($examine);
-                    $this->log($examine[$place-1]);
                     $touser = $this->userCom->getQiyeId($examine[$place-1],true);
                     if(!empty($touser)){
                         $desc = "<div class='gray'>".date("Y年m月d日",time())."</div> <div class='normal'>".session('userName')."在【{$title}】中@您审批，点击进入审批吧！</div>";

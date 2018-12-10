@@ -1,0 +1,29 @@
+<tr>
+    <td class="serial_num" >
+        <input class="modal-info" name="id" type="hidden" value="0">
+        <span class="modal-info" name="sort"></span>
+    </td>
+    <td style="max-width: 180px;min-width: 180px;">
+        <input type="text" class="form-control timepicker modal-info" name="class_notes" readonly="readonly" placeholder="允许多个分类归类">
+    </td>
+    <td style="min-width:100px;max-width:200px;">
+        <select class="form-control modal-info chosen-select" title="承接模块" readonly="readonly" data-value="basicId" data-req="getOptionList" data-text="name" data-type="module" name="classify"  >
+            <!-- <option value="999999999">全部承接模块</option> -->
+            <volist name="moduleArr" id="item">
+                <option value="{$item['basicId']}">{$item['name']}</option>
+            </volist>
+        </select>
+    </td>
+    <td style="min-width: 300px;">
+        <input type="text" class="form-control modal-info" name="item_content" readonly="readonly" placeholder="子项的内容说明">
+    </td>
+    <td>
+        <input type="text" class="form-control modal-info" readonly="readonly" name="cost_surplus" placeholder="可用金额">
+    </td>
+    <td>
+        <input type="text" class="form-control modal-info" readonly="readonly" name="costed" placeholder="已用金额">
+    </td>
+    <td>
+        <input type="text" class="form-control modal-info" name="debit_money" placeholder="借支金额">
+    </td>
+</tr>

@@ -71,6 +71,7 @@
                                 <th class="is-frozen">项目名称</th>
                                 <th class="hidden-xs hidden-sm is-frozen">项目编号</th>
                                 <th>报价批次</th>
+                                <th>报价标识</th>
                                 <th>报价者</th>
                                 <th>报价时间</th>
                                 <th>报价</th>
@@ -127,7 +128,7 @@
         var project_costCon_setInfo = function(info){
             poPanel = info.panel;
             poItem = info.item;
-            ['project_id','tax_rate'].forEach(element => {
+            ['project_id','tax_rate','flag'].forEach(element => {
                 $(tabId+" .global-modal").find(" .modal-info[name='"+element+"']").val(info[element])
             });
             $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val(info['id'])

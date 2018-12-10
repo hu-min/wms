@@ -15,7 +15,7 @@ class PublicController extends BaseController{
 
     function messageControl(){
         $reqType=I('reqType');
-        $this->assign('userArr',A("Project")->_getOption("to_user"));
+        $this->assign('userArr',$this->Com ->get_option("to_user"));
         $this->assign('no_read',$this->MesCom->noRead());
         if($reqType){
             $this->$reqType();
@@ -156,7 +156,7 @@ class PublicController extends BaseController{
         $this->assign("controlName","work_order");
         $this->assign("orderType",$this->worderType);
         $this->assign("tableName",$this->workOrderCom->tableName());
-        $this->assign('projectArr',$this->AProject->_getOption("relation_project"));
+        $this->assign('projectArr',$this->Com ->get_option("relation_project"));
         $this->assign('processAuth',['level' => 1 ,'allLevel' => 0]);
         $this->assign('nodeAuth',1);
         if($reqType){
@@ -326,7 +326,7 @@ class PublicController extends BaseController{
                         $temp[$key] = $excelRow[$i];
                         $temp['roleId'] = $this->userCom->getOne(['where'=>['userId'=>$excelRow[$i]],'fields'=>'roleId'])['list']['roleId'];
                     }elseif($key=="relation_project" && $excelRow[$i]!=""){
-                        $temp[$key] = $this->AProject->_getOption("relation_project",$excelRow[$i],['key_type'=>'code'])[0]['projectId'];
+                        $temp[$key] = $this->Com ->get_option("relation_project",$excelRow[$i],['key_type'=>'code'])[0]['projectId'];
                     }else{
                         $temp[$key] = $excelRow[$i];
                     }

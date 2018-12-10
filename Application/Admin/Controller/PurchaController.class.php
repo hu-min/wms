@@ -36,7 +36,7 @@ class PurchaController extends BaseController{
         $reqType=I('reqType');
         $this->assign("controlName","cost_insert");
         $this->assign('tableName',$this->purchaCom->tableName());//删除数据的时候需要
-        $this->assign('projectArr',$this->project->_getOption("project_id"));
+        $this->assign('projectArr',$this->Com ->get_option("project_id"));
         $this->assign('supplierArr',$this->supplier->getSupType());
         // $this->assign('companyArr',$this->supplier->getSupplier());
         // $this->assign('moduleArr',$this->supplier->getModule());
@@ -51,7 +51,7 @@ class PurchaController extends BaseController{
         $type = I("type");
         if($type){
             $key = I("key");
-            $this->ajaxReturn(["data"=>$this->project->_getOption($type,$key)]);
+            $this->ajaxReturn(["data"=>$this->Com ->get_option($type,$key)]);
         }
         $parameter=[
             "where"=>["projectId"=>$id],
@@ -98,7 +98,7 @@ class PurchaController extends BaseController{
     }
     function getSuprLiOne(){
         $rows = I("rows");
-        $this->assign('projectArr',$this->project->_getOption("project_id"));
+        $this->assign('projectArr',$this->Com ->get_option("project_id"));
         $this->assign('supplierArr',$this->supplier->getSupType());
         $this->assign('companyArr',$this->supplier->getSupplier());
         $this->assign('moduleArr',$this->supplier->getModule());
@@ -525,7 +525,7 @@ class PurchaController extends BaseController{
         //     "template"=>"purchaModal",
         // ];
         // $this->modalOne($modalPara);
-        $this->assign('fin_accountArr',A("Project")->_getOption("fin_account"));
+        $this->assign('fin_accountArr',$this->Com ->get_option("fin_account"));
         if($gettype=="Edit"){
             $title = "采购成本审批";
             $btnTitle = "保存数据";
@@ -645,7 +645,7 @@ class PurchaController extends BaseController{
     }
     function getSuprpayLiOne(){
         $rows = I("rows");
-        $this->assign('projectArr',$this->project->_getOption("project_id"));
+        $this->assign('projectArr',$this->Com ->get_option("project_id"));
         $this->assign('supplierArr',$this->supplier->getSupType());
         $this->assign('companyArr',$this->supplier->getSupplier());
         $this->assign('moduleArr',$this->supplier->getModule());
@@ -655,7 +655,7 @@ class PurchaController extends BaseController{
     }
     function suprFinapayLiOne(){
         $rows = I("rows");
-        $this->assign('projectArr',$this->project->_getOption("project_id"));
+        $this->assign('projectArr',$this->Com ->get_option("project_id"));
         $this->assign('supplierArr',$this->supplier->getSupType());
         $this->assign('companyArr',$this->supplier->getSupplier());
         $this->assign('moduleArr',$this->supplier->getModule());

@@ -452,7 +452,7 @@ class IndexController extends BaseController{
         extract($_REQUEST);
         $this->assign("controlName","index_lock");
         $this->assign("tableName",$this->configCom->tableName());
-        $lockInfo = $this->configCom->getOne(['where'=>['name'=>"cost_conf"]]);
+        $lockInfo = $this->configCom->getOne(['where'=>['name'=>"web_lock"]]);
         if(isset($lockInfo['list']['value'])){
             unset($lockInfo['list']['value']);
         }
@@ -462,7 +462,7 @@ class IndexController extends BaseController{
             "btnTitle"=>$btnTitle,
             "tpFolder"=>'Index',
             "folder"=>'table',
-            "template"=>"costConfModal",
+            "template"=>"lockModal",
         ];
         $this->modalOne($modalPara);
     }

@@ -57,7 +57,7 @@
                                     <button type="button" class="btn bg-teal search-refresh" data-con="{$controlName}"><i class="fa fa-fw fa-refresh"></i> 重置 </button>
                                 </div>
                                 <div class="form-group">
-                                    <!-- {:import_btn(get_defined_vars())} -->
+                                    {:import_btn(get_defined_vars())}
                                 </div>
                             </div>
                         </div>
@@ -76,6 +76,7 @@
                                 <th class="is-frozen">项目名称</th>
                                 <th class="hidden-xs hidden-sm is-frozen">项目编号</th>
                                 <th>报价批次</th>
+                                <th>报价标识</th>
                                 <th>报价者</th>
                                 <th>报价时间</th>
                                 <th>报价</th>
@@ -135,7 +136,7 @@
         var pcost_control_setInfo = function(info){
             poPanel = info.panel;
             poItem = info.item;
-            ['project_id','tax_rate'].forEach(element => {
+            ['project_id','tax_rate','flag'].forEach(element => {
                 $(tabId+" .global-modal").find(" .modal-info[name='"+element+"']").val(info[element])
                 $(tabId+" .global-modal").find(" .modal-info[name='"+element+"']").prop("disabled",true)
             });
@@ -176,14 +177,16 @@
                 var poItemOjc = $(poItem);
                 // console.log(poItemOjc.find(".cost_item_del"))
                 // poItemOjc.find(".cost_item_del").remove()
-                ['id','class_notes','classify','sort','item_content','num','unit','act_num','act_unit','price','total','cost_total','profit','profit_ratio'].forEach(modalName => { 
+                ['id','class_notes','classify','sort','item_content','num','unit','act_num','act_unit','price','total','cost_total','profit','profit_ratio','auth_user_id'].forEach(modalName => { 
                     if(modalName == 'sort'){
                         poItemOjc.find(".modal-info[name='"+modalName+"']").text(alpha(subElement['class_sort'])+subElement[modalName])
                     }else{
                         poItemOjc.find(".modal-info[name='"+modalName+"']").val(subElement[modalName])
                     }
+                    if(modalName!="auth_user_id"){
+                        poItemOjc.find(".modal-info[name='"+modalName+"']").prop("disabled",true)
+                    }
                     
-                    poItemOjc.find(".modal-info[name='"+modalName+"']").prop("disabled",true)
                 });
                 // console.log(subElement['scompany_id'])
                 //供应商和供应商联系人
@@ -293,8 +296,9 @@
                 datas["status"] = 10;
             }
             datas["data"] = {};
-            // datas["data"]['project_id'] = $(tabId+" .global-modal").find(".modal-info[name='project_id']").val()
-            // datas["data"]['tax_rate'] = $(tabId+" .global-modal").find(".modal-info[name='tax_rate']").val();
+            datas["data"]['project_id'] = $(tabId+" .global-modal").find(".modal-info[name='project_id']").val()
+            datas["data"]['tax_rate'] = $(tabId+" .global-modal").find(".modal-info[name='tax_rate']").val();
+            datas["data"]['flag'] = $(tabId+" .global-modal").find(".modal-info[name='flag']").val()
             datas["data"]['total'] = $(tabId+" .global-modal").find(".all-count").text();
             datas["data"]['cost_total'] = $(tabId+" .global-modal").find(".cost-all-count").text();
             datas["data"]['id'] = $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val();
@@ -303,9 +307,10 @@
             $(tabId+" .global-modal").find(".panel").each(function(){
                 
                 var class_sort = $(this).find(".modal-info[name='class_sort']").val();
-                var cost_class = $(this).find(".modal-info[name='cost_class']").val();                
+                var cost_class = $(this).find(".modal-info[name='cost_class']").val();
+                var class_notes = "";          
                 $(this).find("tbody tr").each(function(){
-                    var temp = {class_sort:class_sort,cost_class:cost_class,class_sub:0};
+                    var temp = {class_sort:class_sort,cost_class:cost_class,class_sub:0,class_notes:class_notes};
                     $(this).find(".modal-info").each(function(){
                         var name =$(this).attr("name");
                         var required=$(this).attr("required");
@@ -320,6 +325,9 @@
                             var val =$(this).text().replace(/^[A-Z]*/,'');
                         }else{
                             var val =$(this).val();
+                            if(name=="class_notes"){
+                                class_notes = val
+                            }
                         }
                         
                         if(name=="class_notes"){
@@ -334,16 +342,14 @@
                             notice(110,title,"输入异常");
                             throw title
                         }else{
-                            if(name == "id" || (temp['id'] == 0 && name != "id") || (temp['id'] > 0 && in_array(name,['cost_price','cost_total','total','scompany_id','scompany_cid']))){
+                            if(name == "id" || (temp['id'] == 0 && name != "id") || (temp['id'] > 0 && in_array(name,['cost_price','cost_total','total','scompany_id','scompany_cid','auth_user_id']))){
                                 temp[name] = val;
                             }
                         }
                     })
                     datas["data"]['list'].push(temp)
                 })
-                
             })
-            // console.log(datas)
         }
         $(function(){
             excel_import({url:"{:U('ProjectCost/excel_import')}"})
@@ -493,7 +499,21 @@
 
                 $tr.find(".modal-info[name='profit_ratio']").val(float_format(profit_ratio));
                 cost_compute_count()
-            })        
+            })
+            //供应商选择
+            $(tabId+" .global-modal").on("change",".modal-info[name='scompany_id']",function(){
+                var $authUser = $(this).parents("tr").find(".modal-info[name='auth_user_id']")
+                if($(this).val()>0){
+                    $authUser.prop("disabled",true)
+                }else{
+                    var scompany_cid = $(this).parents("tr").find(".modal-info[name='scompany_cid']")
+
+                    scompany_cid.html("<option value='0'>无供应商联系人</option>")
+                    scompany_cid.trigger("chosen:updated");
+                    $authUser.prop("disabled",false)
+                }
+                $authUser.trigger("chosen:updated");
+            }) 
         })
     </script>
 </body>

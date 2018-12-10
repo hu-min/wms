@@ -187,12 +187,12 @@ function status_label($defind_vars){
  * @Date: 2018-06-09 23:01:13 
  * @Desc: list列表中的按钮状态 
  */
-function list_btn($defind_vars,$idStr,$inlink=[],$onlycat=false,$onlyState=false,$hasState=true,$text = '查看'){
+function list_btn($defind_vars,$idStr,$inlink=[],$onlycat=false,$onlyState=false,$hasState=true,$text = '查看',$option=[]){
     $statusLabel = $defind_vars["statusLabel"];
     $statusType = $defind_vars["statusType"];
     $item = $defind_vars["item"];
-    $tableName = $defind_vars["tableName"];
-    $controlName = $defind_vars["controlName"];
+    $tableName = $option["tableName"] ? $option["tableName"] : $defind_vars["tableName"];
+    $controlName = $option["controlName"] ? $option["controlName"] : $defind_vars["controlName"];
     $url = $defind_vars["url"];
     $userId = $defind_vars["userId"];
     $nodeAuth = $defind_vars["nodeAuth"];
@@ -320,11 +320,11 @@ function save_btn($defind_vars,$always=false,$hide=false){
  * @Date: 2018-06-10 08:59:16 
  * @Desc: 新增的按钮权限 
  */
-function add_btn($defind_vars,$title="新增",$auth = 2,$icon = "fa fa-plus-square"){
+function add_btn($defind_vars,$title="新增",$auth = 2,$icon = "fa fa-plus-square",$option=[]){
     $processAuth = $defind_vars["processAuth"];
     $nodeAuth = $defind_vars["nodeAuth"];
     $url = $defind_vars["url"];
-    $controlName = $defind_vars["controlName"];
+    $controlName = $option['controlName'] ? $option['controlName'] : $defind_vars["controlName"];
     if(($processAuth['level'] > 0 && $nodeAuth >= $auth ) || $nodeAuth >= 7){
         echo "<button type='button' data-gettype='Add' data-toggle='modal'  data-url='{$url}' data-vtarget='.global-modal' data-con='{$controlName}' class='btn btn-info info-edit v-showmodal'><i class='{$icon} '></i> {$title} </button>";
     }

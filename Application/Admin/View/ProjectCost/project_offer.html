@@ -70,6 +70,7 @@
                                 <th class="is-frozen">项目名称</th>
                                 <th class="hidden-xs hidden-sm is-frozen">项目编号</th>
                                 <th>报价批次</th>
+                                <th>报价标识</th>
                                 <th>报价者</th>
                                 <th>报价时间</th>
                                 <th>报价</th>
@@ -123,7 +124,7 @@
         var project_offer_setInfo = function(info){
             poPanel = info.panel;
             poItem = info.item;
-            ['project_id','tax_rate'].forEach(element => {
+            ['project_id','tax_rate','flag'].forEach(element => {
                 $(tabId+" .global-modal").find(" .modal-info[name='"+element+"']").val(info[element])
             });
             $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val(info['id'])
@@ -215,6 +216,7 @@
             }
             datas["data"] = {};
             datas["data"]['project_id'] = $(tabId+" .global-modal").find(".modal-info[name='project_id']").val()
+            datas["data"]['flag'] = $(tabId+" .global-modal").find(".modal-info[name='flag']").val()
             datas["data"]['tax_rate'] = $(tabId+" .global-modal").find(".modal-info[name='tax_rate']").val();
             datas["data"]['total'] = $(tabId+" .global-modal").find(".all-count").text();
             datas["data"]['id'] = $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val();
@@ -223,9 +225,10 @@
             $(tabId+" .global-modal").find(".panel").each(function(){
                 
                 var class_sort = $(this).find(".modal-info[name='class_sort']").val();
-                var cost_class = $(this).find(".modal-info[name='cost_class']").val();                
+                var cost_class = $(this).find(".modal-info[name='cost_class']").val();
+                var class_notes = "";
                 $(this).find("tbody tr").each(function(){
-                    var temp = {class_sort:class_sort,cost_class:cost_class,class_sub:0};
+                    var temp = {class_sort:class_sort,cost_class:cost_class,class_sub:0,class_notes:class_notes};
                     $(this).find(".modal-info").each(function(){
                         var name =$(this).attr("name");
                         var required=$(this).attr("required");
@@ -240,6 +243,9 @@
                             var val =$(this).text().replace(/^[A-Z]*/,'');
                         }else{
                             var val =$(this).val();
+                            if(name=="class_notes"){
+                                class_notes = val
+                            }
                         }
                         
                         if(name=="class_notes"){

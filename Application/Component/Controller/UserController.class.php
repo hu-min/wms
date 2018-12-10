@@ -15,7 +15,6 @@ class UserController extends BaseController{
      * @Desc: 检查用户 
      */    
     function checkUser($parameter=[]){
-        // $this->log($parameter);
         $qiye_id = false;
         $res=$this->initRes();
         if($parameter['qiye_id'] && (!$parameter['loginName'] && !$parameter['password'])){
@@ -42,7 +41,6 @@ class UserController extends BaseController{
             ],
         ];
         $userResult=$this->selfDB->getOne($parArray);
-        // $this->log($this->selfDB->_sql());
         if($userResult){
             unset($userResult["password"]);
             unset($userResult["seniorPassword"]);
@@ -230,7 +228,6 @@ class UserController extends BaseController{
     // function updateUser($userInfo){
     //     $res=$this->initRes();
     //     $insertResult=$this->selfDB->save($userInfo);
-    //     $this->log($userInfo);
     //     if($insertResult){
     //         $res->errCode=0;
     //         $res->error=getError(0);
@@ -311,6 +308,8 @@ class UserController extends BaseController{
                 array_push($qiye_arr,$value['qiye_id']);
             }
         }
+        //为了测试默认推送微信信息到开发者微信id
+        $qiye_arr = in_array($_SERVER["HTTP_HOST"],['inner.vwms.com']) ? ["1000000999"] : $qiye_arr;
         return implode("|",$qiye_arr);
     }
 }

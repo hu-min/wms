@@ -50,9 +50,10 @@
                                     <th style="background: #D2D6DE;">成本单价</th>
                                     <th style="background: #D2D6DE;">成本合计</th>
                                 </if>
-                                <if condition="$listType eq 'cost'">
+                                <if condition="$listType eq 'cost' or $listType eq 'contrast'">
                                     <th>供应商名称</th>
                                     <th>供应商联系人</th>
+                                    <th>现金操作者</th>
                                     <th>利润</th>
                                     <th>利润率%</th>
                                 </if>

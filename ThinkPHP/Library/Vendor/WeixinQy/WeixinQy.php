@@ -75,7 +75,7 @@ class WeixinQy extends Urllib{
 	 * @return [type] [返回access token]
 	 */
 	private function createToken(){
-		$accessTokenJson=$this->get("https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={$this->corpid}&corpsecret={$this->corpsecret}");
+		$accessTokenJson=$this->curlGet("https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={$this->corpid}&corpsecret={$this->corpsecret}");
 		$ATObject=json_decode($accessTokenJson);
 
 		if ($ATObject->access_token) {

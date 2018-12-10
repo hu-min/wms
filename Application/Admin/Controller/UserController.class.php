@@ -380,7 +380,6 @@ class UserController extends BaseController{
     function rolerNodeEdit(){
         $roleId=I("roleId",0,'int');
         $authData=I("data");
-        // $this->log($authData);
         foreach ($authData as $nodeId => $authority) {
             $parameter=[
                 'where'=>['roleId'=>$roleId,"nodeId"=>$nodeId],
@@ -411,7 +410,6 @@ class UserController extends BaseController{
         }
         $this->assign("nodeTree",$this->getNodeTree());
         $this->assign("auth",json_encode($authList));
-        // $this->log($authList);
         $this->ajaxReturn(['errCode'=>0,'info'=>$this->fetch("User/roleNodeControl")]);
     }
     /** 
@@ -910,7 +908,7 @@ class UserController extends BaseController{
         $reqType=I('reqType');
         $this->assign("controlName","white_user");
         $this->assign('tableName',"VWhite");//删除数据的时候需要
-        $this->assign('userArr',$this->AProject->_getOption("create_user"));
+        $this->assign('userArr',$this->Com ->get_option("create_user"));
         if($reqType){
             $this->$reqType();
         }else{         

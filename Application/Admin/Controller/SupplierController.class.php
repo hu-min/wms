@@ -778,7 +778,7 @@ class SupplierController extends BaseController{
         $key=I("key");
         $type=I("type");
         $project = A("Project");
-        $this->ajaxReturn(["data"=>$project->_getOption($type,$key)]);
+        $this->ajaxReturn(["data"=>$this->Com ->get_option($type,$key)]);
     }
 
     function getSuprCont($key="",$companyId=0){

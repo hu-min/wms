@@ -26,7 +26,6 @@ class NodeController extends BaseController{
         $processInfo = ["process"=>[],"allProcess"=>1,"place"=>0,"processId"=>0,"examine"=>'',"auth"=>0];
         $processList = [];
         // print_r($processResult);exit;
-        // $this->log($processResult);
         if(is_array($processResult["list"])){
             $nodeAuth = session('nodeAuth');
             $auth = $nodeAuth[$processResult["list"][0]["controller"]];

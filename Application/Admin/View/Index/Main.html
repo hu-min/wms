@@ -684,9 +684,11 @@
         var tab_content=$('#main-navs .main-tabs-content')
         nav_tabs.children('li').removeClass('active');
         tab_content.children('div').removeClass('active');
+        
         if(tab.length>0){
             nav_tabs.find("[href='#"+id+"']").parents("li").addClass("active");
             nav_tabs.find("[href='#"+id+"']").text(title);
+            
             $("#"+id).addClass('active');
             $("#"+id).html(content);
         }else{
@@ -694,6 +696,7 @@
             var tabContent="<div class='active tab-pane' id='"+id+"'>"+content+"</div>";
             nav_tabs.append(tab);
             tab_content.append(tabContent);
+            // $(tabId).find(".box-header .box-title").text(title)
         }
     }
     //删除tab

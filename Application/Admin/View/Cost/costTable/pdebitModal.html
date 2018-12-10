@@ -1,0 +1,88 @@
+<div class="modal-header">
+    <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{$title}</h4>
+</div>
+<div class="modal-body">
+    <form role="form">
+        
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label >选择项目：</label>
+                        <select class="form-control project-info modal-info chosen-select common-info" title="选择项目" data-type="cost_relation_project" data-value="projectId"  data-text="name" name="project_id" >
+                            <option value="0">选择项目</option>
+                            <volist name="projectArr" id="item">
+                                <option value="{$item['projectId']}">{$item['name']}</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label >成本标识：</label>
+                        <select class="form-control modal-info chosen-select common-info" title="成本标识" required="required" name="section">
+                            
+                        </select>
+                    </div>
+                </div>
+            </div>
+ 
+            <div class="box box-solid">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="box-group" id="{$vtabId}-accordion">
+                        
+                    </div>
+                </div>
+            <!-- /.box-body -->
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="info-title">要求放款日期：</label>
+                        <input class="form-control modal-info date-input input-sm common-info" readonly="readonly" required="required" name="require_date" title="要求放款日期"  value="" placeholder="要求放款日期" type="text">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label >收款账户类型：</label>
+                        <select class="form-control modal-info chosen-select common-info" required="required" title="收款账户类型"  name="account_type">
+                            <option value="0">收款账户</option>
+                            <volist name="accountType" id="item">
+                                <option value="{$key}">{$item}</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="info-title">收款账户详细：</label>
+                        <input class="form-control modal-info input-sm common-info" name="account" title="收款账户详细"  value="" placeholder="收款账户详细" type="text">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="info-title">借支总计：</label>
+                        <input class="form-control all-count input-sm modal-info common-info" readonly="readonly" name="debit_money" title="借支总计"  value="0" placeholder="借支总计" type="text">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>            
+</div>
+<div class="modal-footer">
+    <input class="modal-info" name="status" value="0" type="hidden">
+    <input class="modal-info common-info" name="id" value="0" type="hidden">
+    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+    <if condition="$listType neq 'contrast'">
+        <!-- <button type="button" class="btn btn-sm btn-warning save-info draft-btn" data-con="{$controlName}" data-savetype="draft" data-gettype="{$gettype}" data-url="{$url}" data-modal="true">保存草稿</button> -->
+        {:save_btn(get_defined_vars(),true)}
+    </if>
+    <if condition="$listType eq 'contrast'">
+        {:approve_btn($tableName)}
+    </if>
+    
+</div>

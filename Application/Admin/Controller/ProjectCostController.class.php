@@ -56,6 +56,8 @@ class ProjectCostController extends BaseController{
         $this->assign('moduleArr',$this->Com ->get_option('module'));
         $this->assign('unitArr',$this->Com ->get_option('unit'));
         $this->assign('projectArr',$this->Com ->get_option('project'));
+        $this->assign('userArr',$this->Com->get_option("user"));
+
         $resultData=[];
         $id = I("id");
         
@@ -161,9 +163,9 @@ class ProjectCostController extends BaseController{
         ];
         $projectCostData = $this->pCostCom->getOne($param);
         if($con == "pcost_control" || $con == "project_costCon"){
-            $newFileName = $projectCostData['project_name'].date('Ymd', time()) ;
+            $newFileName = $projectCostData['project_name']."【成本对照】".date('Ymd', time()) ;
         }else{
-
+            $newFileName = $projectCostData['project_name']."【报价】".date('Ymd', time()) ;
         }
         
         // print_r($projectCostData);exit;
@@ -329,9 +331,24 @@ class ProjectCostController extends BaseController{
         $p=I("p")?I("p"):1;
         $roleId = session("roleId");
         $where=[];
-        // if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
-        //     $where['ouser_id'] = session('userId');
-        // }
+        $nodeAuth = $this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME];
+        if($type == 'offer'){
+            if($nodeAuth < 7){
+                $where['ouser_id'] = session('userId');
+            }
+        }elseif($type == 'cost'){
+            if($nodeAuth < 7){
+                $map['cuser_id'] = [["EQ",session('userId')],["EQ",NULL],"OR"];
+                $map['ouser_id'] = session('userId');
+                $map['_logic'] = 'or';
+                $where['_complex'] = $map;
+            }
+        }elseif($type == 'contrast'){
+            if($nodeAuth < 7){
+                $where["_string"] = "FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0";
+                // $where['ouser_id'] = session('userId');
+            }
+        }
         $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_time,FIND_IN_SET({$roleId},examine) place",
@@ -345,6 +362,7 @@ class ProjectCostController extends BaseController{
             ]
         ];
         $listResult=$this->pCostCom->getList($parameter);
+        // echo $this->pCostCom->M()->_sql();exit;
         // $this->
         // if($type == 'offer'){
         //     $listTemplate = 'project_offerList';
@@ -371,7 +389,7 @@ class ProjectCostController extends BaseController{
         }else if($reqType=="project_offerEdit"){
             $where=["id"=>$datas['id']];
             $data=[];
-            foreach (['class_notes','class_sort','cost_class','sort','classify','item_content','num','unit','act_num','act_unit','price','total','status','class_sub','cost_price','cost_total','profit','profit_ratio','scompany_id','scompany_cid'] as $key) {
+            foreach (['class_notes','class_sort','cost_class','sort','classify','item_content','num','unit','act_num','act_unit','price','total','status','class_sub','cost_price','cost_total','profit','profit_ratio','scompany_id','scompany_cid','flag','auth_user_id'] as $key) {
                 if(isset($datas[$key])){
                     $data[$key]=$datas[$key];
                 }
@@ -402,6 +420,7 @@ class ProjectCostController extends BaseController{
         }
         $pOfferData['project_id'] = $data['project_id'];
         $pOfferData['total'] = $data['total'];
+        $pOfferData['flag'] = $data['flag'];
         $pOfferData['tax_rate'] = $data['tax_rate'];
         $pOfferData['ouser_id'] = session('userId');
         $pOfferData['add_time'] = time();

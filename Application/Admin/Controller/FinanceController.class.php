@@ -326,7 +326,7 @@ class FinanceController extends BaseController{
         $reqType=I('reqType');
         $this->assign('tableName',"VReceivable");//删除数据的时候需要
         $this->assign("controlName","receivable");//名字对应cust_company_modalOne，和cust_companyModal.html
-        $this->assign('projectArr',A("Project")->_getOption("project_id"));
+        $this->assign('projectArr',$this->Com ->get_option("project_id"));
         if($reqType){
             $this->$reqType();
         }else{
@@ -484,12 +484,12 @@ class FinanceController extends BaseController{
         $this->assign("payStatus",$this->payStatus);
         $supplier = A("Supplier");
         // print_r($supplier->getSupplier());
-        $this->assign("supComArr",A("Project")->_getOption("supplier_com"));
+        $this->assign("supComArr",$this->Com ->get_option("supplier_com"));
         $reqType=I('reqType');
         $this->assign('tableName',"VWouldpay");//删除数据的时候需要
         $this->assign("controlName","wouldpay");//名字对应cust_company_modalOne，和cust_companyModal.html
-        $this->assign('costArr',A("Project")->_getOption("cost_id"));
-        $this->assign('financeArr',A("Project")->_getOption("finance_id"));
+        $this->assign('costArr',$this->Com ->get_option("cost_id"));
+        $this->assign('financeArr',$this->Com ->get_option("finance_id"));
         if($reqType){
             $this->$reqType();
         }else{
@@ -504,7 +504,7 @@ class FinanceController extends BaseController{
         $id = I("id");
         // $parent_id = I("parent_id");
         // $supplier_id = I("supplier_id");
-        // $this->assign('fin_accountArr',A("Project")->_getOption("fin_account"));
+        // $this->assign('fin_accountArr',$this->Com ->get_option("fin_account"));
         // if($gettype=="Edit"){
         //     $title = "编辑付款";
         //     $btnTitle = "保存数据";
@@ -538,7 +538,7 @@ class FinanceController extends BaseController{
         //     "template"=>"purchaModal",
         // ];
         // $this->modalOne($modalPara);
-        $this->assign('fin_accountArr',A("Project")->_getOption("fin_account"));
+        $this->assign('fin_accountArr',$this->Com ->get_option("fin_account"));
         if($gettype=="Edit"){
             $title = "应付供应商";
             $btnTitle = "保存数据";
@@ -741,7 +741,7 @@ class FinanceController extends BaseController{
         $key=I("key");
         $type=I("type");
         $project = A("Project");
-        $this->ajaxReturn(["data"=>$project->_getOption($type,$key)]);
+        $this->ajaxReturn(["data"=>$this->Com ->get_option($type,$key)]);
     }
     function project_modalOne(){
         $project = A("Project");
@@ -759,8 +759,8 @@ class FinanceController extends BaseController{
         $reqType=I('reqType');
         $this->assign('tableName',"VPurcha");//删除数据的时候需要
         $this->assign("controlName","purcha");//名字对应cust_company_modalOne，\
-        $this->assign('projectArr',A("Project")->_getOption("project_id"));
-        $this->assign("supComArr",A("Project")->_getOption("supplier_com"));
+        $this->assign('projectArr',$this->Com ->get_option("project_id"));
+        $this->assign("supComArr",$this->Com ->get_option("supplier_com"));
         if($reqType){
             $this->$reqType();
         }else{
@@ -1088,7 +1088,6 @@ class FinanceController extends BaseController{
         foreach ($datas as $key => $clearInfo) {
             $updateStatus = false;
             $updateStatus = true;
-            $this->log($clearInfo);
             foreach (["debit","expense"]as $item) {
                 $Ids = explode(",",$clearInfo[$item."_ids"]);
                 if(!empty($clearInfo[$item."_ids"])){
@@ -1098,7 +1097,6 @@ class FinanceController extends BaseController{
                     ];
 
                     $com = $item."Com";
-                    $this->log($parameter);
                     $updateRes = $$com->update($parameter);
                     if(isset($updateRes->errCode) && $updateRes->errCode == 0){
                         $updateStatus = true;
@@ -1112,7 +1110,6 @@ class FinanceController extends BaseController{
             if($updateStatus){
                 $updateInfo = $this->manageSClear($clearInfo);
                 $examine = $updateInfo['examine'];
-                $this->log($updateInfo);
                 $insertRes = $this->clearCom->insert($updateInfo);
                 if(isset($insertRes->errCode) && $insertRes->errCode == 0){
                     $upPoint++; 
@@ -1614,7 +1611,7 @@ class FinanceController extends BaseController{
         $this->assign('accountArr',$accountResult);
         $this->assign('capTypeArr',["1"=>"银行存款","2"=>"库存现金","3"=>"保险箱","4"=>"库存现金（含保险箱）"]);
         $this->assign('floatTypeArr',["1"=>"收入","2"=>"支出"]);
-        $this->assign('projectArr',$this->Aproject->_getOption("project_id"));
+        $this->assign('projectArr',$this->Com ->get_option("project_id"));
         if($reqType){
             $this->$reqType();
         }else{
@@ -1627,7 +1624,7 @@ class FinanceController extends BaseController{
         $gettype = I("gettype");
         $resultData=[];
         $id = I("id");
-        $this->assign('supplierArr',$this->Aproject->_getOption("supplier_com"));
+        $this->assign('supplierArr',$this->Com ->get_option("supplier_com"));
         if($gettype=="Edit"){
             $title = "编辑资金明细";
             $btnTitle = "保存数据";
