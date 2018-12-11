@@ -43,7 +43,7 @@ class User extends Urllib{
 	 * @return [type]            [description]
 	 */
 	function getUserInfo($code,$detailed=false){
-		$resultData=json_decode($this->get("https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token={$this->accessToken}&code={$code}"));
+		$resultData=json_decode($this->curlGet("https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token={$this->accessToken}&code={$code}"));
 		if($detailed==true){
 			if($resultData->UserId!=""){
 				return $this->getUser($resultData->UserId);
@@ -58,7 +58,7 @@ class User extends Urllib{
 	 * @return [type]         [description]
 	 */
 	function getUser($userid){
-		return json_decode($this->get("https://qyapi.weixin.qq.com/cgi-bin/user/get?access_token={$this->accessToken}&userid={$userid}"));
+		return json_decode($this->curlGet("https://qyapi.weixin.qq.com/cgi-bin/user/get?access_token={$this->accessToken}&userid={$userid}"));
 	}
 
 	/**
@@ -86,7 +86,7 @@ class User extends Urllib{
 	 * @return [type]         [description]
 	 */
 	function deleteUser($userid){
-		$resultDataJson=$this->get("https://qyapi.weixin.qq.com/cgi-bin/user/delete?access_token={$this->accessToken}&userid={$userid}");
+		$resultDataJson=$this->curlGet("https://qyapi.weixin.qq.com/cgi-bin/user/delete?access_token={$this->accessToken}&userid={$userid}");
 		$result=json_decode($resultDataJson,true);
 		$result['error'] = $this->getError($result['errcode']);
 		return $result;
@@ -123,7 +123,7 @@ class User extends Urllib{
 	 * @return [type]                [description]
 	 */
 	function simpleList($department_id){
-		$resultDataJson=$this->get("https://qyapi.weixin.qq.com/cgi-bin/user/simplelist?access_token={$this->accessToken}&department_id={$department_id}&fetch_child=1");
+		$resultDataJson=$this->curlGet("https://qyapi.weixin.qq.com/cgi-bin/user/simplelist?access_token={$this->accessToken}&department_id={$department_id}&fetch_child=1");
 		return json_decode($resultDataJson);
 	}
 	/**
@@ -132,7 +132,7 @@ class User extends Urllib{
 	 * @return [type]                [description]
 	 */
 	function userList($department_id){
-		$resultDataJson=$this->get("https://qyapi.weixin.qq.com/cgi-bin/user/list?access_token={$this->accessToken}&department_id={$department_id}&fetch_child=1");
+		$resultDataJson=$this->curlGet("https://qyapi.weixin.qq.com/cgi-bin/user/list?access_token={$this->accessToken}&department_id={$department_id}&fetch_child=1");
 		return json_decode($resultDataJson);
 	}
 
@@ -163,7 +163,7 @@ class User extends Urllib{
 	 * @return [type]         [description]
 	 */
 	function authSucc($userid){
-		$resultDataJson=$this->get("https://qyapi.weixin.qq.com/cgi-bin/user/authsucc?access_token={$this->accessToken}&userid={$userid}");
+		$resultDataJson=$this->curlGet("https://qyapi.weixin.qq.com/cgi-bin/user/authsucc?access_token={$this->accessToken}&userid={$userid}");
 		return json_decode($resultDataJson);
 	}
 
@@ -200,7 +200,7 @@ class User extends Urllib{
 	 * @return [type]                      [description]
 	 */
 	function deleteDepartment($departmentId){
-		$resultDataJson=$this->get("https://qyapi.weixin.qq.com/cgi-bin/department/delete?access_token={$this->accessToken}&id={$departmentId}");
+		$resultDataJson=$this->curlGet("https://qyapi.weixin.qq.com/cgi-bin/department/delete?access_token={$this->accessToken}&id={$departmentId}");
 		$result=json_decode($resultDataJson);
 		if($result->errmsg=="deleted"){
 			return "success";
@@ -216,7 +216,7 @@ class User extends Urllib{
 	 * @return [type]                [description]
 	 */
 	function departmentList($department_id){
-		$resultDataJson=$this->get("https://qyapi.weixin.qq.com/cgi-bin/department/list?access_token={$this->accessToken}&id={$department_id}");
+		$resultDataJson=$this->curlGet("https://qyapi.weixin.qq.com/cgi-bin/department/list?access_token={$this->accessToken}&id={$department_id}");
 		return json_decode($resultDataJson);
 	}
 }

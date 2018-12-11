@@ -135,7 +135,6 @@ class UserController extends BaseController{
     function userEdit(){
         $qiye_sync = I("data")['qiye_sync'];
         $userInfo=$this->manageUserInfo();
-        
         if($userInfo["userId"]==1 && session("userId")!=1){
             $this->ajaxReturn(['errCode'=>10003,'error'=>getError(10003)]);
         }
@@ -146,12 +145,17 @@ class UserController extends BaseController{
             }
             $userInfo['qiye_id'] = $userInfo['qiye_id'];
         }
-        $updateResult=$this->userCom->updateUser($userInfo);
+        $samePwd = $this->userCom->getOne(['where' => ['userId'=>$userInfo["userId"],"password"=>$userInfo['password']],"fields"=>"userId"]);
+        $error = getError(100);
+        if($samePwd){
+            $error = "密码和原密码一致，无需修改";
+        }
+        $updateResult = $this->userCom->updateUser($userInfo);
         
         if($updateResult->errCode==0){
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
         }
-        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100),'reqType'=>$reqType]);
+        $this->ajaxReturn(['errCode'=>100,'error'=>$error,'reqType'=>$reqType]);
     }
     /** 
      * @Author: vition 
@@ -161,6 +165,11 @@ class UserController extends BaseController{
     function userAdd(){
         $qiye_sync = I("data")['qiye_sync'];
         $userInfo=$this->manageUserInfo();
+        $hasUser = $this->userCom->getOne(['where' => ['loginName'=>$userInfo["loginName"]],"fields"=>"userId"]);
+        if($hasUser){
+            $this->ajaxReturn(['errCode'=>10005,'error'=>getError(10005)]);
+        }
+        
         if($qiye_sync){
             $wxResult = $this->qiye_sync($userInfo);
             if($wxResult['errcode']!=0){
