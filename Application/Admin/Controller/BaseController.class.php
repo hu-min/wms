@@ -252,6 +252,7 @@ class BaseController extends \Common\Controller\BaseController{
             session("history",NULL);
             session('web_lock_password',NULL);
             cookie('identify',null);
+            session(null);
             $this->redisCom->offline(session('userId'));
             $this->clearRedis('config_web_lock');
             $this->redirect('Index/Login');

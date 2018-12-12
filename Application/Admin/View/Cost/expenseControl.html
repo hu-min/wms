@@ -86,6 +86,8 @@
                                 <!-- <th>发票或凭证</th> -->
                                 <!-- <th>审批记录</th> -->
                                 <!-- <th>备注</th> -->
+                                <th>审批备注</th>
+                                <th>审批记录</th>
                                 <th>状态</th>
                                 <th>操作</th>
                             </tr>
@@ -114,73 +116,87 @@
         </div>
     </div>
     <script>
-        function expense_initInfo(){
-            init_chosen("{$url}","getOptionList",".global-modal");
+        function expense_initInfo(gettype){
+            if(gettype == "Add"){
+                init_chosen("{$url}","getOptionList",".global-modal");
+            }
             init_date();
             upload({url:"{:U('Cost/upload_filesAdd')}"})
         }
         function expense_setInfo(info){
-            // console.log(info)
-            ["project_id","code","project_name","project_date","business_name","leader_name","all_money","city"].forEach(element=>{
-                if(element == "project_id"){
-                    var projectChosen= $(tabId+" .chosen-select[name='project_id']");
-                    var projectId = info["projectId"];
-                    if(projectChosen.find("option[value='"+info["projectId"]+"']").length==0){
-                        projectChosen.append("<option value='"+info["project_pid"]+"'>"+info["project_name"]+"</option>")
-                    }
-                }
-                $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
-            });
-            ["id","debit_money","fee_type","require_date","account_type","account","invoice_money","debit_cause","leader"].forEach(element=>{
-                if(info[element]!="" || info[element]!="0"){
-                    $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
-                }
-            });
-            set_table_data(["expense-list"],info["tableData"],JSON.parse('{$statusTypeJ}'),function($current,listData,statusType){
-                $current.find(".approve-group .approve-con").remove()
-                for (var key in listData) {
-                    if(key == "status"){
-                        var status = listData[key]
-                        if(Number(listData["last_status"])>1){
-                            status= listData["last_status"]
-                        }
-                        $current.find("td[name='"+key+"']").text(statusType[status]);
-                        $current.find(".modal-info[name='"+key+"']").val(listData[key]);
-                    }else  if(key == "city"){
-                        // console.log(listData)
-                        // console.log($(tabId+" .expense-list .chosen-select[name='province']"))
-                        $current.find(".chosen-select[name='province']").find("option[value='"+listData["cpid"]+"']").prop("selected",true)
- 
-                        var city_optoin = '<option value="">城市</option>'
-                        listData["citys"].forEach(city => {
-                            city_optoin+='<option value="'+city["cid"]+'">'+city["city"]+'</option>'
-                        });
-                        $current.find(".chosen-select[name='city']").html(city_optoin);
-                        $current.find(".chosen-select[name='city']").find("option[value='"+listData['city']+"']").prop("selected",true);
-                    }else if(key == "aremark" ){
-                        if(listData[key]){
-                            $current.find("td[name='"+key+"']").text(listData["approve_name"]+"："+listData["aremark"]);
-                        }else{
-                            $current.find("td[name='"+key+"']").text(listData["approve_name"]);
-                        }
-                    }else{
-                        if(key == "id"){
-                            $current.find(".approve-group").data("id",listData[key])
-                        }
-                        $current.find(".modal-info[name='"+key+"']").val(listData[key]);
-                        if(!in_array(listData["status"],[0,3])){
-                            $current.find(".modal-info[name='"+key+"']").prop("disabled",true);
-                            $current.find(".chosen-select").prop("disabled",true);
-                            $current.find(".clear-media").remove();
-                        }
-                    }
-                }
-                init_date(false,$current);
-            });
             var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
-            if(( info['status'] > 0 || info['user_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3 && gettype !="Add"){
-                $(tabId+" .modal-info").prop("disabled",true);
+            ["project_id","code","project_name","project_date","business_name","leader_name",'leader',"money","city",'account'].forEach(element=>{
+                if(element == "project_id" && info[element] > 0 ){
+                    var projectChosen= $(tabId+" .global-modal .project-info[name='project_id']");
+                    var project_id = info["project_id"];
+                    if(projectChosen.find("option[value='"+info["project_id"]+"']").length==0){
+                        projectChosen.append("<option value='"+info["project_id"]+"'>"+info["project_name"]+"</option>")
+                    }
+                    projectChosen.val(info[element]);
+                    
+                    projectChosen.trigger("chosen:updated");
+                    var sectionChosen = $(tabId+" .global-modal").find(".common-info[name='section']");
+                    if(info['section'] > 0 && sectionChosen.val() <=0){
+                        projectChosen.trigger("change");
+                        sectionChosen.val(info['section']);
+                        sectionChosen.trigger("chosen:updated");
+                    }
+                }else if(info[element]){
+                    $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
+                }
+                
+            });
+            // ["id","debit_money","fee_type","require_date","account_type","account","invoice_money","debit_cause","leader"].forEach(element=>{
+            //     if(info[element]!="" || info[element]!="0"){
+            //         $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
+            //     }
+            // });
+            if(gettype!="Add"){
+                set_table_data(["expense-list"],info["tableData"],JSON.parse('{$statusTypeJ}'),function($current,listData,statusType){
+                    for (var key in listData) {
+                        if(key == "city"){
+                            $current.find(".chosen-select[name='province']").find("option[value='"+listData["cpid"]+"']").prop("selected",true)
+    
+                            var city_optoin = '<option value="">城市</option>'
+                            listData["citys"].forEach(city => {
+                                city_optoin+='<option value="'+city["cid"]+'">'+city["city"]+'</option>'
+                            });
+                            $current.find(".chosen-select[name='city']").html(city_optoin);
+                            $current.find(".chosen-select[name='city']").find("option[value='"+listData['city']+"']").prop("selected",true);
+                        }else if(key == "aremark" ){
+                            if(listData[key]){
+                                $current.find("td[name='"+key+"']").text(listData["approve_name"]+"："+listData["aremark"]);
+                            }else{
+                                $current.find("td[name='"+key+"']").text(listData["approve_name"]);
+                            }
+                        }else{
+                            $current.find(".modal-info[name='"+key+"']").val(listData[key]);
+                        }
+                        
+                    }
+                    init_date(false,$current);
+                    init_chosen("{$url}","getOptionList",$current);
+                });
+                $(tabId+" .global-modal .common-info").each(function(){
+                    if($(this).hasClass("chosen-select")){
+                        init_chosen("{$url}","getOptionList",$(this).parent());
+                    }
+                })
             }
+            
+            if(( info['status'] > 0 || info['author'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3 && gettype !="Add"){
+                $(tabId+" .global-modal").find(".modal-info").prop("disabled",true)
+                $(tabId+" .global-modal").find(".common-info").prop("disabled",true)
+                $(tabId+" .global-modal").find(".chosen-select").prop("disabled",true)
+                $(tabId+" .global-modal").find(".supr-remove").remove();
+                $(tabId+" .global-modal").find(".clear-media").remove();
+                
+                $(tabId+" .global-modal").find(".chosen-select").trigger("chosen:updated");
+            }
+            // var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
+            // if(( info['status'] > 0 || info['user_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3 && gettype !="Add"){
+            //     $(tabId+" .modal-info").prop("disabled",true);
+            // }
             // ["expense-list"].forEach(element => {
             //     if(info["tableData"] !=undefined && info["tableData"][element]["list"]){
             //         var list = info["tableData"][element]["list"];
@@ -208,41 +224,87 @@
             // });
         }
         var expense_getInfo = function (){
-            var expense_id = $(tabId+" .expense-id[name='id']").val();
-            var status = $(tabId+" .modal-info[name='status']").val();
-            var project_id = $(tabId+" .modal-info[name='project_id']").val();
-            var leader = $(tabId+" .modal-info[name='leader']").val();
-            datas["expense_id"] = expense_id;
-            datas["project_id"] = project_id;
-            datas["leader"] = leader;
-
             datas["data"] = {};
             var gettype = $(tabId+" .global-modal .modal-footer .save-info").data("gettype");
-            ["expense-list"].forEach(element => {
-                datas["data"][element] = [];
-                $(tabId+" .global-modal ."+element+" tbody tr").each(function(){
-                    tempSupr = {}
-                    
-                    $(this).find(".modal-info").each(function(){
-                        
-                        var name = $(this).attr("name");
-                        var val = $(this).val();
-                        var required=$(this).attr("required");
-                        var title=$(this).attr("title");
-                        if(required=="required" && val==""){
-                            notice(110,title,"输入异常");
-                            throw title;
-                        }else{
-                            tempSupr[name]=val;
-                        }
-                    })
-                    if(gettype=="Add" || (gettype=="Edit" && in_array(tempSupr["status"],[0,3])) ){
-                        tempSupr["status"] = tempSupr["status"] == 3 ? 0 : tempSupr["status"];
-                        datas["data"][element].push(tempSupr);
-                    }
-                })
+            ['id','project_id','section','money','account_type','leader','account'].forEach(key => {
+                var required = $(tabId+" .global-modal").find(".common-info[name='"+key+"']").attr("required");
+                var title = $(tabId+" .global-modal").find(".common-info[name='"+key+"']").attr("title");
+                var val = $(tabId+" .global-modal").find(".common-info[name='"+key+"']").val()
+                datas["data"][key] = val
+                if(key == "section" && datas["data"]['section'] <= 0 && datas["data"]['project_id'] > 0){
+                    notice(110,'项目报销请选择成本标识',"输入异常");
+                    throw '项目报销请选择成本标识';
+                }
             });
-        }
+            datas["data"]['list'] = [];
+            $(tabId+" .global-modal").find(".modal-expense-table tr").each(function(){
+                var temp ={};
+                ['id','happen_date','expense_type','province','city','fee_type','cost_desc','expen_vouch_type','money','remark','vouch_file','invoice_money'].forEach(key=>{
+                    var name = $(this).find(".modal-info[name='"+key+"']").attr("name");
+                    var val = $(this).find(".modal-info[name='"+key+"']").val();
+                    var required = $(this).find(".modal-info[name='"+key+"']").attr("required");
+                    var title = $(this).find(".modal-info[name='"+key+"']").attr("title");
+             
+                    if(required && (val== "" && val== 0)){
+                        notice(110,title,"输入异常");
+                        throw title;
+                    }else{
+                        temp[name]=val;
+                    }
+                // if(gettype=="Add" || (gettype=="Edit" && in_array(temp["status"],[0,3])) ){
+                //     temp["status"] = temp["status"] == 3 ? 0 : temp["status"];
+                //     datas["data"][element].push(temp);
+                // }
+                //     temp[key] = $(this).find(".modal-info[name='"+key+"']").val();
+                // });
+                // if(float(temp['debit_money'])>0){
+                //     datas["data"]['list'].push(temp);
+                // }
+                });
+                if(float(temp['money'])>0){
+                    datas["data"]['list'].push(temp);
+                }
+            });
+            
+            if(gettype=="Add" && JSON.stringify(datas["data"]['list']) == "[]"){
+                notice(110,"没有数据啊！","输入异常");
+                throw "没有数据啊！";
+            }
+            console.log(datas);
+            // var expense_id = $(tabId+" .expense-id[name='id']").val();
+            // var status = $(tabId+" .modal-info[name='status']").val();
+            // var project_id = $(tabId+" .modal-info[name='project_id']").val();
+            // var leader = $(tabId+" .modal-info[name='leader']").val();
+            // datas["expense_id"] = expense_id;
+            // datas["project_id"] = project_id;
+            // datas["leader"] = leader;
+
+            // var gettype = $(tabId+" .global-modal .modal-footer .save-info").data("gettype");
+            // ["expense-list"].forEach(element => {
+            //     datas["data"][element] = [];
+            //     $(tabId+" .global-modal ."+element+" tbody tr").each(function(){
+            //         tempSupr = {}
+                    
+            //         $(this).find(".modal-info").each(function(){
+                        
+            //             var name = $(this).attr("name");
+            //             var val = $(this).val();
+            //             var required=$(this).attr("required");
+            //             var title=$(this).attr("title");
+            //             if(required=="required" && val==""){
+            //                 notice(110,title,"输入异常");
+            //                 throw title;
+            //             }else{
+            //                 tempSupr[name]=val;
+            //             }
+            //         })
+            //         if(gettype=="Add" || (gettype=="Edit" && in_array(tempSupr["status"],[0,3])) ){
+            //             tempSupr["status"] = tempSupr["status"] == 3 ? 0 : tempSupr["status"];
+            //             datas["data"][element].push(tempSupr);
+            //         }
+            //     })
+            
+        };
         var feeLimit = function(self) {
             var city = self.find(".modal-info[name='city']").val()
             var feeType = self.find(".modal-info[name='fee_type']").val()
@@ -252,7 +314,7 @@
             get("{$url}",datas,function(result){
                 if(result.errCode!=0){
                     notice(result.errCode,result.error,"输入异常");
-                    self.find(".modal-info[name='money']").val(result.data.limit_money)
+                    self.find(".modal-info[name='money']").val(float_format(result.data.limit_money))
                 }
                 sum_expense_money();
             })
@@ -262,13 +324,14 @@
             $(tabId+" .global-modal").find(".modal-info[name='money']").each(function(){
                 all_money += float($(this).val());
             })
-            $(tabId+" .global-modal").find(".project-info[name='all_money']").val(all_money);
+            $(tabId+" .global-modal").find(".common-info[name='money']").val(float_format(all_money));
         }
         $(function(){
             $(tabId+" .search-list").trigger("click");
             $(tabId).offon("change"," .project-info[name='project_id']",function(){
                 var project_id = $(this).val()
                 var flags = $(tabId+" .global-modal").find(".modal-info[name='section']");
+                $(tabId+" .global-modal").find(".project-info[name='no_debit']").val("0.00");
                 if(Number(project_id)>0){
                     datas["reqType"]='getProjectOne';
                     datas["onlydata"]='true';
@@ -285,35 +348,20 @@
                             flags_data = result.data.flags
 
                             result.data['project_id'] = result.data['projectId'];
-                            expense_setInfo(result.data)
+                            var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
+                            if(gettype=="Add"){
+                                expense_setInfo(result.data)
+                            }
+                            // expense_setInfo(result.data)
                         }
-                    })
+                    },false)
                 }else{
                     ["project_id","code","project_name","project_date","business_name","leader_name","leader"].forEach(element=>{
                         $(tabId+" .global-modal .project-info[name='"+element+"']").val("");
                     });
                 }
             });
-            $(tabId).offon("change"," .modal-info[name='section']",function(){
-                // var project_id = $(tabId+" .global-modal").find(" .modal-info[name='project_id']").val()
-                // var flag_id = $(this).val()
-                // if(Number(project_id)>0 && Number(flag_id)>0){
-                //     datas["reqType"]='getPCostOne';
-                //     datas["project_id"]=project_id;
-                //     datas["flag_id"]=flag_id;
 
-                //     get("{$url}",datas,function(result){
-                //         $(tabId+" .global-modal .box-group ").html("")
-                //         // pedbit_compute()
-                //         if(result.data.list){
-                //             // project_debit_set(result.data.list);
-       
-                //         }else{
-                //             notice(100,'<div>当前没有可借支项</div>','借支限制');
-                //         }
-                //     })
-                // }
-            });
             [["add-expense","getExpenseLiOne","expense-list"]].forEach(element => {
                 $(tabId).offon("click","."+element[0],function(){
                     datas["reqType"]=element[1];
@@ -341,6 +389,22 @@
                 var accKey = $(this).val();
                 var accounts = JSON.parse('{$accounts}')
                 $(this).parents("tr").find(".modal-info[name='account']").val(accounts[accKey]);
+            })
+            $(tabId+" .global-modal").offon("change",".modal-info[name='section']",function(){
+                var section = $(this).val()
+                var project_id = $(tabId+" .global-modal").find(".project-info[name='project_id']").val();
+                $(tabId+" .global-modal").find(".project-info[name='no_debit']").val("0.00");
+                if(section > 0 && project_id > 0){
+                    datas["reqType"] = 'getNoDebitOne';
+                    datas["section"] = section;
+                    datas["project_id"] = project_id;
+                    get("{$url}",datas,function(result){
+                        if(result.data){
+                            $(tabId+" .global-modal").find(".project-info[name='no_debit']").val(result.data);
+                        }
+                        
+                    })
+                }
             })
         })
     </script>

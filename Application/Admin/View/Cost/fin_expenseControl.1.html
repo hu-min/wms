@@ -137,85 +137,121 @@
             upload({url:"{:U('Cost/upload_filesAdd')}"})
         }
         function fin_expense_setInfo(info){
-            // console.log(info);throw 'a';
-            var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
-            ["project_id","code","project_name","project_date","business_name","leader_name",'leader',"money","city",'account'].forEach(element=>{
-                if(element == "project_id" && info[element] > 0 ){
-                    var projectChosen= $(tabId+" .global-modal .project-info[name='project_id']");
-                    var project_id = info["project_id"];
-                    if(projectChosen.find("option[value='"+info["project_id"]+"']").length==0){
-                        projectChosen.append("<option value='"+info["project_id"]+"'>"+info["project_name"]+"</option>")
+            $(tabId+" .global-modal .table-id[name='table-id']").val(info["id"]);
+            if(info.process.place>0){
+                $(tabId+" .global-modal .place-id[name='place-id']").val(info.process.place);
+            }
+            ["project_id","code","project_name","project_date","business_name","leader_name","all_money"].forEach(element=>{
+                if(element == "project_id"){
+                    var projectChosen= $(tabId+" .chosen-select[name='project_id']");
+                    var projectId = info["projectId"];
+                    if(projectChosen.find("option[value='"+info["projectId"]+"']").length==0){
+                        projectChosen.append("<option value='"+info["project_pid"]+"'>"+info["project_name"]+"</option>")
                     }
-                    projectChosen.val(info[element]);
-                    
-                    projectChosen.trigger("chosen:updated");
-                    var sectionChosen = $(tabId+" .global-modal").find(".common-info[name='section']");
-                    if(info['section'] > 0 && sectionChosen.val() <=0){
-                        sectionChosen.append("<option value='"+info["section"]+"'>"+info["flag"]+"</option>")
-                        sectionChosen.val(info['section']);
-                        sectionChosen.trigger("chosen:updated");
-                    }
-                }else if(info[element]){
-                    $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
                 }
+                $(tabId+" .global-modal .project-info[name='"+element+"']").val(info[element]);
                 
             });
-            // ["id","debit_money","fee_type","require_date","account_type","account","invoice_money","debit_cause","leader"].forEach(element=>{
-            //     if(info[element]!="" || info[element]!="0"){
-            //         $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
-            //     }
-            // });
-            if(gettype!="Add"){
-                set_table_data(["expense-list"],info["tableData"],JSON.parse('{$statusTypeJ}'),function($current,listData,statusType){
-                    for (var key in listData) {
-                        if(key == "city"){
-                            $current.find(".chosen-select[name='province']").find("option[value='"+listData["cpid"]+"']").prop("selected",true)
-    
-                            var city_optoin = '<option value="">城市</option>'
-                            listData["citys"].forEach(city => {
-                                city_optoin+='<option value="'+city["cid"]+'">'+city["city"]+'</option>'
-                            });
-                            $current.find(".chosen-select[name='city']").html(city_optoin);
-                            $current.find(".chosen-select[name='city']").find("option[value='"+listData['city']+"']").prop("selected",true);
-                        }else if(key == "aremark" ){
-                            if(listData[key]){
-                                $current.find("td[name='"+key+"']").text(listData["approve_name"]+"："+listData["aremark"]);
-                            }else{
-                                $current.find("td[name='"+key+"']").text(listData["approve_name"]);
-                            }
-                        }else{
-                            $current.find(".modal-info[name='"+key+"']").val(listData[key]);
-                        }
-                        
-                    }
-                    init_date(false,$current);
-                    init_chosen("{$url}","getOptionList",$current);
-                });
-                $(tabId+" .global-modal .common-info").each(function(){
-                    if($(this).hasClass("chosen-select")){
-                        init_chosen("{$url}","getOptionList",$(this).parent());
-                    }
-                })
-            }
-            
-            if(( info['status'] > 0 || info['author'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3 && gettype !="Add"){
-                $(tabId+" .global-modal").find(".modal-info").prop("disabled",true)
-                $(tabId+" .global-modal").find(".common-info").prop("disabled",true)
-                $(tabId+" .global-modal").find(".chosen-select").prop("disabled",true)
-                $(tabId+" .global-modal").find(".supr-remove").remove();
-                $(tabId+" .global-modal").find(".clear-media").remove();
-                
-                $(tabId+" .global-modal").find(".chosen-select").trigger("chosen:updated");
-            }
-            $(tabId+" .global-modal").find(".approve-group").data("id",info['id'])
-            if(info['process_level'] > info['place'] || info['status'] == 3){
-                if(info["user_id"] == "{$Think.session.userId}"){
-                    $(tabId+" .global-modal").find(".approve-group .approve-con").remove();
-                }else{
-                    $(tabId+" .global-modal").find(".approve-group .approve-con").addClass("disabled");
-                    $(tabId+" .global-modal").find(".approve-group .approve-con").prop("disabled",true);
+            ["id","debit_money","free_type","require_date","account_type","account","invoice_money","debit_cause"].forEach(element=>{
+                if(info[element]!="" || info[element]!="0"){
+                    $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
                 }
-            }
+
+            });
+            ["expense-list"].forEach(element => {
+                if(info["tableData"] !=undefined && info["tableData"][element]["list"]){
+                    var list = info["tableData"][element]["list"];
+                    var template = info["tableData"][element]["template"];
+                    var statusType = JSON.parse('{$statusTypeJ}')
+                    var allMoney = 0;
+                    var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
+                    set_table_data(["expense-list"],info["tableData"],JSON.parse('{$statusTypeJ}'),function($current,listData,statusType){
+                        // $current.find(".approve-group .approve-con").remove()
+                        for (var key in listData) {
+                            if(key == "status"){
+                                var status = listData[key]
+                                if(Number(listData["last_status"])>1){
+                                    status= listData["last_status"]
+                                }
+                                $current.find("td[name='"+key+"']").text(statusType[status]);
+                                $current.find(".modal-info[name='"+key+"']").val(listData[key]);
+                            }else  if(key == "city"){
+                                // console.log(listData)
+                                // console.log($(tabId+" .expense-list .chosen-select[name='province']"))
+                                $current.find(".chosen-select[name='province']").find("option[value='"+listData["cpid"]+"']").prop("selected",true)
+        
+                                var city_optoin = '<option value="">城市</option>'
+                                listData["citys"].forEach(city => {
+                                    city_optoin+='<option value="'+city["cid"]+'">'+city["city"]+'</option>'
+                                });
+                                $current.find(".chosen-select[name='city']").html(city_optoin);
+                                $current.find(".chosen-select[name='city']").find("option[value='"+listData['city']+"']").prop("selected",true);
+                            }else if(key == "aremark" ){
+                                if(listData[key]){
+                                    $current.find("td[name='"+key+"']").text(listData["approve_name"]+"："+listData["aremark"]);
+                                }else{
+                                    $current.find("td[name='"+key+"']").text(listData["approve_name"]);
+                                }
+                            }else{
+                                if(key == "id"){
+                                    $current.find(".approve-group").data("id",listData[key])
+                                }
+                                $current.find(".modal-info[name='"+key+"']").val(listData[key]);
+                                if(!in_array(listData["status"],[0,3])){
+                                    $current.find(".modal-info[name='"+key+"']").prop("disabled",true);
+                                    $current.find(".chosen-select").prop("disabled",true);
+                                    $current.find(".clear-media").remove();
+                                }
+                            }
+                            
+                            if(( listData['status'] > 0 || info['user_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && listData['status'] !=3 && gettype !="Add"){
+                                $current.find(".modal-info").prop("disabled",true);
+                                $current.find(".chosen-select").prop("disabled",true);
+                                $current.find(".clear-media").remove();
+                            }
+                            // console.log(listData['process_level'])
+                            // console.log(listData['place'])
+                            if(listData['process_level'] > listData['place'] || listData['status'] == 3){
+                                if(info["user_id"] == "{$Think.session.userId}"){
+                                    $current.find(".approve-group .approve-con").remove();
+                                }else{
+                                    $current.find(".approve-group .approve-con").addClass("disabled");
+                                    $current.find(".approve-group .approve-con").prop("disabled",true);
+                                }
+                            }
+                        }
+                        init_date(false,$current);
+                    });
+                    
+                    // list.forEach(function(listData,rows){
+                    //     $(tabId+" .global-modal ."+element+" tbody").append(template);
+                    //     var $current = $(tabId+" .global-modal ."+element+" tbody tr").eq(rows);
+                    //     $current.find(".serial").text(Number(rows+1));
+                    //     //处理权限问题，这个比较特殊，
+                    //     if(info.process.place<1 || listData["a_status"] >= 1){
+                    //         $current.find(".approve-group .approve-con").addClass("disabled")
+                    //         $current.find(".approve-group .approve-con").prop("disabled",true)
+                    //     }
+                    //     $current.find(".clear-media").remove();
+                        
+                    //     for (var key in listData) {
+                    //         if(key == "status"){
+                    //             var status = listData[key]
+                    //             if(Number(listData["last_status"])>1){
+                    //                 status= listData["last_status"]
+                    //             }
+                    //             $current.find("td[name='"+key+"']").text(statusType[status]);
+                    //         }else if(key == "id"){
+                    //             $current.find(".approve-group").data("id",listData[key])
+                    //         }else{
+                    //             $current.find(".modal-info[name='"+key+"']").val(listData[key]);
+                    //         }
+                    //         $current.find(".modal-info[name='"+key+"']").prop("disabled",true);
+                    //     }
+                    //     init_date(false,$current);
+                    // });
+                }
+            });
         }
         $(function(){
             init_chosen("{$url}","getOptionList",".search-box");

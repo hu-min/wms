@@ -14,6 +14,17 @@
         <td>{$item['add_date']}</td>
         <td>{$item['all_item']}</td>
         <td>{$item['all_money']}</td>
-        {:list_btn(get_defined_vars(),"id")}
+        <td>
+            {$item.approve_name}<if condition="$item['aremark']"> ：{$item.aremark} </if>
+        </td>
+        <td>
+            {:approve_btn($tableName,$item['id'],0,0)}
+        </td>
+        <if condition="$item['project_id'] GT 0">
+            {:list_btn(get_defined_vars(),"id",[],false,false,true,'查看')}
+        <else/>
+            {:list_btn(get_defined_vars(),"id")}
+        </if>
+
     </tr>
 </volist>

@@ -17,7 +17,7 @@
             </volist>
         </select>
     </td>
-    <td style="width: 250px;">
+    <td style="min-width: 250px!important;">
         <div style="display:inline-block">
             <select class="form-control chosen-select" title="项目省份" name="province" data-cname="city">
                 <option value="">省份</option>
@@ -51,17 +51,6 @@
         <input class="form-control modal-info input-sm"  name="money" required="required" title="发生金额"  value="" placeholder="发生金额" type="text">
     </td>
     <td>
-        <select class="form-control modal-info chosen-select" required="required" title="收款账户类型"  name="account_type">
-            <option value="0">收款账户</option>
-            <volist name="accountType" id="item">
-                <option value="{$key}">{$item}</option>
-            </volist>
-        </select>
-    </td>
-    <td>
-        <input class="form-control modal-info input-sm" name="account"  title="收款账户详细"  value="" placeholder="收款账户详细" type="text" style="width: 150px;"">
-    </td>
-    <td>
         <input class="form-control modal-info input-sm" name="remark" title="备注"  value="" placeholder="备注" type="text">
     </td>
     <td>
@@ -75,11 +64,4 @@
         <input class="form-control modal-info input-sm" name="invoice_money" title="发票金额"  value="0" placeholder="有发票则写明金额" type="text">
     </td>
     <input class="modal-info" value="0" type="hidden" name="status"/>
-    <td name="status">
-        
-    </td>
-    <td name="aremark" style="min-width: 100px;"></td>
-    <td>
-        {:approve_btn($tableName)}
-    </td>
 </tr>

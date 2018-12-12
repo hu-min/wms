@@ -11,11 +11,19 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label >选择项目：</label>
-                        <select class="form-control project-info modal-info chosen-select" title="选择项目" data-value="projectId"  data-text="name" disabled="disabled" name="project_id">
+                        <select class="form-control project-info modal-info common-info chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
                             <option value="0">非项目报销</option>
                             <volist name="projectArr" id="item">
                                 <option value="{$item['projectId']}">{$item['name']}</option>
                             </volist>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label >成本标识：</label>
+                        <select class="form-control modal-info chosen-select common-info" title="成本标识" required="required" name="section">
+                            
                         </select>
                     </div>
                 </div>
@@ -31,30 +39,37 @@
                         <input class="form-control project-info" readonly="readonly" name="project_name" title="项目名称"  value="" placeholder="项目名称" type="text">
                     </div>
                 </div>
-                <div class="col-md-3">
+            </div>
+            <div class="row">
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="info-title">项目日期：</label>
                         <input class="form-control project-info" readonly="readonly" name="project_date" title="项目日期"  value="" placeholder="项目日期" type="text">
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="info-title">营业主担：</label>
                         <input class="form-control project-info" readonly="readonly" name="business_name" title="营业主担"  value="" placeholder="营业主担" type="text">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="info-title">项目主担：</label>
                         <input class="form-control project-info" readonly="readonly" name="leader_name" title="项目主担"  value="" placeholder="项目主担" type="text">
+                        <input class="project-info modal-info common-info" value="0" name="leader" type="hidden">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="info-title">未报销借支金额：</label>
+                        <input class="form-control project-info" readonly="readonly" name="no_debit" title="未报销借支金额"  value="0.00" placeholder="未报销借支金额" type="text">
+                    </div>
+                </div>
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="info-title">报销金额合计：</label>
-                        <input class="form-control project-info" readonly="readonly" name="all_money" title="报销金额合计"  value="0" placeholder="报销金额合计" type="text">
+                        <input class="form-control project-info common-info" readonly="readonly" name="money" title="报销金额合计"  value="0.00" placeholder="报销金额合计" type="text">
                     </div>
                 </div>
                 <!-- <div class="col-md-3">
@@ -93,14 +108,9 @@
                                 <th>费用说明</th>
                                 <th>报销凭证类型</th>
                                 <th>发生金额</th>
-                                <th>收款账户类别</th>
-                                <th>收款账户</th>
                                 <th>备注</th>
                                 <th>发票或凭证</th>
                                 <th>发票金额</th>
-                                <th>报销状态</th>
-                                <th>审批备注</th>
-                                <th>审批记录</th>
                             </tr>
                         </thead>
                         <tbody class="modal-{$controlName}-table">
@@ -126,5 +136,6 @@
     <input class="modal-info expense-id" value="0" name="id" type="hidden">
     <input class="table-id" value="0" name="table-id" type="hidden">
     <input class="place-id" value="0" name="place-id" type="hidden">
-    <!-- {:save_btn(get_defined_vars())} -->
+
+    {:approve_btn($tableName,0,false,0,0,['vars'=>get_defined_vars()])}
 </div>

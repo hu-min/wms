@@ -11,7 +11,7 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label >选择项目：</label>
-                            <select class="form-control project-info modal-info chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
+                            <select class="form-control project-info modal-info common-info chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
                                 <option value="0">非项目报销</option>
                                 <volist name="projectArr" id="item">
                                     <option value="{$item['projectId']}">{$item['name']}</option>
@@ -41,29 +41,35 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="form-group">
                             <label for="info-title">项目日期：</label>
                             <input class="form-control project-info" readonly="readonly" name="project_date" title="项目日期"  value="" placeholder="项目日期" type="text">
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="form-group">
                             <label for="info-title">营业主担：</label>
                             <input class="form-control project-info" readonly="readonly" name="business_name" title="营业主担"  value="" placeholder="营业主担" type="text">
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="form-group">
                             <label for="info-title">项目主担：</label>
                             <input class="form-control project-info" readonly="readonly" name="leader_name" title="项目主担"  value="" placeholder="项目主担" type="text">
-                            <input class="project-info modal-info" value="0" name="leader" type="hidden">
+                            <input class="project-info modal-info common-info" value="0" name="leader" type="hidden">
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="info-title">未报销借支金额：</label>
+                            <input class="form-control project-info" readonly="readonly" name="no_debit" title="未报销借支金额"  value="0.00" placeholder="未报销借支金额" type="text">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
                         <div class="form-group">
                             <label for="info-title">报销金额合计：</label>
-                            <input class="form-control project-info" readonly="readonly" name="all_money" title="报销金额合计"  value="0" placeholder="报销金额合计" type="text">
+                            <input class="form-control project-info common-info" readonly="readonly" name="money" title="报销金额合计"  value="0.00" placeholder="报销金额合计" type="text">
                         </div>
                     </div>
                     <!-- <div class="col-md-3">
@@ -103,14 +109,12 @@
                                         <th>费用说明</th>
                                         <th>报销凭证类型</th>
                                         <th>发生金额</th>
-                                        <th>收款账户类别</th>
-                                        <th>收款账户</th>
                                         <th>备注</th>
                                         <th>发票或凭证</th>
                                         <th>发票金额</th>
-                                        <th>报销状态</th>
+                                        <!-- <th>报销状态</th>
                                         <th>审批备注</th>
-                                        <th>审批记录</th>
+                                        <th>审批记录</th> -->
                                     </tr>
                                 </thead>
                                 <tbody class="modal-{$controlName}-table">
@@ -121,19 +125,33 @@
                     </div>
                 </div>
                 <div class="row">
-                    
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <select class="form-control modal-info chosen-select common-info" required="required" title="收款账户类型"  name="account_type">
+                                <option value="0">收款账户</option>
+                                <volist name="accountType" id="item">
+                                    <option value="{$key}">{$item}</option>
+                                </volist>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input class="form-control modal-info project-info input-sm common-info" name="account"  title="收款账户详细"  value="" placeholder="收款账户详细" type="text" style="width: 150px;"">
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
                         <input class="modal-info" value="0" name="status" type="hidden">
                         {:modal_btn(get_defined_vars())}
                     </div>
-                </div>
+                </div> -->
             </div>
         </form>            
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-        <input class="modal-info expense-id" value="0" name="id" type="hidden">
+        <input class="modal-info expense-id common-info" value="0" name="id" type="hidden">
         {:save_btn(get_defined_vars())}
     </div>

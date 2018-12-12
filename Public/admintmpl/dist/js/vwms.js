@@ -736,7 +736,7 @@ $(function(){
                 })
             }
             //获取一些财务的东西
-            if(place==level){
+            if(place > 0 && place==level){
                 if($(this).hasClass("approve-con")){
                     moneyAccount = []
                     $("#approve-log-modal").find(".modal-body .money-account").html("");
@@ -1536,19 +1536,6 @@ var set_table_data = function(listData,tableData,statusType,attachCall){
                 var $current = $(tabId+" .global-modal ."+element+" tbody tr").eq(rows);
                 $current.find(".serial").text(Number(rows+1));
                 attachCall($current,listData,statusType)
-                
-                // for (var key in listData) {
-                //     if(key == "status"){
-                //         $current.find("td[name='"+key+"']").text(statusType[listData[key]]);
-                //     }else{
-                //         $current.find(".modal-info[name='"+key+"']").val(listData[key]);
-                //         if(listData["status"] == 1){
-                //             $current.find(".modal-info[name='"+key+"']").prop("disabled",true);
-                //         }
-                        
-                //     }
-                // }
-                // init_date(false,$current);
             });
         }
     });

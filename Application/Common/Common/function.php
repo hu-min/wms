@@ -270,10 +270,24 @@ function modal_btn($defind_vars,$status=false){
     }
 }
 function approve_btn($tableName,$id=0,$place=false,$level=0,$status=0,$param=[]){
-    $all_level = 0;
-    if($param['examine']){
-        $all_level = count(explode(",",$param['examine']));
+    // echo $tableName,",",$id,",",$place,",",$level,",",$status,",";
+    // print_r(get_defined_vars()['param']['vars']['data']);exit;
+    
+    if(isset($param['vars']['vars']['data'])){
+        $data = $param['vars']['vars']['data'];  
     }
+    $place = $data['place'] ? $data['place'] : $place;
+    $level = $data['process_level'] ? $data['process_level'] : $level;
+    $status = $data['status'] ? $data['status'] : $status;
+
+    $all_level = 0;
+    $examine = isset($data['examine']) ? $data['examine'] : (isset($param['examine']) ? $param['examine'] : "");
+    // var_dump($examine);
+    if($examine != ""){
+        $all_level = count(explode(",",$examine));
+    }
+    
+    // print_r($param['examine']);exit; 
     $levelStr = ' data-place="'.$place.'" data-level="'.$all_level.'" data-maurl="'.U('Tools/getMoneyAccountList').'"';
     echo '<div class="approve-group" '.$levelStr.' data-table="'.$tableName.'" data-id="'.$id.'" >
         <button type="button" data-url="'.U('Tools/getApproveList').'" class="btn btn-xs bg-black approve-log">记录</button> ';

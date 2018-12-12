@@ -615,7 +615,7 @@ class CostController extends BaseController{
     function expenseControl(){
         $reqType=I('reqType');
         $this->assign("controlName","expense");
-        $this->assign("tableName",$this->expenseSubCom->tableName());
+        $this->assign("tableName",$this->expenseCom->tableName());
         $this->assign('accountType',$this->accountType);
         $this->assign('projectArr',$this->Com ->get_option("cost_relation_project"));
         $this->assign('expTypeArr',$this->Com ->get_option("expense_type"));
@@ -647,7 +647,7 @@ class CostController extends BaseController{
             $resultData=$this->expenseCom->redis_one($redisName,"id",$id);
         }
         if($resultData){
-            $resultData["tableData"] = [];
+            $resultData["list"] = [];
             $subExpRes = $this->expenseSubCom->getList(["where"=>["parent_id"=>$id],"fields"=>"*,FROM_UNIXTIME(happen_date,'%Y-%m-%d') happen_date",'joins'=>["LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct ON ct.ctid = city","LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='".$this->expenseSubCom->tableName()."' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id","LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",]])["list"];
             // echo $this->expenseSubCom->M()->_sql();exit;
             foreach ($subExpRes as $key => $subInfo) {
@@ -670,7 +670,6 @@ class CostController extends BaseController{
         $this->assign("tableName",$this->expenseCom->tableName());
         $where=[];
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
-            // print_r(session('userId'));
             $where['user_id'] = session('userId');
         }
         foreach (['project_name'] as $key ) {
@@ -722,52 +721,31 @@ class CostController extends BaseController{
                     $data[$key] = $datas[$key];
                 } 
             }
-            // if(isset($datas['status'])){
-                // $parameter=[
-                //     'where'=>["id"=>$datas['id']],
-                // ];
-                // $result=$this->purchaCom->getList($parameter,true);
-                // $data = $this->status_update($result,$datas["status"],$data);
-            // }
             return ["where"=>$where,"data"=>$data];
         }
         return "";
     }
     function expenseAdd(){
-        $datas=I("data");
-        $project_id=I("project_id");
-        $leader=I("leader");
+        // $datas=I("data");
+        // $project_id=I("project_id");
+        // $leader=I("leader");
+        extract($_POST);
+
         
-        $expInfo = [
-            "project_id"=>$project_id,
-            "user_id"=>session("userId"),
-            "add_time"=>time(),
-        ];
-        //添加时必备数据
-        $examines = getComponent('Process')->getExamine(I("vtabId"),$leader);
-        // print_r($examines);
-        // exit;
-        // $process = $this->nodeCom->getProcess(I("vtabId"));
-        // $expInfo['process_id'] = $process["processId"];
+        $expInfo = $data;
+        unset($expInfo['id']);
+        unset($expInfo['list']);
+        unset($expInfo['leader']);
+        $expInfo['user_id'] = session("userId");
+        $expInfo['add_time'] = time();
+        $examines = getComponent('Process')->getExamine(I("vtabId"),$data['leader']);
         $expInfo['process_id'] = $examines["process_id"];
-        // $expInfo['examine'] = $examines["examine"];
         $expInfo['examine'] = getComponent('Process')->filterExamine(session('roleId'),$examines['examine']);
-        if($expInfo["project_id"]>0){ 
-            //检查成本预算是否超支
-            $this->projectCom->checkCost($expInfo["project_id"],array_sum(array_column($datas["expense-list"],'money')));
-            //存在项目，则第一个审批的人是项目主管,examine需要
-            // $userRole = $this->userCom->getUserInfo($leader);
-            // $expInfo['examine'] = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"]))) ;
-            // unset($expInfo['leader']);
-        }else{
-            // $expInfo['examine'] = $process["examine"];
-        }
-        //如果是审批者自己提交的执行下列代码
         $roleId = session("roleId");
-        // $examineArr = explode(",",$expInfo['examine']);
-        // $rolePlace = search_last_key($roleId,$examineArr);
         $rolePlace = $examines['place'];
         $expInfo['status'] = 0;
+        $num = count($data["list"]);
+        $insertNum = 0;
         if($rolePlace!==false){
             $expInfo['process_level']=$rolePlace+2;
             if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
@@ -778,39 +756,127 @@ class CostController extends BaseController{
         }else{
             $expInfo['process_level']=$process["place"] > 0 ? $process["place"] : 1;
         }
+        $this->expenseCom->startTrans();
+        $this->expenseSubCom->startTrans();
+
+        $insertResult = $this->expenseCom->insert($expInfo);
+        // print_r($debitData);
+        if(isset($insertResult->errCode) && $insertResult->errCode==0){
+            $subData = [
+                'parent_id' => $insertResult->data,
+                'add_time' => time(),
+            ];
+            foreach ($data["list"] as $subInfo) {
+                $subData = array_merge($subData,$subInfo);
+                $subData['happen_date'] = strtotime($subData['happen_date']);
+                $inresult = $this->expenseSubCom->insert($subData);
+                if($inresult){
+                    $insertNum++;
+                }
+            }
+        }
+        if($num > 0 && $num == $insertNum){
+
+            $this->expenseCom->commit();
+            $this->expenseSubCom->commit();
+       
+            $addData = [
+                'examine'=>$expInfo["examine"],
+                'title'=>session('userName')."申请了报销",
+                'desc'=>"<div class='gray'>".date("Y年m月d日",time())."</div> <div class='normal'>".session('userName')."申请报销，@你了，点击进入审批吧！</div>",
+                'url'=>C('qiye_url')."/Admin/Index/Main.html?action=Cost/expenseControl",
+                'tableName'=>$this->expenseCom->tableName(),
+                'tableId'=>$insertResult->data,
+            ];
+            $this->add_push($addData);
+
+            $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+        }else{
+            $this->expenseCom->rollback();
+            $this->expenseSubCom->rollback();
+            $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+        }
+        
+        //添加时必备数据
+        
+        // print_r($examines);
+        // exit;
+        // $process = $this->nodeCom->getProcess(I("vtabId"));
+        // $expInfo['process_id'] = $process["processId"];
+        
+        // $expInfo['examine'] = $examines["examine"];
+        
+        // if($expInfo["project_id"]>0){
+            //检查成本预算是否超支
+            // $this->projectCom->checkCost($expInfo["project_id"],array_sum(array_column($datas["expense-list"],'money')));
+            //存在项目，则第一个审批的人是项目主管,examine需要
+            // $userRole = $this->userCom->getUserInfo($leader);
+            // $expInfo['examine'] = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"]))) ;
+            // unset($expInfo['leader']);
+        // }else{
+            // $expInfo['examine'] = $process["examine"];
+        // }
+        //如果是审批者自己提交的执行下列代码
+        // $roleId = session("roleId");
+        // // $examineArr = explode(",",$expInfo['examine']);
+        // // $rolePlace = search_last_key($roleId,$examineArr);
+        // $rolePlace = $examines['place'];
+        // $expInfo['status'] = 0;
+        // if($rolePlace!==false){
+        //     $expInfo['process_level']=$rolePlace+2;
+        //     if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
+        //         $expInfo['status'] = 1;
+        //     }else{
+        //         $expInfo['status'] = 2;
+        //     }
+        // }else{
+        //     $expInfo['process_level']=$process["place"] > 0 ? $process["place"] : 1;
+        // }
         
         // $expInfo['process_level']=$process["place"];
 
-        $isInsert = false;
+        // $isInsert = false;
         // print_r($expInfo);
         // $dataInfo = $this->expenseManage($datas["expense-list"][0]);
         // print_r($dataInfo);
         // exit;
-        $insertRes = $this->expenseCom->insert($expInfo);
-        if($insertRes->errCode==0){
-            foreach ($datas["expense-list"] as $subExpInfo) {
-                $dataInfo = $this->expenseManage($subExpInfo);
-                $dataInfo["parent_id"] = $insertRes->data;
-                $dataInfo["examine"] = $expInfo['examine'];
-                $dataInfo["status"] = $expInfo['status'];
-                $dataInfo['process_level'] = $expInfo["process_level"];
-                if($dataInfo){
-                    $insertResult=$this->expenseSubCom->insert($dataInfo); 
-                    $this->ApprLogCom->createApp($this->expenseSubCom->tableName(),$insertResult->data,session("userId"),"");
-                    $isInsert = true;
-                }
-            }
-            if($isInsert){
-                $touser = $this->userCom->getQiyeId(explode(',',$examines["examine"])[0],true);
-                if(!empty($touser)){
-                    $desc = "<div class='gray'>".date("Y年m月d日",time())."</div> <div class='normal'>".session('userName')."申请报销，@你了，点击进入审批吧！</div>";
-                    $url = C('qiye_url')."/Admin/Index/Main.html?action=Cost/expenseControl";
-                    $msgResult = $this->QiyeCom-> textcard($touser,session('userName')."申请了报销",$desc,$url);
-                }
-                $this->ajaxReturn(['errCode'=>0,'error'=>"添加成功"]);
-            }
-        }
-        $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+        // $insertRes = $this->expenseCom->insert($expInfo);
+        // if($insertRes->errCode==0){
+        //     foreach ($datas["expense-list"] as $subExpInfo) {
+        //         $dataInfo = $this->expenseManage($subExpInfo);
+        //         $dataInfo["parent_id"] = $insertRes->data;
+        //         $dataInfo["examine"] = $expInfo['examine'];
+        //         $dataInfo["status"] = $expInfo['status'];
+        //         $dataInfo['process_level'] = $expInfo["process_level"];
+        //         if($dataInfo){
+        //             $insertResult=$this->expenseSubCom->insert($dataInfo); 
+        //             // $this->ApprLogCom->createApp($this->expenseSubCom->tableName(),$insertResult->data,session("userId"),"");
+        //             $isInsert = true;
+        //         }
+        //     }
+        //     if($isInsert){
+        //         // $touser = $this->userCom->getQiyeId(explode(',',$examines["examine"])[0],true);
+
+        //         // if(!empty($touser)){
+        //         //     $desc = "<div class='gray'>".date("Y年m月d日",time())."</div> <div class='normal'>".session('userName')."申请报销，@你了，点击进入审批吧！</div>";
+        //         //     $url = C('qiye_url')."/Admin/Index/Main.html?action=Cost/expenseControl";
+        //         //     $msgResult = $this->QiyeCom-> textcard($touser,session('userName')."申请了报销",$desc,$url);
+        //         // }
+
+        //         $addData = [
+        //             'examine'=>$examines["examine"],
+        //             'title'=>session('userName')."申请了报销",
+        //             'desc'=>"<div class='gray'>".date("Y年m月d日",time())."</div> <div class='normal'>".session('userName')."申请报销，@你了，点击进入审批吧！</div>",
+        //             'url'=>C('qiye_url')."/Admin/Index/Main.html?action=Cost/expenseControl",
+        //             'tableName'=>$this->expenseCom->tableName(),
+        //             'tableId'=>$insertRes->data,
+        //         ];
+        //         $this->add_push($addData);
+
+        //         $this->ajaxReturn(['errCode'=>0,'error'=>"添加成功"]);
+        //     }
+        // }
+        // $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
     }
     function expenseEdit(){
         $datas=I("data");
@@ -882,7 +948,7 @@ class CostController extends BaseController{
     function fin_expenseControl(){
         $reqType=I('reqType');
         $this->assign("controlName","fin_expense");
-        $this->assign("tableName",$this->expenseSubCom->tableName());
+        $this->assign("tableName",$this->expenseCom->tableName());
         $this->assign('projectArr',$this->Com ->get_option("cost_relation_project"));
         $this->assign('userArr',$this->Com ->get_option("create_user"));
         $this->assign('accountType',$this->accountType);
@@ -921,7 +987,7 @@ class CostController extends BaseController{
         $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
-            'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_date",
+            'fields'=>"*,FROM_UNIXTIME(add_time,'%Y-%m-%d') add_date,FIND_IN_SET({$roleId},examine) place",
             'page'=>$p,
             'pageSize'=>$pageSize,
             'orderStr'=>"id DESC",
@@ -932,6 +998,7 @@ class CostController extends BaseController{
                 "LEFT JOIN (SELECT userId ,userName business_name FROM v_user) bu ON bu.userId = p.business",
                 "LEFT JOIN (SELECT userId ,userName leader_name FROM v_user) lu ON lu.userId = p.leader",
                 "LEFT JOIN (SELECT parent_id,count(*) all_item, SUM(money) all_money FROM v_expense_sub GROUP BY parent_id ) c ON parent_id = id",
+                "LEFT JOIN (SELECT section section_id, flag FROM v_project_cost ) pc ON pc.section_id = section ",
             ],
         ];
         
@@ -948,6 +1015,7 @@ class CostController extends BaseController{
         $id = I("id");
         $roleId = session('roleId');
         $nodeId = getTabId(I("vtabId"));
+       
         $this->assign("provinceArr",$this->basicCom->get_provinces());
         $option='<option value="0">费用类别</option>';
         foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
@@ -979,6 +1047,7 @@ class CostController extends BaseController{
             }
             $resultData["tableData"]["expense-list"] = ["list"=>$subExpRes,"template"=>$this->fetch('Cost/costTable/expenseLi')];
         }
+        $this->assign("tableName",$this->expenseCom->tableName());
         $modalPara=[
             "data"=>$resultData,
             "title"=>$title,
@@ -1000,4 +1069,19 @@ class CostController extends BaseController{
         $this->ajaxReturn(['html'=>$html]);
     }
     //财务报销管理结束
+
+    function getNoDebitOne(){
+        extract($_GET);
+        $no_debit = 0.00;
+        $param = [
+            'fields' => 'SUM(debit_money) no_debit',
+            'where' => ['clear_status'=>0,'section'=>$section, 'project_id'=>$project_id,'user_id'=>session('userId')],
+            'one' => true
+        ];
+        $result = $this->debitCom->getOne($param)['no_debit'];
+        if($result){
+            $no_debit = $result;
+        }
+        $this->ajaxReturn(['data'=>$result]);
+    }
 }
