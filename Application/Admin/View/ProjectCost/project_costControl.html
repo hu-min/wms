@@ -74,7 +74,7 @@
                         <thead>
                             <tr>
                                 <th class="is-frozen">项目名称</th>
-                                <th class="hidden-xs hidden-sm is-frozen">项目编号</th>
+                                <th >项目编号</th>
                                 <th>报价批次</th>
                                 <th>报价标识</th>
                                 <th>报价者</th>
@@ -296,9 +296,15 @@
                 datas["status"] = 10;
             }
             datas["data"] = {};
-            datas["data"]['project_id'] = $(tabId+" .global-modal").find(".modal-info[name='project_id']").val()
+            datas["data"]['project_id'] = $(tabId+" .global-modal").find(".modal-info[name='project_id']").val();
             datas["data"]['tax_rate'] = $(tabId+" .global-modal").find(".modal-info[name='tax_rate']").val();
-            datas["data"]['flag'] = $(tabId+" .global-modal").find(".modal-info[name='flag']").val()
+            datas["data"]['flag'] = $(tabId+" .global-modal").find(".modal-info[name='flag']").val();
+            var flag_required = $(tabId+" .global-modal").find(".modal-info[name='flag']").attr("required");
+            if(flag_required && (datas["data"]['flag']=="" || datas["data"]['flag'] ==0)){
+                notice(110,"请输入成本唯一标识","输入异常");
+                throw "请输入成本唯一标识";
+            }
+            
             datas["data"]['total'] = $(tabId+" .global-modal").find(".all-count").text();
             datas["data"]['cost_total'] = $(tabId+" .global-modal").find(".cost-all-count").text();
             datas["data"]['id'] = $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val();

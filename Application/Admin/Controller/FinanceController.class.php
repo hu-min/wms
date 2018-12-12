@@ -548,7 +548,7 @@ class FinanceController extends BaseController{
                 'where'=>['id'=>$id],
                 "joins"=>[
                     'LEFT JOIN (SELECT id s_id , read_type s_read_type , parent_id s_parent_id , class_sort s_class_sort , cost_class s_cost_class , class_sub s_class_sub , class_notes s_class_notes , classify s_classify , sort s_sort , item_content s_item_content , num s_num , unit s_unit , price s_price , act_num s_act_num , act_unit s_act_unit , total s_total , cost_price s_cost_price ,SUM(cost_total) s_cost_total , profit s_profit , profit_ratio s_profit_ratio , remark s_remark , ouser_id s_ouser_id , cuser_id s_cuser_id , add_time s_add_time , update_time s_update_time , status s_status , scompany_id s_scompany_id , scompany_cid s_scompany_cid,COUNT(id) item_num FROM v_project_cost_sub WHERE scompany_id > 0 GROUP BY parent_id,scompany_cid) pcs ON pcs.s_parent_id = cost_id AND pcs.s_scompany_id = supplier_id',
-                    'LEFT JOIN (SELECT id pcid,project_id FROM v_project_cost ) pc ON pc.pcid = cost_id',
+                    'LEFT JOIN (SELECT id pcid,project_id,flag,section FROM v_project_cost ) pc ON pc.pcid = cost_id',
                     'LEFT JOIN (SELECT projectId,code project_code,name project_name,FROM_UNIXTIME(project_time,"%Y-%m-%d") project_date,DATE_ADD(FROM_UNIXTIME(project_time,"%Y-%m-%d"),INTERVAL days day) end_date,leader FROM v_project ) p ON p.projectId = pc.project_id',
                     "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
                     'LEFT JOIN (SELECT companyId company_id,company supplier_com_name,supr_type,module,provinceId,cityId FROM v_supplier_company ) sc ON sc.company_id = pcs.s_scompany_id',
@@ -556,7 +556,7 @@ class FinanceController extends BaseController{
                     "LEFT JOIN (SELECT basicId type_id,name type_name FROM v_basic WHERE class = 'supType' ) t ON t.type_id = sc.supr_type",
                     "LEFT JOIN (SELECT pid ,province province_name FROM v_province) pr ON pr.pid=sc.provinceId",
                     "LEFT JOIN (SELECT cid,city city_name,pid FROM v_city) ci ON ci.cid=sc.cityId",
-                    "LEFT JOIN (SELECT project_id f_project_id,supplier_id f_supplier_id,SUM(money) f_money FROM v_float_capital_log WHERE log_type = 1 AND float_type = 2 AND supplier_id > 0  GROUP BY project_id,supplier_id) f ON f.f_project_id = pc.project_id AND f.f_supplier_id = supplier_id"
+                    "LEFT JOIN (SELECT project_id f_project_id,supplier_id f_supplier_id,SUM(money) f_money,section f_section FROM v_float_capital_log WHERE  float_type = 2 AND supplier_id > 0  GROUP BY project_id,supplier_id) f ON f.f_project_id = pc.project_id AND f.f_supplier_id = supplier_id AND f.f_section = pc.section"
                     // 'LEFT JOIN (SELECT id wid , cost_id,supplier_id,contract_file FROM v_wouldpay) w ON w.cost_id = pcs.s_parent_id AND w.supplier_id = pcs.s_scompany_id',
                 ],
             ];
@@ -578,7 +578,7 @@ class FinanceController extends BaseController{
             $resultData["tableData"]["suprpay-list"] = ["list"=>$this->payCom->getList(["where"=>["purcha_id"=>$id,"insert_type"=>1],"fields"=>"*,FROM_UNIXTIME(pay_date,'%Y-%m-%d') pay_date"])["list"]];
 
             //  GROUP BY project_id,supplier_id) f ON f.f_project_id = pc.project_id AND f.f_supplier_id = supplier_id
-            $resultData["tableData"]["suprpaid-list"] = ["list"=>$this->flCapLogCom->getList(["where"=>["log_type"=>1,"float_type"=>2,'supplier_id'=>['gt',0],'project_id'=>$resultData['project_id'],'supplier_id'=>$resultData['supplier_id']],"fields"=>"money,FROM_UNIXTIME(happen_time,'%Y-%m-%d') happen_time,proof"])["list"]];
+            $resultData["tableData"]["suprpaid-list"] = ["list"=>$this->flCapLogCom->getList(["where"=>["float_type"=>2,'supplier_id'=>['gt',0],'project_id'=>$resultData['project_id'],'supplier_id'=>$resultData['supplier_id'],'section'=>$resultData['section']],"fields"=>"money,FROM_UNIXTIME(happen_time,'%Y-%m-%d') happen_time,proof"])["list"]];
             
             $resultData["tableData"]["invoice-list"] = ["list"=>$this->InvoiceCom->getList(["where"=>["relation_id"=>$id,"relation_type"=>1],"fields"=>"*,FROM_UNIXTIME(invoice_date,'%Y-%m-%d') invoice_date"])["list"]];
         }
@@ -680,11 +680,11 @@ class FinanceController extends BaseController{
             'pageSize'=>$pageSize,
             'orderStr'=>"id DESC",
             'joins' => [
-                'LEFT JOIN (SELECT id pcid,project_id FROM v_project_cost ) pc ON pc.pcid = cost_id',
+                'LEFT JOIN (SELECT id pcid,project_id,flag,section FROM v_project_cost ) pc ON pc.pcid = cost_id',
                 'LEFT JOIN (SELECT companyId company_id,company supplier_name,supr_type,module,provinceId,cityId FROM v_supplier_company ) sc ON sc.company_id = supplier_id',
                 'LEFT JOIN (SELECT projectId,code project_code,name project_name,FROM_UNIXTIME(project_time,"%Y-%m-%d") project_date,DATE_ADD(FROM_UNIXTIME(project_time,"%Y-%m-%d"),INTERVAL days day) end_date,leader FROM v_project ) p ON p.projectId = pc.project_id',
                 "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
-                "LEFT JOIN (SELECT project_id f_project_id,supplier_id f_supplier_id,SUM(money) f_money FROM v_float_capital_log WHERE log_type = 1 AND float_type = 2 AND supplier_id > 0  GROUP BY project_id,supplier_id) f ON f.f_project_id = pc.project_id AND f.f_supplier_id = supplier_id"
+                "LEFT JOIN (SELECT project_id f_project_id,supplier_id f_supplier_id,SUM(money) f_money,section f_section FROM v_float_capital_log WHERE float_type = 2 AND supplier_id > 0  GROUP BY project_id,supplier_id) f ON f.f_project_id = pc.project_id AND f.f_supplier_id = supplier_id AND f.f_section = pc.section"
             ],
         ];
         $listResult = $this->wouldpayCom->getList($parameter);
@@ -1802,5 +1802,21 @@ class FinanceController extends BaseController{
         // print_r($Info );
         $updateResult=$this->flCapLogCom->update($Info);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+    }
+
+    function getSectionList(){
+        extract($_REQUEST);
+        $param = [
+            'where' => ['project_id'=>$project_id,'scompany_id'=>$supplier_id],
+            'fields'=>"id,project_id,section,flag,scompany_id",
+            'groupBy' => 'project_id,section ',
+            'isCount' =>false,
+            'joins'=>[
+                'RIGHT JOIN (SELECT parent_id,scompany_id FROM v_project_cost_sub WHERE scompany_id > 0) pcs ON pcs.parent_id = id'
+            ]
+        ];
+        $secionResult = $this->pCostCom->getList($param);
+        $data = $secionResult['list'] ? $secionResult['list'] : [];
+        $this->ajaxReturn(["data" => $data]);
     }
 }

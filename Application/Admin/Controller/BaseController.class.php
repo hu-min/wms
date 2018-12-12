@@ -855,7 +855,7 @@ class BaseController extends \Common\Controller\BaseController{
      * @Author: vition 
      * @Date: 2018-12-09 16:08:22 
      * @Desc: 添加数据的时候推送公共方法 
-     * add_push(['examine','title','desc','url','tableName','tableId'])
+     * add_push(['examine','title','desc','url','tableName','tableId','nowhite','noappr])
      */    
     function add_push($param){
         //检查下一个审批者是否存在白名单中，和当前用户判断，如果当前用户在白名单中，指定用户未在白名单中将不会发送信息
@@ -868,8 +868,13 @@ class BaseController extends \Common\Controller\BaseController{
                 break;
             }
         }
+        $nowhite = isset($param['nowhite']) ? false : true; // 默认判断白名单
+        $noappr = isset($param['noappr']) ? false : true; //默认发送审批记录
+        $limitWhite = false;
+        if($nowhite){
+            $limitWhite = $this->whiteCom->limitWhite(session('roleId'),$touserRoleId,true);
+        }
         
-        $limitWhite = $this->whiteCom->limitWhite(session('roleId'),$touserRoleId,true);
         $title = $param['title'];
         $desc = $param['desc'];
         $url = $param['url'];
@@ -882,6 +887,9 @@ class BaseController extends \Common\Controller\BaseController{
                 $msgResult = $this->QiyeCom-> textcard($touser,$title,$desc,$url);
             }
         }
-        $this->ApprLogCom->createApp($tableName,$tableId,session("userId"),"");
+        if($noappr){
+            $this->ApprLogCom->createApp($tableName,$tableId,session("userId"),"");
+        }
+        
     }
 }

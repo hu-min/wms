@@ -256,10 +256,10 @@ class IndexController extends BaseController{
         $projectCom=getComponent('Project');
         $page=I("p")?I("p"):1;
         $param=[
-            "where" => ["project_id"=>"0",'stage'=>["gt","0"]],
+            "where" => ["project_id"=>"0",'stage'=>["gt","0"],'status'=>1],
             'page'=>$page,
-            "fields" => "count(projectId) num,stage,stage_name",
-            'pageSize' => 5,
+            "fields" => "count(stage) num,stage,stage_name",
+            'pageSize' => 9999999999,
             'orderStr' => "addTime DESC",
             'groupBy' => 'stage',
             'joins' =>[

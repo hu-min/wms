@@ -133,17 +133,29 @@
         </div>
     </div>
     <script>
-        var user_initInfo =function(){
+        var user_initInfo =function(gettype){
+            if(gettype=="Add"){
+                $(tabId+" .global-modal input[name='qiye_sync']").prop("disabled",true);
+            }
+            
             upload({url:"{:U('Project/upload_filesAdd')}"})
             init_date();
         }
         $(function(){
             $(tabId+" .search-list").trigger("click");
-            $(tabId).on("click",".modal-info[name='qiye_sync']",function(){
+            $(tabId).on("click",".global-modal .modal-info[name='qiye_sync']",function(){
                 if($(this).is(":checked")){
-                    $(tabId+" .modal-info[name='phone']").prop('required',true)
+                    $(tabId+" .global-modal .modal-info[name='phone']").prop('required',true)
                 }else{
-                    $(tabId+" .modal-info[name='phone']").prop('required',false)
+                    $(tabId+" .global-modal .modal-info[name='phone']").prop('required',false)
+                }
+            })
+            $(tabId).on("change",".global-modal .modal-info[name='qiye_id']",function(){
+                var qiye_id = $(this).val()
+                if(qiye_id.length==10){
+                    $(tabId+" .global-modal input[name='qiye_sync']").prop("disabled",false);
+                }else{
+                    $(tabId+" .global-modal input[name='qiye_sync']").prop("disabled",true);
                 }
             })
         })
@@ -166,25 +178,27 @@
         /*设置编辑用户信息*/
         function user_setInfo(info){
             ['userId','loginName','userName','avatar','phone','birthday','id_card','email','bank_name','bank_card','wechat','alipay','qiye_id'].forEach(element => {
-                $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
+                $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
                 if(element=='qiye_id' && info[element]!=""){
-                    $(tabId+" .modal-info[name='"+element+"']").prop("disabled",true);
+                    $(tabId+" .global-modal .modal-info[name='"+element+"']").prop("disabled",true);
+                }else if (element=='qiye_id' && info[element]==""){
+                    $(tabId+" .global-modal input[name='qiye_sync']").prop("disabled",true);
                 }
             });
    
-            $(tabId+" .modal-info[name='phone']").val(info['phone']);
-            $(tabId+" .modal-info[name='password']").val('');
-            $(tabId+" .modal-info[name='password']").removeAttr("required")
-            $(tabId+" .modal-info[name='gender']").find("option[value='"+info['gender']+"']").prop("selected",true);
-            // $(tabId+" .modal-info[name='userType']").find("option[value='"+info['userType']+"']").prop("selected",true);
+            $(tabId+" .global-modal .modal-info[name='phone']").val(info['phone']);
+            $(tabId+" .global-modal .modal-info[name='password']").val('');
+            $(tabId+" .global-modal .modal-info[name='password']").removeAttr("required")
+            $(tabId+" .global-modal .modal-info[name='gender']").find("option[value='"+info['gender']+"']").prop("selected",true);
+            // $(tabId+" .global-modal .modal-info[name='userType']").find("option[value='"+info['userType']+"']").prop("selected",true);
 
-            $(tabId+" .modal-info[name='roleId']").find("option[value='"+info['roleId']+"']").prop("selected",true);
+            $(tabId+" .global-modal .modal-info[name='roleId']").find("option[value='"+info['roleId']+"']").prop("selected",true);
             set_status_btn($(tabId+" .modal-status .status-btn[name='"+info['status']+"']"))
         }
         /*用户信息*/
         // function userInfoFuns(){
         //     datas.data={}
-        //     $(tabId+" .modal-info").each(function(){
+        //     $(tabId+" .global-modal .modal-info").each(function(){
         //         var name=$(this).attr("name");
         //         var val=$(this).val();
         //         if(name=="avatar" || name=="phone" || name=='password' || name=="userId"){                    

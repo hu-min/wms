@@ -79,6 +79,7 @@
                             <tr>
                                 <th class="hidden-xs hidden-sm is-frozen">项目名称</th>
                                 <th class="hidden-xs hidden-sm is-frozen">项目编号</th>
+                                <th>成本标识</th>
                                 <th>供应商名称</th>
                                 <th>采购项</th>
                                 <th>合同支付总额</th>
@@ -137,7 +138,7 @@
             wouldpay_template['suprpay-list'] = info['getSuprpayLiItem'];
             wouldpay_template['invoice-list'] = info['suprInvoiceLiItem'];
             wouldpay_template['suprpaid-list'] = info['suprpaidItem'];
-            ['id','project_code','project_name','project_date','end_date','leader_name','supplier_com_name','type_name','supplier_cont_name','supplier_cont_phone','supplier_cont_email','pay_grade','supplier_com_region','modules','contract_file','contract_money','sign_date','finance_id','remark'].forEach(key=>{
+            ['id','project_code','project_name','project_date','end_date','leader_name','supplier_com_name','type_name','supplier_cont_name','supplier_cont_phone','supplier_cont_email','pay_grade','supplier_com_region','modules','contract_file','contract_money','sign_date','finance_id','remark','flag'].forEach(key=>{
                 if(key == 'supplier_com_region' && info['city_name']){
                     info[key] = info['province_name'] + "-" + info['city_name']
                 }

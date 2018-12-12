@@ -305,7 +305,7 @@ function save_btn($defind_vars,$always=false,$hide=false){
     $url = $defind_vars["url"];
     $noModal = $defind_vars["noModal"] ? "" : "data-modal='true'";
     // echo $item["user_id"],$gettype,$processAuth['level'];
-    if((($item["author"] == $userId || $item["user_id"] == $userId) && in_array($item['status'],[0,3])) || ($gettype == "Add" && $processAuth['level'] > 0) || $always || $nodeAuth >= 7){
+    if((($item["author"] == $userId || $item["user_id"] == $userId) && in_array($item['status'],[0,3])) || ($gettype == "Add" && $processAuth['level'] > 0) || $always || $nodeAuth >= 7 || ($defind_vars['data']['status'] == 1 && isset($defind_vars['data']['business']) && $defind_vars['data']['business'] == $defind_vars["userId"])){
         echo "<button type='button' class='btn btn-sm btn-primary save-info' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>{$btnTitle}</button>";
     }elseif($hide){
         echo "<button type='button' class='btn btn-sm btn-primary save-info none' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>{$btnTitle}</button>";

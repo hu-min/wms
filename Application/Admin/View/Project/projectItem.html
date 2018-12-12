@@ -333,6 +333,9 @@
             }else if(info['place']==0){
                 $(tabId+" .global-modal").find(".approve-group .approve-con").remove();
             }
+            if(info['status'] == 1 && info['business'] == "{$Think.session.userId}"){
+                $(tabId+" .global-modal").find(".modal-info[name='stage']").prop("disabled",false);
+            }
         }
         function get_project_code(id){
             

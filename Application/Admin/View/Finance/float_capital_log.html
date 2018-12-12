@@ -142,8 +142,13 @@
                 }
                 projectChosen.find("option[value='"+project_id+"']").prop("selected",true);
                 projectChosen.trigger("chosen:updated");
+                
+                $(tabId+" .global-modal .modal-info[name='supplier_id']").val(info['supplier_id'])
+                $(tabId+" .global-modal .modal-info[name='supplier_id']").trigger("change");
+                $(tabId+" .global-modal .modal-info[name='section']").val(info['section'])
+
             }
-            ['id',"account_id",'log_type','float_type','project_code','happen_time','object','money','inner_detail','bank_detail','remark','proof'].forEach(element => {
+            ['id',"account_id",'log_type','float_type','project_code','happen_time','object','money','inner_detail','bank_detail','remark','proof',].forEach(element => {
                 if(info[element]!=null){
                     $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
                 }
@@ -157,6 +162,24 @@
             }
             if(info['log_type'] == 1){
                 $(tabId+" .global-modal").find(".bank-form").removeClass("none");
+            }
+        }
+        var get_section = function(){
+            var project_id = $(tabId+" .global-modal").find(".modal-info[name='project_id']").val();
+            var supplier_id = $(tabId+" .global-modal").find(".modal-info[name='supplier_id']").val();
+            if(project_id > 0 && supplier_id > 0){
+                datas = {}
+                datas["reqType"] = "getSectionList"
+                datas["project_id"] = project_id
+                datas["supplier_id"] = supplier_id
+                get("{$url}",datas,function(result){
+                    var option = '<option></option>'
+                    result.data.forEach(element => {
+                        option += '<option value="'+element.section+'">'+element.flag+'</option>'
+                    });
+                    $(tabId+" .global-modal").find(".modal-info[name='section']").html(option);
+                    $(tabId+" .global-modal").find(".modal-info[name='section']").trigger("chosen:updated")
+                },false)
             }
         }
         $(function(){
@@ -186,6 +209,9 @@
                         $(tabId+" .global-modal").find(".bank-form").addClass("none");
                     }
                 }
+            })
+            $(tabId+" .global-modal").on("change",".modal-info[name='project_id'],.modal-info[name='supplier_id']",function(){
+                get_section();
             })
         })
     </script>

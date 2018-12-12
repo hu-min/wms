@@ -353,6 +353,7 @@ class CostController extends BaseController{
             $this->debitCom->commit();
             $this->debitSubCom->commit();
             $this->pCostSubCom->commit();
+            $this->ApprLogCom->updateStatus($this->debitCom->tableName(),$debitData["where"]["id"]);
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
         }else{
             $this->debitCom->rollback();

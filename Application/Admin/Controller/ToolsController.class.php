@@ -112,22 +112,7 @@ class ToolsController extends BaseController{
         // vtabId:#vtabs57
         
         $db = M($table,NULL);
-        //这里判断下财务资金库存的数据
-        if(in_array($table,C('finan_table'))){
-            $this->moneyAccCom=getComponent('MoneyAccount');
-            $param = [
-                'fields'=>'cash_stock',
-                'where' => ['id'=>$monacc_id],
-                'one' => true,
-            ];
-            $MAresult = $this->moneyAccCom->getOne($param);
-
-            $debitResult = $db ->field("*")->where([$db->getPk()=>$id])->join("LEFT JOIN (SELECT projectId, code project_code,name project_name FROM v_project ) p ON p.projectId = project_id ")->join('LEFT JOIN (SELECT userId,userName user_name FROM v_user) u ON u.userId = author')->find();
-            if($debitResult['debit_money']>$MAresult['cash_stock']){
-                $this->ajaxReturn(['errCode'=>100,'error'=>'当前现金库存金额不足【'.$MAresult['cash_stock'].'元】，无法操作']);
-            }
-            $debit_money = $debitResult['debit_money'];
-        }
+        
    
         $tableId = $tableId ? $tableId : $id;
         $this->approveCom=getComponent('ApproveLog');
@@ -165,6 +150,24 @@ class ToolsController extends BaseController{
             if($place < count($examine) && $status==1){
                 $state = 2;//v_expense_sub 项状态，
             }
+            //这里判断下财务资金库存的数据
+            if(in_array($table,C('finan_table')) && $state == 1){
+                $this->moneyAccCom=getComponent('MoneyAccount');
+                $param = [
+                    'fields'=>'cash_stock',
+                    'where' => ['id'=>$monacc_id],
+                    'one' => true,
+                ];
+                $MAresult = $this->moneyAccCom->getOne($param);
+
+                $debitResult = $db ->field("*")->where([$db->getPk()=>$id])->join("LEFT JOIN (SELECT projectId, code project_code,name project_name FROM v_project ) p ON p.projectId = project_id ")->join('LEFT JOIN (SELECT userId,userName user_name FROM v_user) u ON u.userId = author')->find();
+                if($debitResult['debit_money']>$MAresult['cash_stock']){
+                    $this->approveCom->rollback();
+                    $this->ajaxReturn(['errCode'=>100,'error'=>'当前现金库存金额不足【'.$MAresult['cash_stock'].'元】，无法操作']);
+                }
+                $debit_money = $debitResult['debit_money'];
+            }
+
             // //4,更新$table 表的状态
             $dbData = ["status"=>$state];
             if(isset($file) && $file["file"]!=""){

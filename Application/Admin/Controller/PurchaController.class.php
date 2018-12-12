@@ -480,11 +480,11 @@ class PurchaController extends BaseController{
             'pageSize'=>$pageSize,
             'orderStr'=>"id DESC",
             'joins' => [
-                'LEFT JOIN (SELECT id pcid,project_id FROM v_project_cost ) pc ON pc.pcid = cost_id',
+                'LEFT JOIN (SELECT id pcid,project_id,flag,section FROM v_project_cost ) pc ON pc.pcid = cost_id',
                 'LEFT JOIN (SELECT companyId company_id,company supplier_name,supr_type,module,provinceId,cityId FROM v_supplier_company ) sc ON sc.company_id = supplier_id',
                 'LEFT JOIN (SELECT projectId,code project_code,name project_name,FROM_UNIXTIME(project_time,"%Y-%m-%d") project_date,DATE_ADD(FROM_UNIXTIME(project_time,"%Y-%m-%d"),INTERVAL days day) end_date,leader FROM v_project ) p ON p.projectId = pc.project_id',
                 "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
-                "LEFT JOIN (SELECT project_id f_project_id,supplier_id f_supplier_id,SUM(money) f_money FROM v_float_capital_log WHERE log_type = 1 AND float_type = 2 AND supplier_id > 0  GROUP BY project_id,supplier_id) f ON f.f_project_id = pc.project_id AND f.f_supplier_id = supplier_id"
+                "LEFT JOIN (SELECT project_id f_project_id,supplier_id f_supplier_id,SUM(money) f_money,section f_section FROM v_float_capital_log WHERE float_type = 2 AND supplier_id > 0  GROUP BY project_id,supplier_id) f ON f.f_project_id = pc.project_id AND f.f_supplier_id = supplier_id AND f.f_section = pc.section"
             ],
         ];
         $listResult = $this->wouldpayCom->getList($parameter);
@@ -535,7 +535,7 @@ class PurchaController extends BaseController{
                 'where'=>['id'=>$id],
                 "joins"=>[
                     'LEFT JOIN (SELECT id s_id , read_type s_read_type , parent_id s_parent_id , class_sort s_class_sort , cost_class s_cost_class , class_sub s_class_sub , class_notes s_class_notes , classify s_classify , sort s_sort , item_content s_item_content , num s_num , unit s_unit , price s_price , act_num s_act_num , act_unit s_act_unit , total s_total , cost_price s_cost_price ,SUM(cost_total) s_cost_total , profit s_profit , profit_ratio s_profit_ratio , remark s_remark , ouser_id s_ouser_id , cuser_id s_cuser_id , add_time s_add_time , update_time s_update_time , status s_status , scompany_id s_scompany_id , scompany_cid s_scompany_cid,COUNT(id) item_num FROM v_project_cost_sub WHERE scompany_id > 0 GROUP BY parent_id,scompany_cid) pcs ON pcs.s_parent_id = cost_id AND pcs.s_scompany_id = supplier_id',
-                    'LEFT JOIN (SELECT id pcid,project_id FROM v_project_cost ) pc ON pc.pcid = cost_id',
+                    'LEFT JOIN (SELECT id pcid,project_id,flag FROM v_project_cost ) pc ON pc.pcid = cost_id',
                     'LEFT JOIN (SELECT projectId,code project_code,name project_name,FROM_UNIXTIME(project_time,"%Y-%m-%d") project_date,DATE_ADD(FROM_UNIXTIME(project_time,"%Y-%m-%d"),INTERVAL days day) end_date,leader FROM v_project ) p ON p.projectId = pc.project_id',
                     "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = p.leader",
                     'LEFT JOIN (SELECT companyId company_id,company supplier_com_name,supr_type,module,provinceId,cityId FROM v_supplier_company ) sc ON sc.company_id = pcs.s_scompany_id',

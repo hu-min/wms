@@ -400,7 +400,7 @@ class ProjectCostController extends BaseController{
         return "";
     }
     //添加报价
-    function project_offerAdd(){
+    function project_offerAdd($type="offer"){
         // exit;
         extract($_POST);
         $isInsert = false;
@@ -418,11 +418,13 @@ class ProjectCostController extends BaseController{
         }else{
             $pOfferData['section'] = 1;
         }
-        $pOfferData['project_id'] = $data['project_id'];
-        $pOfferData['total'] = $data['total'];
-        $pOfferData['flag'] = $data['flag'];
-        $pOfferData['tax_rate'] = $data['tax_rate'];
+        foreach (['project_id', 'total', 'flag', 'tax_rate'] as $key) {
+            if(isset($data[$key])){
+                $pOfferData[$key] = $data[$key];
+            }
+        }
         $pOfferData['ouser_id'] = session('userId');
+ 
         $pOfferData['add_time'] = time();
         $examines = getComponent('Process')->getExamine($vtabId,$pResult['leader']);
         $pOfferData['process_id'] = $examines["process_id"];
@@ -444,6 +446,10 @@ class ProjectCostController extends BaseController{
         $this->pCostCom->startTrans();
         // $pOfferData['status'] = $status ? $status : $pOfferData['status'];
         $pInsertResult = $this->pCostCom->insert($pOfferData);
+        if($type=="cost" && isset($pInsertResult->errCode) && $pInsertResult->errCode==0){
+            $this->pCostCom->commit();
+            return $pInsertResult->data;
+        }
         if(isset($pInsertResult->errCode) && $pInsertResult->errCode==0){
             $this->pCostSubCom->startTrans();
             $parent_id = $pInsertResult->data;//
@@ -463,6 +469,17 @@ class ProjectCostController extends BaseController{
             }
             if($isInsert){
                 $this->ApprLogCom->createApp($this->pCostCom->tableName(),$parent_id,session("userId"),"");
+                // $addData = [
+                //     'examine'=>$pOfferData['examine'],
+                //     'title'=>session('userName')."添加了项目报价",
+                //     'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."添加了项目报价，@你了，点击进入围观吧！</div>",
+                //     'url'=>C('qiye_url')."/Admin/Index/Main.html?action=ProjectCost/project_offer",
+                //     'tableName'=>$this->pCostCom->tableName(),
+                //     'tableId'=>$parent_id,
+                //     'nowhite'=>"nowhite",
+                // ];
+                // $this->add_push($addData);
+
                 $this->pCostCom->commit();
                 $this->pCostSubCom->commit();
             }
@@ -474,7 +491,6 @@ class ProjectCostController extends BaseController{
     //报价编辑
     function project_offerEdit(){
         extract($_POST);
-        // print_r($data['list']);exit;
         $this->pCostCom->startTrans();
         
         $pOfferData = [
@@ -532,10 +548,10 @@ class ProjectCostController extends BaseController{
         $this->project_offer_modalOne('cost','查看/编辑成本');
     }
     function pcost_controlAdd(){
-        extract($_POST);
-        print_r($data);
+        $_POST['data']['id'] = $this->project_offerAdd('cost');
+        $this->pcost_controlEdit(true);
     }
-    function pcost_controlEdit(){
+    function pcost_controlEdit($insert = false){
         extract($_POST);
         // print_r($data['list']);
         $this->pCostCom->startTrans();
@@ -592,8 +608,23 @@ class ProjectCostController extends BaseController{
             }
         }
         // exit;
+        $this->ApprLogCom->updateStatus($this->pCostCom->tableName(),$data['id']);
         $this->pCostCom->commit();
         $this->pCostSubCom->commit();
+        $addData = [
+            'examine'=>$pOfferData['data']['examine'],
+            'title'=>session('userName')."添加了项目报价成本",
+            'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."添加了项目报价成本，@你了，点击进入审批吧！</div>",
+            'url'=>C('qiye_url')."/Admin/Index/Main.html?action=ProjectCost/project_costContrast",
+            'tableName'=>$this->pCostCom->tableName(),
+            'tableId'=>$parent_id,
+            'nowhite' => 'nowhite',
+        ];
+        if(!$insert){
+            $addData['noappr'] = 'noappr';
+        }
+        $this->add_push($addData);
+
         $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
     }
     /** 

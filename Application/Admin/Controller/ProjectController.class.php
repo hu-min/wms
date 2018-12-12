@@ -680,9 +680,17 @@ class ProjectController extends BaseController{
         }else if($reqType=="projectEdit"){
             $where=["projectId"=>$datas['projectId']];
             $data=[];
-
+            $redit = true;
+            $keyArray = ['project_id','amount','bid_date','contract','bid_time','bidding','brand','city','code','create_time','author','customer_com','customer_cont','customer_other','days','earlier_user','execute_sub','execute','field','is_bid','business','leader','name','project_time','project_id','projectType','province','scene_user','session_all','type','session_cur','stage','status','cost_budget'];
+            if($datas["status"]==1){
+                $projectResult =$this->projectCom->getOne(['where'=>$where,"one"=>true,"fields"=>'business,status']);
+                if($projectResult['business'] == session('userId') && $projectResult['status'] = 1){
+                    $keyArray = ['stage'];
+                    $redit = false;
+                }
+            }
             $data['updateUser']=session('userId');
-            foreach (['project_id','amount','bid_date','contract','bid_time','bidding','brand','city','code','create_time','author','customer_com','customer_cont','customer_other','days','earlier_user','execute_sub','execute','field','is_bid','business','leader','name','project_time','project_id','projectType','province','scene_user','session_all','type','session_cur','stage','status','cost_budget'] as  $key) {
+            foreach ( $keyArray as  $key) {
                 if(isset($datas[$key])){
                     $data[$key]=$datas[$key];
                 }
@@ -697,7 +705,7 @@ class ProjectController extends BaseController{
             }
             $data['upateTime']=time();
             
-            return ["where"=>$where,"data"=>$data];
+            return ["where"=>$where,"data"=>$data,"redit"=>$redit];
         }
         return "";
     }
@@ -749,7 +757,7 @@ class ProjectController extends BaseController{
     function projectEdit(){
         $projectInfo=$this->manageProjectInfo();
         $updateResult=$this->projectCom->updateProject($projectInfo);
-        if(isset($updateResult->errCode) && $updateResult->errCode == 0){
+        if(isset($updateResult->errCode) && $updateResult->errCode == 0 && $projectInfo['redit']){
             $this->ApprLogCom->updateStatus($this->projectCom->tableName(),$projectInfo["where"]["projectId"]);
         }
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
