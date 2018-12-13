@@ -125,7 +125,7 @@
         }
         function expense_setInfo(info){
             var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
-            ["project_id","code","project_name","project_date","business_name","leader_name",'leader',"money","city",'account'].forEach(element=>{
+            ["project_id","code","project_name","project_date","business_name","leader_name",'leader',"money","city",'account','invoice_money'].forEach(element=>{
                 if(element == "project_id" && info[element] > 0 ){
                     var projectChosen= $(tabId+" .global-modal .project-info[name='project_id']");
                     var project_id = info["project_id"];
@@ -226,11 +226,18 @@
         var expense_getInfo = function (){
             datas["data"] = {};
             var gettype = $(tabId+" .global-modal .modal-footer .save-info").data("gettype");
-            ['id','project_id','section','money','account_type','leader','account'].forEach(key => {
+            ['id','project_id','section','money','account_type','leader','account','invoice_money'].forEach(key => {
                 var required = $(tabId+" .global-modal").find(".common-info[name='"+key+"']").attr("required");
                 var title = $(tabId+" .global-modal").find(".common-info[name='"+key+"']").attr("title");
                 var val = $(tabId+" .global-modal").find(".common-info[name='"+key+"']").val()
-                datas["data"][key] = val
+                if(required && (val== "" || val== 0) && in_array(key,['section','account_type'])){
+                    notice(110,title,"输入异常");
+                    throw title;
+                }else{
+                    datas["data"][key] = val;
+                }
+                
+
                 if(key == "section" && datas["data"]['section'] <= 0 && datas["data"]['project_id'] > 0){
                     notice(110,'项目报销请选择成本标识',"输入异常");
                     throw '项目报销请选择成本标识';
@@ -245,7 +252,7 @@
                     var required = $(this).find(".modal-info[name='"+key+"']").attr("required");
                     var title = $(this).find(".modal-info[name='"+key+"']").attr("title");
              
-                    if(required && (val== "" && val== 0)){
+                    if(required && (val== "" || val== 0)){
                         notice(110,title,"输入异常");
                         throw title;
                     }else{
@@ -270,7 +277,7 @@
                 notice(110,"没有数据啊！","输入异常");
                 throw "没有数据啊！";
             }
-            console.log(datas);
+            // console.log(datas);
             // var expense_id = $(tabId+" .expense-id[name='id']").val();
             // var status = $(tabId+" .modal-info[name='status']").val();
             // var project_id = $(tabId+" .modal-info[name='project_id']").val();
@@ -317,6 +324,7 @@
                     self.find(".modal-info[name='money']").val(float_format(result.data.limit_money))
                 }
                 sum_expense_money();
+                sum_invoice_money();
             })
         }
         var sum_expense_money = function(){
@@ -325,6 +333,20 @@
                 all_money += float($(this).val());
             })
             $(tabId+" .global-modal").find(".common-info[name='money']").val(float_format(all_money));
+        }
+        var sum_invoice_money = function(){
+            var all_invoice_money = 0;
+            $(tabId+" .global-modal").find(".modal-info[name='invoice_money']").each(function(){
+                var money = $(this).parents("tr").find(".modal-info[name='money']").val();
+                var invoice_money = $(this).val();
+                if(float(invoice_money) > 0 && float(invoice_money) > float(money)){
+                    $(this).val(money)
+                    invoice_money = money
+                }
+                
+                all_invoice_money += float(invoice_money);
+            })
+            $(tabId+" .global-modal").find(".common-info[name='invoice_money']").val(float_format(all_invoice_money));
         }
         $(function(){
             $(tabId+" .search-list").trigger("click");
@@ -382,13 +404,17 @@
             $(tabId+" .global-modal").offon("input",".modal-info[name='money']",function(){
                 sum_expense_money();
             })
+            $(tabId+" .global-modal").offon("input",".modal-info[name='invoice_money']",function(){
+                sum_invoice_money();
+            })
             $(tabId+" .global-modal").offon("change",".modal-info[name='city'],.modal-info[name='fee_type'],.modal-info[name='money']",function(){
                 feeLimit($(this).parents("tr"))
             })
             $(tabId+" .global-modal").offon("change",".modal-info[name='account_type']",function(){
                 var accKey = $(this).val();
                 var accounts = JSON.parse('{$accounts}')
-                $(this).parents("tr").find(".modal-info[name='account']").val(accounts[accKey]);
+            
+                $(tabId+" .global-modal").find(".common-info[name='account']").val(accounts[accKey]);
             })
             $(tabId+" .global-modal").offon("change",".modal-info[name='section']",function(){
                 var section = $(this).val()
@@ -402,7 +428,6 @@
                         if(result.data){
                             $(tabId+" .global-modal").find(".project-info[name='no_debit']").val(result.data);
                         }
-                        
                     })
                 }
             })

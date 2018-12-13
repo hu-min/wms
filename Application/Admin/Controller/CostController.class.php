@@ -639,7 +639,7 @@ class CostController extends BaseController{
             $option.=A("Basic")->getfeeType($value,0);
         }
         $this->assign("pidoption",$option);
-
+        
         if($gettype=="Edit"){
             $title = "编辑报销";
             $btnTitle = "保存数据";

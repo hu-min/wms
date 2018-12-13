@@ -139,7 +139,7 @@
         function fin_expense_setInfo(info){
             // console.log(info);throw 'a';
             var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
-            ["project_id","code","project_name","project_date","business_name","leader_name",'leader',"money","city",'account'].forEach(element=>{
+            ["project_id","code","project_name","project_date","business_name","leader_name",'leader',"money","city",'account','invoice_money'].forEach(element=>{
                 if(element == "project_id" && info[element] > 0 ){
                     var projectChosen= $(tabId+" .global-modal .project-info[name='project_id']");
                     var project_id = info["project_id"];

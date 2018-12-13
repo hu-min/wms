@@ -941,6 +941,7 @@ class FinanceController extends BaseController{
             $this->returnHtml();
         }
     }
+    
     function getReckonList($return=false){
         $sql="SELECT p.project_id project_id,CASE WHEN ISNULL(vp.name) THEN '非项目' ELSE vp.name END `name` ,CASE WHEN ISNULL(vp.code) THEN '非项目' ELSE vp.code END `code`,SUM(debit_money) debit_money,COUNT(debit_money) debit_num,SUM(money) expense_money,COUNT(money) expense_num,SUM(invoice_money) invoice_money,GROUP_CONCAT(did) debit_ids,GROUP_CONCAT(eid) expense_ids,leader FROM (SELECT project_id FROM v_debit WHERE `status`=1 AND user_id=".session("userId")." AND clear_status = 0 UNION SELECT project_id FROM v_expense_sub RIGHT JOIN (SELECT id exId,project_id FROM v_expense WHERE `status`=1 AND user_id=".session("userId").") m1 ON m1.exId=parent_id WHERE clear_status = 0) p LEFT JOIN (SELECT project_id,debit_money,id did FROM v_debit WHERE `status`=1 AND user_id=".session("userId")." AND clear_status = 0) d ON d.project_id=p.project_id LEFT JOIN (SELECT project_id,parent_id,money,invoice_money,id eid FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id FROM v_expense WHERE `status`=1 AND user_id=".session("userId").") m ON m.exId=parent_id WHERE clear_status = 0) e ON e.project_id=p.project_id LEFT JOIN (SELECT projectId,name,code,leader FROM v_project) vp ON vp.projectId=p.project_id GROUP BY p.project_id";
         // echo $sql;exit;
