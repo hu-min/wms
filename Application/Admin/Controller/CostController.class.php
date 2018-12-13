@@ -158,7 +158,7 @@ class CostController extends BaseController{
                 'one'=>true,
                 'joins'=>[
                     "LEFT JOIN (SELECT projectId,name project_name FROM v_project ) p ON p.projectId = project_id ",
-                    "LEFT JOIN (SELECT section section_id, flag FROM v_project_cost ) pc ON pc.section_id = section ",
+                    "LEFT JOIN (SELECT project_id p_project_id ,section section_id, flag FROM v_project_cost ) pc ON pc.section_id = section AND pc.p_project_id = project_id",
                 ],
             ];
             $resultData=$this->debitCom->getOne($param);
@@ -998,12 +998,13 @@ class CostController extends BaseController{
                 "LEFT JOIN (SELECT userId ,userName business_name FROM v_user) bu ON bu.userId = p.business",
                 "LEFT JOIN (SELECT userId ,userName leader_name FROM v_user) lu ON lu.userId = p.leader",
                 "LEFT JOIN (SELECT parent_id,count(*) all_item, SUM(money) all_money FROM v_expense_sub GROUP BY parent_id ) c ON parent_id = id",
-                "LEFT JOIN (SELECT section section_id, flag FROM v_project_cost ) pc ON pc.section_id = section ",
+                "LEFT JOIN (SELECT project_id p_project_id, section section_id, flag FROM v_project_cost ) pc ON pc.section_id = section AND pc.p_project_id = project_id",
             ],
         ];
         
         //"LEFT JOIN (SELECT GROUP_CONCAT(table_id ORDER BY add_time DESC) aid ,GROUP_CONCAT(status ORDER BY add_time DESC) last_status FROM v_approve_log WHERE table_name = '".$this->expenseSubCom->tableName()."' GROUP BY table_id) al ON al.aid = id",
         $listResult=$this->expenseCom->getList($parameter);
+        // echo $this->expenseCom->M()->_sql();exit;
         // print_r($listResult);exit;
         $this->tablePage($listResult,'Cost/costTable/fin_expenseList',"fin_expenseList",$pageSize);
     }
