@@ -3,6 +3,7 @@
         <td>{$key+1}<button type="button" class="close supr-remove"><span>×</span></button></td>
         <td>{$item.name}</td>
         <td>{$item.code|pcode_format}</td>
+        <td>{$item.flag}</td>
         <td class="modal-info" name="debit_num" >{$item.debit_num|default=0}</td>
         <td class="modal-info" name="debit_money" >{$item.debit_money|default=0}</td>
         <td class="modal-info" name="expense_num" >{$item.expense_num|default=0}</td>

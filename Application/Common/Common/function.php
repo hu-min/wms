@@ -272,9 +272,10 @@ function modal_btn($defind_vars,$status=false){
 function approve_btn($tableName,$id=0,$place=false,$level=0,$status=0,$param=[]){
     // echo $tableName,",",$id,",",$place,",",$level,",",$status,",";
     // print_r(get_defined_vars()['param']['vars']['data']);exit;
-    
+    // print_r($param);
     if(isset($param['vars']['vars']['data'])){
-        $data = $param['vars']['vars']['data'];  
+        $data = $param['vars']['vars']['data'];
+        
     }
     $place = $data['place'] ? $data['place'] : $place;
     $level = $data['process_level'] ? $data['process_level'] : $level;
@@ -446,7 +447,7 @@ function pcode_format($project_code){
     if(count($pnameArr) > 1){
         return '<div>'.$pnameArr[0].'</div><div>'.$pnameArr[1].'</div>';
     }
-    return $pnameArr ;
+    return $project_code ;
 }
 /** 
  * @Author: vition 
