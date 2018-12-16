@@ -31,8 +31,8 @@ class BaseController extends \Common\Controller\BaseController{
         parent::_initialize();
         $nowConAct=MODULE_NAME."/".CONTROLLER_NAME.'/'.ACTION_NAME;
         $this->configCom=getComponent('Config');
-
-        $locks = $this->configCom->get_val("web_lock");
+        $locks = $this->configCom->is_web_lock();
+        //  $this->redisCom->delAll();//测试redis 缓存的时候可以使用删除清空redis
         // print_r($locks);
         if(isset($locks['value']) && $locks['value'] != session('web_lock_password') && strtolower($nowConAct) !="admin/index/lock"){
             if(IS_AJAX){
@@ -45,6 +45,19 @@ class BaseController extends \Common\Controller\BaseController{
                 $this->redirect('Index/Login');
             }
         }
+        // $UGID = sha1(com_create_guid());
+        // $UGIDREDIS = $this->redisCom->rget("request_".$UGID);
+        // if($UGIDREDIS){
+            
+        //     $test = $test + 1 ;
+        //     $this->redisCom->rset("test",$test);
+        //     $this->log($test);
+        //     $this->redirect('Index/Login');
+        // }else{
+        //     $UGIDATA = ['lastime'=>time(),'request'=>0];
+        //     $this->redisCom->rset("request_".$UGID,$UGIDATA,1800);
+        // }
+        
         $this->userCom=getComponent('User');
         $this->Com=getComponent('Common'); // 公共调用的控件
         $this->LogCom=getComponent('Log');
@@ -54,7 +67,7 @@ class BaseController extends \Common\Controller\BaseController{
         $this->nodeAuth=session('nodeAuth');
         $this->basicCom=getComponent('Basic');
         $this->resetCom=getComponent('ResetApply');
-        $this->redisCom=getComponent('Redis');
+        // $this->redisCom=getComponent('Redis');
         $this->QiyeCom=getComponent('Qiye');
         $this->whiteCom=getComponent('White');
         $this->exemption=[//排除的控制器
@@ -115,7 +128,7 @@ class BaseController extends \Common\Controller\BaseController{
             // print_r($conAct);exit;
             if(!$auth){
                 // echo $conAct;
-                if($this->isLogin() && (in_array(ucfirst(CONTROLLER_NAME),["Tools","Public"]) || $conAct == "Index/home")){
+                if($this->isLogin() && (in_array(ucfirst(CONTROLLER_NAME),["Tools","Public",'Wap']) || $conAct == "Index/home")){
 
                 }else{
                     $this->prompt(1,'警告!','您不具备访问此页面的权限，如果您认为值得拥有，请联系管理员！');
@@ -135,43 +148,14 @@ class BaseController extends \Common\Controller\BaseController{
             $this->assign('statusType',$this->statusType);
             $this->assign('statusTypeJ',json_encode($this->statusType));
             $this->assign('statusLabel',$this->statusLabel);
-            $this->assign('entries',[30,35,40,45,50]);
+            $this->assign('entries',[15,30,35,40,45,50]);
             // $nodeId = getTabId(I("vtabId"));
             $this->nodeId = getTabId(I("vtabId"));
             // $this->assign('processType',$this->processType);
             // $this->assign('processTypeJ',json_encode($this->processType));
             
             $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
-            $this->assign("pageId",$this->createId());
-            //临时处理程序，处理所有图片的缩图
-            // $fileList=[];
-            // getFiles('Uploads',$fileList);
-            // $image = new Image();
-            // foreach ($fileList as $file) {
-            //     preg_match("/[\S]+\_thumb\.[\S]+$/",$file,$match);
-            //     if(empty($match)){
-            //         preg_match_all("/([^\/]+)\.([\S]+)$/",$file,$match2);
-            //         if(in_array($match2[2][0],["jpeg","jpg","png","gif"])){
-            //             $newAvatar = preg_replace("/([^\/]+)\.[\S]+$/",$match2[1][0]."_thumb.".$match2[2][0],$file);
-            //             if(PHP_OS=="WINNT"){
-            //                 $file = iconv("utf-8","gbk",$file);
-            //                 $newAvatar = iconv("utf-8","gbk",$newAvatar);
-            //             }
-            //             if(!file_exists($newAvatar)){
-            //                 $image->open($file);
-            //                 $width = $image->width();
-            //                 $height = $image->height();
-            //                 if($width>250){
-            //                     $height = (250/$width)*$height;
-            //                     $width = 250;
-            //                 }
-            //                 $image->thumb( $width, $height);
-            //                 $image->save($newAvatar);
-            //             }
-            //         }
-            //     }
-            // }
-            //处理所有图片缩图结束            
+            $this->assign("pageId",$this->createId());      
         }
         // exit;
     }
@@ -254,7 +238,7 @@ class BaseController extends \Common\Controller\BaseController{
             cookie('identify',null);
             session(null);
             $this->redisCom->offline(session('userId'));
-            $this->clearRedis('config_web_lock');
+            $this->redisCom->delAll("",'config_web_lock');
             $this->redirect('Index/Login');
 
         }elseif(!session('userId')){
@@ -580,7 +564,12 @@ class BaseController extends \Common\Controller\BaseController{
             $returnData["page"]="";
             $returnData["count"]="";
         }
-        $this->ajaxReturn($returnData);
+        if(isset($config['return']) && $config['return']){
+            return $returnData;
+        }else{
+            $this->ajaxReturn($returnData);
+        }
+        
     }
     /** 
      * @Author: vition 
@@ -694,7 +683,6 @@ class BaseController extends \Common\Controller\BaseController{
         // }
     }
     function getOptionList(){
-        // $this->AProject=A("Project");
         $key=I("key");
         $type=I("type");
         $this->ajaxReturn(["data"=>$this->Com->get_option($type,$key)]);
@@ -875,14 +863,15 @@ class BaseController extends \Common\Controller\BaseController{
         if($nowhite){
             $limitWhite = $this->whiteCom->limitWhite(session('roleId'),$touserRoleId,true);
         }
-        
         $title = $param['title'];
         $desc = $param['desc'];
         $url = $param['url'];
         $tableName = $param['tableName'];
         $tableId = $param['tableId'];
+
         if(!$limitWhite){
-            $touser = $this->userCom->getQiyeId($touserRoleId,true);
+            $touserWeixin = array_unique($touserRoleId);
+            $touser = $this->userCom->getQiyeId($touserWeixin,true);
             
             if(!empty($touser)){
                 $msgResult = $this->QiyeCom-> textcard($touser,$title,$desc,$url);
@@ -890,6 +879,17 @@ class BaseController extends \Common\Controller\BaseController{
         }
         if($noappr){
             $this->ApprLogCom->createApp($tableName,$tableId,session("userId"),"");
+            if($touserRoleIds[0] == $roleId){
+                $parameter=[
+                    "table_name" => $tableName,
+                    "table_id" => $tableId,
+                    "add_time" => time(),
+                    "user_id" => session("userId"),
+                    "status" => 1, //审批流程里的状态是实际状态
+                    "remark" => '审批者(角色)与申请者(角色)一致自动审批',
+                ];
+                $this->ApprLogCom->insert($parameter);
+            }
         }
         
     }

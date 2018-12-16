@@ -28,7 +28,9 @@ class ToolsController extends BaseController{
     function getApproveList(){
         extract($_REQUEST);
         $this->approveCom=getComponent('ApproveLog');
-        
+        if(!$id){
+            $this->ajaxReturn(['errCode'=>115,'error'=>getError(115)."；id不存在哦！"]);
+        }
         $nodeId = getTabId($vtabId);
         $processResult = $this->nodeCom->getOne(["fields"=>"processIds,processOption","where"=>["nodeId"=> $nodeId],"joins"=>["LEFT JOIN (SELECT processId,processOption FROM v_process) p ON p.processId = processIds"] ]);
         $allProcess = 1;
@@ -59,6 +61,7 @@ class ToolsController extends BaseController{
         if(in_array($examineRes["status"],[3,5])){
             $nextExamine = "已".$this->statusType[$examineRes["status"]];
         }else{
+
             if(($examineRes["process_level"]-1)==$allProcess || $examineRes["status"] ==1 ){
                 $nextExamine = "已完成";
             }else{
@@ -71,10 +74,44 @@ class ToolsController extends BaseController{
                 if($nextRoleId==session("roleId")){
                     $nextExamine = "说的就是你啊！";
                 }else{
-                    $userRole = $this->userCom->getUserInfo(0,$nextRoleId);
-                    $nextExamine = $userRole["userName"]."【{$userRole['roleName']}】";
+
+                    $nextExamine = '';
+                    $process_level = $examineRes["process_level"] - 1;
+                    do {
+                        $userParam = [
+                            'fields' => 'roleId,userName,roleName',
+                            'where' => ['roleId'=>$nextRoleId,'status'=>1],
+                            'joins' => [
+                                'LEFT JOIN (SELECT roleId role_id,roleName FROM v_role WHERE status = 1) r ON r.role_id = roleId'
+                            ]
+                        ];
+                        $userResult = $this->userCom->getList($userParam);
+                        $process_level ++ ;
+                        $nextRoleId = $examine[$process_level];
+                        
+                    } while ($process_level < $allProcess && !$userResult);
+        
+                    if($userResult){
+                        if($userResult['count']>1){
+                            foreach ($userResult['list'] as $userInfo) {
+                                $nextExamine .= $userInfo["userName"]."、";
+                            }
+                            $nextExamine = rtrim($nextExamine,"、");
+                            $nextExamine ="【{$userInfo['roleName']}】".$nextExamine;
+                        }else{
+                            if($userResult['list'][0]["roleId"] == session("roleId")){
+                                $nextExamine = "说的就是你啊！";
+                            }else{
+                                $nextExamine = $userResult['list'][0]["userName"]."【".$userResult['list'][0]['roleName']."】";
+                            }
+                            
+                        }
+                        
+                    }else{
+                        $nextExamine = "没有人可以审批";
+                    }
+                    
                 }
-                
             }
         }
         
@@ -82,7 +119,7 @@ class ToolsController extends BaseController{
         if($resultData && !empty($resultData["list"])){
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0),"data"=>$resultData["list"],"allProcess"=>$allProcess,"nextExamine"=>$nextExamine]);
         }
-        $this->ajaxReturn(['errCode'=>115,'error'=>getError(115),"allProcess"=>$allProcess]);
+        $this->ajaxReturn(['errCode'=>115,'error'=>getError(115)."；可能是系统生成所以无记录","allProcess"=>$allProcess]);
         
     }
     /** 
@@ -94,9 +131,9 @@ class ToolsController extends BaseController{
         extract($_POST);
         $this->nodeCom=getComponent('Node');
         if($table=="v_expense_sub"){
-            $tableInfo = $this->nodeCom->getOne(['db_table'=>"v_expense","nodeType"=>2]);
+            $tableInfo = $this->nodeCom->getOne(['db_table'=>"v_expense","_string" => "FIND_IN_SET(2,nodeType) > 0"]);
         }else{
-            $tableInfo = $this->nodeCom->getOne(['db_table'=>$table,"nodeType"=>2]);
+            $tableInfo = $this->nodeCom->getOne(['db_table'=>$table,"_string" => "FIND_IN_SET(2,nodeType) > 0"]);
         }
         if(!$tableInfo){
             $this->ajaxReturn(['errCode'=>100,'error'=>'当前数据表异常，请联系管理员']);
@@ -130,28 +167,109 @@ class ToolsController extends BaseController{
             "user_id" => $userId,
             "status" => $status, //审批流程里的状态是实际状态
             "remark" => $remark,
+            'effect' => 1,
         ];
+        $hasParam = $parameter;
+        unset($hasParam['add_time']);
+        unset($hasParam['remark']);
         $this->approveCom->M()->startTrans();
+        $hasApp = $this->approveCom->getOne($hasParam);
+        if($hasApp){
+            //防止频繁操作
+            $this->ajaxReturn(['errCode'=>409,'error'=>"您已经审批过了！".getError(409)]);
+        }
         $insertRes = $this->approveCom->insert($parameter);
         if(isset($insertRes->errCode) && $insertRes->errCode==0){
-            $examineRes = $db ->field("process_level,examine")->where([$db->getPk()=>$id])->find();
+            $examineRes = $db ->field("user_id,process_level,examine")->where([$db->getPk()=>$id])->find();
+            $uparam = [
+                'fields' => 'roleId,userName',
+                'where' => ['userId'=>$examineRes['user_id']],
+                'one' => true,
+            ];
+            $authorResult = $this->userCom->getOne($uparam);
+            $authRoleId = $authorResult['roleId'];
+            $authName = $authorResult['userName'];
+
             $examine = explode(",",$examineRes["examine"]);
-            if(array_search($roleId,$examine)!==false){
-                $place = array_search($roleId,$examine)+1;
+            //再查询用的的角色信息
+            $param = [
+                'fields' => 'roleId',
+                'where' => ['roleId'=>['IN',$examine],'status'=>1],
+                'groupBy' => "roleId",
+            ];
+            $userResult = $this->userCom->getList($param);
+            if(isset($userResult['list'])){
+                $roles = array_column($userResult['list'],"roleId");
             }else{
-                $this->ajaxReturn(['errCode'=>100,'error'=>'当前用户不能执行审核']);
+                $this->ajaxReturn(['errCode'=>100,'error'=>'查询用户信息失败']);
             }
+            $place = $examineRes['process_level'];
+            //审批通过才会修改下一级审核数据
+            if($status == 1){
+                if($place <= count($examine)){
+                    if(count($examine) > 0 && count($examine) > count($roles)){
+                        $diffRoles = array_diff($examine,$roles);
+                        for ($place ; $place <= count($examine) ; $place++) { 
+                            if(!in_array($examine[$place],$diffRoles)){
+                                $place ++;
+                                break;
+                            }
+                        }
+                    }else{
+                        $place ++;
+                    }
+                }else{
+                    $this->ajaxReturn(['errCode'=>100,'error'=>'不需要再审核了']);
+                }
+                if($examine[($place-1)] == $authRoleId){
+                    //如果下一个审批者是提交者本身则自动审批
+                    $parameter=[
+                        "table_name" => $table,
+                        "table_id" => $id,
+                        "add_time" => time(),
+                        "user_id" => $examineRes['user_id'],
+                        "status" => $status, //审批流程里的状态是实际状态
+                        "remark" => '审批者(角色)与申请者(角色)一致自动审批',
+                    ];
+                    $insertRes = $this->approveCom->insert($parameter);
+                    
+                    for ($place ; $place <= count($examine) ; $place++) { 
+                        if(!in_array($examine[$place],$diffRoles)){
+                            $place ++;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // if(array_search($roleId,$examine)!==false){
+            //     // $place = array_search($roleId,$examine)+1;
+            //     $place = $examineRes + 1;
+            // }else{
+            //     $this->ajaxReturn(['errCode'=>100,'error'=>'当前用户不能执行审核']);
+            // }
             // //2，根据$vtabId获取当前应用的权限
             // $nodeId = getTabId($vtabId);
             // $process = $this->nodeCom->getProcess($nodeId);
             $state = $status;//v_expense_sub 项状态，
             // //3，当前审批者的位置如果小于总流程数量，且审批值是1
             // $place = $process["place"];
-            if($place < count($examine) && $status==1){
+            if($place <= count($examine) && $status==1){
                 $state = 2;//v_expense_sub 项状态，
             }
+            $authPlace = array_search($authRoleId,$examine);//判断提交者在流程中的位置
+            if(($authPlace+1) == count($examine) && $status == 1 && $place >= $authPlace){
+                $state = 1;
+            }
+            $this->log($examine);
+            $this->log($place);
+            $this->log($state);
             //这里判断下财务资金库存的数据
             if(in_array($table,C('finan_table')) && $state == 1){
+                if($monacc_id <= 0){
+                    $this->approveCom->rollback();
+                    $this->ajaxReturn(['errCode'=>100,'error'=>'没有现金库存id']);
+                }
                 $this->moneyAccCom=getComponent('MoneyAccount');
                 $param = [
                     'fields'=>'cash_stock',
@@ -160,7 +278,7 @@ class ToolsController extends BaseController{
                 ];
                 $MAresult = $this->moneyAccCom->getOne($param);
 
-                $debitResult = $db ->field("*")->where([$db->getPk()=>$id])->join("LEFT JOIN (SELECT projectId, code project_code,name project_name FROM v_project ) p ON p.projectId = project_id ")->join('LEFT JOIN (SELECT userId,userName user_name FROM v_user) u ON u.userId = author')->find();
+                $debitResult = $db ->field("*")->where([$db->getPk()=>$id])->join("LEFT JOIN (SELECT projectId, code project_code,name project_name FROM v_project ) p ON p.projectId = project_id ")->join('LEFT JOIN (SELECT userId,userName user_name FROM v_user) u ON u.userId = user_id')->find();
                 if($debitResult['debit_money']>$MAresult['cash_stock']){
                     $this->approveCom->rollback();
                     $this->ajaxReturn(['errCode'=>100,'error'=>'当前现金库存金额不足【'.$MAresult['cash_stock'].'元】，无法操作']);
@@ -168,8 +286,9 @@ class ToolsController extends BaseController{
                 $debit_money = $debitResult['debit_money'];
             }
 
-            // //4,更新$table 表的状态
-            $dbData = ["status"=>$state];
+            //4,更新$table 表的状态
+            $dbData = ["process_level" => $place,"status" => $state];
+            
             if(isset($file) && $file["file"]!=""){
                 $dbData[$file["key"]] = $file["file"];
                 $hasStatus = $db ->query("SELECT COLUMN_NAME FROM information_schema. COLUMNS WHERE TABLE_NAME = '".$table."' AND COLUMN_NAME = 'loan_date'");
@@ -179,41 +298,42 @@ class ToolsController extends BaseController{
             }
             
             $updateRes = $db ->where([$db->getPk()=>$id])->save($dbData);
-            if($updateRes || $state==2){
+            $this->log($db ->_sql());
+            if($updateRes || $state == 2){
                 $db ->commit();
                 $this->approveCom->M() ->commit();
                 //5，统计 $table 数量
                 
                 //6，统计审批状态为1的审批记录
-                if($table=="v_expense_sub"){
-                    $allItem = $db ->where(["parent_id"=>$tableId])->count();
-                    $approveSql = "SELECT count(*) all_approve FROM v_approve_log WHERE user_id = {$userId} AND table_name = '{$table}' AND  FIND_IN_SET(table_id,(SELECT GROUP_CONCAT(id) FROM {$table} WHERE parent_id = {$tableId})) AND status = 1 AND effect = 1";
-                }else{
+                // if($table=="v_expense_sub"){
+                    // $allItem = $db ->where(["parent_id"=>$tableId])->count();
+                    // $approveSql = "SELECT count(*) all_approve FROM v_approve_log WHERE user_id = {$userId} AND table_name = '{$table}' AND  FIND_IN_SET(table_id,(SELECT GROUP_CONCAT(id) FROM {$table} WHERE parent_id = {$tableId})) AND status = 1 AND effect = 1";
+                // }else{
                     // $allItem = $db ->where([$db->getPk()=>$tableId])->count();
-                    $allItem = 1;
-                    $approveSql = "SELECT count(*) all_approve FROM v_approve_log WHERE user_id = {$userId} AND table_name = '{$table}' AND  table_id = {$tableId} AND status = 1 AND effect = 1";
-                }
-                $approveRes = $this->approveCom->M()->query($approveSql);
-                $allApprove = 0;
- 
-                if($approveRes[0]["all_approve"]){
-                    $allApprove = $approveRes[0]["all_approve"];
-                }
-                if($allItem == $allApprove){
-                    $place ++;
-                    if($table=="v_expense_sub"){
-                        $db->where(["parent_id"=>$tableId])->save(["status"=>$state,"process_level"=>$place]);
-                    }else{
-                        $db->where([$db->getPk()=>$tableId])->save(["status"=>$state,"process_level"=>$place]);
-                    }
-                    
-                }
+                    // $allItem = 1;
+                    // $approveSql = "SELECT count(*) all_approve FROM v_approve_log WHERE user_id = {$userId} AND table_name = '{$table}' AND  table_id = {$tableId} AND status = 1 AND effect = 1";
+                // }
 
-                
-                if($table=="v_expense_sub"){
-                    $mainDb = M("v_expense",NULL);
-                    $mainDb->where([$mainDb->getPk()=>$tableId])->save(["status"=>$state,"process_level"=>$place]);
-                }else if($table=="v_project" && $state==1){
+                // $approveRes = $this->approveCom->M()->query($approveSql);
+                // $allApprove = 0;
+ 
+                // if($approveRes[0]["all_approve"]){
+                    // $allApprove = $approveRes[0]["all_approve"];
+                // }
+                // if($allItem == $allApprove){
+                    // $place ++;
+                    // if($table=="v_expense_sub"){
+                    //     $db->where(["parent_id"=>$tableId])->save(["status"=>$state,"process_level"=>$place]);
+                    // }else{
+                    //     $db->where([$db->getPk()=>$tableId])->save(["status"=>$state,"process_level"=>$place]);
+                    // }
+                // }
+
+                // if($table=="v_expense_sub"){
+                    // $mainDb = M("v_expense",NULL);
+                    // $mainDb->where([$mainDb->getPk()=>$tableId])->save(["status"=>$state,"process_level"=>$place]);
+                // }else 
+                if($table=="v_project" && $state==1){
                     $this->ReceCom=getComponent('Receivable');
                     $this->ReceCom->createOrder($tableId,session('userId'));
                 }else if($table=="v_float_capital_log" && $state==1){
@@ -232,12 +352,12 @@ class ToolsController extends BaseController{
                     ];
                     getComponent('FlCapLog')->flo_cap_logAdd($data,true);
                 }
-                $examineRes = $db ->field("process_level,examine")->where([$db->getPk()=>$id])->find();
+                // $examineRes = $db ->field("process_level,examine")->where([$db->getPk()=>$id])->find();
                                
                 if(isset($examine[$place-1]) && $examine[$place-1] > 0){
                     $touser = $this->userCom->getQiyeId($examine[$place-1],true);
                     if(!empty($touser)){
-                        $desc = "<div class='gray'>".date("Y年m月d日",time())."</div> <div class='normal'>".session('userName')."在【{$title}】中@您审批，点击进入审批吧！</div>";
+                        $desc = "<div class='gray'>".date("Y年m月d日",time())."</div> <div class='normal'>{$authName}在【{$title}】中提交的申请，".session('userName')."已经通过了审批，现在轮到您审批，点击进入审批吧！</div>";
                         $url = C('qiye_url')."/Admin/Index/Main.html?action={$controller}";
                         $msgResult = $this->QiyeCom-> textcard($touser,"【{$title}】审批",$desc,$url);
                     }

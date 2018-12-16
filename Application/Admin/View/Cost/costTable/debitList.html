@@ -7,10 +7,10 @@
                 非项目
             </if>
         </td>
-        <td>{$item['project_name']}</td>
-        <td>{$item['project_date']}</td>
-        <td>{$item['business_name']}</td>
-        <td>{$item['leader_name']}</td>
+        <td>{$item['project_name']|default='非项目'}</td>
+        <td>{$item['project_date']|default='非项目'}</td>
+        <td>{$item['business_name']|default='非项目'}</td>
+        <td>{$item['leader_name']|default='非项目'}</td>
         <td>{$item['debit_date']}</td>
         <td>{$item['require_date']|time_format}</td>
         <td>{$item['free_name']}</td>
@@ -29,7 +29,7 @@
             {$item.approve_name}<if condition="$item['aremark']"> ：{$item.aremark} </if>
         </td>
         <td>
-            {:approve_btn($tableName,$item['id'],0,0)}
+            {:approve_btn($tableName,['item'=>get_defined_vars()['list'][$key]])}
         </td>
         <if condition="$item['project_id'] GT 0">
             {:list_btn(get_defined_vars(),"id",[],false,false,true,'查看',["controlName"=>"pdebit"])}

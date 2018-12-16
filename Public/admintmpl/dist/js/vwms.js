@@ -613,9 +613,10 @@ $(function(){
         if(!$(this).hasClass("disabled") && ($("#approve-log-modal").css("display")=="none" || $("#approve-log-modal").css("display")==undefined)){
             var table = $(this).parents(".approve-group").data("table")
             var id = $(this).parents(".approve-group").data("id")
-            var place = $(this).parents(".approve-group").data("place")
+            var alllevel = $(this).parents(".approve-group").data("alllevel")
             var level = $(this).parents(".approve-group").data("level")
             var maurl = $(this).parents(".approve-group").data("maurl")
+            var place = $(this).parents(".approve-group").data("place")
             var url = $(this).data("url")
             var tableId =  $(tabId+" .global-modal .table-id[name='table-id']").val();
             var indata = {table:table,id:id,tableId:tableId}
@@ -680,7 +681,7 @@ $(function(){
                         }
                         
                     }else if(result.errCode == 115){
-                        $("#"+apl_id+" .modal-body .next-examine").text('系统生成所以无记录')
+                        $("#"+apl_id+" .modal-body .next-examine").text(result.error)
                     }
                 },false)
             }else{
@@ -736,7 +737,7 @@ $(function(){
                 })
             }
             //获取一些财务的东西
-            if(place > 0 && place==level){
+            if(place > 0 && alllevel == level && place == level){
                 if($(this).hasClass("approve-con")){
                     moneyAccount = []
                     $("#approve-log-modal").find(".modal-body .money-account").html("");

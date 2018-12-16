@@ -162,7 +162,7 @@
             if((info['process_level'] > 0 || info['status'] == 1) && "{$nodeAuth}"<7){
                 $(tabId+" .modal-info").prop("disabled",true)
             }
-            if(info['author'] == "{$Think.session.userId}"){
+            if(info['user_id'] == "{$Think.session.userId}"){
                 $(tabId+" .status-btn[name='3']").addClass("none")
             }else{
                 $(tabId+" .status-btn[name='3']").removeClass("none")

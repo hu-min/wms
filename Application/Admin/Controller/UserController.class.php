@@ -479,8 +479,16 @@ class UserController extends BaseController{
     function nodeList(){
         $this->ajaxReturn(["tree"=>$this->getNodeTree()]);
     }
-    function getNodeTree(){
+    function authNodeList(){
+        $this->ajaxReturn(["tree"=>$this->getNodeTree(true)]);
+    }
+    function getNodeTree($is_process=false){
+        $where = ['status'=>1];
+        if($is_process){
+            $where['is_process'] =  1;
+        }
         $parameter=[
+            'where' => $where,
             'page'=>0,
             'pageSize'=>9999,
             'orderStr'=>'level DESC,sort ASC',
@@ -671,15 +679,16 @@ class UserController extends BaseController{
         if(isset($data['status'])){
             $where['status']=$data['status'];
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr' => 'addTime DESC',
         ];
         
         $processResult=$this->processCom->getProcessList($parameter);
-        $this->tablePage($processResult,'User/userTable/processList',"user_processList");
+        $this->tablePage($processResult,'User/userTable/processList',"user_processList",$pageSize);
         // if($processResult){
         //     $pListRed="processList_".session("userId");
         //     $this->Redis->set($pListRed,json_encode($processResult['list']),3600);
@@ -753,12 +762,12 @@ class UserController extends BaseController{
         $datas["processDepict"]=json_encode($datas["Depict"],JSON_UNESCAPED_UNICODE);
         $datas["processOption"]=json_encode($datas["Option"],JSON_UNESCAPED_UNICODE);
         unset($datas["Depict"]);
-        
+        //判断哪些角色没有人员分配，必须是激活状态
         foreach ($datas["Option"] as $key => $value) {
             if($value["type"]==1){
-                $where = ['rolePid'=>["IN",$value['role']]];
+                $where = ['rolePid'=>["IN",$value['role']],'status'=>1];
             }else{
-                $where = ['roleId'=>["IN",$value['role']]];
+                $where = ['roleId'=>["IN",$value['role']],'status'=>1];
             }
             $param = [
                 'where' => $where,
@@ -962,11 +971,12 @@ class UserController extends BaseController{
         // }else{
         //     $where['status']=["lt",3];
         // }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'fields'=>'*,FROM_UNIXTIME(add_time,"%Y-%m-%d %H:%i:%s") add_time',
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"add_time DESC",
             'joins'=>[
                 "LEFT JOIN (SELECT userId,userName user_name,loginName login_name,avatar,roleId role_id FROM v_user) u ON u.userId=user_id",
@@ -974,7 +984,7 @@ class UserController extends BaseController{
             ],
         ];
         $resultData=$whiteCom->getList($parameter);
-        $this->tablePage($resultData,'User/userTable/whiteList',"white_userList");
+        $this->tablePage($resultData,'User/userTable/whiteList',"white_userList",$pageSize);
     }
     function manageWhiteUser(){
         $reqType=I("reqType");

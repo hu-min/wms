@@ -17,6 +17,7 @@ class CommonController extends \Common\Controller\BaseController{
         $this->APurcha = A('Component/Purcha');
         $this->AField = A('Component/Field');
         $this->AMoneyAcc = A('Component/MoneyAccount');
+        $this->AProcess = A('Component/Process');
     }
     /** 
      * @Author: vition 
@@ -106,10 +107,11 @@ class CommonController extends \Common\Controller\BaseController{
                     'groupBy'=>"project_id",
                     'pageSize'=> 99999999,
                     'joins' => [
-                        "RIGHT JOIN (SELECT projectId,name FROM v_project WHERE (FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (author = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 ) ) p ON p.projectId = project_id",
+                        "RIGHT JOIN (SELECT projectId,name FROM v_project WHERE (FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (user_id = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (user_id = {$userId})) AND status =1 ) ) p ON p.projectId = project_id",
                     ],
                 ];
                 $result = $this->AProjectCost->getList($parameter);
+                $this->log($this->AProjectCost->M()->_sql());
                 if($result){
                     return $result["list"];
                 }
@@ -117,7 +119,7 @@ class CommonController extends \Common\Controller\BaseController{
             //员工关联的项目
             case 'relation_project':
                 $where["project_id"]=0;
-                $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (author = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 )";
+                $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (user_id = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (user_id = {$userId})) AND status =1 )";
                 $key_type = "name";
                 if($option['key_type'] == "code"){
                     $key_type = "code";
@@ -177,7 +179,7 @@ class CommonController extends \Common\Controller\BaseController{
                 }
                 break;
             //用户
-            case 'user': case 'create_user': case 'business': case 'leader': case 'earlier_user': case 'scene_user': case 'author' : case 'to_user' :
+            case 'user': case 'create_user': case 'business': case 'leader': case 'earlier_user': case 'scene_user': case 'user_id' : case 'to_user' :
                 if($key!=""){
                     $where["userName"]=["LIKE","%{$key}%"];
                 }
@@ -323,6 +325,22 @@ class CommonController extends \Common\Controller\BaseController{
                 if($result){
                     return $result["list"];
                 }                     
+                break;
+            //获取审批流程
+            case 'get_processes':
+                if ($key!=""){
+                    $where["account"]=["LIKE","%{$key}%"];
+                }
+                $parameter=[
+                    'fields'=>"processId,processName",
+                    'where'=>$where,
+                    'pageSize'=>99999999,
+                    'orderStr'=>"processId DESC",
+                ];
+                $result = $this->AProcess->getList($parameter);
+                if($result){
+                    return $result["list"];
+                }               
                 break;
             default:
                 return [];

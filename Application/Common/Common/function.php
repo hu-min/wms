@@ -217,7 +217,7 @@ function list_btn($defind_vars,$idStr,$inlink=[],$onlycat=false,$onlyState=false
     }
     // if($processAuth['level'] > 1 && ($item['status'] == 0 or  $item['status'] == 2 ) && !$onlycat){
     //     echo "  <button type='button' class='btn btn-success submit-status btn-xs' data-status='1' name='approve' >{$statusType[1]}</button>";
-    //     if($item['author'] != $userId && isset($statusType[3])){
+    //     if($item['user_id'] != $userId && isset($statusType[3])){
     //         echo "  <button type='button' class='btn btn-warning submit-status btn-xs' data-status='3' name='refuse' >{$statusType[3]}</button>";
     //     }
     // }
@@ -248,7 +248,7 @@ function modal_btn($defind_vars,$status=false){
         if($processAuth['level'] > 1 && !in_array($userId,explode(',',$item['examine'])) || $item['status'] == 1 || $nodeAuth>= 7){
             echo "<button type='button' name='1' class='btn btn-success btn-sm status-btn'><i class='fa fa-square text-default'> $statusType[1] </i></button>";
         }
-        // if(isset($statusType[3]) && $item['author']!= $userId && $gettype!="Add" && $item['status']!=1){
+        // if(isset($statusType[3]) && $item['user_id']!= $userId && $gettype!="Add" && $item['status']!=1){
         //     echo "<button type='button' name='3' class='btn btn-warning btn-sm status-btn'><i class='fa fa-square text-default'> {$statusType[3]} </i></button>";
         // }
         if($processAuth['level'] > 1 && ($item['status'] == 0 ||  $item['status'] == 2 ) && !in_array($userId,explode(',',$item['examine'])) || ($nodeAuth>= 7 && $gettype == "Edit") && isset($statusType[3]) && $gettype != "Add"){
@@ -258,7 +258,7 @@ function modal_btn($defind_vars,$status=false){
     // if($processAuth['level'] > 1 && !in_array($userId,explode(',',$item['examine'])) || $item['status'] == 1 || $nodeAuth>= 7){
     //     echo "<button type='button' name='1' class='btn btn-success btn-sm status-btn'><i class='fa fa-square text-default'> $statusType[1] </i></button>";
     // }
-    // if(isset($statusType[3]) && $item['author']!= $userId && $gettype!="Add" && $item['status']!=1){
+    // if(isset($statusType[3]) && $item['user_id']!= $userId && $gettype!="Add" && $item['status']!=1){
     //     echo "<button type='button' name='3' class='btn btn-warning btn-sm status-btn'><i class='fa fa-square text-default'> {$statusType[3]} </i></button>";
     // }
     // if($processAuth['level'] > 1 && ($item['status'] == 0 ||  $item['status'] == 2 ) && !in_array($userId,explode(',',$item['examine'])) || ($nodeAuth>= 7 && $gettype == "Edit") && isset($statusType[3]) && $gettype != "Add"){
@@ -269,17 +269,22 @@ function modal_btn($defind_vars,$status=false){
         echo "  <button type='button' class='btn btn-danger btn-sm status-info' data-status='4' data-reqtype='Del'  >{$statusType[4]}</button>";
     }
 }
-function approve_btn($tableName,$id=0,$place=false,$level=0,$status=0,$param=[]){
+function approve_btn($tableName,$param=[]){
     // echo $tableName,",",$id,",",$place,",",$level,",",$status,",";
     // print_r(get_defined_vars()['param']['vars']['data']);exit;
-    // print_r($param);
+    // print_r($param['vars']);exit;
     if(isset($param['vars']['vars']['data'])){
         $data = $param['vars']['vars']['data'];
-        
+    }elseif(isset($param['item'])){
+        $data = $param['item'];
     }
-    $place = $data['place'] ? $data['place'] : $place;
-    $level = $data['process_level'] ? $data['process_level'] : $level;
-    $status = $data['status'] ? $data['status'] : $status;
+    $tableName = isset($param['vars']['tableName']) ? $param['vars']['tableName'] : $tableName;
+    $idName = isset($param['idName']) ? $param['idName'] : "id";
+    $id = isset($data[$idName])  ? $data[$idName] : $id;
+    $place = isset($data['place']) ? $data['place'] : $place;
+    $level = isset($data['process_level']) ? $data['process_level'] : $level;
+    $status = isset($data['status']) ? $data['status'] : $status;
+    // echo $tableName,",",$id,",",$place,",",$level,",",$status,",";
 
     $all_level = 0;
     $examine = isset($data['examine']) ? $data['examine'] : (isset($param['examine']) ? $param['examine'] : "");
@@ -289,14 +294,14 @@ function approve_btn($tableName,$id=0,$place=false,$level=0,$status=0,$param=[])
     }
     
     // print_r($param['examine']);exit; 
-    $levelStr = ' data-place="'.$place.'" data-level="'.$all_level.'" data-maurl="'.U('Tools/getMoneyAccountList').'"';
+    $levelStr = ' data-place="'.$place.'" data-level="'.$level.'" data-alllevel="'.$all_level.'" data-maurl="'.U('Tools/getMoneyAccountList').'"';
     echo '<div class="approve-group" '.$levelStr.' data-table="'.$tableName.'" data-id="'.$id.'" >
         <button type="button" data-url="'.U('Tools/getApproveList').'" class="btn btn-xs bg-black approve-log">记录</button> ';
     if($place===false || $place > 0){
         $disabled = "";
         
         // if(($place !== false && $level >= $place) || $status == 3){
-        if(( $level > $place) || $status == 3 || $status == 1){
+        if(( $level != $place) || $status == 3 || $status == 1){
             $disabled = "disabled";
         }
         echo '<button type="button" '.$disabled.' data-url="'.U('Tools/approveEdit').'" class="btn btn-xs bg-orange approve-con '.$disabled.'">操作</button>';
@@ -320,17 +325,17 @@ function save_btn($defind_vars,$always=false,$hide=false){
     $url = $defind_vars["url"];
     $noModal = $defind_vars["noModal"] ? "" : "data-modal='true'";
     // echo $item["user_id"],$gettype,$processAuth['level'];
-    if((($item["author"] == $userId || $item["user_id"] == $userId) && in_array($item['status'],[0,3])) || ($gettype == "Add" && $processAuth['level'] > 0) || $always || $nodeAuth >= 7 || ($defind_vars['data']['status'] == 1 && isset($defind_vars['data']['business']) && $defind_vars['data']['business'] == $defind_vars["userId"])){
+    if((($item["user_id"] == $userId || $item["user_id"] == $userId) && in_array($item['status'],[0,3])) || ($gettype == "Add" && $processAuth['level'] > 0) || $always || $nodeAuth >= 7 || ($defind_vars['data']['status'] == 1 && isset($defind_vars['data']['business']) && $defind_vars['data']['business'] == $defind_vars["userId"])){
         echo "<button type='button' class='btn btn-sm btn-primary save-info' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>{$btnTitle}</button>";
     }elseif($hide){
         echo "<button type='button' class='btn btn-sm btn-primary save-info none' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>{$btnTitle}</button>";
     }
     
-    if(($item["author"] == $userId || $item["user_id"] == $userId) && $item['status'] == 1){
+    if(($item["user_id"] == $userId || $item["user_id"] == $userId) && $item['status'] == 1){
         // echo "<button type='button' class='btn btn-sm btn-info reset-info-active' data-con='{$controlName}' data-gettype='reset_apply' data-db='{$tableName}' data-url='{$url}' {$noModal}>重新提审</button>";
     }
     
-    // if((($item["author"] == $userId && $item['status'] == 0) || ($gettype == "Add" && $processAuth['level'] > 0) || (($processAuth['level'] -1) == $item["process_level"] && $item["process_level"] > 0))  || $nodeAuth>= 7){
+    // if((($item["user_id"] == $userId && $item['status'] == 0) || ($gettype == "Add" && $processAuth['level'] > 0) || (($processAuth['level'] -1) == $item["process_level"] && $item["process_level"] > 0))  || $nodeAuth>= 7){
     //     echo "<button type='button' class='btn btn-primary save-info' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>{$btnTitle}</button>";
     // }
 }

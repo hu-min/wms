@@ -216,23 +216,13 @@ class PublicController extends BaseController{
                     # code...
                     break;
             }
-            //添加时必备数据 ($vtabId=false,$leader=0,$roleId=0,$processIds=0)
+            //添加时审批流数据
             $examines = getComponent('Process')->getExamine(I("vtabId"),0,$roleId,$processId);
-            // print_r($examines);exit;
             $datas['process_id'] = $examines["process_id"];
             $datas['examine'] = $examines["examine"];
-            $rolePlace = $examines['place'];
-            if($rolePlace!==false){
-                $datas['process_level']=$rolePlace+2;
-                if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
-                    $datas['status'] = 1;
-                }else{
-                    $datas['status'] = 2;
-                }
-            }else{
-                $datas['process_level']=$process["place"] > 0 ? $process["place"] : 1;
-            }
-            $datas['examine'] = getComponent('Process')->filterExamine(session('roleId'),$datas['examine']);
+            $datas['process_level'] = $examines["process_level"];
+            $datas['status'] = $examines["status"];
+
             unset($datas['id']);
             return $datas;
         }else if($reqType=="work_orderEdit"){

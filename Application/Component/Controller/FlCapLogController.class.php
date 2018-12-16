@@ -77,28 +77,12 @@ class FlCapLogController extends BaseController{
             }
             unset($datas['id']);
             if(!$isInset){
+                //添加时审批流数据
                 $examines = A("Component/Process")->getExamine(I("vtabId"),0);
-                $datas['examine'] = $examines['examine'];
-                $datas['process_id'] = $examines['process_id'];
-                $roleId = session("roleId");
-                $rolePlace = $examines['place'];
-                $datas['status'] = 0;
-                if($rolePlace!==false){
-                    
-                    if($examines['place'] == 0 &&  $roleId == $examines['examine']){
-                        $datas['status'] = 1;
-                    }else{
-                        $datas['process_level']=$rolePlace+2;
-                        if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
-                            $datas['status'] = 1;
-                        }else{
-                            $datas['status'] = 2;
-                        }
-                    }
-                    
-                }else{
-                    $datas['process_level'] = $examines["place"] > 0 ? $examines["place"] : 1;
-                }
+                 $datas['process_id'] = $examines["process_id"];
+                 $datas['examine'] = $examines["examine"];
+                 $datas['process_level'] = $examines["process_level"];
+                 $datas['status'] = $examines["status"];
             }
             return $datas;
         }else if($reqType=="flo_cap_logEdit"){

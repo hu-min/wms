@@ -19,6 +19,13 @@ class RedisController extends Controller{
     function offline($userId){
         $this->redis->set($this->onlineName.$userId,time(),1);
     }
+    function rset($name,$value="",$seconds=300)
+    {
+        return $this->redis->set($name,$value,$seconds);
+    }
+    function rget($name){
+        return $this->redis->get($name);
+    }
     function isOnline()
     {
 
@@ -33,5 +40,17 @@ class RedisController extends Controller{
             array_push($returnData['ids'],str_replace($this->prefix.$this->onlineName,'',$userKey));
         }
         return $returnData;
+    }
+    function getRedisAll($prefix="",$extend=""){
+        if(!$prefix){
+            $prefix = $this->prefix;
+        }
+        return $this->redis->R()->keys($prefix.$extend."*");
+    }
+    function delAll($prefix="",$extend=""){
+        if(!$prefix){
+            $prefix = $this->prefix;
+        }
+        $this->redis->R()->delete($this->redis->R()->keys($prefix.$extend."*"));
     }
 }

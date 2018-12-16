@@ -99,7 +99,7 @@
                                 <th>报销项</th>
                                 <th>费用金额</th>
                                 <th>财务备注</th>
-                                <!-- <th>审批记录</th> -->
+                                <th>审批备注</th>
                                 <th>审批记录</th>
                                 <th>状态</th>
                                 <th>操作</th>
@@ -198,7 +198,7 @@
                 })
             }
             
-            if(( info['status'] > 0 || info['author'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3 && gettype !="Add"){
+            if(( info['status'] > 0 || info['user_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3 && gettype !="Add"){
                 $(tabId+" .global-modal").find(".modal-info").prop("disabled",true)
                 $(tabId+" .global-modal").find(".common-info").prop("disabled",true)
                 $(tabId+" .global-modal").find(".chosen-select").prop("disabled",true)
@@ -207,7 +207,7 @@
                 
                 $(tabId+" .global-modal").find(".chosen-select").trigger("chosen:updated");
             }
-            $(tabId+" .global-modal").find(".approve-group").data("id",info['id'])
+            // $(tabId+" .global-modal").find(".approve-group").data("id",info['id'])
             if(info['process_level'] > info['place'] || info['status'] == 3){
                 if(info["user_id"] == "{$Think.session.userId}"){
                     $(tabId+" .global-modal").find(".approve-group .approve-con").remove();

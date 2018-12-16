@@ -165,7 +165,7 @@ class ProjectController extends BaseController{
             $result=$this->userCom->getUserList($parameter);
             $resultData["user_ids"]=$result["list"];
         }
-        if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME] >= 7 || ($resultData['business'] == session('userId')) || ($resultData['author'] == session('userId')) ){
+        if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME] >= 7 || ($resultData['business'] == session('userId')) || ($resultData['user_id'] == session('userId')) ){
             
         }else{
             $resultData['contract'] = '';
@@ -238,7 +238,7 @@ class ProjectController extends BaseController{
     //                 'orderStr'=>"add_time DESC",
     //                 'groupBy'=>"project_id",
     //                 'joins' => [
-    //                     "RIGHT JOIN (SELECT projectId,name FROM v_project WHERE (FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (author = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 ) ) p ON p.projectId = project_id",
+    //                     "RIGHT JOIN (SELECT projectId,name FROM v_project WHERE (FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (user_id = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (user_id = {$userId})) AND status =1 ) ) p ON p.projectId = project_id",
     //                 ],
     //             ];
     //             $result=getComponent('ProjectCost')->getList($parameter);
@@ -249,7 +249,7 @@ class ProjectController extends BaseController{
     //             break;
     //         case 'relation_project':
     //             $where["project_id"]=0;
-    //             $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (author = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 )";
+    //             $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (user_id = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (user_id = {$userId})) AND status =1 )";
     //             $key_type = "name";
     //             if($option['key_type'] == "code"){
     //                 $key_type = "code";
@@ -328,7 +328,7 @@ class ProjectController extends BaseController{
     //                 return $result;
     //             }
     //             break;
-    //         case 'create_user': case 'business': case 'leader': case 'earlier_user': case 'scene_user': case 'author' : case 'to_user' :
+    //         case 'create_user': case 'business': case 'leader': case 'earlier_user': case 'scene_user': case 'user_id' : case 'to_user' :
     //             if($key!=""){
     //                 $where["userName"]=["LIKE","%{$key}%"];
     //             }
@@ -485,7 +485,7 @@ class ProjectController extends BaseController{
         $process = $this->nodeCom->getProcess($nodeId);
         $this->assign("place",$process["place"]);
         $where=[];
-        // $where['_string']=" (process_level = ".($this->processAuth["level"]-1)." OR process_level = 0 OR author = ".session("userId")." OR FIND_IN_SET(".session("userId").",examine)) OR (create_user = '{$userId}') OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}') ";
+        // $where['_string']=" (process_level = ".($this->processAuth["level"]-1)." OR process_level = 0 OR user_id = ".session("userId")." OR FIND_IN_SET(".session("userId").",examine)) OR (create_user = '{$userId}') OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}') ";
         // $data['code'] = 'TWSH12fengtiangz22018101416';
         foreach (['name','code','customer_com_name','customer_cont_name','business_name','leader_name'] as $key) {
             if(isset($data[$key])){
@@ -506,32 +506,31 @@ class ProjectController extends BaseController{
         $whiteWhere = "";
         $roleId = session('roleId');
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
-            $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (author = {$userId}) OR (( FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) OR FIND_IN_SET({$userId},scene_user) OR (author = {$userId})) AND status =1 )";
+            $where["_string"] = "(FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0) OR (user_id = {$userId}) OR (( business = {$userId} OR leader = {$userId} OR FIND_IN_SET({$userId},earlier_user) > 0 OR FIND_IN_SET({$userId},scene_user) > 0 OR (user_id = {$userId})) )";
             $whites = $this->whiteCom->getWhites();
             // print_r($whites);exit;
             if($whites && $search==""){
                 $whiteWhere = " AND user_id NOT IN (".implode(',',$whites).")";
-                $where["author"] = ['NOT IN',$whites];
+                $where["user_id"] = ['NOT IN',$whites];
             }
         }
         // $whites = $this->whiteCom->getWhites();
         // print_r($whites);exit;
         // if($nodeAuth<7){
-        //     $where['_string'] = " ((create_user = {$userId})  OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) AND status =1) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}) OR ((process_level = ".($this->processAuth["level"]-1)." OR process_level >= ".$this->processAuth["level"].") AND process_level <>0) OR FIND_IN_SET({$userId},examine) OR (author = {$userId})";
+        //     $where['_string'] = " ((create_user = {$userId})  OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) AND status =1) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}) OR ((process_level = ".($this->processAuth["level"]-1)." OR process_level >= ".$this->processAuth["level"].") AND process_level <>0) OR FIND_IN_SET({$userId},examine) OR (user_id = {$userId})";
             // $where['user_id'] = session('userId');
             // if($process["place"]>0){
             //     $where=["process_level"=>[["eq",($process["place"]-1)],["egt",($process["place"])],"OR"],"status"=>1,'_logic'=>'OR'];
             // }else{
             //     $where=["status"=>1];
             // }
-            // $where['_string'] = " ((create_user = {$userId})  OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) AND status =1) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}) OR (process_level = ".($this->processAuth["level"]-1)." AND process_level <>0) OR FIND_IN_SET({$userId},examine) OR (author = {$userId})";
+            // $where['_string'] = " ((create_user = {$userId})  OR FIND_IN_SET({$userId},business) OR FIND_IN_SET({$userId},leader) OR FIND_IN_SET({$userId},earlier_user) AND status =1) OR FIND_IN_SET({$userId},scene_user) OR (create_user = {$userId}) OR (process_level = ".($this->processAuth["level"]-1)." AND process_level <>0) OR FIND_IN_SET({$userId},examine) OR (user_id = {$userId})";
         // }
-        //OR process_level = 0 OR author = {$userId} OR FIND_IN_SET({$userId},examine)
+        //OR process_level = 0 OR user_id = {$userId} OR FIND_IN_SET({$userId},examine)
 
         if(isset($data['status'])){
             $where['status']=$data['status'];
         }else{
-            
             $where['_string'] = isset($where['_string']) ? $where['_string'].=" AND status < 3" : $where['_string'].=" status < 3";
         }
         $file_type="1,2";
@@ -549,8 +548,8 @@ class ProjectController extends BaseController{
                 "LEFT JOIN (SELECT basicId brand_id,name brand_name FROM v_basic WHERE class = 'brand' ) b ON b.brand_id = brand",
                 "LEFT JOIN (SELECT companyId company_id,company customer_com_name FROM v_customer_company ) c ON c.company_id = customer_com",
                 "LEFT JOIN (SELECT contactId contact_id,contact customer_cont_name FROM v_customer_contact ) c2 ON c2.contact_id = customer_cont",
-                "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = business",
-                "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = leader",
+                "LEFT JOIN (SELECT userId bu_user_id,userName business_name FROM v_user) bu ON bu.bu_user_id = business",
+                "LEFT JOIN (SELECT userId lu_user_id,userName leader_name FROM v_user) lu ON lu.lu_user_id = leader",
                 "LEFT JOIN (SELECT basicId stage_id,name stage_name FROM v_basic WHERE class = 'stage' ) s ON s.stage_id = stage",
                 "LEFT JOIN (SELECT basicId type_id,name type_name FROM v_basic WHERE class = 'projectType' ) t ON t.type_id = type",
                 "LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct ON ct.ctid = city AND ct.cpid = province",
@@ -562,6 +561,7 @@ class ProjectController extends BaseController{
             ],
         ];
         $listResult=$this->projectCom->getProjectList($parameter);
+        $this->log($this->projectCom->M()->_sql());
         // echo $this->projectCom->M()->_sql();exit;
         if( isset($data['template'])){
             $listRedis = $data['template'].'List';
@@ -636,7 +636,7 @@ class ProjectController extends BaseController{
         if($reqType=="projectAdd"){
             $datas['addTime']=time();
             $datas['time']=strtotime($datas['time']);
-            $datas['author']=session('userId');
+            $datas['user_id']=session('userId');
             // $datas['process_level']=$this->processAuth["level"];
             //添加时必备数据
             // $process = $this->nodeCom->getProcess(I("vtabId"));
@@ -644,25 +644,14 @@ class ProjectController extends BaseController{
             // $datas['process_id'] = $process["processId"];
             // $userRole = $this->userCom->getUserInfo($datas['leader']);
             // $datas['examine'] = $userRole['roleId'].",".$process["examine"];
-            $examines = getComponent('Process')->getExamine(I("vtabId"),$datas['leader']);
-            $datas['examine'] = $examines['examine'];
-            $datas['process_id'] = $examines['process_id'];
-            //如果是审批者自己提交的执行下列代码
-            $roleId = session("roleId");
-            // $examineArr = explode(",",$datas['examine']);
-            // $rolePlace = search_last_key($roleId,$examineArr);
-            $rolePlace = $examines['place'];
-            $datas['status'] = 0;
-            if($rolePlace!==false){
-                $datas['process_level']=$rolePlace+2;
-                if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
-                    $status = 1;
-                }else{
-                    $status = 2;
-                }
-            }else{
-                $datas['process_level'] = $examines["place"] > 0 ? $examines["place"] : 1;
-            }
+
+            //添加时审批流数据
+            $examines = getComponent('Process')->getExamine(I("vtabId"),$datas['business']);
+            $datas['process_id'] = $examines["process_id"];
+            $datas['examine'] = $examines["examine"];
+            $datas['process_level'] = $examines["process_level"];
+            $datas['status'] = $examines["status"];
+
             // if($rolePlace!==false){
             //     $datas['process_level']=$rolePlace+2;
             //     if(count($examineArr) <= ($rolePlace+1)){
@@ -675,13 +664,12 @@ class ProjectController extends BaseController{
             // }
 
             unset($datas['projectId']);
-            $datas['examine'] = getComponent('Process')->filterExamine(session('roleId'),$datas['examine']);
             return $datas;
         }else if($reqType=="projectEdit"){
             $where=["projectId"=>$datas['projectId']];
             $data=[];
             $redit = true;
-            $keyArray = ['project_id','amount','bid_date','contract','bid_time','bidding','brand','city','code','create_time','author','customer_com','customer_cont','customer_other','days','earlier_user','execute_sub','execute','field','is_bid','business','leader','name','project_time','project_id','projectType','province','scene_user','session_all','type','session_cur','stage','status','cost_budget'];
+            $keyArray = ['project_id','amount','bid_date','contract','bid_time','bidding','brand','city','code','create_time','user_id','customer_com','customer_cont','customer_other','days','earlier_user','execute_sub','execute','field','is_bid','business','leader','name','project_time','project_id','projectType','province','scene_user','session_all','type','session_cur','stage','status','cost_budget'];
             if($datas["status"]==1){
                 $projectResult =$this->projectCom->getOne(['where'=>$where,"one"=>true,"fields"=>'business,status']);
                 if($projectResult['business'] == session('userId') && $projectResult['status'] = 1){
@@ -730,17 +718,28 @@ class ProjectController extends BaseController{
                 }
             }
             $userArray = array_unique($userArray);
-            if(!empty($userArray)){
-                $touser = $this->userCom->getQiyeId($userArray);
-            }
+            // if(!empty($userArray)){
+            //     $touser = $this->userCom->getQiyeId($userArray);
+            // }
             $insertResult=$this->projectCom->insertProject($projectInfo);
             if($insertResult && $insertResult->errCode==0){
-                if(!empty($touser)){
-                    $desc = "<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."创建了项目【{$projectInfo['name']}】，当中@了你，来围观吧！</div>";
-                    $url = C('qiye_url')."/Admin/Index/Main.html?action=Project/projectItem";
-                    $msgResult = $this->QiyeCom-> textcard($touser,"立项【{$projectInfo['name']}】",$desc,$url);
-                }
-                $this->ApprLogCom->createApp($this->projectCom->tableName(),$insertResult->data,session("userId"),"");
+                // if(!empty($touser)){
+                //     $desc = "<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."创建了项目【{$projectInfo['name']}】，当中@了你，来围观吧！</div>";
+                //     $url = C('qiye_url')."/Admin/Index/Main.html?action=Project/projectItem";
+                //     $msgResult = $this->QiyeCom-> textcard($touser,"立项【{$projectInfo['name']}】",$desc,$url);
+                // }
+                // $this->ApprLogCom->createApp($this->projectCom->tableName(),$insertResult->data,session("userId"),"");
+
+                $addData = [
+                    'examine'=>$projectInfo['examine'],
+                    'title'=>"立项【{$projectInfo['name']}】",
+                    'desc'=> "<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."创建了项目【{$projectInfo['name']}】，当中@了你，来围观吧！</div>",
+                    'url'=>C('qiye_url')."/Admin/Index/Main.html?action=Project/projectItem",
+                    'tableName'=>$this->projectCom->tableName(),
+                    'tableId'=>$insertResult->data,
+                ];
+                $this->add_push($addData);
+                
                 if($projectInfo['status']==1){
                     $this->ReceCom->createOrder($insertResult->data,session('userId'));
                 }
@@ -803,10 +802,11 @@ class ProjectController extends BaseController{
         if(isset($datas['company'])){
             $where['company']=["LIKE","%{$datas['company']}%"];
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'fields'=>"customerId,company,contact",
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"customerId DESC"
         ];
         $listResult=$this->customerCom->getCustomerList($parameter);
@@ -818,10 +818,11 @@ class ProjectController extends BaseController{
         if(isset($datas['userName'])){
             $where['userName']=["LIKE","%{$datas['userName']}%"];
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'fields'=>"userName",
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"userId DESC"
         ];
         $listResult=$this->userCom->getUserList($parameter);
@@ -1053,9 +1054,9 @@ class ProjectController extends BaseController{
                     "LEFT JOIN (SELECT companyId company_id,company customer_com_name FROM v_customer_company ) c ON c.company_id = customer_com",
                     "LEFT JOIN (SELECT contactId contact_id,contact customer_cont_name FROM v_customer_contact ) c2 ON c2.contact_id = customer_cont",
                     "LEFT JOIN (SELECT id field_id,name field_name,city f_city FROM v_field ) f ON f.field_id = field AND f.f_city=city",
-                    "LEFT JOIN (SELECT userId user_id,userName create_user_name FROM v_user) cu ON cu.user_id = author",
-                    "LEFT JOIN (SELECT userId user_id,userName business_name FROM v_user) bu ON bu.user_id = business",
-                    "LEFT JOIN (SELECT userId user_id,userName leader_name FROM v_user) lu ON lu.user_id = leader",
+                    "LEFT JOIN (SELECT userId cu_user_id,userName create_user_name FROM v_user) cu ON cu.cu_user_id = user_id",
+                    "LEFT JOIN (SELECT userId bu_user_id,userName business_name FROM v_user) bu ON bu.bu_user_id = business",
+                    "LEFT JOIN (SELECT userId lu_user_id,userName leader_name FROM v_user) lu ON lu.lu_user_id = leader",
                     "LEFT JOIN (SELECT basicId execute_sub_id,name execute_sub_name FROM v_basic WHERE class = 'execute' ) e ON e.execute_sub_id = execute_sub",
                     "LEFT JOIN (SELECT basicId type_id,name type_name FROM v_basic WHERE class = 'projectType' ) pt ON pt.type_id = type",
                     "LEFT JOIN (SELECT basicId stage_id,name stage_name FROM v_basic WHERE class = 'stage' ) s ON s.stage_id = stage",

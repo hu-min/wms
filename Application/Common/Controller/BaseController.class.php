@@ -20,7 +20,12 @@ class BaseController extends Controller{
     public function _initialize() {
         $this->Redis= new Redis();
         vendor('WeixinQy.WeixinQy');//引入WeiXin企业
-        $this->WxConf=getWeixinConf();
+        $this->redisCom=getComponent('Redis');
+        $this->WxConf = $this->redisCom->rget("base_wexin_conf");
+        if(!$this->WxConf){
+            $this->WxConf = getWeixinConf();
+            $this->redisCom->rset("base_wexin_conf",$this->WxConf,7200);
+        }
         $this->Wxqy = new \WeixinQy($this->WxConf["1000009"]["corpid"],$this->WxConf["1000009"]["corpsecret"]);
     }
     /**

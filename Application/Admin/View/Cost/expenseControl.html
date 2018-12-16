@@ -184,7 +184,7 @@
                 })
             }
             
-            if(( info['status'] > 0 || info['author'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3 && gettype !="Add"){
+            if(( info['status'] > 0 || info['user_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3 && gettype !="Add"){
                 $(tabId+" .global-modal").find(".modal-info").prop("disabled",true)
                 $(tabId+" .global-modal").find(".common-info").prop("disabled",true)
                 $(tabId+" .global-modal").find(".chosen-select").prop("disabled",true)

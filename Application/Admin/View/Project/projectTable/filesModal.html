@@ -5,12 +5,15 @@
     <h4 class="modal-title">{$title}</h4>
 </div>
 <div class="modal-body">
-    <!-- {$nodeAuth} -->
-    <if condition="$hasEdit OR $nodeAuth egt 7">
-        <div class="row">
-            <div class="col-md-12"> <h5 class="box-title">点击右边"+"添加文件<i class="fa fa-fw fa-plus-square text-aqua add-filecom" title="添加文件" style="cursor: pointer;"></i></h5>提示：由于权限问题下列文件你可能无法查看</div>
-        </div>
-    </if>
+
+    <div class="row">
+        <if condition="$hasEdit OR $nodeAuth egt 7">
+            <div class="col-md-12"> <h5 class="box-title">点击右边"+"添加文件<i class="fa fa-fw fa-plus-square text-aqua add-filecom" title="添加文件" style="cursor: pointer;"></i></h5>提示：营业主担可以上传“报价/成本”，项目主担可以上传“方案/标书”</div>
+        <else/>
+            <div class="col-md-12">提示：营业主担可以上传“报价/成本”，项目主担可以上传“方案/标书”</div>
+        </if>
+    </div>
+    
     <input type="hidden" value="{$project_id}" class="modal-info" name="project_id">
     <div style="overflow-x: auto;">
         <table class="table table-bordered table-hover">

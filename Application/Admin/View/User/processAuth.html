@@ -74,7 +74,7 @@
         //获取节点数据
         function getNodeTree() {
             var tree=[]
-            datas["reqType"]="nodeList";
+            datas["reqType"]="authNodeList";
             get("{$url}",datas,function(result){
                 // console.log(result);
                 tree=result.tree

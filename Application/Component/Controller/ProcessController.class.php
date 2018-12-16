@@ -87,7 +87,6 @@ class ProcessController extends BaseController{
             // $roleId = $userRole['roleId'];
             $examines = $userRole['roleId'].",".$process["examine"];
         }elseif($processIds>0){
-            
             $process = A("Component/Node")->getProcess($vtabId,$roleId,null,$processIds);
             $examines = $process["examine"];
         }else{
@@ -97,7 +96,7 @@ class ProcessController extends BaseController{
                 $execuProcess = json_decode($execuProResult['value'],true);
                 if(isset($execuProcess['db_name']) && !empty($execuProcess['db_name'])){
                     $param = [
-                        'where' => ['db_table'=>['IN',$execuProcess['db_name']],"nodeType"=>3],
+                        'where' => ['db_table'=>['IN',$execuProcess['db_name']],"_string" => "FIND_IN_SET(3,nodeType) > 0"],
                         'fields' => "nodeId",
                     ];
                     $nodeIdResult = A("Component/Node")->getList($param);
@@ -117,11 +116,24 @@ class ProcessController extends BaseController{
         // $limitWhite = A("Component/White")->limitWhite(session('roleId'),$touserRoleId,true);
 
         $process["place"] = search_last_key($roleId,array_unique(explode(",",$examines)));
-
         $returnData['examine'] = trim(implode(",",array_unique(explode(",",$examines))),",");
         $returnData['place'] = $process["place"];
+        $returnData['process_level'] = session('roleId') ==  explode(",",$examines)[0] ? 2 : 1;
+        // $returnData['place'] = $process["place"];
         $returnData['process_id'] = $process["processId"];
         $returnData['auth'] = $process["auth"];
+        if($returnData['process_level'] == 1){
+            $returnData['status'] = 0;
+        }elseif($returnData['process_level']>1){
+            if(count(explode(",",$returnData['examine']))== $returnData['place']){
+                $returnData['status'] = 1;
+            }elseif(count(explode(",",$returnData['examine'])) > $returnData['place']){
+                $returnData['status'] = 2;
+            }
+        }else{
+            $returnData['status'] = 2;
+        }
+        
         // print_r($returnData);exit;
         if($returnData['examine']==""){
             $this->ajaxReturn(['errCode'=>20001,'error'=>getError(20001)]);

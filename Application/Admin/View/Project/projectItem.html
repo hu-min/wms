@@ -311,9 +311,9 @@
             // console.log(info['status'])
             // console.log("{$nodeAuth}")
             // console.log("{$gettype}")
-            // console.log(info['author'])
+            // console.log(info['user_id'])
             // console.log("{$Think.session.userId}")
-            if(( info['status'] > 0 || info['author'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3){
+            if(( info['status'] > 0 || info['user_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3){
                 $(tabId+" .modal-info").prop("disabled",true)
             }
             // //设置审批按钮状态
@@ -324,7 +324,7 @@
 
             if(info['process_level'] > info['place'] || info['status'] ==3){
                 // console.log(info);
-                if(info["author"] == "{$Think.session.userId}"){
+                if(info["user_id"] == "{$Think.session.userId}"){
                     $(tabId+" .global-modal").find(".approve-group .approve-con").remove();
                 }else{
                     $(tabId+" .global-modal").find(".approve-group .approve-con").addClass("disabled");

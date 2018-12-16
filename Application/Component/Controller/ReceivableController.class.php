@@ -5,11 +5,11 @@ class ReceivableController extends BaseController{
         parent::_initialize();
         $this->selfDB = D('Component/Receivable');
     }
-    function createOrder($project_id,$author){
+    function createOrder($project_id,$user_id){
         $info=[
             "project_id"=>$project_id,
             "add_time"=>time(),
-            "author"=>$author,
+            "user_id"=>$user_id,
             "status"=>1,
         ];
         $this->insert($info);

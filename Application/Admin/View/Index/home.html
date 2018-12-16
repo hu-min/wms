@@ -12,10 +12,10 @@
 <body>
     <section class="content">
         <div class="row">
-            <div class="col-md-9">
+            <div class="col-md-6">
                 <div class="box box-primary box-solid">
                     <div class="box-header with-border">
-                      <h3 class="box-title">待审批列表</h3>
+                      <h3 class="box-title">需要您审批的项</h3>
                       <div class="box-tools">
                         <button type="button" name="getAppList" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
 						</button>
@@ -27,12 +27,12 @@
                             <table class="table table-bordered table-hover">
                                 <thead>
                                 <tr>
-                                <th class="serial_num">#</th>
+                                <!-- <th class="serial_num">#</th> -->
                                 <th style="min-width: 40px;max-width: 50px">提交人</th>
                                 <th>模块名称</th>
                                 <th>项目名称</th>
                                 <th style="max-width: 120px;">提交时间</th>
-                                <th>审批进度</th>
+                                <!-- <th>审批进度</th> -->
                                 <th style="width: 60px">百分比</th>
                                 </tr>
                                 </thead>
@@ -50,37 +50,41 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <div class="box box-primary box-solid">
-                    <div class="box-header with-border">
-                        <h3 class="box-title">最新登录 TOP100</h3>
-                        <span class="text-yellow">&nbsp;&nbsp;当前在线：<span class="online_num"></span></span>
-                        <div class="box-tools">
-                        <button type="button" name="lastLoginList" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
-                        </button>
-                        </div>
+                    <div class="box-header with-border" style="background:#38AFDC;">
+                      <h3 class="box-title">您正于审批过程中的项</h3>
+                      <div class="box-tools">
+                        <button type="button" name="getWaitList" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
+						</button>
+                      </div>
                     </div>
                     <!-- /.box-header -->
                     <div class="box-body">
                         <div style="overflow: auto;z-index: 1;">
-                            <table class="table table-bordered">
+                            <table class="table table-bordered table-hover">
                                 <thead>
                                 <tr>
-                                    <th>员工姓名</th>
-                                    <th>登录时间</th>
+                                <!-- <th class="serial_num">#</th> -->
+                                <th style="min-width: 40px;max-width: 50px">提交人</th>
+                                <th>模块名称</th>
+                                <th>项目名称</th>
+                                <th style="max-width: 120px;">提交时间</th>
+                                <!-- <th>审批进度</th> -->
+                                <th style="width: 60px">百分比</th>
                                 </tr>
                                 </thead>
-                                    <tbody class="lastLogin-table"></tbody>
+                                <tbody class="getWait-table"></tbody>
                             </table>
                         </div>
                     </div>
                     <!-- /.box-body -->
                     <div class="box-footer clearfix">
-                        <div class="">
-                            <div  class="lastLogin-page row page-div" data-url="{$url}" data-reqtype="lastLoginList" data-con="lastLogin">
-                                
-                            </div>
-                        </div>
+						<div class="">
+							<div  class="getWait-page row page-div" data-url="{$url}" data-reqtype="getWaitList" data-con="getWait">
+								
+							</div>
+						</div>
                     </div>
                 </div>
             </div>
@@ -123,29 +127,6 @@
             <div class="col-md-4">
                 <div class="box box-warning box-solid">
                     <div class="box-header with-border">
-                        <h3 class="box-title">费用【借支/报销】饼图 目前数据仅模拟</h3>
-                        <div class="box-tools">
-                        <button type="button" name="" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
-                        </button>
-                        </div>
-                    </div>
-                    <!-- /.box-header -->
-                    <div class="box-body">
-                        <div id="container" style="width: 100%;height:300px;" ></div>
-                    </div>
-                    <!-- /.box-body -->
-                    <div class="box-footer clearfix">
-                        <div class="">
-                            <div  class="-page row page-div" data-url="{$url}" data-reqtype="" data-con="">
-                                
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="box box-warning box-solid">
-                    <div class="box-header with-border">
                         <h3 class="box-title">项目概况</h3>
                         <span class="text-navy">&nbsp;&nbsp;项目总数：<span class="project_num"></span></span>
                         <div class="box-tools">
@@ -175,8 +156,66 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-3">
+                <div class="box box-primary box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">最新登录 TOP100</h3>
+                        <span class="text-yellow">&nbsp;&nbsp;当前在线：<span class="online_num"></span></span>
+                        <div class="box-tools">
+                        <button type="button" name="lastLoginList" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
+                        </button>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div style="overflow: auto;z-index: 1;">
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>员工姓名</th>
+                                    <th>登录时间</th>
+                                </tr>
+                                </thead>
+                                    <tbody class="lastLogin-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                    <div class="box-footer clearfix">
+                        <div class="">
+                            <div  class="lastLogin-page row page-div" data-url="{$url}" data-reqtype="lastLoginList" data-con="lastLogin">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
         <div class="row">
+            <div class="col-md-4">
+                <div class="box box-warning box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">费用【借支/报销】饼图 目前数据仅模拟</h3>
+                        <div class="box-tools">
+                        <button type="button" name="" class="btn btn-box-tool refresh"><i class="fa fa-refresh"></i>
+                        </button>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div id="container" style="width: 100%;height:300px;" ></div>
+                    </div>
+                    <!-- /.box-body -->
+                    <div class="box-footer clearfix">
+                        <div class="">
+                            <div  class="-page row page-div" data-url="{$url}" data-reqtype="" data-con="">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="col-md-4">
                 <div class="box box-warning box-solid">
                     <div class="box-header with-border">
@@ -211,12 +250,9 @@
     </section>
     <script>
         $(function(){
-            updateList("getAppList")
-            updateList("relItemList")
-            updateList("lastLoginList")
-            updateList("projectDescList")
+            updateList(["getAppList","relItemList","lastLoginList","projectDescList",'getWaitList']);
             $(tabId+" .refresh").offon("click",function(){
-				updateList($(this).attr("name"))
+				updateList([$(this).attr("name")])
             })
             var myChart = echarts.init(document.getElementById("container"));
         
@@ -266,18 +302,22 @@
             myChart.setOption(option);
 
         })
-        var updateList = function(req){
-			var self =  $(tabId+" .box-header").find(".refresh[name='"+req+"']").parents(".box");
-			// console.log(self);return;
-            get("{$url}",{reqType:req},function(result){
-				self.find("tbody").html(result.table);
-				self.find(".page-div").html(result.page);
-                if(req=="projectDescList"){
-                    $(tabId+" .refresh[name='"+req+"']").parents('.box-header').find(".project_num").text(result.count)
-                }else if(req=='lastLoginList'){
-                    $(tabId+" .refresh[name='"+req+"']").parents('.box-header').find(".online_num").text(result.count)
-                }
-                // console.log(result);
+        var updateList = function(reqArr){
+            get("{$url}",{reqType:"homePanl",reqArr:reqArr},function(result){
+                for (var req in result) {
+                    var self =  $(tabId+" .box-header").find(".refresh[name='"+req+"']").parents(".box");
+                    
+                    if(result[req].table){
+                        self.find("tbody").html(result[req].table);
+                        self.find(".page-div").html(result[req].page);
+
+                        if(req=="projectDescList"){
+                            $(tabId+" .refresh[name='"+req+"']").parents('.box-header').find(".project_num").text(result[req].count)
+                        }else if(req=='lastLoginList'){
+                            $(tabId+" .refresh[name='"+req+"']").parents('.box-header').find(".online_num").text(result[req].count)
+                        }
+                    }
+                }				
             },false)
         }
     </script>

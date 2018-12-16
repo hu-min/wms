@@ -148,15 +148,38 @@ class IndexController extends BaseController{
     }
     /** 
      * @Author: vition 
+     * @Date: 2018-12-14 16:53:33 
+     * @Desc: 首页板块整合 
+     */    
+    function homePanl(){
+        extract($_GET);
+        $return = [];
+        if($reqArr){
+            foreach ($reqArr as $req) {
+                if(method_exists($this,$req)){
+                    $return[$req] = $this->$req(true);
+                }
+            }
+        }
+        $this->ajaxReturn($return);
+    }
+    /** 
+     * @Author: vition 
      * @Date: 2018-08-27 08:56:16 
      * @Desc: 获取最新的审核 
      */    
-    function getAppList(){
+    function getAppList($return=false,$option=[]){
         $page=I("p")?I("p"):1;
         $pageNum = 5;
-        $nodeProce = A("Component/Node")->nodeProcess();
+        if(isset($option['wait']) && $option['wait']){
+            $nodeProce = A("Component/Node")->nodeProcess(4);
+        }else{
+            $nodeProce = A("Component/Node")->nodeProcess();
+        }
+        
         $nodeAuth = session('nodeAuth');
         $roleId = session("roleId");
+        $userId = session("userId");
         
         // print_r($nodeProce);exit;
         // print_r($nodeAuth);
@@ -167,7 +190,6 @@ class IndexController extends BaseController{
             $add_time = "add_time";
             $project_id = "project_id";
             if(in_array($npInfo["db_table"],["v_project"])){
-                $user_id = "author `user_id`";
                 $add_time = "addTime `add_time`";
                 $project_id = "`projectId` project_id";
             }elseif(in_array($npInfo["db_table"],["v_work_order"])){
@@ -176,11 +198,21 @@ class IndexController extends BaseController{
                 $user_id = "ouser_id `user_id`";
             }
             if(isset($nodeAuth[$npInfo["controller"]]) && $nodeAuth[$npInfo["controller"]] > 0){
-                $s = "SELECT '{$npInfo["nodeId"]}' nodeId , {$project_id} ,'{$npInfo["nodeTitle"]}' `moudle_name`,{$user_id},`process_level`,`status`,{$add_time},'{$npInfo["controller"]}' controller,examine FROM {$npInfo['db_table']} WHERE `status` IN (0,2) AND process_level = FIND_IN_SET({$roleId},examine) AND process_level > 0";
+                $whereStr = "`status` IN (0,2) AND process_level = FIND_IN_SET({$roleId},examine)";
+                if(isset($option['wait']) && $option['wait']){
+                    if(in_array($npInfo["db_table"],["v_project_cost"])){
+                        $whereStr = "`status` = 2 AND (ouser_id = {$userId} || cuser_id = {$userId})";
+                    }else{
+                        $whereStr = "`status` = 2 AND user_id = {$userId}";
+                    }
+                    
+                }
+                $s = "SELECT '{$npInfo["nodeId"]}' nodeId , {$project_id} ,'{$npInfo["nodeTitle"]}' `moudle_name`,{$user_id},`process_level`,`status`,{$add_time},'{$npInfo["controller"]}' controller,examine FROM {$npInfo['db_table']} WHERE {$whereStr} AND process_level > 0";
                 array_push($sqlArr,$s);
             }
         }
         $sql = implode(" UNION ALL ",$sqlArr);
+        // print_r($sqlArr);exit;
         if($sql != ""){
             $whites = $this->whiteCom->getWhites();
             $where = "";
@@ -200,15 +232,18 @@ class IndexController extends BaseController{
         
         // echo "SELECT `moudle_name`,`name`,`user_id`,`user_name`,`process_level`,`all`,`status`,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time FROM ({$sql}) p LEFT JOIN (SELECT userId,userName `user_name` FROM v_user WHERE status =1) u ON userId = `user_id` ORDER BY add_time DESC";
         
-        $this->tablePage($listResult,'Index/table/appList',"homeAppList",5,"",["bigSize"=>false]);
+        return $this->tablePage($listResult,'Index/table/appList',"homeAppList",5,"",["bigSize"=>false,'return'=>$return]);
         // $this->ajaxReturn($result);
+    }
+    function getWaitList($return=false,$option=[]){
+        return $this->getAppList($return,['wait'=>true]);
     }
     /** 
      * @Author: vition 
      * @Date: 2018-10-16 10:48:55 
      * @Desc: 与我有关的列表 
      */    
-    function relItemList(){
+    function relItemList($return=false){
         $page=I("p")?I("p"):1;
         $pageNum = 5;
         $where = [];
@@ -225,14 +260,14 @@ class IndexController extends BaseController{
             ]
         ];
         $listResult = getComponent('Project')->getList($param);
-        $this->tablePage($listResult,'Index/table/relItemList',"relItemList",5,"",["rollPage"=>5,"onlyPage"=>true,"bigSize"=>false]);
+        return $this->tablePage($listResult,'Index/table/relItemList',"relItemList",5,"",["rollPage"=>5,"onlyPage"=>true,"bigSize"=>false,'return'=>$return]);
     }
     /** 
      * @Author: vition 
      * @Date: 2018-10-16 10:49:09 
      * @Desc: 最后登录的列表 
      */    
-    function lastLoginList(){
+    function lastLoginList($return=false){
         $page=I("p")?I("p"):1;
         $param=[
             "where" => ["class"=>"login"],
@@ -245,14 +280,14 @@ class IndexController extends BaseController{
         $listResult["count"] = $listResult["count"]>100 ? 100 : $listResult["count"];
         $onlineData = $this->redisCom->onlineList();
         $countStr = $onlineData['count'];
-        $this->tablePage($listResult,'Index/table/lastLoginList',"lastLoginList",5,$countStr,["rollPage"=>5,"onlyPage"=>true,"bigSize"=>false]);
+        return $this->tablePage($listResult,'Index/table/lastLoginList',"lastLoginList",5,$countStr,["rollPage"=>5,"onlyPage"=>true,"bigSize"=>false,'return'=>$return]);
     }
     /** 
      * @Author: vition 
      * @Date: 2018-10-16 10:51:52 
      * @Desc: 项目概要 
      */    
-    function projectDescList(){
+    function projectDescList($return=false){
         $projectCom=getComponent('Project');
         $page=I("p")?I("p"):1;
         $param=[
@@ -268,7 +303,7 @@ class IndexController extends BaseController{
         ];
         $listResult = $projectCom->getList($param);
         $count = array_sum(array_column($listResult["list"],'num'));
-        $this->tablePage($listResult,'Index/table/projectDescList',"projectDescList",5,$count,["rollPage"=>5,"onlyPage"=>false,"bigSize"=>false]);
+        return $this->tablePage($listResult,'Index/table/projectDescList',"projectDescList",5,$count,["rollPage"=>5,"onlyPage"=>false,"bigSize"=>false,'return'=>$return]);
     }
     /** 
      * @Author: vition 
@@ -295,7 +330,12 @@ class IndexController extends BaseController{
         $btnTitle = "修改配置";
         extract($_REQUEST);
         $resultData=[];
-        $this->assign("processData",$this->AUser->getProcess());
+        $result = $this->Com ->get_option('get_processes');
+        $optionStr='';
+        foreach($result as $opt){
+            $optionStr.='<option value="'.$opt["processId"].'">'.$opt["processName"].'</option>';
+        }
+        $this->assign("processData",$optionStr);
         $this->assign("controlName","index_process");
         $dbnames = [
             "v_debit"=>"借支",
@@ -433,7 +473,7 @@ class IndexController extends BaseController{
      */    
     function checkRepair(){
         $datas = I("data");
-        $locks = $this->configCom->get_val("web_lock");
+        $locks = $this->configCom->is_web_lock();
         if(isset($datas['password']) && !empty($datas['password']) && $locks['value']==sha1(sha1($datas['password']))){
             session('web_lock_password',sha1(sha1($datas['password'])));
             $this->ajaxReturn(["errCode"=>0,"error"=>getError(0)]);
@@ -488,7 +528,7 @@ class IndexController extends BaseController{
             $result = $this->configCom->insert($data);
         }
         session('web_lock_password',NULL);
-        $this->clearRedis('config_web_lock');
+        $this->redisCom->delAll("","config_web_lock");
         if($data["status"] == 1){
             $result->errCode = 407;
             $result->error = getError(407);

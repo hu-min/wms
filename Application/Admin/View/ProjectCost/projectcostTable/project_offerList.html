@@ -18,9 +18,9 @@
         </if>        
         <td>
             <if condition="$listType eq 'contrast'">
-                {:approve_btn($tableName,$item['id'],$item['place'],$item['process_level'],$item['status'])}
+                {:approve_btn($tableName,['item'=>get_defined_vars()['list'][$key]])}
             <else/>
-                {:approve_btn($tableName,$item['id'],0,$item['process_level'],$item['status'])}    
+                {:approve_btn($tableName,['item'=>get_defined_vars()['list'][$key]])}
             </if> 
             
         </td>

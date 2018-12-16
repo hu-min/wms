@@ -18,7 +18,7 @@
             {$item.approve_name}<if condition="$item['aremark']"> ：{$item.aremark} </if>
         </td>
         <td>
-            {:approve_btn($tableName,$item['id'],0,0)}
+            {:approve_btn($tableName,['item'=>get_defined_vars()['list'][$key]])}
         </td>
         <if condition="$item['project_id'] GT 0">
             {:list_btn(get_defined_vars(),"id",[],false,false,true,'查看')}

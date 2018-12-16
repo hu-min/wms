@@ -22,7 +22,6 @@ class NodeController extends BaseController{
         }else{
             $processResult = $this->getList(["fields"=>"processId,controller,processIds,processOption","where"=>["nodeId"=> $nodeId],"joins"=>["LEFT JOIN (SELECT processId,processOption FROM v_process WHERE status = 1) p ON FIND_IN_SET(p.processId,processIds)"] ]);
         }
-        
         $processInfo = ["process"=>[],"allProcess"=>1,"place"=>0,"processId"=>0,"examine"=>'',"auth"=>0];
         $processList = [];
         // print_r($processResult);exit;
@@ -39,10 +38,10 @@ class NodeController extends BaseController{
                     }
                 }
             }
-            
             foreach ($processList as $processData) {
 
                 $process = json_decode($processData["processOption"],true);
+                
                 $processId = $processData["processId"];
                 if( $auth >=7 || ($process[0]["type"] ==1 && in_array(99999999,$process[0]["role"])) || (($process[0]["type"] ==1 && in_array($rolePid,$process[0]["role"])) || ($process[0]["type"] == 2) && $roleId==$process[0]["role"])){
                     
@@ -51,8 +50,10 @@ class NodeController extends BaseController{
                     $processInfo["processId"] = $processId;
                     $processInfo['process'] = $process;
                     $processInfo['allProcess'] = count($processInfo['process']);
+                    
                     foreach ($processInfo['process'] as $key => $proceData) {
                         if($key>0){
+                            
                             array_push($examine,$proceData["role"]);
                         }
                         if($proceData["type"]==1){
@@ -64,6 +65,19 @@ class NodeController extends BaseController{
                                 $processInfo["place"] = $key + 1;
                             }
                         }
+                    }
+                    //查询一下哪些角色的用户是被冻结或者无效的，就
+                    $param = [
+                        'fields' => 'roleId',
+                        'where' => ['roleId'=>['IN',$examine],'status'=>1],
+                        'groupBy' => "roleId",
+                    ];
+
+                    $userResult = A("Component/User")->getList($param);
+
+                    if(isset($userResult['list'])){
+                        $roles = array_column($userResult['list'],"roleId");
+                        $examine = array_intersect($examine,$roles);
                     }
                     $processInfo["examine"] = implode(",",$examine);
                 }
@@ -81,11 +95,11 @@ class NodeController extends BaseController{
             "status"=>1,
             // "processIds"=>['neq',""],
             "db_table"=>['neq',""],
-            "nodeType"=>$nodeType,
+            "_string" => "FIND_IN_SET({$nodeType},nodeType) > 0",
         ];
         $parameter=[
             "where"=>$where,
-            "fields"=>'nodeId,db_table,controller,nodeTitle,processIds',
+            "fields"=>'nodeId,db_table,controller,nodeTitle,processIds,nodeNames',
         ];
         $nodeRes = $this->getList($parameter);
         if(isset($nodeRes["list"]) && !empty($nodeRes["list"])){

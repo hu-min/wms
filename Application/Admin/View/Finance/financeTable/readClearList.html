@@ -2,6 +2,7 @@
     <tr <if condition="$item['clear_status'] eq 0"> style="color: #fff;background: #555;" </if> >   
         <td style="min-width:100px;">{$item.name}</td>
         <td title="{$item.code}" style="max-width:150px;min-width:100px;">{$item.code|pcode_format}</td>
+        <td style="min-width:100px;">{$item.flag}</td>
         <td style="min-width:100px;">{$item.user_name}</td>
         <td style="min-width:100px;" class="modal-info" name="debit_num" >{$item.debit_num|default=0}</td>
         <td style="min-width:100px;" class="modal-info" name="debit_money" >{$item.debit_money|default=0}</td>

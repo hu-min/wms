@@ -19,8 +19,8 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">个人借支</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        {:add_btn(get_defined_vars(),"新增借支")}
-                        {:add_btn(get_defined_vars(),"新增项目借支",2,"fa fa-plus-square",['controlName'=>'pdebit'])}
+                        {:add_btn(get_defined_vars(),"非项目借支")}
+                        {:add_btn(get_defined_vars(),"项目借支",2,"fa fa-plus-square",['controlName'=>'pdebit'])}
                         
                     </div>
                     <div class="box-body search-body company-search-box">
@@ -212,7 +212,7 @@
                 }
             })
             var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
-            if(( info['status'] > 0 || info['author'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3 && gettype !="Add"){
+            if(( info['status'] > 0 || info['user_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3 && gettype !="Add"){
                 $(tabId+" .modal-info").prop("disabled",true)
             }
         }
@@ -244,7 +244,7 @@
             pedbit_compute()
 
             
-            if(( info['status'] > 0 || info['author'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3 && gettype !="Add"){
+            if(( info['status'] > 0 || info['user_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3 && gettype !="Add"){
                 $(tabId+" .global-modal").find(".modal-info").prop("disabled",true)
                 $(tabId+" .global-modal").find(".common-info").prop("disabled",true)
                 $(tabId+" .global-modal").find(".chosen-select").trigger("chosen:updated");

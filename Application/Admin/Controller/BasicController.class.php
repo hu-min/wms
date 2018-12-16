@@ -571,7 +571,7 @@ class BasicController extends BaseController{
         $parameter=[
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"basicId DESC",
         ];
         $basicResult=$this->basicCom->getBasicList($parameter);

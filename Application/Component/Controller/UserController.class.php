@@ -289,7 +289,7 @@ class UserController extends BaseController{
      * @Desc: 用户id转企业微信id 
      */    
     function getQiyeId($userId,$role=false){
-        $where = [];
+        $where = ['status' => 1]; //用户必须激活
         $key = $role ? 'roleId' : 'userId';
         if(is_array($userId)){
             $where[$key] = ["IN",$userId];

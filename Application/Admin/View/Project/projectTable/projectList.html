@@ -36,7 +36,7 @@
             <button type="button" data-gettype="business"" data-toggle="modal" data-vtarget=".files-modal" class="btn btn-xs btn-info v-showmodal">查看</button><if condition="$item['file_num'] gt 0"><span class="label label-success files-num-label">{$item.file_num|default=0}</span><else/><span class="label bg-gray files-num-label">0</span></if>
         </td>
         <td>
-            {:approve_btn($tableName,$item['projectId'],$item['place'],$item['process_level'],$item['status'])}
+            {:approve_btn($tableName,['item'=>get_defined_vars()['list'][$key],'idName'=>'projectId'])}
         </td>
         {:list_btn(get_defined_vars(),"projectId")}
     </tr>

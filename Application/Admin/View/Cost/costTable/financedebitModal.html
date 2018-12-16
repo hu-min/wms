@@ -8,58 +8,16 @@
     <form role="form">
         <div class="box-body">
             <input class="modal-info" value="0" name="id" type="hidden">
-            <input class="modal-info" value="0" name="project_id" type="hidden">
+            <!-- <input class="modal-info" value="0" name="project_id" type="hidden"> -->
+            
             <div class="row">
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label >选择项目：</label>
-                        <select class="form-control project-info modal-info chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
-                            <option value="0">非项目借支</option>
-                            <volist name="projectArr" id="item">
-                                <option value="{$item['projectId']}">{$item['name']}</option>
-                            </volist>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="info-title">项目编号：</label>
-                        <input class="form-control project-info" readonly="readonly" name="code" title="项目编号"  value="" placeholder="项目编号" type="text">
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="info-title">项目名称：</label>
-                        <input class="form-control project-info" readonly="readonly" name="project_name" title="项目名称"  value="" placeholder="项目名称" type="text">
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="info-title">项目日期：</label>
-                        <input class="form-control project-info" readonly="readonly" name="project_date" title="项目日期"  value="" placeholder="项目日期" type="text">
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="info-title">营业主担：</label>
-                        <input class="form-control project-info" readonly="readonly" name="business_name" title="营业主担"  value="" placeholder="营业主担" type="text">
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="info-title">项目主担：</label>
-                        <input class="form-control project-info" readonly="readonly" name="leader_name" title="项目主担"  value="" placeholder="项目主担" type="text">
-                    </div>
-                </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label for="info-title">借支金额：</label>
                         <input class="form-control modal-info" required="required" name="debit_money" title="借支金额"  value="" placeholder="借支金额" type="text">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label >费用类别：</label>
                         <select class="form-control modal-info chosen-select" required="required" title="费用类别"  name="free_type">
@@ -67,16 +25,15 @@
                         </select>
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label for="info-title">要求放款日期：</label>
-                        <input class="form-control modal-info date-input" readonly="readonly" name="require_date" title="要求放款日期"  value="" placeholder="要求放款日期" type="text">
+                        <input class="form-control modal-info date-input" readonly="readonly" required="required" name="require_date" title="要求放款日期"  value="" placeholder="要求放款日期" type="text">
                     </div>
                 </div>
-                
-                <div class="col-md-3">
+            </div>
+            <div class="row">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label >收款账户类型：</label>
                         <select class="form-control modal-info chosen-select" required="required" title="收款账户类型"  name="account_type">
@@ -87,13 +44,13 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label for="info-title">收款账户详细：</label>
                         <input class="form-control modal-info" name="account" title="收款账户详细"  value="" placeholder="收款账户详细" type="text">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label for="info-title">借支说明：</label>
                         <input class="form-control modal-info"  name="debit_cause" title="借支说明"  value="" placeholder="借支说明" type="text">
@@ -101,15 +58,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <input class="form-control modal-info upload-file input-sm" readonly="readonly" name="voucher_file" type="text">
-                            <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
-                            <span class="input-group-addon clear-media"><i class="fa fa-recycle"></i></span>
-                        </div>
-                    </div> 
-                </div>
+                
             </div>
             <div class="form-group">
                 <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
@@ -124,5 +73,5 @@
     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
     <input class="modal-info" name="status" value="0" type="hidden">
     {:save_btn(get_defined_vars())}
-    {:approve_btn($tableName,0,false,0,0,['vars'=>get_defined_vars()])}
+    {:approve_btn($tableName,['vars'=>get_defined_vars()])}
 </div>

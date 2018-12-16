@@ -431,7 +431,7 @@ class SupplierController extends BaseController{
             $datas['addTime']=time();
             $datas['status'] = 1;
             $datas['process_level']=$this->processAuth["level"];
-            $datas['author']=session("userId");
+            $datas['user_id']=session("userId");
             unset($datas['companyId']);
             return $datas;
         }else if($reqType=="sup_companyEdit"){

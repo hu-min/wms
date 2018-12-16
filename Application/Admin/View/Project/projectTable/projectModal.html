@@ -374,5 +374,5 @@
     <input class="modal-info" name="status" value="0" type="hidden">
     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
     {:save_btn(get_defined_vars())}
-    {:approve_btn($tableName)}
+    {:approve_btn($tableName,['vars'=>get_defined_vars()])}
 </div>

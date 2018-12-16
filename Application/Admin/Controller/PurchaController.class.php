@@ -127,11 +127,12 @@ class PurchaController extends BaseController{
             if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
                 $where['_string'] = "user_id = ".session('userId')." OR FIND_IN_SET({$roleId},examine)>0";
             }
+            $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
             $parameter=[
                 'where'=>$where,
                 'fields'=>"*,FROM_UNIXTIME(sign_date,'%Y-%m-%d') sign_date,FROM_UNIXTIME(advance_date,'%Y-%m-%d') advance_date,FIND_IN_SET({$roleId},examine) place",
                 'page'=>$p,
-                'pageSize'=>$this->pageSize,
+                'pageSize'=>$pageSize,
                 'orderStr'=>"id DESC",
                 "joins"=>[
                     "LEFT JOIN(SELECT projectId, name,code,business,leader FROM v_project) p ON p.projectId = project_id",
@@ -188,11 +189,12 @@ class PurchaController extends BaseController{
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME]<7){
             $where['user_id'] = session('userId');
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'fields'=>"id,type,project_id,state status,user_id,COUNT(supplier_com) supr_num,SUM(contract_amount) amount, name,code,business_name,leader_name,FIND_IN_SET({$roleId},examine) place,CASE WHEN expense_money>debit_money THEN expense_money ELSE debit_money END debit_expense",
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"id DESC",
             'groupBy' => 'project_id',
             "joins"=>[
@@ -207,7 +209,7 @@ class PurchaController extends BaseController{
         
         $listResult=$this->purchaCom->getList($parameter);
         // echo $this->purchaCom->M()->_sql();exit;
-        $this->tablePage($listResult,'Purcha/purchaTable/costInsertList',"cost_insertList");
+        $this->tablePage($listResult,'Purcha/purchaTable/costInsertList',"cost_insertList",$pageSize);
     }
     function manageCostInsertInfo($datas,$reqType=false){
         $reqType = $reqType ? $reqType : I("reqType");
@@ -245,7 +247,8 @@ class PurchaController extends BaseController{
     function cost_insertAdd(){
         $datas=I("data");
         $isInsert =false;
-        $examines = getComponent('Process')->getExamine(I("vtabId"),$datas[0]["leader"]);
+        
+        
         // $process = $this->nodeCom->getProcess(I("vtabId"));
 
         // $process_id = $process["processId"];
@@ -275,28 +278,15 @@ class PurchaController extends BaseController{
         // $roleId = session("roleId");
         // $examineArr = explode(",",$examine);
         // $rolePlace = search_last_key($roleId,explode(",",$userRole['roleId'].",".$process["examine"]));
-        $rolePlace = $examines['place'];
-        $status = 0;
-        if($rolePlace!==false){
-            $process_level=$rolePlace+2;
-            if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
-                $status = 1;
-            }else{
-                $status = 2;
-            }
-        }else{
-            $process_level=$rolePlace > 0 ? $rolePlace : 1;
-        }
+        
+        //添加时审批流数据
+        $examines = getComponent('Process')->getExamine(I("vtabId"),$datas[0]["leader"]);
         foreach ($datas as $suprInfo) {
             $dataInfo = $this->manageCostInsertInfo($suprInfo);
-            $dataInfo["process_id"] = $examines['process_id'];
-            // $dataInfo["process_id"] = $process_id;
-            // $dataInfo["examine"] = $examine;
-            // $dataInfo["examine"] = $examines['examine'];
-            $dataInfo['examine'] = getComponent('Process')->filterExamine(session('roleId'),$dataInfo['examine']);
-            
-            $dataInfo['process_level'] = $process_level;
-            $dataInfo['status'] = $status;
+            $dataInfo["process_id"] = $examines["process_id"];
+            $dataInfo['examine'] = $examines["examine"];
+            $dataInfo['process_level'] = $examines["status"];
+            $dataInfo['status'] = $examines["process_level"];
             // print_r($process);
             // print_r($dataInfo);exit;
             unset($dataInfo['leader']);
@@ -333,19 +323,25 @@ class PurchaController extends BaseController{
             }
         }
 
+        //添加时审批流数据
         $examines = getComponent('Process')->getExamine(I("vtabId"),$datas[0]["leader"]);
-        $rolePlace = $examines['place'];
-        $status = 0;
-        if($rolePlace!==false){
-            $process_level=$rolePlace+2;
-            if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
-                $status = 1;
-            }else{
-                $status = 2;
-            }
-        }else{
-            $process_level=$rolePlace > 0 ? $rolePlace : 1;
-        }
+        // $datas['process_id'] = $examines["process_id"];
+        // $datas['examine'] = $examines["examine"];
+        // $datas['process_level'] = $examines["process_level"];
+        // $datas['status'] = $examines["status"];
+
+        // $rolePlace = $examines['place'];
+        // $status = 0;
+        // if($rolePlace!==false){
+        //     $process_level=$rolePlace+2;
+        //     if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
+        //         $status = 1;
+        //     }else{
+        //         $status = 2;
+        //     }
+        // }else{
+        //     $process_level=$rolePlace > 0 ? $rolePlace : 1;
+        // }
 
         if($datas[0]["project_id"]>0){
             $ids = array_column($datas,'id');
@@ -379,10 +375,9 @@ class PurchaController extends BaseController{
             }else{
                 $dataInfo = $this->manageCostInsertInfo($suprInfo,"cost_insertAdd");
                 $dataInfo["process_id"] = $examines['process_id'];
-                // $dataInfo["examine"] = $examines['examine'];;
-                $examines['examine'] = getComponent('Process')->filterExamine(session('roleId'),$examines['examine']);
-                $dataInfo['process_level'] = $process_level;
-                $dataInfo['status'] = $status;
+                $examines['examine'] = $examines["examine"];
+                $dataInfo['process_level'] = $examines["process_level"];
+                $dataInfo['status'] = $examines["status"];
                 // print_r($dataInfo);
                 if($dataInfo){
                     $insertResult=$this->purchaCom->insert($dataInfo);

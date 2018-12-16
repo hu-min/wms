@@ -167,6 +167,11 @@
         var get_section = function(){
             var project_id = $(tabId+" .global-modal").find(".modal-info[name='project_id']").val();
             var supplier_id = $(tabId+" .global-modal").find(".modal-info[name='supplier_id']").val();
+            if(supplier_id > 0){
+                $(tabId+" .global-modal").find(".modal-info[name='section']").prop("required",true)
+            }else{
+                $(tabId+" .global-modal").find(".modal-info[name='section']").prop("required",false)
+            }
             if(project_id > 0 && supplier_id > 0){
                 datas = {}
                 datas["reqType"] = "getSectionList"

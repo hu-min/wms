@@ -15,17 +15,21 @@ class ConfigController extends BaseController{
     function get_val($name,$json_decode=true){
         $redsName = "config_".$name;
         $val = $this->Redis->get($redsName);
+        
         if($val){
             return $val;
         }else{
             $parameter=[
                 "where"=>["name"=>$name,"status"=>1],
                 "fields"=>"value",
+                'one'=>true,
             ];
-            $configRes=$this->selfDB->getOne($parameter);
+            $this->log($parameter);
+            $configRes=$this->getOne($parameter);
         }
-       
-        if(!is_null($configRes)){
+
+        if($configRes){
+    
             if($configRes){
                 $this->Redis->set($redsName,$configRes,3600);
                 return $configRes;
@@ -51,10 +55,36 @@ class ConfigController extends BaseController{
         }
         $nameRes=$this->get_val($name);
         if(!$nameRes){
-            $result=$this->selfDB->insert(["name"=>$name,"value"=>$valJson,"status"=>1]);
+            $result=$this->insert(["name"=>$name,"value"=>$valJson,"status"=>1]);
         }else if(!is_null($nameRes)){//存在则修改
             $result=$this->update(["where"=>["name"=>$name],"data"=>["value"=>$valJson]]);
         }
+        $this->redisCom->delAll("","config_".$name); //清空一下redis 的缓存
         return $result;
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-12-13 23:00:27 
+     * @Desc: 判断服务器是否锁定 
+     */    
+    function is_web_lock(){
+        $name = "web_lock";
+        $val = $this->Redis->get("config_".$name);
+        
+        if($val){
+            return $val;
+        }
+        $parameter=[
+            "where"=>["name"=>$name,"status"=>1],
+            "fields"=>"value",
+            'one'=>true,
+        ];
+        $configRes=$this->getOne($parameter);
+        
+        if(!$configRes){
+            $configRes = ['open'];
+        }
+        $this->Redis->set("config_".$name,$configRes,3600);
+        return $configRes;
     }
 }

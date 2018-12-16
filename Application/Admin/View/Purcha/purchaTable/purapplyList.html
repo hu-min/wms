@@ -21,8 +21,7 @@
         </td>
         <td>{$item['remark']}</td>
         <td>
-            {:approve_btn($tableName,$item['id'],$item['place'],$item['process_level'],$item['status'])}
-            <!-- {:approve_btn($tableName,$item['id'])} -->
+            {:approve_btn($tableName,['item'=>get_defined_vars()['list'][$key]])}
             <!-- <div class="approve-group" data-table="{$tableName}" data-id="{$item['id']}" >
                 <button type="button" data-url="{:U('Tools/getApproveList')}" class="btn btn-sm bg-purple approve-log">记录</button>
             </div> -->

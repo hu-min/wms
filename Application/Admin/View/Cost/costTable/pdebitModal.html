@@ -82,7 +82,7 @@
         {:save_btn(get_defined_vars(),true)}
     </if>
     <if condition="$listType eq 'contrast'">
-        {:approve_btn($tableName)}
+        {:approve_btn($tableName,['vars'=>get_defined_vars()])}
     </if>
     
 </div>

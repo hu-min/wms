@@ -89,7 +89,13 @@ class ProjectCostController extends BaseController{
                     'LEFT JOIN (SELECT basicId mid, name module_name FROM v_basic WHERE class ="module" ) mo ON mo.mid = m.module_id',
                 ],
             ];
-            $resultData['list'] = $this->pCostSubCom->getList($sParam)['list'];
+            $subResult = $this->pCostSubCom->getList($sParam);
+            if($subResult){
+                $resultData['list'] = $subResult['list'];
+            }else{
+                $resultData['list'] = [];
+            }
+            
             if($export){
                 $sql = explode("LIMIT",$this->pCostSubCom->M()->_sql())[0];
                 $this->Redis->set(md5($sql),$sql,300);
@@ -426,23 +432,15 @@ class ProjectCostController extends BaseController{
         $pOfferData['ouser_id'] = session('userId');
  
         $pOfferData['add_time'] = time();
-        $examines = getComponent('Process')->getExamine($vtabId,$pResult['leader']);
+
+        //添加时审批流数据
+        $examines = getComponent('Process')->getExamine(I("vtabId"),$pResult['leader']);
         $pOfferData['process_id'] = $examines["process_id"];
         $pOfferData['examine'] = $examines["examine"];
-        $roleId = session("roleId");
-        $rolePlace = $examines['place'];
-        $pOfferData['status'] = 0;
-        // if($rolePlace!==false){
-        //     $pOfferData['process_level']=$rolePlace+2;
-        //     if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
-        //         $pOfferData['status'] = 1;
-        //     }else{
-        //         $pOfferData['status'] = 2;
-        //     }
-        // }else{
-        //     $pOfferData['process_level'] = $examines["place"] > 0 ? $examines["place"] : 1;
-        // }
-        // print_r($pOfferData);exit;
+        $pOfferData['process_level'] = $examines["process_level"];
+        $pOfferData['status'] = $examines["status"];
+
+  
         $this->pCostCom->startTrans();
         // $pOfferData['status'] = $status ? $status : $pOfferData['status'];
         $pInsertResult = $this->pCostCom->insert($pOfferData);
@@ -574,20 +572,14 @@ class ProjectCostController extends BaseController{
         //     $pOfferData['data']['status'] = $status;
         // }
         $pResult = $this->projectCom->getOne(['where'=>['project_id' => $data['id']],'leader'])['list'];
-        $examines = getComponent('Process')->getExamine($vtabId,$pResult['leader']);
+        
+        //添加时审批流数据
+        $examines = getComponent('Process')->getExamine(I("vtabId"),$pResult['leader']);
         $pOfferData['data']['process_id'] = $examines["process_id"];
         $pOfferData['data']['examine'] = $examines["examine"];
-        $roleId = session("roleId");
-        $rolePlace = $examines['place'];
-        $pOfferData['data']['status'] = 2;
-        if($rolePlace!==false){
-            $pOfferData['data']['process_level']=$rolePlace+2;
-            if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
-                $pOfferData['data']['status'] = 1;
-            }
-        }else{
-            $pOfferData['data']['process_level'] = $examines["place"] > 0 ? $examines["place"] : 1;
-        }
+        $pOfferData['data']['process_level'] = $examines["process_level"];
+        $pOfferData['data']['status'] = $examines["status"];
+
         // print_r($pOfferData);exit;
         $pInsertResult = $this->pCostCom->update($pOfferData);
 

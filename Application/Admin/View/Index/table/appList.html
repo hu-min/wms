@@ -1,16 +1,16 @@
 
 <volist name="list" id="item">
     <tr class="nodeOn node-action" data-nodeid="{$item['nodeId']}" href="{:U($item['controller'])}" data-title="{$item.moudle_name}">
-        <td class="serial_num">{$key+1}</td>
+        <!-- <td class="serial_num">{$key+1}</td> -->
         <td style="min-width: 80px;">{$item.user_name}</td>
         <td><span>{$item.moudle_name}</span></td>
         <td>{$item.project_name}</td>
         <td>{$item.add_time}</td>
-        <td>
+        <!-- <td>
             <div class="progress progress-xs progress-striped active">
                 <div class="progress-bar progress-bar-primary" style="width: {:round(($item['process_level']-1)/count(explode(',',$item['examine']))*100)}%"></div>
             </div>
-            </td>
+            </td> -->
         <td>
             <span class="badge bg-light-blue">{:round(($item['process_level']-1)/count(explode(',',$item['examine']))*100)}%</span>
         </td>

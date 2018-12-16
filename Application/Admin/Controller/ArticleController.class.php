@@ -168,7 +168,7 @@ class ArticleController extends BaseController{
             $datas['cover']=base64Img($filesData[urlencode($datas['cover'])])["url2"];
         }
         if($reqType=="articleAdd"){
-            $datas['author']=session("loginName");
+            $datas['user_id']=session("loginName");
             $datas['addTime']=time();
             unset($datas['articleId']);
             return $datas;
@@ -206,8 +206,8 @@ class ArticleController extends BaseController{
         if($data['title']){
             $where['title']=['LIKE','%'.$data['title'].'%'];
         }
-        if($data['author']){
-            $where['author']=['LIKE','%'.$data['author'].'%'];
+        if($data['user_id']){
+            $where['user_id']=['LIKE','%'.$data['user_id'].'%'];
         }
         if($data['class']){
             $where['class']=$data['class'];
@@ -218,15 +218,16 @@ class ArticleController extends BaseController{
         if(isset($data['status'])){
             $where['status']=$data['status'];
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"articleId DESC"
         ];
         
         $listResult=$this->articleCom->getArticleList($parameter);
-        $this->tablePage($listResult,'Article/articleTable/articleList',"articleList");
+        $this->tablePage($listResult,'Article/articleTable/articleList',"articleList",$pageSize);
         // if($articleResult){
         //     $articleRed="articleList_".session("userId");
         //     $this->Redis->set($articleRed,json_encode($articleResult['list']),3600);

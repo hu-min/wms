@@ -49,7 +49,6 @@ class CostController extends BaseController{
      * @Desc: 借支控制 
      */    
     function debitControl(){
-
         $reqType=I('reqType');
         $this->assign('accountType',$this->accountType);
         // print_r($this->Com ->get_option("cost_project"));exit;
@@ -57,8 +56,8 @@ class CostController extends BaseController{
         $this->assign("controlName","debit");
         $this->assign("tableName",$this->debitCom->tableName()); 
         $nodeId = getTabId(I("vtabId"));
-        $process = $this->nodeCom->getProcess($nodeId);
-        $this->assign("place",$process["place"]);
+        // $process = $this->nodeCom->getProcess($nodeId);
+        // $this->assign("place",$process["place"]);
         $this->assign('accounts',json_encode($this->accounts));
 
         if($reqType){
@@ -362,7 +361,7 @@ class CostController extends BaseController{
             $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
         }
     }
-    function manageDebitInfo($datas,$reqType=false){
+    function manageDebitInfo($datas=[],$reqType=false){
         $reqType = $reqType ? $reqType : I("reqType");
         $datas= $datas ? $datas : I("data");
         // if($datas["project_id"]>0){
@@ -398,39 +397,36 @@ class CostController extends BaseController{
             $datas['add_time']=time();
             $datas['debit_date']=time();
             $datas['user_id']=session('userId');
-            $datas['author']=session('userId');
 
-            //添加时必备数据
+            //添加时审批流数据
             $examines = getComponent('Process')->getExamine(I("vtabId"),$datas['leader']);
-            // $process = $this->nodeCom->getProcess(I("vtabId"));
             $datas['process_id'] = $examines["process_id"];
             $datas['examine'] = $examines["examine"];
-            // $datas['process_id'] = $process["processId"];
-            if($datas["project_id"]>0){
-                // print_r($datas);exit;
-                //存在项目，则第一个审批的人是项目主管,examine需要
-                // $userRole = $this->userCom->getUserInfo($datas['leader']);
-                // $datas['examine'] = implode(",",array_unique(explode(",",$userRole['roleId'].",".$process["examine"]))) ;
-                unset($datas['leader']);
-            }else{
-                // $datas['examine'] = $process["examine"];
-            }
-            // $examineArr = explode(",",$datas['examine']);
-            // $rolePlace = search_last_key($roleId,$examineArr);
-            $rolePlace = $examines['place'];
-            if($rolePlace!==false){
-                $datas['process_level']=$rolePlace+2;
-                if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
-                    $datas['status'] = 1;
-                }else{
-                    $datas['status'] = 2;
-                }
-            }else{
-                $datas['process_level']=$process["place"] > 0 ? $process["place"] : 1;
-            }
-            //如果自己处于某个申请阶段，直接跳过下级;
-            // $datas['process_level']=$this->processAuth["level"];
-            $datas['examine'] = getComponent('Process')->filterExamine(session('roleId'),$datas['examine']);
+            $datas['process_level'] = $examines["process_level"];
+            $datas['status'] = $examines["status"];
+
+            // if($datas["project_id"]>0){
+            //     unset($datas['leader']);
+            // }
+            // if(count(explode(",",$examines['examine']))==$examines['place']){
+            //     $datas['status'] = 1;
+            // }elseif(count(explode(",",$examines['examine']))>$examines['place']){
+            //     $datas['status'] = 2;
+            // }
+            // $rolePlace = $examines['place'];
+            // if($rolePlace!==false){
+            //     $datas['process_level']=$rolePlace+2;
+            //     if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
+            //         $datas['status'] = 1;
+            //     }else{
+            //         $datas['status'] = 2;
+            //     }
+            // }else{
+            //     $datas['process_level']= $process["place"] > 0 ? $process["place"] : 1;
+            // }
+            // //如果自己处于某个申请阶段，直接跳过下级;
+            // // $datas['process_level']=$this->processAuth["level"];
+            // $datas['examine'] = getComponent('Process')->filterExamine(session('roleId'),$datas['examine']);
             unset($datas['id']);
             return $datas;
         }else if($reqType=="debitEdit"){
@@ -576,6 +572,8 @@ class CostController extends BaseController{
                 "LEFT JOIN (SELECT userId,userName business_name FROM v_user) bu ON bu.userId = p.business",
                 "LEFT JOIN (SELECT userId,userName leader_name FROM v_user) lu ON lu.userId = p.leader",
                 "LEFT JOIN (SELECT basicId,name free_name FROM v_basic WHERE class='feeType') f ON f.basicId=free_type",
+                "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='".$this->debitCom->tableName()."' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id",
+                "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
             ]
         ];
         $listResult=$this->debitCom->getList($parameter);
@@ -593,7 +591,9 @@ class CostController extends BaseController{
             $option.=A("Basic")->getfeeType($value,0);
         }
         $this->assign("pidoption",$option);
-        
+        $this->assign("controlName","finance_debit");
+        $this->assign("tableName",$this->debitCom->tableName()); 
+
         if($gettype=="Edit"){
             $title = "编辑借支";
             $btnTitle = "保存数据";
@@ -606,7 +606,7 @@ class CostController extends BaseController{
             "data"=>$resultData,
             "title"=>$title,
             "btnTitle"=>$btnTitle,
-            "template"=>"debitModal",
+            "template"=>"financedebitModal",
         ];
         $this->modalOne($modalPara);
     }
@@ -694,6 +694,8 @@ class CostController extends BaseController{
                 "LEFT JOIN (SELECT userId buser_id,userName business_name FROM v_user) bu ON bu.buser_id = p.business",
                 "LEFT JOIN (SELECT userId luser_id,userName leader_name FROM v_user) lu ON lu.luser_id = p.leader",
                 "LEFT JOIN (SELECT parent_id,count(*) all_item,SUM(money) all_money FROM v_expense_sub GROUP BY parent_id ) c ON parent_id = id",
+                "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='".$this->expenseCom->tableName()."' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id",
+                "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
             ],
         ];
         
@@ -738,24 +740,13 @@ class CostController extends BaseController{
         unset($expInfo['leader']);
         $expInfo['user_id'] = session("userId");
         $expInfo['add_time'] = time();
+
         $examines = getComponent('Process')->getExamine(I("vtabId"),$data['leader']);
         $expInfo['process_id'] = $examines["process_id"];
-        $expInfo['examine'] = getComponent('Process')->filterExamine(session('roleId'),$examines['examine']);
-        $roleId = session("roleId");
-        $rolePlace = $examines['place'];
-        $expInfo['status'] = 0;
-        $num = count($data["list"]);
-        $insertNum = 0;
-        if($rolePlace!==false){
-            $expInfo['process_level']=$rolePlace+2;
-            if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
-                $expInfo['status'] = 1;
-            }else{
-                $expInfo['status'] = 2;
-            }
-        }else{
-            $expInfo['process_level']=$process["place"] > 0 ? $process["place"] : 1;
-        }
+        $expInfo['examine'] = $examines["examine"];
+        $expInfo['process_level'] = $examines["process_level"];
+        $expInfo['status'] = $examines["status"];
+
         $this->expenseCom->startTrans();
         $this->expenseSubCom->startTrans();
 
@@ -999,6 +990,8 @@ class CostController extends BaseController{
                 "LEFT JOIN (SELECT userId ,userName leader_name FROM v_user) lu ON lu.userId = p.leader",
                 "LEFT JOIN (SELECT parent_id,count(*) all_item, SUM(money) all_money FROM v_expense_sub GROUP BY parent_id ) c ON parent_id = id",
                 "LEFT JOIN (SELECT project_id p_project_id, section section_id, flag FROM v_project_cost ) pc ON pc.section_id = section AND pc.p_project_id = project_id",
+                "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='".$this->expenseCom->tableName()."' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id",
+                "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
             ],
         ];
         

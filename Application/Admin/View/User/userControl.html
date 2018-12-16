@@ -134,11 +134,7 @@
     </div>
     <script>
         var user_initInfo =function(gettype){
-            if(gettype=="Add"){
-                $(tabId+" .global-modal input[name='qiye_sync']").prop("disabled",true);
-            }
-            
-            upload({url:"{:U('Project/upload_filesAdd')}"})
+             upload({url:"{:U('Project/upload_filesAdd')}"})
             init_date();
         }
         $(function(){
@@ -148,14 +144,6 @@
                     $(tabId+" .global-modal .modal-info[name='phone']").prop('required',true)
                 }else{
                     $(tabId+" .global-modal .modal-info[name='phone']").prop('required',false)
-                }
-            })
-            $(tabId).on("change",".global-modal .modal-info[name='qiye_id']",function(){
-                var qiye_id = $(this).val()
-                if(qiye_id.length==10){
-                    $(tabId+" .global-modal input[name='qiye_sync']").prop("disabled",false);
-                }else{
-                    $(tabId+" .global-modal input[name='qiye_sync']").prop("disabled",true);
                 }
             })
         })
@@ -179,11 +167,6 @@
         function user_setInfo(info){
             ['userId','loginName','userName','avatar','phone','birthday','id_card','email','bank_name','bank_card','wechat','alipay','qiye_id'].forEach(element => {
                 $(tabId+" .global-modal .modal-info[name='"+element+"']").val(info[element]);
-                if(element=='qiye_id' && info[element]!=""){
-                    $(tabId+" .global-modal .modal-info[name='"+element+"']").prop("disabled",true);
-                }else if (element=='qiye_id' && info[element]==""){
-                    $(tabId+" .global-modal input[name='qiye_sync']").prop("disabled",true);
-                }
             });
    
             $(tabId+" .global-modal .modal-info[name='phone']").val(info['phone']);

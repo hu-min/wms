@@ -200,12 +200,12 @@ class FinanceController extends BaseController{
             $where["_string"] = "FROM_UNIXTIME(payTime,'%Y') = '{$year}'";
         }
        
-
+        $pageSize = isset($datas['pageSize']) ? $datas['pageSize'] : $this->pageSize;
         $parameter=[
             'fields'=>$fields,
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"payTime DESC",
             'groupBy' => $groupBy,
             "joins"=>[""],
@@ -218,7 +218,7 @@ class FinanceController extends BaseController{
         $countStr = "<div><label>支出总额：<span class='text-light-blue'>".$countResult["list"]["all_fee"]."</span></label> | <label>已付总额：<span class='text-light-blue'>".$countResult["list"]["payment"]."</span></label> | <label>未支付总额：<span class='text-light-blue'>".$countResult["list"]["no_payment"]."</span></label></div>";
         
         // echo $this->fixExpenCom->M()->_sql();
-        $this->tablePage($listResult,'Finance/financeTable/fix_expCountList',"fix_expCount{}List",false,$countStr);
+        $this->tablePage($listResult,'Finance/financeTable/fix_expCountList',"fix_expCount{}List",$pageSize,$countStr);
     }
     function fix_expenseList(){
         $data=I("data");
@@ -245,11 +245,12 @@ class FinanceController extends BaseController{
         if($data['expenClas']){
             $where['expenClas']=$data['expenClas'];
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
-            'fields'=>"`id`,`expenClas`,expenClass,`finanAccount`,finanAccs,`toObject`,`content`,`startDate`,`endDate`,`fee`,`payment`,noPayment,payTime,remark,addTime,status,process_level,author,examine,detail_file",
+            'fields'=>"`id`,`expenClas`,expenClass,`finanAccount`,finanAccs,`toObject`,`content`,`startDate`,`endDate`,`fee`,`payment`,noPayment,payTime,remark,addTime,status,process_level,user_id,examine,detail_file",
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"id DESC",
             "joins"=>["LEFT JOIN (SELECT basicId , `name` expenClass FROM v_basic WHERE status=1 AND class='expenClas' ) bt ON bt.basicId=expenClas","LEFT JOIN (SELECT basicId , `name` finanAccs FROM v_basic WHERE class in ('bankstock','cashstock') ) bf ON bf.basicId=finanAccount"],
         ];
@@ -261,7 +262,7 @@ class FinanceController extends BaseController{
         $countResult = $this->fixExpenCom->getOne($parameter);
         $countStr = "<div><label>支出总额：<span class='text-light-blue'>".$countResult["list"]["fee"]."</span></label> | <label>已付总额：<span class='text-light-blue'>".$countResult["list"]["payment"]."</span></label> | <label>未支付总额：<span class='text-light-blue'>".$countResult["list"]["noPayment"]."</span></label></div>";
 
-        $this->tablePage($listResult,'Finance/financeTable/fix_expenseList',"fix_expenseList",false,$countStr);
+        $this->tablePage($listResult,'Finance/financeTable/fix_expenseList',"fix_expenseList",$pageSize ,$countStr);
     }
     function manageFixExpenInfo(){
         $reqType=I("reqType");
@@ -277,7 +278,7 @@ class FinanceController extends BaseController{
         }
         if($reqType=="fix_expenseAdd"){
             $datas['addTime']=time();
-            $datas['author']=session("userId");
+            $datas['user_id']=session("userId");
             $datas['status']=1;
             unset($datas['id']);
             return $datas;
@@ -395,7 +396,7 @@ class FinanceController extends BaseController{
         if($reqType=="receivableAdd"){
             $datas['add_time']=time();
             $datas['time']=strtotime($datas['time']);
-            $datas['author']=session('userId');
+            $datas['user_id']=session('userId');
             $datas['process_level']=$this->processAuth["level"];
             unset($datas['id']);
             return $datas;
@@ -606,7 +607,7 @@ class FinanceController extends BaseController{
         }
         if($reqType=="wouldpayAdd"){
             $datas['add_time']=time();
-            $datas['author']=session('userId');
+            $datas['user_id']=session('userId');
             $datas['process_level']=$this->processAuth["level"];
             unset($datas['id']);
             return $datas;
@@ -690,7 +691,7 @@ class FinanceController extends BaseController{
         $listResult = $this->wouldpayCom->getList($parameter);
         // echo $this->wouldpayCom->M()->_sql();exit;
         // print_r($listResult);exit;
-        $this->tablePage($listResult,'Finance/financeTable/supplierpayList',"supplierpayList");
+        $this->tablePage($listResult,'Finance/financeTable/supplierpayList',"supplierpayList",$pageSize);
     }
     function wouldpayAdd(){
         $info=$this->manageWouldpayInfo();
@@ -825,7 +826,7 @@ class FinanceController extends BaseController{
         }
         if($reqType=="purchaAdd"){
             $datas['add_time']=time();
-            $datas['author']=session('userId');
+            $datas['user_id']=session('userId');
             $datas['process_level']=$this->processAuth["level"];
             unset($datas['id']);
             return $datas;
@@ -861,11 +862,13 @@ class FinanceController extends BaseController{
         if($id>0){
             $where["id"] = $id;
         }
+
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'fields'=>"*",
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"add_time DESC",
             "joins"=>[
                 "LEFT JOIN (SELECT projectId, name project_name,brand,code,project_time,DATE_ADD(FROM_UNIXTIME(project_time,'%Y-%m-%d'),INTERVAL days day) end_date,type,leader FROM v_project ) p ON p.projectId = project_id ",
@@ -898,7 +901,7 @@ class FinanceController extends BaseController{
             $this->ajaxReturn(["data"=>$listResult["list"][0]]);
         }
         // print_r( $listResult);
-        $this->tablePage($listResult,'Finance/financeTable/purchaList',"purchaList");
+        $this->tablePage($listResult,'Finance/financeTable/purchaList',"purchaList",$pageSize);
     }
     function purchaAdd(){
         $info=$this->managePurchaInfo();
@@ -1023,11 +1026,19 @@ class FinanceController extends BaseController{
             $datas['add_time']=time();
             $datas['user_id']=session('userId');
 
-            //添加时必备数据
+
+            //添加时审批流数据
             $examines = getComponent('Process')->getExamine(I("vtabId"),$datas['leader']);
-            // $process = $this->nodeCom->getProcess(I("vtabId"));
             $datas['process_id'] = $examines["process_id"];
             $datas['examine'] = $examines["examine"];
+            $datas['process_level'] = $examines["process_level"];
+            $datas['status'] = $examines["status"];
+
+            //添加时必备数据
+            
+            // $process = $this->nodeCom->getProcess(I("vtabId"));
+            
+            
             if($datas["project_id"]>0){ 
                 unset($datas['leader']);
             }
@@ -1041,22 +1052,9 @@ class FinanceController extends BaseController{
             //     $datas['examine'] = $process["examine"];
             // }
             //如果是审批者自己提交的执行下列代码
-            $roleId = session("roleId");
-            $rolePlace = $examines['place'];
             // $examineArr = explode(",",$datas['examine']);
             // $rolePlace = search_last_key($roleId,$examineArr);
-            $datas['status'] = 0;
-            if($rolePlace!==false){
-                $datas['process_level']=$rolePlace+2;
-                if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
-                    $datas['status'] = 1;
-                }else{
-                    $datas['status'] = 2;
-                }
-            }else{
-                $datas['process_level']=$process["place"] > 0 ? $process["place"] : 1;
-            }
-            $datas['examine'] = getComponent('Process')->filterExamine(session('roleId'),$datas['examine']);
+            
             // $datas['process_level']=$process["place"];
             unset($datas['id']);
             return $datas;
@@ -1176,8 +1174,8 @@ class FinanceController extends BaseController{
             $where = "";
         }
         $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
-
-        $table = "SELECT p.project_id project_id,SUM(debit_money) debit_money,COUNT(debit_money) debit_num,SUM(money) expense_money,COUNT(money) expense_num,SUM(invoice_money) invoice_money,GROUP_CONCAT(did) debit_ids,GROUP_CONCAT(eid) expense_ids,user_id, clear_status,vp.name,vp.code,user_name  FROM (SELECT project_id,user_id,clear_status FROM v_debit WHERE `status`=1 UNION SELECT project_id,user_id,clear_status FROM v_expense_sub RIGHT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m1 ON m1.exId=parent_id) p LEFT JOIN (SELECT project_id,debit_money,id did,user_id user_did FROM v_debit WHERE `status`=1) d ON d.project_id=p.project_id AND d.user_did = p.user_id LEFT JOIN (SELECT project_id,parent_id,money,invoice_money,id eid,user_id user_eid  FROM v_expense_sub RIGHT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m ON m.exId=parent_id ) e ON e.project_id=p.project_id AND e.user_eid=p.user_id LEFT JOIN (SELECT projectId,name,code,leader FROM v_project) vp ON vp.projectId=p.project_id LEFT JOIN (SELECT userId ,userName user_name FROM v_user) u ON u.userId = user_id GROUP BY p.project_id,clear_status";
+        $table = "SELECT pc.project_id project_id,pc.section section,CASE WHEN ISNULL(vp.name) THEN '非项目' ELSE vp.name END `name` ,CASE WHEN ISNULL(vp.code) THEN '非项目' ELSE vp.code END `code`,CASE WHEN ISNULL(flag) THEN '非项目' ELSE flag END flag,d.debit_money debit_money,d.debit_num debit_num,e.expense_money expense_money,e.expense_num expense_num,e.invoice_money invoice_money,user_name,d.did debit_ids,e.eid expense_ids,e.clear_status eclear,d.clear_status dclear FROM (SELECT project_id,section,user_id,clear_status FROM v_debit WHERE `status`=1  GROUP BY project_id, section,user_id,clear_status UNION SELECT project_id,section,user_id,clear_status FROM v_expense WHERE `status`=1 GROUP BY project_id, section,user_id,clear_status) psuc LEFT JOIN (SELECT project_id,section,SUM(debit_money) debit_money,COUNT(id) debit_num,user_id,clear_status,GROUP_CONCAT(id) did FROM v_debit WHERE `status`=1 GROUP BY project_id, section,user_id,clear_status) d ON d.project_id = psuc.project_id AND d.section = psuc.section AND d.user_id = psuc.user_id AND d.clear_status = psuc.clear_status LEFT JOIN (SELECT project_id,section,SUM(money) expense_money,COUNT(id) expense_num,SUM(invoice_money) invoice_money,user_id,clear_status,GROUP_CONCAT(id) eid FROM v_expense WHERE `status`=1 GROUP BY project_id, section,user_id,clear_status) e ON e.project_id = psuc.project_id AND e.section = psuc.section AND e.user_id = psuc.user_id AND e.clear_status = psuc.clear_status LEFT JOIN (SELECT projectId,name,code FROM v_project) vp ON vp.projectId=psuc.project_id LEFT JOIN (SELECT project_id,section,flag FROM v_project_cost) pc ON pc.project_id=psuc.project_id AND pc.section = psuc.section LEFT JOIN (SELECT userId, userName user_name FROM v_user ) u ON u.userId = psuc.user_id";
+        // $table = "SELECT p.project_id project_id,SUM(debit_money) debit_money,COUNT(debit_money) debit_num,SUM(money) expense_money,COUNT(money) expense_num,SUM(invoice_money) invoice_money,GROUP_CONCAT(did) debit_ids,GROUP_CONCAT(eid) expense_ids,user_id, clear_status,vp.name,vp.code,user_name  FROM (SELECT project_id,user_id,clear_status FROM v_debit WHERE `status`=1 UNION SELECT project_id,user_id,clear_status FROM v_expense_sub RIGHT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m1 ON m1.exId=parent_id) p LEFT JOIN (SELECT project_id,debit_money,id did,user_id user_did FROM v_debit WHERE `status`=1) d ON d.project_id=p.project_id AND d.user_did = p.user_id LEFT JOIN (SELECT project_id,parent_id,money,invoice_money,id eid,user_id user_eid  FROM v_expense_sub RIGHT JOIN (SELECT id exId,project_id,user_id FROM v_expense WHERE `status`=1) m ON m.exId=parent_id ) e ON e.project_id=p.project_id AND e.user_eid=p.user_id LEFT JOIN (SELECT projectId,name,code,leader FROM v_project) vp ON vp.projectId=p.project_id LEFT JOIN (SELECT userId ,userName user_name FROM v_user) u ON u.userId = user_id GROUP BY p.project_id,clear_status";
 
         $sql="SELECT * FROM ({$table}) c {$where} LIMIT ".(($p-1)*$pageSize).",".$pageSize;
         $db = M();
@@ -1644,31 +1642,32 @@ class FinanceController extends BaseController{
         $this->modalOne($modalPara);
     }
     function flo_cap_logList(){
-        $datas = I("data");
+        $data = I("data");
         $p=I("p")?I("p"):1;
         $where=['status'=>['elt',1]];
         $roleId = session('roleId');
 
         foreach (['project_id','account_id','log_type','float_type'] as $key ) {
-            if(isset($datas[$key])){
-                if( $key == "log_type" && $datas[$key] == 4){
+            if(isset($data[$key])){
+                if( $key == "log_type" && $data[$key] == 4){
                     $where[$key] = ['IN',[2,3]];
                 }else{
-                    $where[$key] = $datas[$key];
+                    $where[$key] = $data[$key];
                 }
             }
         }
-        if(isset($datas['happen_time'])){
-           $date = explode(" - ",$datas['happen_time']);
+        if(isset($data['happen_time'])){
+           $date = explode(" - ",$data['happen_time']);
            if(count($date)>1){
                 $where['happen_time'] = [['egt',strtotime($date[0]." 00:00:00")],['lt',strtotime($date[1]." 23:59:59")]];
            }
         }
+        $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
         $parameter=[
             'fields'=>"*,FROM_UNIXTIME(happen_time,'%Y-%m-%d %H:%i:%s') happen_time,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time,FIND_IN_SET({$roleId},examine) place",
             'where'=>$where,
             'page'=>$p,
-            'pageSize'=>$this->pageSize,
+            'pageSize'=>$pageSize,
             'orderStr'=>"add_time DESC",
             "joins"=>[
                 "LEFT JOIN (SELECT projectId,code project_code,name project_name FROM v_project ) p ON p.projectId = project_id",
@@ -1704,22 +1703,12 @@ class FinanceController extends BaseController{
                 $datas['happen_time']=time();
             }
             unset($datas['id']);
+            //添加时审批流数据
             $examines = getComponent('Process')->getExamine(I("vtabId"),0);
-            $datas['examine'] = $examines['examine'];
-            $datas['process_id'] = $examines['process_id'];
-            $roleId = session("roleId");
-            $rolePlace = $examines['place'];
-            $datas['status'] = 0;
-            if($rolePlace!==false){
-                $datas['process_level']=$rolePlace+2;
-                if(count(explode(",",$examines['examine'])) <= ($rolePlace+1)){
-                    $status = 1;
-                }else{
-                    $status = 2;
-                }
-            }else{
-                $datas['process_level'] = $examines["place"] > 0 ? $examines["place"] : 1;
-            }
+            $datas['process_id'] = $examines["process_id"];
+            $datas['examine'] = $examines["examine"];
+            $datas['process_level'] = $examines["process_level"];
+            $datas['status'] = $examines["status"];
 
             return $datas;
         }else if($reqType=="flo_cap_logEdit"){

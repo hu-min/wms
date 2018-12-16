@@ -3,7 +3,7 @@
             <td>{$item['articleId']}</td>
             <td>{$item['title']}</td>
             <td data-avatar="{$item['cover']}" class="users-avatar-td"><if condition="$item['cover'] neq ''"><img src="__UPLOADS__/{$item['cover']}"></if></td>
-            <td>{$item['author']}</td>
+            <td>{$item['user_id']}</td>
             <td>{$artClsList[$item['class']]}</td>
             <td>{$item['content']|htmlspecialchars_decode|strip_tags|mb_substr=0,30}</td>
             <td><neq name="item['addTime']" value="" >{$item['addTime']|date='Y-m-d H:i:s',###}</neq></td>

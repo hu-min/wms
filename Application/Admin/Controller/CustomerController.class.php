@@ -95,7 +95,7 @@ class CustomerController extends BaseController{
         $data=I("data");
         $p=I("p")?I("p"):1;
         // $where=["process_level"=>[($this->processAuth["level"]-1),0,"OR"]];
-        $where['_string']=" (process_level = ".($this->processAuth["level"]-1)." OR process_level = 0 OR author = ".session("userId")." OR FIND_IN_SET(".session("userId").",examine))";
+        $where['_string']=" (process_level = ".($this->processAuth["level"]-1)." OR process_level = 0 OR user_id = ".session("userId")." OR FIND_IN_SET(".session("userId").",examine))";
 
         foreach (['company','alias'] as $key) {
             if($data[$key]){
@@ -142,7 +142,7 @@ class CustomerController extends BaseController{
         if($reqType=="cust_companyAdd"){
             $datas['addTime']=time();
             $datas['process_level']=$this->processAuth["level"];
-            $datas['author']=session("userId");
+            $datas['user_id']=session("userId");
             unset($datas['companyId']);
             return $datas;
         }else if($reqType=="cust_companyEdit"){
@@ -284,7 +284,7 @@ class CustomerController extends BaseController{
         $data=I("data");
         $p=I("p")?I("p"):1;
 
-        $where['_string']=" (process_level = ".($this->processAuth["level"]-1)." OR process_level = 0 OR author = ".session("userId")." OR FIND_IN_SET(".session("userId").",examine))";
+        $where['_string']=" (process_level = ".($this->processAuth["level"]-1)." OR process_level = 0 OR user_id = ".session("userId")." OR FIND_IN_SET(".session("userId").",examine))";
         if($data['companyId']){
             $where['companyId']=$data['companyId'];
         }
@@ -318,7 +318,7 @@ class CustomerController extends BaseController{
         if($reqType=="cust_contactAdd"){
             $datas['addTime']=time();
             $datas['process_level']=$this->processAuth["level"];
-            $datas['author']=session("userId");
+            $datas['user_id']=session("userId");
             unset($datas['contactId']);
             return $datas;
         }else if($reqType=="cust_contactEdit"){
