@@ -294,19 +294,29 @@ class PurchaController extends BaseController{
                 $insertResult=$this->purchaCom->insert($dataInfo);
                 
                 if(isset($insertResult->errCode) && $insertResult->errCode==0){
-                    $this->ApprLogCom->createApp($this->purchaCom->tableName(),$insertResult->data,session("userId"),"");
+                    // $this->ApprLogCom->createApp($this->purchaCom->tableName(),$insertResult->data,session("userId"),"");
                     $this->wouldpayCom->insert(["cost_id"=>$insertResult->data]);
                     $isInsert =true;
                 }
             }
         }
         if($isInsert){
-            $touser = $this->userCom->getQiyeId(explode(',',$examines["examine"])[0],true);
-            if(!empty($touser)){
-                $desc = "<div class='gray'>".date("Y年m月d日",time())."</div> <div class='normal'>".session('userName')."添加供应商成本，@你了，点击进入审批吧！</div>";
-                $url = C('qiye_url')."/Admin/Index/Main.html?action=Purcha/costInsert";
-                $msgResult = $this->QiyeCom-> textcard($touser,session('userName')."添加供应商成本",$desc,$url);
-            }
+            // $touser = $this->userCom->getQiyeId(explode(',',$examines["examine"])[0],true);
+            // if(!empty($touser)){
+            //     $desc = "<div class='gray'>".date("Y年m月d日",time())."</div> <div class='normal'>".session('userName')."添加供应商成本，@你了，点击进入审批吧！</div>";
+            //     $url = C('qiye_url')."/Admin/Index/Main.html?action=Purcha/costInsert";
+            //     $msgResult = $this->QiyeCom-> textcard($touser,session('userName')."添加供应商成本",$desc,$url);
+            // }
+            $addData = [
+                'examine'=>$examines['examine'],
+                'title'=>session('userName')."添加供应商成本",
+                'desc'=> "<div class='gray'>".date("Y年m月d日",time())."</div> <div class='normal'>".session('userName')."添加供应商成本，@你了，点击进入审批吧！</div>",
+                'url'=>C('qiye_url')."/Admin/Index/Main.html?action=Purcha/costInsert",
+                'tableName'=>$this->purchaCom->tableName(),
+                'tableId'=>$insertResult->data,
+            ];
+            $this->add_push($addData);
+
             $this->ajaxReturn(['errCode'=>0,'error'=>"添加成功"]);
         }
         $this->ajaxReturn(['errCode'=>$insertResult->errCode,'error'=>$insertResult->error]);

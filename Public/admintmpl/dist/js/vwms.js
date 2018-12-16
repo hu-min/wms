@@ -151,7 +151,32 @@ function searchFun(option){
             var noData = result.table == '<tr><td colspan="'+tdNum+'">无数据</td></tr>' ? true : false
             // console.log(tabId+" ."+table)
             table_frozen($(tabId+" ."+table),noData);
-           
+            //通过这里来实现直接进入界面
+            var $id = 0
+            var $idArray = window.location.search.match(/\&id\=([0-9]*)/);
+     
+            if($idArray && $idArray.length>1){
+                $id = $idArray[1]
+            }
+            if($id > 0){
+                $(tabId+" ."+table).find("tr .status-con").each(function(){
+                    var _id =  $(this).data("id")
+                    if($(this).parents("tr").find(".status-con").length>1){
+                        $(this).each(function(){
+                            var _con = $(this).data("con")
+                            if(_con == con && $id == _id){
+                                $(this).children(".v-showmodal").trigger("click")
+                                return false;
+                            }
+                        })
+                    }else{
+                        if($id == _id){
+                            $(this).children(".v-showmodal").trigger("click")
+                            return false;
+                        }
+                    } 
+                })
+            }
             //这里插入一个js修改table
         }else{
             if(result.url){
@@ -160,7 +185,7 @@ function searchFun(option){
                 notice(result.errCode,result.error);
             }
         }
-    })
+    },false)
 }
 /** 
  * javascript comment 
@@ -559,10 +584,12 @@ $(function(){
         if(!paramMatch){
             paramMatch = "Index/home"
         }
-        var splitArr=paramMatch.split("/");
+        var splitArr = paramMatch.match(/([\w]+\/[\w]+)/);
+        // console.log(test)
+        // var splitArr=paramMatch.split("/");
         
-        var match= window.document.body.innerHTML.match(new RegExp("\/Admin\/"+splitArr[0]+"\/"+splitArr[1]+"\.html","gm"))
-        // console.log(match)
+        var match = window.document.body.innerHTML.match(new RegExp("\/Admin\/"+splitArr[0]+"\.html","gm"))
+        
         if(match!=null && match[0]){
             $(document).find(".nodeOn").each(function(){
                 if($(this).attr("href")==match[0] && $(this).data("nodeid")>0){
@@ -916,12 +943,9 @@ $(function(){
  */
 function getUrlAction(){
     var clSearch=window.location.search
-    if(clSearch!="" && clSearch.search(/\?action\=/)>=0){
-        if(clSearch.indexOf("&")>=0){
-            return clSearch.match(/\=([\S\/]*)(&+[\S\/]*)/)[1];
-        }else{
-            return clSearch.match(/\=([\S\/]*)([\S\/]*)/)[1];
-        }
+    var action = clSearch.match(/([\w]+\/[\w]+)/);
+    if(action){
+        return action[0]
     }
     return false;
 }

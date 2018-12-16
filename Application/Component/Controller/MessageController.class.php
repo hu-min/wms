@@ -20,7 +20,10 @@ class MessageController extends BaseController{
             $datas['relation_user'] = implode(",",$datas['to_user']);
             $datas['relation_uname'] = $relationRes["list"]["relation_uname"];
         }
-        $touser = A("Component/User")->getQiyeId($relationArray);
+
+
+        $weinPush = [];
+        
         // print_r($datas);exit;
         // echo stripslashes(htmlspecialchars_decode($datas['content']));exit;
         $this->startTrans();
@@ -29,17 +32,24 @@ class MessageController extends BaseController{
             // print_r($datas);
             $insertResult=$this->insert($datas);
             if(isset($insertResult->errCode) && $insertResult->errCode==0){
+                $touser = A("Component/User")->getQiyeId($to_user);
+                if(!empty($touser)){
+                    $weinPush[$touser] = $insertResult->data;
+                }
                 $current++;
             }
         }
         
         // print_r($msgResult );
         if($allNum > 0 && $current==$allNum){
-            if(!empty($touser)){
-                $desc = "<div class=\"gray\">".date("Y年m月d日",$datas['add_time'])."</div> <div class=\"normal\">".utf8_substr($datas['content'],30)."</div>";
-                $url = C('qiye_url')."/Admin/Index/Main.html?action=Public/messageControl";
-                $msgResult = $this->QiyeCom-> textcard($touser,$datas['title'],$desc,$url);
+            if(!empty($weinPush)){
+                foreach ($weinPush as $tUser => $id) {
+                    $desc = "<div class=\"gray\">".date("Y年m月d日",$datas['add_time'])."</div> <div class=\"normal\">".utf8_substr($datas['content'],30)."</div>";
+                    $url = C('qiye_url')."/Admin/Index/Main.html?action=Public/messageControl&id=".$id;
+                    $msgResult = $this->QiyeCom-> textcard($tUser,$datas['title'],$desc,$url);
+                }
             }
+            
             $this->commit();
             return ['errCode'=>0,'error'=>getError(0)];
         }else{

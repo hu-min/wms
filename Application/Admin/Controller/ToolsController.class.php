@@ -358,10 +358,12 @@ class ToolsController extends BaseController{
                     $touser = $this->userCom->getQiyeId($examine[$place-1],true);
                     if(!empty($touser)){
                         $desc = "<div class='gray'>".date("Y年m月d日",time())."</div> <div class='normal'>{$authName}在【{$title}】中提交的申请，".session('userName')."已经通过了审批，现在轮到您审批，点击进入审批吧！</div>";
-                        $url = C('qiye_url')."/Admin/Index/Main.html?action={$controller}";
+                        $url = C('qiye_url')."/Admin/Index/Main.html?action={$controller}&id=".$tableId;
                         $msgResult = $this->QiyeCom-> textcard($touser,"【{$title}】审批",$desc,$url);
                     }
                 }
+
+
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }else{
                 $this->approveCom->M()->rollback();

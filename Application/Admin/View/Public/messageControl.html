@@ -380,6 +380,20 @@
                 //         $this.toggleClass("fa-star-o");
                 //     }
                 // });
+                var $id = 0
+                var $idArray = window.location.search.match(/\&id\=([0-9]*)/);
+                if($idArray && $idArray.length>1){
+                    $id = $idArray[1]
+                }
+                if($id > 0){
+                    $(tabId+" .message-box .message-list-box").find(".read-message").each(function(){
+                        var _id =  $(this).data("id")
+                        if($id == _id){
+                            $(this).trigger("click")
+                            return false;
+                        }
+                    })
+                }
             });
         </script>
     </body>

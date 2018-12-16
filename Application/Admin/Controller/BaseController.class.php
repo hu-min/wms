@@ -865,7 +865,7 @@ class BaseController extends \Common\Controller\BaseController{
         }
         $title = $param['title'];
         $desc = $param['desc'];
-        $url = $param['url'];
+        $url = $param['url']."&id=".$tableId;
         $tableName = $param['tableName'];
         $tableId = $param['tableId'];
 
