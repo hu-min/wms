@@ -598,6 +598,7 @@
             e.preventDefault();
             var level = $(this).data('level')
             var id = $(this).data('id') ? $(this).data('id') : 0
+            var rid = $(this).data('rid') ? $(this).data('rid') : 0
             var call = $(this).data('call') ? $(this).data('call') : false;
             var title = $(this).data('title') ? $(this).data('title') : $(this).children('span').text();
             var el=$(this)
@@ -616,7 +617,10 @@
                         if(param){
                           cMatch[1]+=param[0];
                         }
-                        setUrlAction(cMatch[1],cMatch[1]);
+                        // if(rid > 0) 
+
+                        var params = rid > 0 ? cMatch[1]+"&id="+rid : cMatch[1];
+                        setUrlAction(cMatch[1],params);
                     }
                     tabId = nodeid
                     get(controller.split('&')[0],{authNodeId:nodeid,id:id,vtabId:"#vtabs"+nodeid},function(result){

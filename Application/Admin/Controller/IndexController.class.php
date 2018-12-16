@@ -172,6 +172,7 @@ class IndexController extends BaseController{
         $page=I("p")?I("p"):1;
         $pageNum = 5;
         if(isset($option['wait']) && $option['wait']){
+            $this->assign('wait',true);
             $nodeProce = A("Component/Node")->nodeProcess(4);
         }else{
             $nodeProce = A("Component/Node")->nodeProcess();
@@ -189,9 +190,11 @@ class IndexController extends BaseController{
             $user_id = "user_id";
             $add_time = "add_time";
             $project_id = "project_id";
+            $id = "id";
             if(in_array($npInfo["db_table"],["v_project"])){
                 $add_time = "addTime `add_time`";
                 $project_id = "`projectId` project_id";
+                $id = "`projectId` id";
             }elseif(in_array($npInfo["db_table"],["v_work_order"])){
                 $project_id = "`relation_project` project_id";
             }elseif(in_array($npInfo["db_table"],["v_project_cost"])){
@@ -201,14 +204,15 @@ class IndexController extends BaseController{
                 $whereStr = "`status` IN (0,2) AND process_level = FIND_IN_SET({$roleId},examine)";
                 if(isset($option['wait']) && $option['wait']){
                     if(in_array($npInfo["db_table"],["v_project_cost"])){
-                        $whereStr = "`status` = 2 AND (ouser_id = {$userId} || cuser_id = {$userId})";
+                        $whereStr = "`status` IN (0,2) AND (ouser_id = {$userId} || cuser_id = {$userId})";
                     }else{
-                        $whereStr = "`status` = 2 AND user_id = {$userId}";
+                        $whereStr = "`status` IN (0,2) AND user_id = {$userId}";
                     }
                     
                 }
-                $s = "SELECT '{$npInfo["nodeId"]}' nodeId , {$project_id} ,'{$npInfo["nodeTitle"]}' `moudle_name`,{$user_id},`process_level`,`status`,{$add_time},'{$npInfo["controller"]}' controller,examine FROM {$npInfo['db_table']} WHERE {$whereStr} AND process_level > 0";
+                $s = "SELECT {$id}, '{$npInfo["nodeId"]}' nodeId , {$project_id} ,'{$npInfo["nodeTitle"]}' `moudle_name`,{$user_id},`process_level`,`status`,{$add_time},'{$npInfo["controller"]}' controller,examine,'{$npInfo['db_table']}' tableName FROM {$npInfo['db_table']} WHERE {$whereStr} AND process_level > 0";
                 array_push($sqlArr,$s);
+                $this->log($s);
             }
         }
         $sql = implode(" UNION ALL ",$sqlArr);
@@ -220,7 +224,7 @@ class IndexController extends BaseController{
                 $where = " WHERE user_id NOT IN (".implode(",",$whites).")";
             }
 
-            $sqls = "SELECT nodeId, project_id,project_name,`moudle_name`,`user_id`,`user_name`,`process_level`,`status`,examine,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time,controller FROM ({$sql}) p LEFT JOIN (SELECT userId,userName `user_name` FROM v_user WHERE status =1) u ON userId = `user_id` LEFT JOIN (SELECT projectId pId,name project_name FROM v_project) pr ON pr.pId = project_id ".$where." ORDER BY add_time DESC LIMIT ".($page - 1) * $pageNum.",".$pageNum;
+            $sqls = "SELECT id,nodeId, project_id,project_name,`moudle_name`,`user_id`,`user_name`,`process_level`,`status`,examine,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time,controller ,tableName FROM ({$sql}) p LEFT JOIN (SELECT userId,userName `user_name` FROM v_user WHERE status =1) u ON userId = `user_id` LEFT JOIN (SELECT projectId pId,name project_name FROM v_project) pr ON pr.pId = project_id ".$where." ORDER BY add_time DESC LIMIT ".($page - 1) * $pageNum.",".$pageNum;
             // echo $sqls;exit;
             $cqls = "SELECT count(*) `count` FROM ({$sql}) p LEFT JOIN (SELECT userId,userName `user_name` FROM v_user WHERE status =1) u ON userId = `user_id` ".$where;
             $result = $db ->query($sqls);

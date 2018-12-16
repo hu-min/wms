@@ -1,18 +1,24 @@
 
 <volist name="list" id="item">
     <tr class="nodeOn node-action" data-nodeid="{$item['nodeId']}" href="{:U($item['controller'])}" data-title="{$item.moudle_name}">
-        <!-- <td class="serial_num">{$key+1}</td> -->
-        <td style="min-width: 80px;">{$item.user_name}</td>
+        <td >
+            <a type='button' data-nodeid="{$item['nodeId']}" data-rid="{$item.id}" data-title="{$item.moudle_name}" href="{:U($item['controller'])}" class='btn btn-xs btn-primary nodeOn node-action'>查看</a>
+            {:approve_btn($item['tableName'],['item'=>get_defined_vars()['list'][$key]])}
+        </td>
+        <if condition=" $wait neq true">
+            <td style="min-width: 80px;">{$item.user_name}</td>
+        </if>
+        
         <td><span>{$item.moudle_name}</span></td>
-        <td>{$item.project_name}</td>
+        <td>{$item.project_name|default='非项目'}</td>
         <td>{$item.add_time}</td>
         <!-- <td>
             <div class="progress progress-xs progress-striped active">
                 <div class="progress-bar progress-bar-primary" style="width: {:round(($item['process_level']-1)/count(explode(',',$item['examine']))*100)}%"></div>
             </div>
             </td> -->
-        <td>
+        <!-- <td>
             <span class="badge bg-light-blue">{:round(($item['process_level']-1)/count(explode(',',$item['examine']))*100)}%</span>
-        </td>
+        </td> -->
     </tr>
 </volist>

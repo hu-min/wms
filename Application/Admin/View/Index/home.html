@@ -23,21 +23,24 @@
                     </div>
                     <!-- /.box-header -->
                     <div class="box-body">
-                        <div style="overflow: auto;z-index: 1;">
-                            <table class="table table-bordered table-hover">
-                                <thead>
-                                <tr>
-                                <!-- <th class="serial_num">#</th> -->
-                                <th style="min-width: 40px;max-width: 50px">提交人</th>
-                                <th>模块名称</th>
-                                <th>项目名称</th>
-                                <th style="max-width: 120px;">提交时间</th>
-                                <!-- <th>审批进度</th> -->
-                                <th style="width: 60px">百分比</th>
-                                </tr>
-                                </thead>
-                                <tbody class="getApp-table"></tbody>
-                            </table>
+                        <div class="table-outbox" style="z-index: 1;">
+                            <div style="font-size:0.95em;overflow: auto;">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                    <tr>
+                                    <th class="is-frozen" >操作</th>
+                                    <!-- <th class="serial_num">#</th> -->
+                                    <th style="min-width: 40px;max-width: 50px">提交人</th>
+                                    <th>模块名称</th>
+                                    <th>项目名称</th>
+                                    <th style="max-width: 120px;">提交时间</th>
+                                    <!-- <th>审批进度</th> -->
+                                    <!-- <th style="width: 60px">百分比</th> -->
+                                    </tr>
+                                    </thead>
+                                    <tbody class="getApp-table"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                     <!-- /.box-body -->
@@ -61,21 +64,23 @@
                     </div>
                     <!-- /.box-header -->
                     <div class="box-body">
-                        <div style="overflow: auto;z-index: 1;">
-                            <table class="table table-bordered table-hover">
-                                <thead>
-                                <tr>
-                                <!-- <th class="serial_num">#</th> -->
-                                <th style="min-width: 40px;max-width: 50px">提交人</th>
-                                <th>模块名称</th>
-                                <th>项目名称</th>
-                                <th style="max-width: 120px;">提交时间</th>
-                                <!-- <th>审批进度</th> -->
-                                <th style="width: 60px">百分比</th>
-                                </tr>
-                                </thead>
-                                <tbody class="getWait-table"></tbody>
-                            </table>
+                        <div class="table-outbox" style="z-index: 1;">
+                            <div style="font-size:0.95em;overflow: auto;">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                    <tr>
+                                    <th class="is-frozen" >操作</th>
+                                    <!-- <th style="min-width: 40px;max-width: 50px">提交人</th> -->
+                                    <th >模块名称</th>
+                                    <th>项目名称</th>
+                                    <th style="max-width: 120px;">提交时间</th>
+                                    <!-- <th>审批进度</th> -->
+                                    <!-- <th style="width: 60px">百分比</th> -->
+                                    </tr>
+                                    </thead>
+                                    <tbody class="getWait-table"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                     <!-- /.box-body -->
@@ -306,17 +311,26 @@
             get("{$url}",{reqType:"homePanl",reqArr:reqArr},function(result){
                 for (var req in result) {
                     var self =  $(tabId+" .box-header").find(".refresh[name='"+req+"']").parents(".box");
-                    
-                    if(result[req].table){
-                        self.find("tbody").html(result[req].table);
-                        self.find(".page-div").html(result[req].page);
-
-                        if(req=="projectDescList"){
-                            $(tabId+" .refresh[name='"+req+"']").parents('.box-header').find(".project_num").text(result[req].count)
-                        }else if(req=='lastLoginList'){
-                            $(tabId+" .refresh[name='"+req+"']").parents('.box-header').find(".online_num").text(result[req].count)
-                        }
+                    var tdNum = self.find("tbody").parent("table").find("thead tr th").length
+                    if(!result[req].table && in_array(req,['getAppList','getWaitList'])){
+                        result[req].table = '<tr><td colspan="'+tdNum+'">无数据</td></tr>'
                     }
+                    // if(result[req].table){
+                    self.find("tbody").html(result[req].table);
+                    self.find(".page-div").html(result[req].page);
+                    if(in_array(req,['getAppList','getWaitList'])){
+                        self.find("tbody").parents('.table-outbox').find(".frozen-table").remove();
+                        var noData = result[req].table == '<tr><td colspan="'+tdNum+'">无数据</td></tr>' ? true : false
+                        table_frozen(self.find("tbody"),noData);
+                    }
+
+                    
+                    if(req=="projectDescList"){
+                        $(tabId+" .refresh[name='"+req+"']").parents('.box-header').find(".project_num").text(result[req].count)
+                    }else if(req=='lastLoginList'){
+                        $(tabId+" .refresh[name='"+req+"']").parents('.box-header').find(".online_num").text(result[req].count)
+                    }
+                    // }
                 }				
             },false)
         }

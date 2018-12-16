@@ -172,6 +172,8 @@ function searchFun(option){
                     }else{
                         if($id == _id){
                             $(this).children(".v-showmodal").trigger("click")
+                            var title = window.location.search.replace(/&id=[\d]*/,"").replace("?action=","");
+                            setUrlAction(title,title)
                             return false;
                         }
                     } 
@@ -706,7 +708,11 @@ $(function(){
                         if(current>0){
                             $("#"+apl_id+" .modal-body .progress .progress-bar").text("当前进度："+current+" / "+allProcess+final);
                         }
-                        
+                        setInterval(function(){
+                            if($("#approve-log-modal").css("display") == "block"){
+                                $("#approve-log-modal .modal-close").click();
+                            }
+                        },5000)
                     }else if(result.errCode == 115){
                         $("#"+apl_id+" .modal-body .next-examine").text(result.error)
                     }
@@ -807,7 +813,8 @@ $(function(){
         // console.log(height)
         if($("#approve-log-modal").find(".approve-btn").length==0){
             if(width>600){
-                $("#approve-log-modal .modal-close").click();
+                
+                
             }else{
             }
             
