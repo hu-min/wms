@@ -210,7 +210,11 @@ class BaseController extends \Common\Controller\BaseController{
         if($isLogin && $loginName && $roleId){
             return true;
         }
+        $history = session("history");
         session(null);
+        if($history){
+            session("history",$history);
+        }
         return false;
     }
     /** 
