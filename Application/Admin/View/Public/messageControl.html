@@ -390,6 +390,8 @@
                         var _id =  $(this).data("id")
                         if($id == _id){
                             $(this).trigger("click")
+                            var title = window.location.search.replace(/&id=[\d]*/,"").replace("?action=","");
+                            setUrlAction(title,title)
                             return false;
                         }
                     })
