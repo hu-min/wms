@@ -466,6 +466,7 @@ class ProjectCostController extends BaseController{
                 // print_r($infoData);
             }
             if($isInsert){
+                
                 $this->ApprLogCom->createApp($this->pCostCom->tableName(),$parent_id,session("userId"),"");
                 // $addData = [
                 //     'examine'=>$pOfferData['examine'],
