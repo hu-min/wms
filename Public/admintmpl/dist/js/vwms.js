@@ -638,7 +638,7 @@ $(function(){
     $(document).offon("click",tabId+" .clear-media",function(){
         $(this).parent().children(".upload-file").val("")
     })
-    $(document).offon("mouseover click",".approve-group .approve-log,.approve-group .approve-con",function(event){
+    $(document).offon("click",".approve-group .approve-log,.approve-group .approve-con",function(event){
         if(!$(this).hasClass("disabled") && ($("#approve-log-modal").css("display")=="none" || $("#approve-log-modal").css("display")==undefined)){
             var table = $(this).parents(".approve-group").data("table")
             var id = $(this).parents(".approve-group").data("id")
@@ -803,23 +803,23 @@ $(function(){
         }
         
     })
-    $(document).on("mouseout",".approve-group .approve-log",function(evnet){
-        // var mouse  = evnet.screenY;
-        // var modalTop = $("#approve-log-modal").position().top;
-        // var height = $("#approve-log-modal").height();
-        var width = $(window).width();
-        // console.log(mouse)
-        // console.log(modalTop)
-        // console.log(height)
-        if($("#approve-log-modal").find(".approve-btn").length==0){
-            if(width>600){
+    // $(document).on("mouseout",".approve-group .approve-log",function(evnet){
+    //     // var mouse  = evnet.screenY;
+    //     // var modalTop = $("#approve-log-modal").position().top;
+    //     // var height = $("#approve-log-modal").height();
+    //     var width = $(window).width();
+    //     // console.log(mouse)
+    //     // console.log(modalTop)
+    //     // console.log(height)
+    //     if($("#approve-log-modal").find(".approve-btn").length==0){
+    //         if(width>600){
                 
                 
-            }else{
-            }
+    //         }else{
+    //         }
             
-        }
-    })
+    //     }
+    // })
     $(document).on("click",tabId+" input[class='all-checked']",function(){
         var checked = $(this).is(":checked");
         $(this).parents("table").find("tbody input[class='item-checked']").prop("checked",checked)
