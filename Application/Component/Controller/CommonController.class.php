@@ -62,6 +62,11 @@ class CommonController extends \Common\Controller\BaseController{
                 if($key!=""){
                     $where["name"]=["LIKE","%{$key}%"];
                 }
+                foreach (['offer_user','cost_user'] as $key ) {
+                    if(isset($option[$key]) && $option[$key]>0){
+                        $where[$key] = $option[$key];
+                    }
+                }
                 $parameter=[
                     'where'=>$where,
                     'fields'=>"projectId,name",
@@ -69,6 +74,7 @@ class CommonController extends \Common\Controller\BaseController{
                     'pageSize'=> 99999999,
                 ];
                 $result = $this->AProject ->getList($parameter);
+                $this->log($this->AProject ->M()->_sql());
                 if($result){
                     return $result["list"];
                 }

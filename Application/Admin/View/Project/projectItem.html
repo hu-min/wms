@@ -94,6 +94,7 @@
                                 <th class="hidden-xs ">纯利率</th>
                                 <th class="hidden-xs ">项目阶段</th>
                                 <th >报价/成本</th>
+                                <th>审批备注</th>
                                 <th>审批记录</th>
                                 <th>状态</th>
                                 <th>操作</th>
@@ -249,7 +250,7 @@
                 //     $(tabId+" .modal-info[name='"+element+"']").prop("disabled",true);
                 // }
             });
-            ["brand","customer_com","customer_cont","province","city","field","create_user","is_bid","business","leader","execute","execute_sub","type","stage","re_status"].forEach(element => {
+            ["brand","customer_com","customer_cont","province","city","field","create_user","is_bid","business","leader","execute","execute_sub","type","stage","re_status",'offer_user','cost_user'].forEach(element => {
                 var select= $(tabId+" .modal-info[name='"+element+"']")
                 if(info[element]>0){
                     if(select.find("option[value='"+info[element]+"']").length==0){
@@ -333,8 +334,16 @@
             }else if(info['place']==0){
                 $(tabId+" .global-modal").find(".approve-group .approve-con").remove();
             }
-            if(info['status'] == 1 && info['business'] == "{$Think.session.userId}"){
-                $(tabId+" .global-modal").find(".modal-info[name='stage']").prop("disabled",false);
+            if(info['status'] == 1 && in_array("{$Think.session.userId}",[info['business'],info['user_id']])){
+                if("{$Think.session.userId}" == info['business']){
+                    $(tabId+" .global-modal").find(".modal-info[name='stage']").prop("disabled",false);
+                }else{
+                    $(tabId+" .global-modal").find(".modal-info[name='offer_user']").prop("disabled",false);
+                    $(tabId+" .global-modal").find(".modal-info[name='cost_user']").prop("disabled",false);
+                }
+                
+            }else if(info['status'] == 1){
+                // $(tabId+" .global-modal .modal-footer").find(".save-info").reomve();
             }
         }
         function get_project_code(id){

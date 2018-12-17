@@ -875,7 +875,7 @@ class BaseController extends \Common\Controller\BaseController{
 
         if(!$limitWhite){
             $touserWeixin = array_unique($touserRoleId);
-            $touser = $this->userCom->getQiyeId($touserWeixin,true);
+            $touser = $param['touser'] ? $param['touser'] : $this->userCom->getQiyeId($touserWeixin,true);
             
             if(!empty($touser)){
                 $msgResult = $this->QiyeCom-> textcard($touser,$title,$desc,$url);

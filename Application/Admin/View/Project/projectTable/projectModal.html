@@ -358,6 +358,30 @@
                                                 </select>
                                             </div>
                                         </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">报价执行人：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" required="required" title="请选择报价执行人" data-value="userId"  data-text="userName" name="offer_user">
+                                                    <option value="">报价执行人</option>
+                                                    <volist name="userArr" id="item">
+                                                        <option value="{$item['userId']}">【{$item['roleName']}】{$item['userName']}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">成本执行人：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" required="required" title="请选择成本执行人" data-value="userId"  data-text="userName" name="cost_user">
+                                                    <option value="">成本执行人</option>
+                                                    <volist name="userArr" id="item">
+                                                        <option value="{$item['userId']}">【{$item['roleName']}】{$item['userName']}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -44,9 +44,7 @@
                         <i class="fa fa-plus-square"></i>
                         <h4 class="box-title">成本列表</h4>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <if condition="$nodeAuth egt 6 ">
-                            {:add_btn(get_defined_vars(),"新增报价成本")}
-                        </if>
+                        {:add_btn(get_defined_vars(),"新增报价成本")}
                         <!-- {:add_btn(get_defined_vars(),"新增成本")} -->
                     </div>
                     <div class="box-body search-body">
@@ -297,6 +295,10 @@
             }
             datas["data"] = {};
             datas["data"]['project_id'] = $(tabId+" .global-modal").find(".modal-info[name='project_id']").val();
+            if(datas["data"]['project_id']<=0){
+                notice(110,"请选择项目","输入异常");
+                throw "请输入成本唯一标识";
+            }
             datas["data"]['tax_rate'] = $(tabId+" .global-modal").find(".modal-info[name='tax_rate']").val();
             datas["data"]['flag'] = $(tabId+" .global-modal").find(".modal-info[name='flag']").val();
             var flag_required = $(tabId+" .global-modal").find(".modal-info[name='flag']").attr("required");

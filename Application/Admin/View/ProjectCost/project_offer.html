@@ -216,6 +216,10 @@
             }
             datas["data"] = {};
             datas["data"]['project_id'] = $(tabId+" .global-modal").find(".modal-info[name='project_id']").val()
+            if(datas["data"]['project_id']<=0){
+                notice(110,"请选择项目","输入异常");
+                throw "请选择项目";
+            }
             datas["data"]['flag'] = $(tabId+" .global-modal").find(".modal-info[name='flag']").val()
             var flag_required = $(tabId+" .global-modal").find(".modal-info[name='flag']").attr("required");
             if(flag_required && (datas["data"]['flag']=="" || datas["data"]['flag'] ==0)){
@@ -272,6 +276,10 @@
                 })
                 
             })
+            if(JSON.stringify(datas["data"]['list']) == "[]"){
+                notice(110,"请认真添加数据","输入异常");
+                throw "请认真添加数据";
+            }
             // console.log(datas)
         }
         $(function(){

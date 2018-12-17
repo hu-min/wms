@@ -212,7 +212,7 @@ class IndexController extends BaseController{
                 }
                 $s = "SELECT {$id}, '{$npInfo["nodeId"]}' nodeId , {$project_id} ,'{$npInfo["nodeTitle"]}' `moudle_name`,{$user_id},`process_level`,`status`,{$add_time},'{$npInfo["controller"]}' controller,examine,'{$npInfo['db_table']}' tableName FROM {$npInfo['db_table']} WHERE {$whereStr} AND process_level > 0";
                 array_push($sqlArr,$s);
-                $this->log($s);
+                // $this->log($s);
             }
         }
         $sql = implode(" UNION ALL ",$sqlArr);

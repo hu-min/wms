@@ -55,7 +55,7 @@ class ProjectCostController extends BaseController{
         $this->assign('costClassArr',$this->Com ->get_option('costClass'));
         $this->assign('moduleArr',$this->Com ->get_option('module'));
         $this->assign('unitArr',$this->Com ->get_option('unit'));
-        $this->assign('projectArr',$this->Com ->get_option('project'));
+        $this->assign('projectArr',$this->Com ->get_option('project','',[$listType.'_user'=>session('userId')]));
         $this->assign('userArr',$this->Com->get_option("user"));
 
         $resultData=[];

@@ -12,7 +12,7 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label >选择项目：</label>
-                        <select class="form-control modal-info chosen-project chosen-select" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
+                        <select class="form-control modal-info chosen-project chosen-select" required="required" title="选择项目" data-value="projectId"  data-text="name" name="project_id">
                             <volist name="projectArr" id="item">
                                 <option value="{$item['projectId']}">{$item['name']}</option>
                             </volist>
