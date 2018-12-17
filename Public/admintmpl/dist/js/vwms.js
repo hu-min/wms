@@ -708,11 +708,11 @@ $(function(){
                         if(current>0){
                             $("#"+apl_id+" .modal-body .progress .progress-bar").text("当前进度："+current+" / "+allProcess+final);
                         }
-                        setInterval(function(){
-                            if($("#approve-log-modal").css("display") == "block"){
-                                $("#approve-log-modal .modal-close").click();
-                            }
-                        },5000)
+                        // setInterval(function(){
+                        //     if($("#approve-log-modal").css("display") == "block"){
+                        //         $("#approve-log-modal .modal-close").click();
+                        //     }
+                        // },5000)
                     }else if(result.errCode == 115){
                         $("#"+apl_id+" .modal-body .next-examine").text(result.error)
                     }
