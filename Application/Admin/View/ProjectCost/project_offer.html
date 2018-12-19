@@ -75,7 +75,8 @@
                                 <th>报价时间</th>
                                 <th>报价</th>
                                 <th>增值税率</th>
-                                <th>含税报价</th>          
+                                <th>含税报价</th> 
+                                <th>审批备注</th>         
                                 <th>审批记录</th>
                                 <th>状态</th>
                                 <th>操作</th>
@@ -385,7 +386,7 @@
                 
             })
             //合计金额计算
-            $(tabId+" .global-modal").on("input",".modal-info[name='num'],.modal-info[name='act_num'],.modal-info[name='price']",function(){
+            $(tabId+" .global-modal").on("input",".modal-info[name='num'],.modal-info[name='act_num'],.modal-info[name='num'],.modal-info[name='act_num'],.modal-info[name='price']",function(){
                 var $tr = $(this).parents("tr")
                 var num = Number($tr.find(".modal-info[name='num']").val());
                 var act_num = Number($tr.find(".modal-info[name='act_num']").val());

@@ -226,6 +226,7 @@ class BaseController extends \Common\Controller\BaseController{
         if(empty($userInfo)){
 	        $this->vlog(0);
             //退出设置
+            $userId = session('userId');
             session("userInfo",NULL);
             session('userId',NULL);
             session('userName',NULL);
@@ -241,14 +242,15 @@ class BaseController extends \Common\Controller\BaseController{
             session('web_lock_password',NULL);
             cookie('identify',null);
             session(null);
-            $this->redisCom->offline(session('userId'));
-            $this->redisCom->delAll("",'config_web_lock');
+            $this->redisCom->offline($userId);
+            // $this->redisCom->delAll("",'config_web_lock');
             $this->redirect('Index/Login');
 
         }elseif(!session('userId')){
             //登录设置
             if($userInfo['avatar']=="" || !file_exists($userInfo['avatar'])){
-                $userInfo['avatar']='Public'.'/admintmpl'."/dist/img/avatar/avatar".rand(1,5).".png";
+                $avatar =  $userInfo['gender'] == 1  ? "avatar".rand(14,16).".png" : "avatar".rand(11,13).".png";
+                $userInfo['avatar']='Public'.'/admintmpl'."/dist/img/avatar/".$avatar;
             }else{
                 $userInfo['avatar'] = imge2thumb($userInfo['avatar']);
             }
@@ -874,12 +876,12 @@ class BaseController extends \Common\Controller\BaseController{
         $tableId = $param['tableId'];
 
         if(!$limitWhite){
-            $touserWeixin = array_unique($touserRoleId);
-            $touser = $param['touser'] ? $param['touser'] : $this->userCom->getQiyeId($touserWeixin,true);
             
-            if(!empty($touser)){
-                $msgResult = $this->QiyeCom-> textcard($touser,$title,$desc,$url);
-            }
+        }
+        // $touserWeixin = array_unique($touserRoleId);
+        $touser = $param['touser'] ? $param['touser'] : $this->userCom->getQiyeId($touserRoleId,true);
+        if(!empty($touser)){
+            $msgResult = $this->QiyeCom-> textcard($touser,$title,$desc,$url);
         }
         if($noappr){
             $this->ApprLogCom->createApp($tableName,$tableId,session("userId"),"");
@@ -892,6 +894,7 @@ class BaseController extends \Common\Controller\BaseController{
                     "status" => 1, //审批流程里的状态是实际状态
                     "remark" => '审批者(角色)与申请者(角色)一致自动审批',
                 ];
+                
                 $this->ApprLogCom->insert($parameter);
             }
         }

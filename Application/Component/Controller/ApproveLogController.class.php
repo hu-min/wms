@@ -20,7 +20,16 @@ class ApproveLogController extends BaseController{
             "remark" => $remark,
             "effect" => $effect,
         ];
-        return $this->insert($parameter);
+        $param = $parameter;
+        unset($param['add_time']);
+        unset($param['remark']);
+        unset($param['status']);
+        $hasApp = $this->getOne(['where'=>$param]);
+        if(!$hasApp){
+            return $this->insert($parameter);
+        }
+        return false;
+        
     }
     /** 
      * @Author: vition 

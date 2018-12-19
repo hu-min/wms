@@ -197,17 +197,11 @@ class IndexController extends BaseController{
                 $id = "`projectId` id";
             }elseif(in_array($npInfo["db_table"],["v_work_order"])){
                 $project_id = "`relation_project` project_id";
-            }elseif(in_array($npInfo["db_table"],["v_project_cost"])){
-                $user_id = "ouser_id `user_id`";
             }
             if(isset($nodeAuth[$npInfo["controller"]]) && $nodeAuth[$npInfo["controller"]] > 0){
                 $whereStr = "`status` IN (0,2) AND process_level = FIND_IN_SET({$roleId},examine)";
                 if(isset($option['wait']) && $option['wait']){
-                    if(in_array($npInfo["db_table"],["v_project_cost"])){
-                        $whereStr = "`status` IN (0,2) AND (ouser_id = {$userId} || cuser_id = {$userId})";
-                    }else{
-                        $whereStr = "`status` IN (0,2) AND user_id = {$userId}";
-                    }
+                    $whereStr = "`status` IN (0,2) AND user_id = {$userId}";
                     
                 }
                 $s = "SELECT {$id}, '{$npInfo["nodeId"]}' nodeId , {$project_id} ,'{$npInfo["nodeTitle"]}' `moudle_name`,{$user_id},`process_level`,`status`,{$add_time},'{$npInfo["controller"]}' controller,examine,'{$npInfo['db_table']}' tableName FROM {$npInfo['db_table']} WHERE {$whereStr} AND process_level > 0";
@@ -218,15 +212,17 @@ class IndexController extends BaseController{
         $sql = implode(" UNION ALL ",$sqlArr);
         // print_r($sqlArr);exit;
         if($sql != ""){
-            $whites = $this->whiteCom->getWhites();
-            $where = "";
-            if($whites){
-                $where = " WHERE user_id NOT IN (".implode(",",$whites).")";
-            }
+            //白名单处理
+            // $whites = $this->whiteCom->getWhites();
+            // $where = "";
+            // if($whites){
+            //     $where = " WHERE user_id NOT IN (".implode(",",$whites).")";
+            // }
 
             $sqls = "SELECT id,nodeId, project_id,project_name,`moudle_name`,`user_id`,`user_name`,`process_level`,`status`,examine,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time,controller ,tableName FROM ({$sql}) p LEFT JOIN (SELECT userId,userName `user_name` FROM v_user WHERE status =1) u ON userId = `user_id` LEFT JOIN (SELECT projectId pId,name project_name FROM v_project) pr ON pr.pId = project_id ".$where." ORDER BY add_time DESC LIMIT ".($page - 1) * $pageNum.",".$pageNum;
             // echo $sqls;exit;
             $cqls = "SELECT count(*) `count` FROM ({$sql}) p LEFT JOIN (SELECT userId,userName `user_name` FROM v_user WHERE status =1) u ON userId = `user_id` ".$where;
+            $this->log($sqls);
             $result = $db ->query($sqls);
             $countRes = $db ->query($cqls);
             $listResult = ["list"=>$result,"count"=>$countRes[0]["count"]];
@@ -256,7 +252,7 @@ class IndexController extends BaseController{
         $param=[
             "where" => $where,
             'page'=>$page,
-            "fields" => "*,CASE WHEN business = {$userId} THEN '营业主担' WHEN leader = {$userId} THEN '项目主担' WHEN FIND_IN_SET({$userId},earlier_user) > 0 THEN '前期项目人员' WHEN FIND_IN_SET({$userId},scene_user) THEN '现场执行人员' ELSE '其他职务' END duties ",
+            "fields" => "*,CASE WHEN user_id = {$userId} THEN '立项人' WHEN business = {$userId} THEN '营业主担' WHEN leader = {$userId} THEN '项目主担' WHEN FIND_IN_SET({$userId},earlier_user) > 0 THEN '前期项目人员' WHEN FIND_IN_SET({$userId},scene_user) THEN '现场执行人员' ELSE '其他职务' END duties ",
             'pageSize' => 5,
             'orderStr' => "addTime DESC",
             'joins' => [

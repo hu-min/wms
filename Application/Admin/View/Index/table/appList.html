@@ -3,7 +3,12 @@
     <tr class="nodeOn node-action" data-nodeid="{$item['nodeId']}" data-rid="{$item.id}" href="{:U($item['controller'])}" data-title="{$item.moudle_name}">
         <td >
             <a type='button' data-nodeid="{$item['nodeId']}" data-rid="{$item.id}" data-title="{$item.moudle_name}" href="{:U($item['controller'])}" class='btn btn-xs btn-primary nodeOn node-action'>查看</a>
-            {:approve_btn($item['tableName'],['item'=>get_defined_vars()['list'][$key]])}
+            <if condition=" $wait eq true">
+                {:approve_btn($item['tableName'],['item'=>get_defined_vars()['list'][$key],'nocon'=>true])}
+            <else/>
+                {:approve_btn($item['tableName'],['item'=>get_defined_vars()['list'][$key]])}
+            </if>
+            
         </td>
         <if condition=" $wait neq true">
             <td style="min-width: 80px;">{$item.user_name}</td>

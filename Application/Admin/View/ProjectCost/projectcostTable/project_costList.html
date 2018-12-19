@@ -4,6 +4,7 @@
         <td>{$item['project_code']|pcode_format}</td>
         <td>{$item['section']}</td>
         <td>{$item['flag']}</td>
+        <td>{$item['ouser_name']}</td>
         <td>{$item['user_name']}</td>
         <td>{$item['add_time']}</td>
         <td>{$item['total']}</td>
@@ -15,10 +16,10 @@
         <if condition="$listType eq 'contrast'">
             <td>{$item['profit']|default=0}</td>
             <td>{$item['profit_ratio']|default=0}</td>
-        </if> 
+        </if>
         <td>
             {$item.approve_name}<if condition="$item['aremark']"> ：{$item.aremark} </if>
-        </td>       
+        </td>        
         <td>
             <if condition="$listType eq 'contrast'">
                 {:approve_btn($tableName,['item'=>get_defined_vars()['list'][$key]])}

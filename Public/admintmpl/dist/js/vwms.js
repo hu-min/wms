@@ -714,7 +714,7 @@ $(function(){
                         //     }
                         // },5000)
                     }else if(result.errCode == 115){
-                        $("#"+apl_id+" .modal-body .next-examine").text(result.error)
+                        $("#"+apl_id+" .modal-body .next-examine").text(result.nextExamine)
                     }
                 },false)
             }else{
@@ -1244,6 +1244,9 @@ function init_chosen(url,reqType,parental){
     })
 }
 function float(num,place) {
+    if(num == -Infinity){
+        num = 0;
+    }
     var result = parseFloat(num);
     if (isNaN(result)) {
     //   alert('传递参数错误，请检查！');
@@ -1267,6 +1270,9 @@ function float(num,place) {
     // return parseFloat(s_x);
   }
 function float_format(num,place){
+    if(num == -Infinity){
+        num = 0;
+    }
     if(num){
         if(num.toString().indexOf(".")>0){
             return float(num);

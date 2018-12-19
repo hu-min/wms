@@ -421,11 +421,11 @@ class PurchaController extends BaseController{
             $this->$reqType();
         }else{
             //自动计算成本
-            $sql = "SELECT s_parent_id , s_scompany_id,s_cost_total,s_scompany_cid,item_num FROM (SELECT parent_id s_parent_id , scompany_id s_scompany_id,SUM(cost_total) s_cost_total, scompany_cid s_scompany_cid,COUNT(id) item_num  FROM v_project_cost_sub WHERE scompany_id > 0 GROUP BY parent_id,scompany_id) pcs LEFT JOIN (SELECT id wid , cost_id,supplier_id FROM v_wouldpay) w ON w.cost_id = pcs.s_parent_id AND w.supplier_id = pcs.s_scompany_id  WHERE ISNULL(wid)";
+            $sql = "SELECT s_parent_cid , s_scompany_id,s_cost_total,s_scompany_cid,item_num FROM (SELECT parent_cid s_parent_cid , scompany_id s_scompany_id,SUM(cost_total) s_cost_total, scompany_cid s_scompany_cid,COUNT(id) item_num  FROM v_project_cost_sub RIGHT JOIN (SELECT id cid FROM v_project_cost WHERE `status` = 1) pc ON pc.cid = parent_cid WHERE scompany_id > 0 GROUP BY parent_cid,scompany_id) pcs LEFT JOIN (SELECT id wid , cost_id,supplier_id FROM v_wouldpay) w ON w.cost_id = pcs.s_parent_cid AND w.supplier_id = pcs.s_scompany_id  WHERE ISNULL(wid)";
             // $this->log();
             $listResult =M()->query($sql);
             foreach ($listResult as  $supplierCost) {
-                $insertResult = $this->wouldpayCom->insert(['cost_id'=>$supplierCost['s_parent_id'],'supplier_id'=>$supplierCost['s_scompany_id'],'contract_money'=>$supplierCost['s_cost_total'],'add_time'=>time(),'status'=>1,'supplier_cid'=>$supplierCost['s_scompany_cid'],'item_num'=>$supplierCost['item_num']]);
+                $insertResult = $this->wouldpayCom->insert(['cost_id'=>$supplierCost['s_parent_cid'],'supplier_id'=>$supplierCost['s_scompany_id'],'contract_money'=>$supplierCost['s_cost_total'],'add_time'=>time(),'status'=>1,'supplier_cid'=>$supplierCost['s_scompany_cid'],'item_num'=>$supplierCost['item_num']]);
             }
             $this->returnHtml();
         }

@@ -33,7 +33,10 @@
             </div>
             <div class="row">
                 <div class="col-md-2">
-                    <button type="button" class="btn btn-info btn-xs add-costClass"><i class="fa fa-plus-square"></i> <span> 添加主分类 </span> </button>
+                    <button type="button" class="btn btn-info btn-xs add-costClass" data-type="1"><i class="fa fa-plus-square"></i> <span> 添加主分类 </span> </button>
+                    <if condition="$listType eq 'cost'">
+                        <button type="button" class="btn btn-primary btn-xs add-costClass" data-type="2"><i class="fa fa-plus-square"></i> <span> 添加非报价项成本 </span> </button>
+                    </if>
                 </div>
                 <div class="col-md-6 text-red">
                     合计（金额合计）= 数量（单项）X 数量（重复项）X 金额（单价）
@@ -65,12 +68,13 @@
 <div class="modal-footer">
     <input class="modal-info" name="status" value="0" type="hidden">
     <input class="modal-info" name="id" value="0" type="hidden">
+    <input class="modal-info" name="oid" value="0" type="hidden">
     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
     <if condition="$listType neq 'contrast'">
         <!-- <button type="button" class="btn btn-sm btn-warning save-info draft-btn" data-con="{$controlName}" data-savetype="draft" data-gettype="{$gettype}" data-url="{$url}" data-modal="true">保存草稿</button> -->
         {:save_btn(get_defined_vars(),true)}
     </if>
-    <if condition="$listType eq 'contrast'">
+    <if condition="$listType neq 'contrast'">
         {:approve_btn($tableName,['vars'=>get_defined_vars()])}
     </if>
     

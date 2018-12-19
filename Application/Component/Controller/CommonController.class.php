@@ -74,7 +74,7 @@ class CommonController extends \Common\Controller\BaseController{
                     'pageSize'=> 99999999,
                 ];
                 $result = $this->AProject ->getList($parameter);
-                $this->log($this->AProject ->M()->_sql());
+                // $this->log($this->AProject ->M()->_sql());
                 if($result){
                     return $result["list"];
                 }

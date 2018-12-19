@@ -284,19 +284,27 @@ function approve_btn($tableName,$param=[]){
     $place = isset($data['place']) ? $data['place'] : $place;
     $level = isset($data['process_level']) ? $data['process_level'] : $level;
     $status = isset($data['status']) ? $data['status'] : $status;
+    
     // echo $tableName,",",$id,",",$place,",",$level,",",$status,",";
 
     $all_level = 0;
     $examine = isset($data['examine']) ? $data['examine'] : (isset($param['examine']) ? $param['examine'] : "");
+
+    $place = search_last_key(session('roleId'),array_unique(explode(",",$examine)));
+    $place = $place !== false ? ++$place : 0;
+    // $place ++;
     // var_dump($examine);
+    // echo $examine;
     if($examine != ""){
         $all_level = count(explode(",",$examine));
     }
     
     // print_r($param['examine']);exit; 
     $levelStr = ' data-place="'.$place.'" data-level="'.$level.'" data-alllevel="'.$all_level.'" data-maurl="'.U('Tools/getMoneyAccountList').'"';
-    echo '<div class="approve-group" '.$levelStr.' data-table="'.$tableName.'" data-id="'.$id.'" >
+    if($level > 0){
+        echo '<div class="approve-group" '.$levelStr.' data-table="'.$tableName.'" data-id="'.$id.'" >
         <button type="button" data-url="'.U('Tools/getApproveList').'" class="btn btn-xs bg-black approve-log">记录</button> ';
+    }
     if($place===false || $place > 0){
         $disabled = "";
         
@@ -304,7 +312,10 @@ function approve_btn($tableName,$param=[]){
         if(( $level != $place) || $status == 3 || $status == 1){
             $disabled = "disabled";
         }
-        echo '<button type="button" '.$disabled.' data-url="'.U('Tools/approveEdit').'" class="btn btn-xs bg-orange approve-con '.$disabled.'">操作</button>';
+        if($level > 0 && !isset($param['nocon']) ){
+            echo '<button type="button" '.$disabled.' data-url="'.U('Tools/approveEdit').'" class="btn btn-xs bg-orange approve-con '.$disabled.'">操作</button>';
+        }
+        
     }
     echo '</div>';
 }

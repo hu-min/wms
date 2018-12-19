@@ -115,11 +115,11 @@ class ToolsController extends BaseController{
             }
         }
         
-        
+        $this->log($nextExamine);
         if($resultData && !empty($resultData["list"])){
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0),"data"=>$resultData["list"],"allProcess"=>$allProcess,"nextExamine"=>$nextExamine]);
         }
-        $this->ajaxReturn(['errCode'=>115,'error'=>getError(115)."；可能是系统生成所以无记录","allProcess"=>$allProcess]);
+        $this->ajaxReturn(['errCode'=>115,'error'=>getError(115)."；可能是系统生成所以无记录","allProcess"=>$allProcess,"nextExamine"=>$nextExamine]);
         
     }
     /** 
@@ -172,11 +172,12 @@ class ToolsController extends BaseController{
         $hasParam = $parameter;
         unset($hasParam['add_time']);
         unset($hasParam['remark']);
+        unset($hasParam['status']);
         $this->approveCom->M()->startTrans();
         $hasApp = $this->approveCom->getOne($hasParam);
         if($hasApp){
             //防止频繁操作
-            $this->ajaxReturn(['errCode'=>409,'error'=>"您已经审批过了！".getError(409)]);
+            $this->ajaxReturn(['errCode'=>409,'error'=>getError(409)."您已经执行过审批，请不要重复操作"]);
         }
         $insertRes = $this->approveCom->insert($parameter);
         if(isset($insertRes->errCode) && $insertRes->errCode==0){
@@ -300,8 +301,7 @@ class ToolsController extends BaseController{
             $updateRes = $db ->where([$db->getPk()=>$id])->save($dbData);
             $this->log($db ->_sql());
             if($updateRes || $state == 2){
-                $db ->commit();
-                $this->approveCom->M() ->commit();
+               
                 //5，统计 $table 数量
                 
                 //6，统计审批状态为1的审批记录
@@ -333,25 +333,56 @@ class ToolsController extends BaseController{
                     // $mainDb = M("v_expense",NULL);
                     // $mainDb->where([$mainDb->getPk()=>$tableId])->save(["status"=>$state,"process_level"=>$place]);
                 // }else 
-                if($table=="v_project" && $state==1){
-                    $this->ReceCom=getComponent('Receivable');
-                    $this->ReceCom->createOrder($tableId,session('userId'));
-                }else if($table=="v_float_capital_log" && $state==1){
-                    getComponent('FlCapLog')->computeFloat($id);
-                }else if(in_array($table,C('finan_table')) && $state==1){
-                    $data = [
-                        'account_id' => $monacc_id,
-                        'float_type' => 2,
-                        'happen_time' => date("Y-m-d H:i:s"),
-                        'inner_detail' => $debitResult['debit_cause'],
-                        'log_type' => 2,
-                        'money' => $debitResult['debit_money'],
-                        'object' =>  $debitResult['user_name'],
-                        'project_code' => $debitResult['project_code'],
-                        'project_id' =>$debitResult['project_id'],
-                    ];
-                    getComponent('FlCapLog')->flo_cap_logAdd($data,true);
+                if($state==1){
+                    switch ($table) {
+                        case 'v_project':
+                            $this->ReceCom=getComponent('Receivable');
+                            $this->ReceCom->createOrder($tableId,session('userId'));
+                            break;
+                        case 'v_float_capital_log':
+                            getComponent('FlCapLog')->computeFloat($id);
+                            break;
+                        case in_array($table,C('finan_table')):
+                            $data = [
+                                'account_id' => $monacc_id,
+                                'float_type' => 2,
+                                'happen_time' => date("Y-m-d H:i:s"),
+                                'inner_detail' => $debitResult['debit_cause'],
+                                'log_type' => 2,
+                                'money' => $debitResult['debit_money'],
+                                'object' =>  $debitResult['user_name'],
+                                'project_code' => $debitResult['project_code'],
+                                'project_id' =>$debitResult['project_id'],
+                            ];
+                            getComponent('FlCapLog')->flo_cap_logAdd($data,true);
+                            break;
+                        case 'v_project_offer':
+                            $nodeResult = A('Component/Node')->getOne(['fields'=>'nodeId','where'=>['db_table'=>'v_project_cost','processIds'=>['GT',0],'is_process'=>1],'one'=>true]);
+                            getComponent('ProjectOffer')->toCost($tableId,$nodeResult['nodeId']);
+                            break;
+                        default:
+                            break;
+                    }
                 }
+                // if($table=="v_project" && $state==1){
+                //     $this->ReceCom=getComponent('Receivable');
+                //     $this->ReceCom->createOrder($tableId,session('userId'));
+                // }else if($table=="v_float_capital_log" && $state==1){
+                //     getComponent('FlCapLog')->computeFloat($id);
+                // }else if(in_array($table,C('finan_table')) && $state==1){
+                //     $data = [
+                //         'account_id' => $monacc_id,
+                //         'float_type' => 2,
+                //         'happen_time' => date("Y-m-d H:i:s"),
+                //         'inner_detail' => $debitResult['debit_cause'],
+                //         'log_type' => 2,
+                //         'money' => $debitResult['debit_money'],
+                //         'object' =>  $debitResult['user_name'],
+                //         'project_code' => $debitResult['project_code'],
+                //         'project_id' =>$debitResult['project_id'],
+                //     ];
+                //     getComponent('FlCapLog')->flo_cap_logAdd($data,true);
+                // }
                 // $examineRes = $db ->field("process_level,examine")->where([$db->getPk()=>$id])->find();
                                
                 if(isset($examine[$place-1]) && $examine[$place-1] > 0){
@@ -362,7 +393,8 @@ class ToolsController extends BaseController{
                         $msgResult = $this->QiyeCom-> textcard($touser,"【{$title}】审批",$desc,$url);
                     }
                 }
-
+                $db ->commit();
+                $this->approveCom->M() ->commit();
 
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }else{

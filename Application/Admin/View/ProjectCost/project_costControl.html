@@ -76,11 +76,13 @@
                                 <th>报价批次</th>
                                 <th>报价标识</th>
                                 <th>报价者</th>
+                                <th>成本编辑</th>
                                 <th>报价时间</th>
                                 <th>报价</th>
                                 <th>成本</th>
                                 <th>增值税率</th>
                                 <th>含税报价</th>
+                                <th>审批备注</th>
                                 <th>审批记录</th>
                                 <th>状态</th>
                                 <th>操作</th>
@@ -139,6 +141,8 @@
                 $(tabId+" .global-modal").find(" .modal-info[name='"+element+"']").prop("disabled",true)
             });
             $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val(info['id'])
+            $(tabId+" .global-modal").find(".modal-footer .modal-info[name='oid']").val(info['oid'])
+
             $(tabId+" .global-modal").find(".all-count").text(info['total']);
             $(tabId+" .global-modal").find(".cost-all-count").text(info['cost_total'] ? info['cost_total'] : "0.00");
             $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(info['tax_rate']/100))*info['total']));
@@ -160,13 +164,22 @@
                     poPanelObj.find(".cost-class-title").text(subElement['cost_class_name'])
                     poPanelObj.find(".cost-class-alpha").text(alpha(subElement['class_sort']))
                     poPanelObj.find(".cost_class_div").addClass('none')
-                    poPanelObj.find(".add-costItem").removeClass('none')
-
+                    // poPanelObj.find(".add-costItem").removeClass('none')
+                
                     poPanelObj.find(".cost_chosen").remove()
                     poPanelObj.find(".cost_chosen_del").remove()
+                    if(subElement['read_type'] < 2){
+                        poPanelObj.find(".add-costItem").remove()
+                        poPanelObj.find(".class-rowspan").remove()
+                    }else{
+                        poPanelObj.removeClass('box-info')
+                        poPanelObj.addClass('box-primary');
+                        poPanelObj.find(".add-costItem").removeClass('none') 
+                    }
                     
                     poPanelObj.find(".modal-info[name='class_sort']").val(subElement['class_sort'])
                     poPanelObj.find(".modal-info[name='cost_class']").val(subElement['cost_class'])
+                    poPanelObj.find(".modal-info[name='read_type']").val(subElement['read_type'])
                     poPanelObj.find(idstr).attr("id",poPanelObj.find(idstr).attr("id")+subElement['class_sort'])
     
                     $(tabId+" .global-modal .box-group ").append(poPanelObj);
@@ -224,7 +237,10 @@
                     poItemOjc.find('td').eq(1).remove();
                 }
                 poItemOjc.find('.cost_item_del').remove();
-                
+                if(subElement['read_type'] < 2){
+                    poItemOjc.find(".class-rowspan").remove()
+                }
+
                 $(tabId+" .global-modal .box-group ").find(".panel").eq(subElement['class_sort']).find(".table-items").append(poItemOjc);
                 init_chosen("{$url}","getOptionList",poItemOjc);
                 // $this.find(".table-items").append(poItemOjc);
@@ -310,15 +326,17 @@
             datas["data"]['total'] = $(tabId+" .global-modal").find(".all-count").text();
             datas["data"]['cost_total'] = $(tabId+" .global-modal").find(".cost-all-count").text();
             datas["data"]['id'] = $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val();
+            datas["data"]['oid'] = $(tabId+" .global-modal").find(".modal-footer .modal-info[name='oid']").val();
             datas["data"]['list'] = []
 
             $(tabId+" .global-modal").find(".panel").each(function(){
                 
                 var class_sort = $(this).find(".modal-info[name='class_sort']").val();
                 var cost_class = $(this).find(".modal-info[name='cost_class']").val();
+                var read_type = $(this).find(".modal-info[name='read_type']").val();
                 var class_notes = "";          
                 $(this).find("tbody tr").each(function(){
-                    var temp = {class_sort:class_sort,cost_class:cost_class,class_sub:0,class_notes:class_notes};
+                    var temp = {class_sort:class_sort,cost_class:cost_class,class_sub:0,class_notes:class_notes,read_type:read_type};
                     $(this).find(".modal-info").each(function(){
                         var name =$(this).attr("name");
                         var required=$(this).attr("required");
@@ -364,9 +382,16 @@
             $(tabId+" .search-list").trigger("click");
             //添加主分类按钮事件
             $(tabId+" .global-modal").on("click",".add-costClass",function(){
+                var type = $(this).data('type');
                 var num = $(tabId+" .global-modal .box-group ").find(".panel").length;
-
+                
                 var poPanelObj = $(poPanel)
+
+                poPanelObj.find(".modal-info[name='read_type']").val(type)
+                if(type>1){
+                    poPanelObj.removeClass('box-info')
+                    poPanelObj.addClass('box-primary');
+                }
                 var idstr = poPanelObj.find(".cost-class-title").attr("href")
                 poPanelObj.find(".cost-class-title").attr("href",idstr+num)
                 poPanelObj.find(".modal-info[name='class_sort']").val(num)
@@ -402,10 +427,17 @@
             $(tabId+" .global-modal").on("click",".box-title .add-costItem,tbody .class-rowspan",function(){
                 // var sort = $(this).parents(".panel").find(".table-items tr").length
                 // sort = Number(sort) + 1;
+                var read_type = $(this).parents(".panel").find(".modal-info[name='read_type']").val();
                 if($(this).parents(".panel").find(".panel-collapse").css("display") == "none"){
                     $(this).parents(".panel").find(".panel-collapse").collapse('toggle')
                 }
                 var poItemOjc = $(poItem);
+                if(read_type>1){
+                    ['price','total'].forEach(modalName => { 
+                            poItemOjc.find(".modal-info[name='"+modalName+"']").prop("disabled",true)
+                        
+                    });
+                }
                 init_chosen("{$url}","getOptionList",poItemOjc);
                 if($(this).hasClass("class-rowspan")){
                     var rows = $(this).parents("td").prop("rowspan");
@@ -463,7 +495,7 @@
                 
             })
             //合计金额计算
-            $(tabId+" .global-modal").on("input",".modal-info[name='price'],.modal-info[name='cost_price']",function(){ 
+            $(tabId+" .global-modal").on("input",".modal-info[name='num'],.modal-info[name='act_num'],.modal-info[name='price'],.modal-info[name='cost_price']",function(){ 
                 var $tr = $(this).parents("tr")
                 var num = Number($tr.find(".modal-info[name='num']").val());
                 var act_num = Number($tr.find(".modal-info[name='act_num']").val());
@@ -495,7 +527,7 @@
                     classCount += float($(this).val());
                 })
                 $(this).parents(".panel").find(".class-count").text(float_format(classCount));
-
+                
                 var profit =  float(total) - float(cost_total);
                 $tr.find(".modal-info[name='profit']").val(float_format(profit));
                 var profit_ratio =  (float(profit)/float(total))*100;

@@ -34,6 +34,8 @@ class BaseController extends \Common\Controller\BaseController{
         $method=str_replace($className,"",$fun);
         if(method_exists(__CLASS__,$method)){
             return $this->$method($argu[0]);
+        }elseif(method_exists($this->selfDB,$method)){
+            return $this->selfDB->$method($argu[0]);
         }
         return false;
     }
@@ -203,4 +205,7 @@ class BaseController extends \Common\Controller\BaseController{
     function getActionName(){
         return CONTROLLER_NAME;
     }
+    // function _sql(){
+    //     return $this->selfDB->_sql();
+    // }
 }

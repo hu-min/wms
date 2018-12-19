@@ -685,6 +685,7 @@
         var tab=$("#"+id);
         tabId="#"+id;
         var nav_tabs=$("#main-navs .main-tabs")
+        
         var tab_content=$('#main-navs .main-tabs-content')
         nav_tabs.children('li').removeClass('active');
         tab_content.children('div').removeClass('active');
@@ -696,6 +697,10 @@
             $("#"+id).addClass('active');
             $("#"+id).html(content);
         }else{
+            if($("#main-navs .main-tabs").find('li').length>=15){
+              notice(110,'您最多只能同时添加15个标签栏，请关闭一些不需要用的',"系统限制");
+              return false;
+            }
             var tab="<li class='active'><i class='fa fa-fw fa-times-circle tab-clo none'></i><a href='#"+id+"' data-toggle='tab'>"+title+"</a></li>";
             var tabContent="<div class='active tab-pane' id='"+id+"'>"+content+"</div>";
             nav_tabs.append(tab);
@@ -746,9 +751,19 @@
         // $(".sidebar-menu").find(".nodeOn").removeClass("node-action");
         // $(this).addClass("node-action");
         if(nowId>0){
+            $(".sidebar-menu").find(".treeview-menu").css("display","none");
+            $(".sidebar-menu").find(".treeview").removeClass("menu-open");
             chUrlAction(nowId)
         }
         $(tabId).addClass("active");
+        
+        $(".sidebar-menu").find(".nodeOn").each(function(){
+            if( $(this).data("nodeid")>0 && $(this).data("nodeid")== nowId){
+                var result=$(this).parents(".treeview-menu").css("display","block");
+                var result=$(this).parents(".treeview-menu").prev(".nodeOn").parent(".treeview").addClass("menu-open");
+            }
+        })
+        
     })
 </script>
 </body>

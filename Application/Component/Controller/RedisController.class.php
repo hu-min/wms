@@ -17,7 +17,7 @@ class RedisController extends Controller{
         $this->redis->set($this->onlineName.$userId,time(),300);
     }
     function offline($userId){
-        $this->redis->set($this->onlineName.$userId,time(),1);
+        $this->delAll("",$this->onlineName.$userId);
     }
     function rset($name,$value="",$seconds=300)
     {

@@ -118,7 +118,7 @@ class ProcessController extends BaseController{
         $process["place"] = search_last_key($roleId,array_unique(explode(",",$examines)));
         $returnData['examine'] = trim(implode(",",array_unique(explode(",",$examines))),",");
         $returnData['place'] = $process["place"];
-        $returnData['process_level'] = session('roleId') ==  explode(",",$examines)[0] ? 2 : 1;
+        $returnData['process_level'] = $roleId ==  explode(",",$examines)[0] ? 2 : 1;
         // $returnData['place'] = $process["place"];
         $returnData['process_id'] = $process["processId"];
         $returnData['auth'] = $process["auth"];
