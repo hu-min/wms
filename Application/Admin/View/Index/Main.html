@@ -589,6 +589,17 @@
     var breadData={};//定义breadcrumb数据
     
     $(document).ready(function () {
+        
+		if(typeof(EventSource)!=="undefined"){
+			// var serverSent=new EventSource("{:U('Index/serverSent')}");
+			// serverSent.onmessage=function(event){
+			// 	console.log(JSON.parse(event.data))
+				
+			// };
+		}else{
+			notice(110,'您的浏览器不支持Server-Sent，将无法自动更新某些数据',"浏览器限制");
+		}
+
         $('.sidebar-menu').tree()
         //菜单点击事件
         $(document).offon('click','.nodeOn',function(e){

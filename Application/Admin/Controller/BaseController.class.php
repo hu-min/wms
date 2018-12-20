@@ -75,12 +75,13 @@ class BaseController extends \Common\Controller\BaseController{
             'Admin/Index/Main',
             'Admin/Index/logOut',
             'Admin/Index/checkLogin',
+            'Admin/Index/serverSent',
             'Admin/Index/Index',
             'Admin/Index/lock',
         ];
         
         $this->refreNode();
-
+        
         if($_GET['code'] && ACTION_NAME=='Login'){
             $userInfo=$this->Wxqy->user()->getUserInfo($_GET['code'],true);
             if($userInfo->userid!=""){

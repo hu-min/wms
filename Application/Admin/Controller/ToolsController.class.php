@@ -52,7 +52,14 @@ class ToolsController extends BaseController{
             "orderStr" => "add_time DESC",
         ];
         $resultData = $this->approveCom->getList($parameter);
-
+        $appUserList = [];
+        if($resultData){
+            foreach ($resultData['list'] as $info) {
+                if($info['status'] == 1){
+                    array_push($appUserList,$info['user_id']);
+                }
+            }
+        }
         $db = M($table,NULL);
         $examineRes = $db ->field("process_level,examine,status")->where([$db->getPk()=>$id])->find();
         $examine = explode(",",$examineRes["examine"]);
@@ -72,7 +79,31 @@ class ToolsController extends BaseController{
                 }
                 
                 if($nextRoleId==session("roleId")){
-                    $nextExamine = "说的就是你啊！";
+                    $this->log($appUserList);
+                    if(in_array(session("userId"),$appUserList)){
+                        $userParam = [
+                            'fields' => 'userId,roleId,userName,roleName',
+                            'where' => ['roleId'=>session("roleId"),'status'=>1,"userId"=>["neq",session("userId")]],
+                            'joins' => [
+                                'LEFT JOIN (SELECT roleId role_id,roleName FROM v_role WHERE status = 1) r ON r.role_id = roleId'
+                            ]
+                        ];
+                        $userResult = $this->userCom->getList($userParam);
+                        if($userResult){
+                            if($userResult['count']>1){
+                                foreach ($userResult['list'] as $userInfo) {
+                                    $nextExamine .= $userInfo["userName"]."、";
+                                }
+                                $nextExamine = rtrim($nextExamine,"、");
+                                $nextExamine ="【{$userInfo['roleName']}】".$nextExamine;
+                            }else{
+                                $nextExamine = $userResult['list'][0]["userName"]."【".$userResult['list'][0]['roleName']."】";
+                            }
+                        }
+                    }else{
+                        $nextExamine = "说的就是你啊！";
+                    }
+
                 }else{
 
                     $nextExamine = '';
@@ -104,9 +135,7 @@ class ToolsController extends BaseController{
                             }else{
                                 $nextExamine = $userResult['list'][0]["userName"]."【".$userResult['list'][0]['roleName']."】";
                             }
-                            
                         }
-                        
                     }else{
                         $nextExamine = "没有人可以审批";
                     }
@@ -155,10 +184,25 @@ class ToolsController extends BaseController{
         $this->approveCom=getComponent('ApproveLog');
         // $allItem = $db ->where(["parent_id"=>$tableId])->count();
         // print_r($allItem);exit;
-        $db ->startTrans();
+        
         $userId = session('userId');
         $roleId = session('roleId');
         
+
+
+        $userParam = [
+            'fields' => 'userId,roleId,userName,roleName',
+            'where' => ['roleId'=>$roleId,'status'=>1],
+            'joins' => [
+                'LEFT JOIN (SELECT roleId role_id,roleName FROM v_role WHERE status = 1) r ON r.role_id = roleId'
+            ]
+        ];
+        $userResult = $this->userCom->getList($userParam);
+        $userIds = $userResult ? array_column($userResult['list'],'userId') : [];
+        
+
+
+
         //1,先执行插入审批记录
         $parameter=[
             "table_name" => $table,
@@ -169,17 +213,29 @@ class ToolsController extends BaseController{
             "remark" => $remark,
             'effect' => 1,
         ];
-        $hasParam = $parameter;
-        unset($hasParam['add_time']);
-        unset($hasParam['remark']);
-        unset($hasParam['status']);
-        $this->approveCom->M()->startTrans();
-        $hasApp = $this->approveCom->getOne($hasParam);
-        if($hasApp){
+        $hasParam = [
+            'fields' => 'user_id',
+            'where'=>["table_name" => $table,"table_id" => $id,"user_id"=>["IN",$userIds],'effect' => 1,],
+        ];
+        
+        $hasApp = $this->approveCom->getList($hasParam);
+        $appUsers = $hasApp ? array_column($hasApp['list'],'user_id') : [];
+        if(in_array($userId,$appUsers)){
             //防止频繁操作
             $this->ajaxReturn(['errCode'=>409,'error'=>getError(409)."您已经执行过审批，请不要重复操作"]);
         }
+        $diff = array_diff($userIds,$appUsers);
+        
+        
+        $this->approveCom->M()->startTrans();
         $insertRes = $this->approveCom->insert($parameter);
+
+        if(count($diff)>1 && $status ==1 ){
+            $this->approveCom->commit();//如果同一个角色多个审批者必须要达到所有审批者都审核通过才可以执行下面一步，必须是状态为批准，
+            $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+        }
+        $db ->startTrans();
+
         if(isset($insertRes->errCode) && $insertRes->errCode==0){
             $examineRes = $db ->field("user_id,process_level,examine")->where([$db->getPk()=>$id])->find();
             $uparam = [
@@ -260,11 +316,13 @@ class ToolsController extends BaseController{
             }
             $authPlace = array_search($authRoleId,$examine);//判断提交者在流程中的位置
             if(($authPlace+1) == count($examine) && $status == 1 && $place >= $authPlace){
+
                 $state = 1;
             }
-            $this->log($examine);
-            $this->log($place);
-            $this->log($state);
+       
+            // $this->log($examine);
+            // $this->log($place);
+            // $this->log($state);
             //这里判断下财务资金库存的数据
             if(in_array($table,C('finan_table')) && $state == 1){
                 if($monacc_id <= 0){

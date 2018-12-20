@@ -90,6 +90,7 @@ class IndexController extends BaseController{
         $this->assign('logout',$logout);
         $this->display();
     }
+    
     /** 
      * @Author: vition 
      * @Date: 2018-01-14 21:31:09 
@@ -191,10 +192,12 @@ class IndexController extends BaseController{
             $add_time = "add_time";
             $project_id = "project_id";
             $id = "id";
+            $idW = "id";
             if(in_array($npInfo["db_table"],["v_project"])){
                 $add_time = "addTime `add_time`";
                 $project_id = "`projectId` project_id";
                 $id = "`projectId` id";
+                $idW = "projectId";
             }elseif(in_array($npInfo["db_table"],["v_work_order"])){
                 $project_id = "`relation_project` project_id";
             }
@@ -204,12 +207,13 @@ class IndexController extends BaseController{
                     $whereStr = "`status` IN (0,2) AND user_id = {$userId}";
                     
                 }
-                $s = "SELECT {$id}, '{$npInfo["nodeId"]}' nodeId , {$project_id} ,'{$npInfo["nodeTitle"]}' `moudle_name`,{$user_id},`process_level`,`status`,{$add_time},'{$npInfo["controller"]}' controller,examine,'{$npInfo['db_table']}' tableName FROM {$npInfo['db_table']} WHERE {$whereStr} AND process_level > 0";
+                $s = "SELECT {$id}, '{$npInfo["nodeId"]}' nodeId , {$project_id} ,'{$npInfo["nodeTitle"]}' `moudle_name`,{$user_id},`process_level`,`status`,{$add_time},'{$npInfo["controller"]}' controller,examine,'{$npInfo['db_table']}' tableName,approve_id FROM {$npInfo['db_table']} LEFT JOIN (SELECT id approve_id,table_id FROM v_approve_log WHERE table_name='{$npInfo['db_table']}' AND {$user_id} = {$userId} ) a ON a.table_id = {$idW} WHERE {$whereStr} AND process_level > 0";
                 array_push($sqlArr,$s);
                 // $this->log($s);
             }
         }
         $sql = implode(" UNION ALL ",$sqlArr);
+        // $this->log($sql);
         // print_r($sqlArr);exit;
         if($sql != ""){
             //白名单处理
@@ -219,10 +223,10 @@ class IndexController extends BaseController{
             //     $where = " WHERE user_id NOT IN (".implode(",",$whites).")";
             // }
 
-            $sqls = "SELECT id,nodeId, project_id,project_name,`moudle_name`,`user_id`,`user_name`,`process_level`,`status`,examine,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time,controller ,tableName FROM ({$sql}) p LEFT JOIN (SELECT userId,userName `user_name` FROM v_user WHERE status =1) u ON userId = `user_id` LEFT JOIN (SELECT projectId pId,name project_name FROM v_project) pr ON pr.pId = project_id ".$where." ORDER BY add_time DESC LIMIT ".($page - 1) * $pageNum.",".$pageNum;
+            $sqls = "SELECT id,nodeId, project_id,project_name,`moudle_name`,`user_id`,`user_name`,`process_level`,`status`,examine,FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time,controller ,tableName,approve_id FROM ({$sql}) p LEFT JOIN (SELECT userId,userName `user_name` FROM v_user WHERE status =1) u ON userId = `user_id` LEFT JOIN (SELECT projectId pId,name project_name FROM v_project) pr ON pr.pId = project_id ".$where." ORDER BY add_time DESC LIMIT ".($page - 1) * $pageNum.",".$pageNum;
             // echo $sqls;exit;
             $cqls = "SELECT count(*) `count` FROM ({$sql}) p LEFT JOIN (SELECT userId,userName `user_name` FROM v_user WHERE status =1) u ON userId = `user_id` ".$where;
-            $this->log($sqls);
+            // $this->log($sqls);
             $result = $db ->query($sqls);
             $countRes = $db ->query($cqls);
             $listResult = ["list"=>$result,"count"=>$countRes[0]["count"]];
@@ -559,6 +563,29 @@ class IndexController extends BaseController{
             "template"=>"processModal",
         ];
         $this->modalOne($modalPara);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-12-20 13:30:26 
+     * @Desc: 服务器推送客户端 
+     */    
+    function serverSent(){
+        header('Content-Type: text/event-stream');
+        header('Cache-Control: no-cache');
+        
+        if($this->isLogin()){
+            $time = date('r');
+            $data = [
+                'title'=>'通过时间来测试事件流',
+                'time' =>date('r'),
+            ];
+            echo "data:".json_encode($data)."\n\n";
+            // echo "data: 通过时间来测试事件流: {$time}\n\n";
+            flush();
+        }else{
+            exit;
+        }
+        
     }
 }
 

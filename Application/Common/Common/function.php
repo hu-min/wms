@@ -284,6 +284,7 @@ function approve_btn($tableName,$param=[]){
     $place = isset($data['place']) ? $data['place'] : $place;
     $level = isset($data['process_level']) ? $data['process_level'] : $level;
     $status = isset($data['status']) ? $data['status'] : $status;
+    $approved = isset($data['approve_id']) && $data['approve_id'] > 0  ? true : false;
     
     // echo $tableName,",",$id,",",$place,",",$level,",",$status,",";
 
@@ -307,9 +308,9 @@ function approve_btn($tableName,$param=[]){
     }
     if($place===false || $place > 0){
         $disabled = "";
-        
+   
         // if(($place !== false && $level >= $place) || $status == 3){
-        if(( $level != $place) || $status == 3 || $status == 1){
+        if(( $level != $place) || $status == 3 || $status == 1 || $approved){
             $disabled = "disabled";
         }
         if($level > 0 && !isset($param['nocon']) ){
