@@ -698,7 +698,7 @@ class PurchaController extends BaseController{
         //     $where['ouser_id'] = session('userId');
         // }
         $pageSize = isset($data['pageSize']) ? $data['pageSize'] : $this->pageSize;
-        $sql = 'SELECT *,COUNT(id) item_num,"供应商" suprtype FROM v_project_cost_sub WHERE scompany_id > 0  GROUP BY parent_id  UNION ALL SELECT *,COUNT(id) item_num,"非供应商" suprtype FROM v_project_cost_sub WHERE scompany_id = 0 GROUP BY parent_id';
+        $sql = 'SELECT *,COUNT(id) item_num,"供应商" suprtype FROM v_project_cost_sub WHERE scompany_id > 0  GROUP BY parent_cid  UNION ALL SELECT *,COUNT(id) item_num,"非供应商" suprtype FROM v_project_cost_sub WHERE scompany_id = 0 GROUP BY parent_cid';
         $sqlLimit= 'SELECT *,FROM_UNIXTIME(add_time,"%Y-%m-%d") add_time FROM ('.$sql.') pcs LEFT JOIN (SELECT id pId,project_id,section FROM v_project_cost) pc ON pId = pcs.parent_id LEFT JOIN (SELECT projectId,code project_code,name project_name FROM v_project ) p ON p.projectId = pc.project_id LEFT JOIN (SELECT userId, userName ouser_name FROM v_user ) u ON u.userId = pcs.ouser_id LEFT JOIN (SELECT userId, userName cuser_name FROM v_user ) u1 ON u1.userId = pcs.cuser_id ORDER BY add_time DESC LIMIT '.$p.','.$pageSize;
         $sqlCount= 'SELECT COUNT(id) v_count FROM ('.$sql.') pcs';
         if(isset($data['suprtype'])){
