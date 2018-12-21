@@ -207,7 +207,7 @@ class IndexController extends BaseController{
                     $whereStr = "`status` IN (0,2) AND user_id = {$userId}";
                     
                 }
-                $s = "SELECT {$id}, '{$npInfo["nodeId"]}' nodeId , {$project_id} ,'{$npInfo["nodeTitle"]}' `moudle_name`,{$user_id},`process_level`,`status`,{$add_time},'{$npInfo["controller"]}' controller,examine,'{$npInfo['db_table']}' tableName,approve_id FROM {$npInfo['db_table']} LEFT JOIN (SELECT id approve_id,table_id FROM v_approve_log WHERE table_name='{$npInfo['db_table']}' AND {$user_id} = {$userId} ) a ON a.table_id = {$idW} WHERE {$whereStr} AND process_level > 0";
+                $s = "SELECT {$id}, '{$npInfo["nodeId"]}' nodeId , {$project_id} ,'{$npInfo["nodeTitle"]}' `moudle_name`,{$user_id},`process_level`,`status`,{$add_time},'{$npInfo["controller"]}' controller,examine,'{$npInfo['db_table']}' tableName,approve_id FROM {$npInfo['db_table']} LEFT JOIN (SELECT id approve_id,table_id FROM v_approve_log WHERE table_name='{$npInfo['db_table']}' AND `status` > 0 AND {$user_id} = {$userId} ) a ON a.table_id = {$idW} WHERE {$whereStr} AND process_level > 0";
                 array_push($sqlArr,$s);
                 // $this->log($s);
             }

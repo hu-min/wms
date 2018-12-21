@@ -407,7 +407,7 @@ class ProjectCostController extends BaseController{
         $joins3 = [
             "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='".$offerCostCom->tableName()."' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id",
             "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
-            "LEFT JOIN (SELECT id approve_id,table_id FROM v_approve_log WHERE table_name='".$offerCostCom->tableName()."' AND user_id = '".session("userId")."' ) a ON a.table_id = id"
+            "LEFT JOIN (SELECT id approve_id,table_id FROM v_approve_log WHERE table_name='".$offerCostCom->tableName()."' AND status > 0 AND user_id = '".session("userId")."' ) a ON a.table_id = id"
         ];
         $joins = array_merge($joins2,$joins,$joins3);
         // if($nodeAuth < 7){
