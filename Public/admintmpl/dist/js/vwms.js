@@ -680,18 +680,18 @@ $(function(){
                     // console.log(result)
                     var current = 0;
                     var allRoles = []
-                    var allProcess = result.allProcess > 0 ? (Number(result.allProcess)) : 0;
+                    var allProcess = result.allApprove > 0 ? (Number(result.allApprove)) : 0;
                     if(result.errCode == 0){
                         var trHtml = '';
                         result.data.forEach(element => {
                             trHtml+='<tr><td>'+element.user_name+'</td><td>'+element.role_name+'</td><td>'+element.state+'</td><td>'+element.add_time+'</td><td>'+element.remark+'</td></tr>'
                             if(Number(element.status) == 1){
                                 current++
-                                allRoles.push(element.role_name);
+                                // allRoles.push(element.role_name);
                             }
                         });
-                        $.unique(allRoles)
-                        current = allRoles.length
+                        // $.unique(allRoles)
+                        // current = allRoles.length
                         // console.log(result.nextExamine)
                         
                         $("#"+apl_id+" .modal-body .next-examine").text(result.nextExamine)

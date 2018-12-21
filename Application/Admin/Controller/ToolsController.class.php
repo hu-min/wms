@@ -65,11 +65,13 @@ class ToolsController extends BaseController{
         $examine = explode(",",$examineRes["examine"]);
         $allProcess = count($examine);
         
+        $allApprove = $this->userCom->getList(['where'=>['roleId'=>['IN',$examine]]])['count'];
+        $this->log($this->userCom->_sql());
         if(in_array($examineRes["status"],[3,5])){
             $nextExamine = "已".$this->statusType[$examineRes["status"]];
         }else{
 
-            if(($examineRes["process_level"]-1)==$allProcess || $examineRes["status"] ==1 ){
+            if(($examineRes["process_level"]-1) == $allProcess || $examineRes["status"] ==1 ){
                 $nextExamine = "已完成";
             }else{
                 if($examineRes["process_level"]>0){
@@ -146,9 +148,9 @@ class ToolsController extends BaseController{
         
         $this->log($nextExamine);
         if($resultData && !empty($resultData["list"])){
-            $this->ajaxReturn(['errCode'=>0,'error'=>getError(0),"data"=>$resultData["list"],"allProcess"=>$allProcess,"nextExamine"=>$nextExamine]);
+            $this->ajaxReturn(['errCode'=>0,'error'=>getError(0),"data"=>$resultData["list"],"allProcess"=>$allProcess,"nextExamine"=>$nextExamine,'allApprove'=>$allApprove]);
         }
-        $this->ajaxReturn(['errCode'=>115,'error'=>getError(115)."；可能是系统生成所以无记录","allProcess"=>$allProcess,"nextExamine"=>$nextExamine]);
+        $this->ajaxReturn(['errCode'=>115,'error'=>getError(115)."；可能是系统生成所以无记录","allProcess"=>$allProcess,"nextExamine"=>$nextExamine,'allApprove'=>$allApprove]);
         
     }
     /** 
