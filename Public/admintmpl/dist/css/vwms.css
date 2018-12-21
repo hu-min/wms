@@ -53,6 +53,9 @@
 .users-avatar-td img{
   	height:50px;	
 }
+.modal{
+	position: absolute;
+}
 .modal-dialog .full-screen i{
 	margin-left: -42px;
 	font-size: 20px;
