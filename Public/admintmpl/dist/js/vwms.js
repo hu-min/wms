@@ -679,6 +679,7 @@ $(function(){
                 get(url,indata,function(result){
                     // console.log(result)
                     var current = 0;
+                    var allRoles = []
                     var allProcess = result.allProcess > 0 ? (Number(result.allProcess)) : 0;
                     if(result.errCode == 0){
                         var trHtml = '';
@@ -686,8 +687,11 @@ $(function(){
                             trHtml+='<tr><td>'+element.user_name+'</td><td>'+element.role_name+'</td><td>'+element.state+'</td><td>'+element.add_time+'</td><td>'+element.remark+'</td></tr>'
                             if(Number(element.status) == 1){
                                 current++
+                                allRoles.push(element.role_name);
                             }
                         });
+                        $.unique(allRoles)
+                        current = allRoles.length
                         // console.log(result.nextExamine)
                         
                         $("#"+apl_id+" .modal-body .next-examine").text(result.nextExamine)
@@ -761,6 +765,9 @@ $(function(){
                                         }
                                     })
                                 },500)
+                            }
+                            if(tabId == "#vtabs10000"){
+                                $(tabId+" .box").find(".box-header button[name='getAppList']").trigger("click")
                             }
                             
                         }else{

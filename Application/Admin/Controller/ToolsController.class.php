@@ -168,8 +168,8 @@ class ToolsController extends BaseController{
             $this->ajaxReturn(['errCode'=>100,'error'=>'当前数据表异常，请联系管理员']);
         }
     
-        $title = $tableInfo['list']['nodeTitle'];
-        $controller = $tableInfo['list']['controller'];
+        $title = $tableInfo['nodeTitle'];
+        $controller = $tableInfo['controller'];
         
         // table:v_project
         // id:13

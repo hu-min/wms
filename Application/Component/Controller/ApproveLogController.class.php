@@ -37,32 +37,29 @@ class ApproveLogController extends BaseController{
      * @Desc: 修改数据的时候需要判断 
      */    
     function updateStatus($table,$id,$parentId=null){
-        // $delRes = $this->del();
-        $updateRes = $this->update(["where"=>["table_name"=>$table,"table_id"=>$id,"status"=>["IN",[1,3]]],"data"=>["effect"=>0]]);
-        //只有删除了驳回和存在父id才需要执行下面的代码
-        if(isset($updateRes->errCode) && $updateRes->errCode==0){                          
-            $db = M($table,NULL);
-            if($parentId){
-                $where = ["parent_id" => $parentId];
-   
-                //判断当前的表中，指定的id是否存在着驳回的数据，在之前驳回的状态已改成0的前提，如果不存在驳回状态，那么更改父表的状态。
-                //获取所有状态
-                $rebutRes = $db ->field("status")->where($where)->select();
-                if($rebutRes){
-                    $allStatus = array_column($rebutRes,"status");
-                    $parentDb = M("v_expense",NULL);
-                    // 判断不存在驳回，同时属于审核中，那么修改状态为审核中，否则修改为提交中
-                    if(!in_array(3,$allStatus)){
-                        if(in_array(2,$allStatus)){
-                            $parentDb->where([$parentDb->getPk()=>$parentId])->save(["status"=>2]);
-                        }else{
-                            $parentDb->where([$parentDb->getPk()=>$parentId])->save(["status"=>0,"process_level"=>1]);
-                        }
-                    }
-                }
+        $param = [
+            'where' => ["table_name"=>$table,"table_id"=>$id,"status"=>3],
+        ];
+        $hasRefute = $this ->getOne($param);
+
+        $db = M($table,NULL);
+
+        $itemResult = $db ->where([$db->getPk()=>$id])->field("user_id")->find();
+
+        //如果申请中存在反驳则需要修改了且修改者是提交者才会重新修改数据
+        if($hasRefute && $itemResult['user_id'] == session('userId')){
+             
+            $this->startTrans();
+            $updateRes = $this->update(["where"=>["table_name"=>$table,"table_id"=>$id,"status"=>["IN",[1,3]]],"data"=>["effect"=>0]]);
+            if(isset($updateRes->errCode) && $updateRes->errCode == 0){
+                
+                $db->startTrans();
+                $db -> where([$db->getPk()=>$id])->save(["status"=>0,"process_level"=>1]);
+                $this->commit();
+                $db->commit();  
             }else{
-                $db->where([$db->getPk()=>$id])->save(["status"=>0,"process_level"=>1]);
-            }   
-        }
+                $this->rollback();
+            }
+        }   
     }
 }

@@ -103,7 +103,6 @@ class ProjectController extends BaseController{
         if($reqType){
             $this->$reqType();
         }else{
-            $this->assign('url',U(CONTROLLER_NAME.'/'.ACTION_NAME));
             $this->returnHtml();
         }
     }
