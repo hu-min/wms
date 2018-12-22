@@ -54,7 +54,8 @@
   	height:50px;	
 }
 .modal{
-	position: absolute;
+	/* display: flex; */
+	/* position: absolute; */
 }
 .modal-dialog .full-screen i{
 	margin-left: -42px;

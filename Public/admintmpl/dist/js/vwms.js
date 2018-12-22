@@ -621,7 +621,7 @@ $(function(){
 			handle: '.modal-header'
         });
         $(this).css("background","none");
-        $(this).css("display","flex");
+        // $(this).css("display","flex");
         // $(this).css("overflow-x", "scroll");   
         // $(this).css("overflow-y", "scroll");   
         // 防止出现滚动条，出现的话，你会把滚动条一起拖着走的
@@ -658,6 +658,7 @@ $(function(){
                     $(this).parents("#"+apl_id).toggleClass("modal fade in")
                     $(this).parents("#"+apl_id).prev(".modal-backdrop").toggleClass("none")
                     $(this).parents("#"+apl_id).css("display","none")
+                    $(tabId+" .modal").css("position","fixed")
                 })           
             }else{
                 if(!$("#"+apl_id).hasClass("modal fade in")){
@@ -670,6 +671,7 @@ $(function(){
                 var title = "审批记录"
                 var body = '<p class="text-yellow" style="font-weight: bold;">下一个审批者：<span class="next-examine"></span></p><table class="table table-bordered"><thead><tr><th>操作人</th><th>职务</th><th>状态</th><th>时间</th><th>备注</th></tr></thead><tbody></tbody></table><div><div class="progress progress-striped active"><div class="progress-bar progress-bar-primary" style="width: 0%"></div></div></div>'
             }else{
+                $(tabId+" .modal").css("position","static")
                 var title = "审批操作"
                 var body ='<div class="form-group"><label>审批内容</label><textarea class="form-control approve-remark" rows="3" placeholder="如果驳回或拒绝请写明理由"></textarea></div><div class="form-group money-account"></div><div style="text-align: right;"> <button type="button" class="btn bg-olive approve-btn btn-sm" data-status="1">通过</button> <button type="button" class="btn bg-orange approve-btn btn-sm" data-status="3">驳回</button> <button type="button" class="btn btn-danger approve-btn btn-sm" data-status="5">拒绝</button></div>';
             }
@@ -1472,11 +1474,12 @@ function media(mediafile,title){
     var width = $(window).width();
     if(in_array(suffix,["jpg","jpeg","png","gif","bmp"])){
         //支持的图片格式处理
-        if(width<767){
-            var style ='width:100%;';
-        }else{
-            var style ='height: 100%;';
-        }
+        // if(width<767){
+        //     var style ='width:100%;';
+        // }else{
+        //     var style ='max-height: '+height+"px";
+        // }
+        var style ='max-height: '+height+"px;max-width:"+width+"px";
         mediaHtml = '<div style="padding-bottom: 5px;"><button class="img-enlarge"><i class="fa fa-fw fa-search-plus"></i>放大</button><button class="img-reduce"><i class="fa fa-fw fa-search-minus"></i>缩小</button><button class="img-cwise"><i class="fa fa-fw fa-rotate-right"></i>顺时针90°</button><button class="img-acwise"><i class="fa fa-fw fa-rotate-left"></i>逆时针90°</button></div><div class="img-box" style="justify-content: center;height:'+height+'px;display: flex;align-items: center;position: relative;overflow: hidden;"><p style="position: relative;"><img style="'+style+'" src="'+mediafile+'" /></p></div>';
     }else if(suffix=="pdf"){
         //pdf处理
