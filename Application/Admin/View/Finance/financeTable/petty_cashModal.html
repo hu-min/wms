@@ -1,0 +1,73 @@
+<div class="modal-header">
+    <span class="full-screen pull-right"><i class="fa fa-arrows-alt"></i></span>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{$title}</h4>
+</div>
+<div class="modal-body">
+    <form role="form">
+        <div class="box-body">
+            <div class="col-sm-12">
+                <input class="modal-info" value="{$accountData.id}" name="id" type="hidden">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label"> 公司账户名称：</label>
+                            <input class="form-control fill-blank" value="{$accountData.account}" readonly="readonly" name="account" title="公司账户名称" placeholder="公司账户名称" type="text">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label"> 银行库存名称：</label>
+                            <input class="form-control fill-blank" value="{$accountData.bs_title}" readonly="readonly" name="bs_title" title="银行库存名称" placeholder="银行库存名称" type="text">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label"> 银行库存余额：</label>
+                            <input class="form-control fill-blank" value="{$accountData.bank_stock}" readonly="readonly" name="bank_stock" title="银行库存余额" placeholder="银行库存余额" type="text">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label"> 现金库存名称：</label>
+                            <input class="form-control fill-blank" value="{$accountData.cs_title}" readonly="readonly" name="cs_title" title="现金库存名称" placeholder="现金库存名称" type="text">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label"> 现金库存余额：</label>
+                            <input class="form-control fill-blank" value="{$accountData.cash_stock}" readonly="readonly" name="cash_stock" title="现金库存余额" placeholder="现金库存余额" type="text">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label"> 提取金额：</label>
+                            <input class="form-control modal-info" value="0.00" name="get_cash" title="提取金额" placeholder="提取金额" type="text">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="control-label"> 提取后银行库存余额：</label>
+                                <input class="form-control fill-blank text-green" value="" readonly="readonly" name="bstock" title="提取后银行库存余额" placeholder="提取后银行库存余额" type="text">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="control-label"> 提取后现金库存余额：</label>
+                                <input class="form-control fill-blank text-red" value="" readonly="readonly" name="cstock" title="提取后现金库存余额" placeholder="提取后现金库存余额" type="text">
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </form>            
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+    {:save_btn(get_defined_vars())}
+</div>

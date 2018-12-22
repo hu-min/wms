@@ -127,12 +127,22 @@
             $(tabId+" .search-body").find(".search-info[name='account_id']").val(accountid);
             $(tabId+" .search-body").find(".search-info[name='log_type']").val(logtype);
         }
-        var flo_cap_log_initInfo = function(){
+        var flo_cap_log_initInfo = function(gettype){
+            if(gettype == "Add"){
+                ['account_id','log_type'].forEach(element => {
+                    var value = $(tabId+" .search-body").find(".search-info[name='"+element+"']").val();
+                    $(tabId+" .global-modal .modal-info[name='"+element+"']").val(value)
+                });
+
+
+            }
+            console.log(gettype)
             init_chosen("{$url}","getOptionList",".global-modal");
             init_date({theme: '#3C8DBC'},$(tabId+" .global-modal"));
             upload({url:"{:U('Finance/upload_filesAdd')}"})
         }
         var flo_cap_log_setInfo = function(info){
+            
             var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
             if(info["project_id"] > 0){
                 var projectChosen= $(tabId+" .global-modal .modal-info[name='project_id']")
@@ -187,6 +197,7 @@
                 },false)
             }
         }
+
         $(function(){
             // console.log("here")
             init_date({theme: '#3C8DBC'});

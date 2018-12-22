@@ -872,9 +872,17 @@ class BaseController extends \Common\Controller\BaseController{
         }
         $title = $param['title'];
         $desc = $param['desc'];
-        $url = $param['url']."&id=".$tableId;
         $tableName = $param['tableName'];
-        $tableId = $param['tableId'];
+        if(is_array($param['tableId'])){
+            $tableIds = $param['tableId'];
+            $tableId = $tableIds[0];
+        }else{
+            $tableId = $param['tableId'];
+            $tableIds = false;
+        }
+        
+
+        $url = $param['url']."&id=".$tableId;
 
         if(!$limitWhite){
             
@@ -885,7 +893,15 @@ class BaseController extends \Common\Controller\BaseController{
             $msgResult = $this->QiyeCom-> textcard($touser,$title,$desc,$url);
         }
         if($noappr){
-            $this->ApprLogCom->createApp($tableName,$tableId,session("userId"),"");
+            if($tableIds){
+                foreach ($tableIds as $tid) {
+                    $this->ApprLogCom->createApp($tableName,$tid,session("userId"),"");
+                }
+            }else{
+                $this->ApprLogCom->createApp($tableName,$tableId,session("userId"),"");
+            }
+            
+
             if($touserRoleIds[0] == $roleId){
                 $parameter=[
                     "table_name" => $tableName,
@@ -895,8 +911,15 @@ class BaseController extends \Common\Controller\BaseController{
                     "status" => 1, //审批流程里的状态是实际状态
                     "remark" => '审批者(角色)与申请者(角色)一致自动审批',
                 ];
+                if($tableIds){
+                    foreach ($tableIds as $tid) {
+                        $parameter['table_id'] = $tid;
+                        $this->ApprLogCom->insert($parameter);
+                    }
+                }else{
+                    $this->ApprLogCom->insert($parameter);
+                }
                 
-                $this->ApprLogCom->insert($parameter);
             }
         }
         

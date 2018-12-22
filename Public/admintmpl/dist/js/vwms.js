@@ -1282,6 +1282,9 @@ function float_format(num,place){
     }
     if(num){
         if(num.toString().indexOf(".")>0){
+            if(num.toString().split(".")[1] == "00"){
+                return num;
+            }
             return float(num);
         }else{
             return num+".00";

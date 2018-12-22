@@ -16,7 +16,7 @@
                             <select class="form-control modal-info" required="required" title="请选择项公司账户" name="account_id" >
                                 <option value="">全部</option>
                                 <volist name="accountArr" id="item">
-                                    <option value="{$item.id}">{$item.account}</option>
+                                    <option value="{$item.id}" <if condition="$account_id eq $item.id"> selected="true"</if> >{$item.account}</option>
                                 </volist>
                             </select>
                         </div>

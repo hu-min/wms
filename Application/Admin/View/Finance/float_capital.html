@@ -79,9 +79,14 @@
             <div class="modal-content"></div>
         </div>
     </div>
+    <div class="modal fade petty-cash-modal" aria-hidden="true" data-backdrop="static" >
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
     <script>
         var float_capital_searchInfo = function(){
-            datas={}
+            datas = {}
             datas["reqType"]='getMoneyAccList';
             get("{$url}",datas,function(result){
                 $(tabId+" table .bank-table").html(result.tables.bankTable);
@@ -93,6 +98,17 @@
                 }
             })
         }
+        var bank_balance_showInfo = function($this){
+            datas["data"] = {}
+            datas["data"]['accountid'] = $($this).data("accountid");
+            datas["data"]['logtype'] = $($this).data("logtype");
+        }
+        // var bank_balance_get = function(){
+        //     datas["data"] = {};
+        //     $(tabId+" .petty-cash-modal").find(".modal-info").each(function(){
+        //         var name 
+        //     })
+        // }
         $(function(){
             var flCapFilterInfo = {}
             float_capital_searchInfo()
@@ -111,6 +127,30 @@
                     $(tabId+" .global-modal").find(".modal-info[name='sb_title']").val(account+"-保险箱")
                 }
             })
+            $(tabId+" .petty-cash-modal").on("input","input[name='get_cash']",function(){
+                var bank_stock = $(tabId+" .petty-cash-modal").find("input[name='bank_stock']").val()
+                var cash_stock = $(tabId+" .petty-cash-modal").find("input[name='cash_stock']").val()
+                var get_cash = $(this).val()
+          
+                if(float(get_cash)>=float(bank_stock)){
+                    notice(110,"提取金额超出银行库存金额","输入异常");
+                    $(this).val(float_format(bank_stock))
+                    get_cash = bank_stock
+                    // return;
+                }
+                var bstock = ""
+                var cstock = ""
+                if(get_cash > 0){
+                    bstock = float_format(float(bank_stock)-float(get_cash))
+                    cstock = float_format(float(cash_stock)+float(get_cash))
+                }
+                $(tabId+" .petty-cash-modal").find("input[name='bstock']").val(bstock)
+                $(tabId+" .petty-cash-modal").find("input[name='cstock']").val(cstock)
+            })
+            // $(tabId+" .content").on("click","button[class='petty-cash']",function(){
+            //     var accountid = $(this).data("accountid");
+            //     var logtype = $(this).data("logtype");
+            // })
         })
     </script>
 </body>

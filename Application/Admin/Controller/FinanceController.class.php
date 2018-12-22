@@ -316,7 +316,7 @@ class FinanceController extends BaseController{
     function fix_expenseEdit(){
         $Info=$this->manageFixExpenInfo();
         $updateResult=$this->fixExpenCom->update($Info);
-        $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
+        $this->ajaxReturn(['errCode'=>100,'error'=>$updateResult->error]);
     }
     //固定费用支出结束
     function project_one(){
@@ -1807,6 +1807,58 @@ class FinanceController extends BaseController{
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
 
+    function bank_balance_modalOne(){
+        $title = "提取备用金";
+        $btnTitle = "提取";
+        extract($_GET);
+        $param = [
+            'fields' => 'id,account,bs_title,bank_stock,cs_title,cash_stock',
+            'where' => ['id'=>$data['accountid'],'status'=>1],
+            'one' => true
+        ];
+        $accountData = $this->moneyAccCom->getOne($param);
+        // $this->assign("title",$title);
+        // $this->assign("btnTitle",$btnTitle);
+        $this->assign("controlName","bank_balance");
+        $this->assign("accountData",$accountData);
+
+        $modalPara=[
+            "data"=>$accountData,
+            "title"=>$title,
+            "btnTitle"=>$btnTitle,
+            "template"=>"petty_cashModal",
+        ];
+        $this->modalOne($modalPara);
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-12-22 11:19:16 
+     * @Desc: 提备用金 
+     */    
+    function bank_balanceAdd(){
+        extract($_POST);
+        if($data['get_cash'] <= 0){
+            $this->ajaxReturn(['errCode'=>100,'error'=>"提取金额不能小于1"]);
+        }
+        $param = [
+            "type" => "btc",
+            "id" => $data['id'],
+            "get_cash" => $data['get_cash'],
+        ];
+        $result = $this->flCapLogCom->two_way_bind($param);
+        if(isset($result['isUpdate']) && !$result['isUpdate']){
+            $addData = [
+                'examine'=>$result['data']['examine'],
+                'title'=>session('userName')."发起了备用金提取",
+                'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."发起了备用金提取，@你了，点击进入审批吧！</div>",
+                'url'=>C('qiye_url')."/Admin/Index/Main.html?action=Finance/float_capital_log",
+                'tableName'=>$this->flCapLogCom->tableName(),
+                'tableId'=>$result['ids'],
+            ];
+            $this->add_push($addData);
+        }
+        $this->ajaxReturn($result);
+    }
     function getSectionList(){
         extract($_REQUEST);
         $param = [

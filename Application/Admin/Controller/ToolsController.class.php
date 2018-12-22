@@ -66,7 +66,7 @@ class ToolsController extends BaseController{
         $allProcess = count($examine);
         
         $allApprove = $this->userCom->getList(['where'=>['roleId'=>['IN',$examine]]])['count'];
-        $this->log($this->userCom->_sql());
+        // $this->log($this->userCom->_sql());
         if(in_array($examineRes["status"],[3,5])){
             $nextExamine = "已".$this->statusType[$examineRes["status"]];
         }else{
@@ -81,7 +81,7 @@ class ToolsController extends BaseController{
                 }
                 
                 if($nextRoleId==session("roleId")){
-                    $this->log($appUserList);
+                    // $this->log($appUserList);
                     if(in_array(session("userId"),$appUserList)){
                         $userParam = [
                             'fields' => 'userId,roleId,userName,roleName',
@@ -146,7 +146,7 @@ class ToolsController extends BaseController{
             }
         }
         
-        $this->log($nextExamine);
+        // $this->log($nextExamine);
         if($resultData && !empty($resultData["list"])){
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0),"data"=>$resultData["list"],"allProcess"=>$allProcess,"nextExamine"=>$nextExamine,'allApprove'=>$allApprove]);
         }
@@ -169,7 +169,7 @@ class ToolsController extends BaseController{
         if(!$tableInfo){
             $this->ajaxReturn(['errCode'=>100,'error'=>'当前数据表异常，请联系管理员']);
         }
-    
+        
         $title = $tableInfo['nodeTitle'];
         $controller = $tableInfo['controller'];
         
@@ -180,9 +180,17 @@ class ToolsController extends BaseController{
         // vtabId:#vtabs57
         
         $db = M($table,NULL);
-        
-   
+        $fields = $db->getDbFields();
+        if(in_array("bind_id",$fields)){
+            $bind_id = $db -> where(["id"=>$id])->find()['bind_id'];
+            $idResult = $db -> where(['bind_id'=>$bind_id])->select();
+            if($idResult){
+                $tableIds = array_column($idResult,'id');
+            }
+        }
+      
         $tableId = $tableId ? $tableId : $id;
+        $tableIds = isset($tableIds) ? $tableIds : false;
         $this->approveCom=getComponent('ApproveLog');
         // $allItem = $db ->where(["parent_id"=>$tableId])->count();
         // print_r($allItem);exit;
@@ -230,7 +238,15 @@ class ToolsController extends BaseController{
         
         
         $this->approveCom->M()->startTrans();
-        $insertRes = $this->approveCom->insert($parameter);
+        if($tableIds){
+            foreach ($tableIds as $tid) {
+                $parameter['table_id'] = $tid;
+                $insertRes = $this->approveCom->insert($parameter);
+            }
+        }else{
+            $insertRes = $this->approveCom->insert($parameter);
+        }
+        
 
         if(count($diff)>1 && $status ==1 ){
             $this->approveCom->commit();//如果同一个角色多个审批者必须要达到所有审批者都审核通过才可以执行下面一步，必须是状态为批准，
@@ -290,7 +306,16 @@ class ToolsController extends BaseController{
                         "status" => $status, //审批流程里的状态是实际状态
                         "remark" => '审批者(角色)与申请者(角色)一致自动审批',
                     ];
-                    $insertRes = $this->approveCom->insert($parameter);
+
+                    if($tableIds){
+                        foreach ($tableIds as $tid) {
+                            $parameter['table_id'] = $tid;
+                            $insertRes = $this->approveCom->insert($parameter);
+                        }
+                    }else{
+                        $insertRes = $this->approveCom->insert($parameter);
+                    }
+                    // $insertRes = $this->approveCom->insert($parameter);
                     
                     for ($place ; $place <= count($examine) ; $place++) { 
                         if(!in_array($examine[$place],$diffRoles)){
@@ -357,9 +382,13 @@ class ToolsController extends BaseController{
                     $dbData["loan_date"] = time();
                 }
             }
+            if($tableIds){
+                $updateRes = $db ->where([$db->getPk()=>["IN",$tableIds]])->save($dbData);
+            }else{
+                $updateRes = $db ->where([$db->getPk()=>$id])->save($dbData);
+            }
             
-            $updateRes = $db ->where([$db->getPk()=>$id])->save($dbData);
-            $this->log($db ->_sql());
+            // $this->log($db ->_sql());
             if($updateRes || $state == 2){
                
                 //5，统计 $table 数量
@@ -400,7 +429,14 @@ class ToolsController extends BaseController{
                             $this->ReceCom->createOrder($tableId,session('userId'));
                             break;
                         case 'v_float_capital_log':
-                            getComponent('FlCapLog')->computeFloat($id);
+                            if($tableIds){
+                                foreach ($tableIds as $tid) {
+                                    getComponent('FlCapLog')->computeFloat($tid);
+                                }
+                            }else{
+                                getComponent('FlCapLog')->computeFloat($id);
+                            }
+                            
                             break;
                         case in_array($table,C('finan_table')):
                             $data = [

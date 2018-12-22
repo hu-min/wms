@@ -23,6 +23,9 @@ class NodeController extends BaseController{
             $processResult = $this->getList(["fields"=>"processId,controller,processIds,processOption","where"=>["nodeId"=> $nodeId],"joins"=>["LEFT JOIN (SELECT processId,processOption FROM v_process WHERE status = 1) p ON FIND_IN_SET(p.processId,processIds)"] ]);
         }
         $processInfo = ["process"=>[],"allProcess"=>1,"place"=>0,"processId"=>0,"examine"=>'',"auth"=>0];
+        if(!$processResult || $processResult['list'][0]['processId'] <= 0){
+            return $processInfo;
+        }        
         $processList = [];
         // print_r($processResult);exit;
         if(is_array($processResult["list"])){
@@ -129,6 +132,14 @@ class NodeController extends BaseController{
                 }
                 return $nodeInfo;
             }
+        }
+        return false;
+    }
+
+    function tableNodeId($tableName){
+        $nodeResult = $this->getOne(['fields'=>'nodeId','where'=>['db_table'=>$tableName,'processIds'=>['GT',0],'is_process'=>1],'one'=>true]);
+        if($nodeResult){
+            return $nodeResult['nodeId'];
         }
         return false;
     }

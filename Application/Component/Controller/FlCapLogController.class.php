@@ -79,10 +79,10 @@ class FlCapLogController extends BaseController{
             if(!$isInset){
                 //添加时审批流数据
                 $examines = A("Component/Process")->getExamine(I("vtabId"),0);
-                 $datas['process_id'] = $examines["process_id"];
-                 $datas['examine'] = $examines["examine"];
-                 $datas['process_level'] = $examines["process_level"];
-                 $datas['status'] = $examines["status"];
+                $datas['process_id'] = $examines["process_id"];
+                $datas['examine'] = $examines["examine"];
+                $datas['process_level'] = $examines["process_level"];
+                $datas['status'] = $examines["status"];
             }
             return $datas;
         }else if($reqType=="flo_cap_logEdit"){
@@ -149,5 +149,104 @@ class FlCapLogController extends BaseController{
         }
         $this->rollback();
         return ['errCode'=>100,'error'=>getError(100)];
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-12-22 08:55:48 
+     * @Desc: 双向绑定 
+     */    
+    function two_way_bind($param=[]){
+        extract($param);
+        $moneyAccCom = A("Component/MoneyAccount");
+        $ApprLogCom = A("Component/ApproveLog");
+        $account = $moneyAccCom->getOne(["id" => $id]);
+
+        if($type == "btc"){
+            $inType = 2;
+            $outType = 1;
+            $inFloat = 1;
+            $outFloat = 2;
+            $outAccount = "bank_stock";
+            $inAccount = "cash_stock";
+            $inner_detail = "内部提取备用金（银行库存转现金库存）";
+        }else{
+            $inType = 1;
+            $outType = 2;
+            $inFloat = 2;
+            $outFloat = 1;
+            $outAccount = "cash_stock";
+            $inAccount = "bank_stock";
+            $inner_detail = "现金库转银行库存存";
+        }
+        
+        if($account[$outAccount] < $get_cash){
+            return ['errCode'=>100,'error'=>"库存金额不足{$get_cash}，无法提取"];
+        }
+        $bindResult = $this->getOne(['where'=>['bind_id'=>["GT",0]],"fields"=>"bind_id","groupBy"=>"bind_id","orderStr"=>"bind_id DESC","one"=>true]);
+        
+        if(!$bindResult){
+            $bind_id = 1;
+        }else{
+            $bind_id = $bindResult['bind_id'] + 1;
+        }
+        
+        $datas = [
+            'account_id' => $id,
+            'happen_time' => time(),
+            'money' => $get_cash,
+            'user_id' => session('userId'),
+            'add_time' => time(),
+            'object' => '内部操作',
+            'bind_id' => $bind_id,
+            'inner_detail' => $inner_detail,
+        ];
+        $nodeId = A('Component/Node')->tableNodeId("v_float_capital_log");
+        $examines = A("Component/Process")->getExamine($nodeId,0);
+
+        $datas['process_id'] = $examines["process_id"];
+        $datas['examine'] = $examines["examine"];
+        $datas['process_level'] = $examines["process_level"];
+        $datas['status'] = $examines["status"];
+        $data['examine'] = $examines["examine"];
+        $outParam = [
+            'log_type' => $outType,
+            'float_type' => $outFloat,
+        ];
+        $inParam = [
+            'log_type' => $inType,
+            'float_type' => $inFloat,
+        ];
+        $moneyAccCom -> startTrans();
+        $this -> startTrans();
+        $isUpdate = false;
+        if($examines["place"] == 1 && count(explode(",",$datas['examine'])) == 1 && explode(",",$datas['examine'])[0] == session("roleId") ){
+            $isUpdate = true;
+            $outParam['balance'] = $account[$outAccount] - $get_cash;
+            $inParam['balance'] = $account[$inAccount] + $get_cash;
+
+            $accountParam = [
+                'where' => ["id" => $id],
+                'data' => [
+                    $outAccount => $outParam['balance'],
+                    $inAccount => $inParam['balance'],
+                    'update_time' => time(),
+                ]
+            ];
+            $updateResult = $moneyAccCom -> update($accountParam);
+        }
+        $ids = [];
+        $inResult = $this->insert(array_merge($datas,$inParam));
+        array_push($ids,$inResult->data);
+        $outResult = $this->insert(array_merge($datas,$outParam));
+        array_push($ids,$outResult->data);
+        if($inResult && $outResult && ((isset($updateResult) && $updateResult) || !isset($updateResult))){
+            $moneyAccCom -> commit();
+            $this -> commit();
+            return ['errCode'=>0,'error'=>getError(0),'isUpdate'=>$isUpdate,'data'=>$data,"ids"=>$ids];
+        }else{
+            $moneyAccCom -> rollback();
+            $this -> rollback();
+        }
+        return ['errCode'=>100,'error'=>getError(100),'isUpdate'=>$isUpdate];
     }
 }

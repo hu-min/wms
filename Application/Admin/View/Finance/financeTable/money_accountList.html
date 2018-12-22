@@ -23,12 +23,19 @@
             <td>
                 <if condition=" $stockType eq 'bank' ">
                     <button type="button" class="btn btn-info btn-xs nodeOn" data-accountid="{$item.id}" data-logtype="1" data-nodeid="{$flCapLogNodeId}" data-call="float_filter_initInfo" href="{:U('Finance/float_capital_log')}"><i class="fa fa-list-alt"></i> <span> 流动资金明细 </span> </button>
+                    
+                    
                 <elseif condition=" $stockType eq 'cash' "/>
                     <button type="button" class="btn btn-info btn-xs nodeOn" data-accountid="{$item.id}" data-logtype="2" data-nodeid="{$flCapLogNodeId}" data-call="float_filter_initInfo" href="{:U('Finance/float_capital_log')}"><i class="fa fa-list-alt"></i> <span> 流动资金明细 </span> </button>
                 <elseif condition=" $stockType eq 'strongbox'"/>
                     <button type="button" class="btn btn-info btn-xs nodeOn" data-accountid="{$item.id}" data-logtype="3" data-nodeid="{$flCapLogNodeId}" data-call="float_filter_initInfo" href="{:U('Finance/float_capital_log')}"><i class="fa fa-list-alt"></i> <span> 流动资金明细 </span> </button>
                 </if>
                 
+            </td>
+            <td>
+                <if condition=" $stockType eq 'bank' ">
+                    <button type="button" class="btn btn-warning btn-xs v-showmodal" data-url="{$url}" data-con="bank_balance" data-gettype="Add" data-vtarget=".petty-cash-modal" data-accountid="{$item.id}" data-logtype="1" ><i class="fa fa-money"></i> <span> 提备用金 </span> </button>
+                </if>
             </td>
         </tr>
     </if>
