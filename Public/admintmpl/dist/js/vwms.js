@@ -1571,6 +1571,15 @@ function media(mediafile,title){
                 "-webkit-transform":"rotate("+spin_n+"deg)"
             })
         })
+        $("#vmedia-box .modal-body .img-box img").mousewheel(function(event, delta) {
+            var dir = delta > 0 ? 'Up' : 'Down';
+            if (dir == 'Up') {
+                $("#vmedia-box .modal-body .img-enlarge").trigger("click")
+            } else {
+                $("#vmedia-box .modal-body .img-reduce").trigger("click")
+            }
+            return false;
+        });
     }
 }
 function domain(){
