@@ -559,7 +559,26 @@ class ToolsController extends BaseController{
     }
     //获取金额
     function getMoneyAccountList(){
-        $table =  I('table');
+        extract($_GET);
+     
+        $this->approveCom=getComponent('ApproveLog');
+
+        $db = M($table,NULL);
+
+        $examineRes = $db ->field("process_level,examine,status")->where([$db->getPk()=>$id])->find();
+        
+        $allApprove = $this->userCom->getList(['fields'=>'userId','where'=>['roleId'=>explode(",",$examineRes['examine'])[$place-1]]]);
+        $userIds = array_column($allApprove['list'],"userId");
+        // $this->log($allApprove);
+        $appResult = $this ->approveCom ->getList(['where'=>["table_name"=>$table,"table_id"=>$id,"effect"=>1,'user_id' => ["IN",$userIds]]]);
+        $appCount = $appResult ? $appResult['count'] : $appResult['count'];
+        // $this->log($appResult);
+
+        if(($appCount + 1) < $allApprove['count']){
+            $this->ajaxReturn(['data'=>false]);
+        }
+
+
         if(in_array($table,C('finan_table'))){
             $this->moneyAccCom=getComponent('MoneyAccount');
             $param = [

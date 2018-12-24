@@ -21,7 +21,27 @@ class LogController extends BaseController{
 			"describe"=>$describe?$describe:$this->formatDesc($type),
 			"addTime"=>time(),
 		];
-		$this->selfDB->insert($logInfo);
+		$lastTime = time() - 5;
+		$hasInfo = [
+			"userId"=>session("userId"),
+			"userName"=>session("userName"),
+			"class"=>$this->logType[$type],
+			"describe"=>$describe?$describe:$this->formatDesc($type),
+			"addTime"=> ["GT",$lastTime],
+		];
+		$redisName = md5(json_encode($hasInfo));
+
+		$hasLog = $this->Redis->get($redisName);
+
+		if(!$hasLog){
+			$hasLog = $this->selfDB->getOne($hasInfo);
+			$this->Redis->set($redisName,$hasLog,30);
+		}
+		
+		if(!$hasLog){
+			$this->selfDB->insert($logInfo);
+		}
+		
     }
     protected function formatDesc($type){
 			$userName=session("userName");

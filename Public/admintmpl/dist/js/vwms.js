@@ -783,7 +783,7 @@ $(function(){
                 if($(this).hasClass("approve-con")){
                     moneyAccount = []
                     $("#approve-log-modal").find(".modal-body .money-account").html("");
-                    maData = {table:table}
+                    maData = {table:table,place:place,id:id}
                     get(maurl,maData,function(result){
                         if(result.data){
                             moneyAccount = result.data

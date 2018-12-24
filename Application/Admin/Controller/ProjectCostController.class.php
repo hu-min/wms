@@ -485,7 +485,7 @@ class ProjectCostController extends BaseController{
         // exit;
         extract($_POST);
         $isInsert = false;
-        $pResult = $this->projectCom->getOne(['where'=>['project_id' => $data['project_id']],'fields'=>'leader','one'=>true]);
+        $pResult = $this->projectCom->getOne(['where'=>['project_id' => $data['project_id']],'fields'=>'leader,offer_user,cost_user','one'=>true]);
         $param = [
             'fields' => 'id',
             'where' => ['project_id' => $data['project_id']],
@@ -513,6 +513,7 @@ class ProjectCostController extends BaseController{
                 $pOfferData[$key] = $data[$key];
             }
         }
+
         $pOfferData['user_id'] = session('userId');
  
         $pOfferData['add_time'] = time();
@@ -528,6 +529,7 @@ class ProjectCostController extends BaseController{
             $pOfferData['examine'] = '';
             $pOfferData['process_level'] = 0;
             $pOfferData['status'] = 1;
+            $pOfferData['user_id'] = $pResult['offer_user'];
         }
   
         $offerCostCom->startTrans();
