@@ -182,7 +182,7 @@ class ToolsController extends BaseController{
         $db = M($table,NULL);
         $fields = $db->getDbFields();
         if(in_array("bind_id",$fields)){
-            $bind_id = $db -> where(["id"=>$id])->find()['bind_id'];
+            $bind_id = $db -> where(["id"=>$id,"bind_id"=>['GT',0]])->find()['bind_id'];
             $idResult = $db -> where(['bind_id'=>$bind_id])->select();
             if($idResult){
                 $tableIds = array_column($idResult,'id');
