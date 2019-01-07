@@ -574,7 +574,7 @@ class CostController extends BaseController{
                 "LEFT JOIN (SELECT basicId,name free_name FROM v_basic WHERE class='feeType') f ON f.basicId=free_type",
                 "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='".$this->debitCom->tableName()."' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id",
                 "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
-                "LEFT JOIN (SELECT id approve_id,table_id FROM v_approve_log WHERE table_name='".$this->debitCom."' AND status > 0 AND user_id = '".session("userId")."' ) a ON a.table_id = id",
+                "LEFT JOIN (SELECT id approve_id,table_id FROM v_approve_log WHERE table_name='".$this->debitCom."' AND status > 0 AND user_id = '".session("userId")."' AND effect = 1) a ON a.table_id = id",
             ]
         ];
         $listResult=$this->debitCom->getList($parameter);
@@ -993,7 +993,7 @@ class CostController extends BaseController{
                 "LEFT JOIN (SELECT project_id p_project_id, section section_id, flag FROM v_project_cost ) pc ON pc.section_id = section AND pc.p_project_id = project_id",
                 "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='".$this->expenseCom->tableName()."' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id",
                 "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
-                "LEFT JOIN (SELECT id approve_id,table_id FROM v_approve_log WHERE table_name='".$this->expenseCom."' AND status > 0 AND user_id = '".session("userId")."' ) a ON a.table_id = id",
+                "LEFT JOIN (SELECT id approve_id,table_id FROM v_approve_log WHERE table_name='".$this->expenseCom."' AND status > 0 AND user_id = '".session("userId")."' AND effect = 1 ) a ON a.table_id = id",
             ],
         ];
         
@@ -1032,9 +1032,9 @@ class CostController extends BaseController{
                 "where" => ["parent_id"=>$id],
                 "fields"=> "*,FROM_UNIXTIME(happen_date,'%Y-%m-%d') happen_date,FIND_IN_SET({$roleId},examine) place",
                 "joins" =>[
-                    "LEFT JOIN (SELECT table_id,status a_status FROM v_approve_log WHERE table_name = '".$this->expenseSubCom->tableName()."' AND status > 0 AND user_id = ".session("userId").") ap ON ap.table_id = id",
+                    "LEFT JOIN (SELECT table_id,status a_status FROM v_approve_log WHERE table_name = '".$this->expenseSubCom->tableName()."' AND status > 0 AND user_id = ".session("userId")." AND effect = 1) ap ON ap.table_id = id",
                     "LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct ON ct.ctid = city",
-                    "LEFT JOIN (SELECT GROUP_CONCAT(table_id ORDER BY add_time DESC) aid ,GROUP_CONCAT(status ORDER BY add_time DESC) last_status FROM v_approve_log WHERE table_name = '".$this->expenseSubCom->tableName()."' AND status > 0 GROUP BY table_id) al ON al.aid = id",
+                    "LEFT JOIN (SELECT GROUP_CONCAT(table_id ORDER BY add_time DESC) aid ,GROUP_CONCAT(status ORDER BY add_time DESC) last_status FROM v_approve_log WHERE table_name = '".$this->expenseSubCom->tableName()."' AND status > 0 AND effect = 1 GROUP BY table_id) al ON al.aid = id",
                 ],
             ];
             $subExpRes = $this->expenseSubCom->getList($subPar)["list"];

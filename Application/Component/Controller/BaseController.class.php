@@ -103,7 +103,8 @@ class BaseController extends \Common\Controller\BaseController{
             $res->errCode=0;
             $res->error=getError(0);
             $res->data=$insertResult;
-            $this->LogModel->log(3);
+            unset($parameter['password'],$parameter['seniorPassword']);
+            $this->LogModel->log(3,json_encode(['table'=>$this->tableName(),'data'=>$parameter],JSON_UNESCAPED_UNICODE));
             return $res;
         }
         $res->errCode=111;
@@ -127,7 +128,15 @@ class BaseController extends \Common\Controller\BaseController{
         if($insertResult){
             $res->errCode=0;
             $res->error=getError(0);
-            $this->LogModel->log(4);
+            if(isset($parameter["data"])){
+                unset($parameter["data"]['password'],$parameter["data"]['seniorPassword']);
+                $logData = array_merge($parameter,['table'=>$this->tableName()]);
+            }else{
+                unset($parameter['password'],$parameter['seniorPassword']);
+                $logData = ["data"=>$parameter,'table'=>$this->tableName()];
+            }
+            
+            $this->LogModel->log(4,json_encode($logData,JSON_UNESCAPED_UNICODE));
             return $res;
         }
         $res->errCode=114;
@@ -142,11 +151,12 @@ class BaseController extends \Common\Controller\BaseController{
     public function del($where_arra){
         $res=$this->initRes();
         $modFlag = false;
+        $delData = $this->where($where_arra)->find();
         $modFlag = $this->selfDB->where($where_arra)->delete();
         if($modFlag){
             $res->errCode=0;
             $res->error=getError(0);
-            $this->LogModel->log(6);
+            $this->LogModel->log(6,json_encode(array_merge($delData,['table'=>$this->tableName()]) ,JSON_UNESCAPED_UNICODE));
             return $res;
         }
         $res->errCode=113;

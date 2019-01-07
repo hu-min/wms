@@ -242,7 +242,7 @@
                 projectChosen.find("option[value='"+projectId+"']").prop("selected",true);
                 projectChosen.trigger("chosen:updated");
             }
-            ["projectId","session_all","session_cur","contract","amount","code","project_time","days","name","customer_other",'cost_budget',"create_time","status"].forEach(element => {
+            ["projectId","session_all","session_cur","contract","amount","code","project_time","days","name","customer_other",'cost_budget',"create_time"].forEach(element => {
                 if(info[element]!=null){
                     $(tabId+" .modal-info[name='"+element+"']").val(info[element]);
                 }
@@ -250,7 +250,7 @@
                 //     $(tabId+" .modal-info[name='"+element+"']").prop("disabled",true);
                 // }
             });
-            ["brand","customer_com","customer_cont","province","city","field","create_user","is_bid","business","leader","execute","execute_sub","type","stage","re_status",'offer_user','cost_user'].forEach(element => {
+            ["brand","customer_com","customer_cont","province","city","field","user_id","is_bid","business","leader","execute","execute_sub","type","stage","re_status",'offer_user','cost_user'].forEach(element => {
                 var select= $(tabId+" .modal-info[name='"+element+"']")
                 if(info[element]>0){
                     if(select.find("option[value='"+info[element]+"']").length==0){
@@ -283,6 +283,12 @@
                         $(tabId+" .global-modal .bid-group").prop("disabled",true);
                         $(tabId+" .global-modal .bid-group").prop("required",false);
                     }
+                }else if(element == "user_id"){
+                    var create_user= $(tabId+" .modal-info[name='create_user']")
+                    if(create_user.find("option[value='"+info[element]+"']").length==0){
+                        create_user.append("<option value='"+info[element]+"'>"+info["create_user_name"]+"</option>")
+                    }
+                    create_user.val(info[element])
                 }
                 // if(info["status"]>0){
                 //     select.prop("disabled",true);
@@ -314,7 +320,7 @@
             // console.log("{$gettype}")
             // console.log(info['user_id'])
             // console.log("{$Think.session.userId}")
-            if(( info['status'] > 0 || info['user_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3){
+            if(( (info['status'] != 10 && info['status'] > 0) || info['user_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3){
                 $(tabId+" .modal-info").prop("disabled",true)
             }
             // //设置审批按钮状态

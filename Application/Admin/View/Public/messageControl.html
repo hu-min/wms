@@ -203,6 +203,9 @@
                     }
                     $(tabId+" .message-box .message-table").html(result.table)
                     $(tabId+" .message-box .message-page").html(result.page)
+                    if(result.count){
+                        $(".message-no-read").text(result.count)
+                    }
                     $('.mailbox-messages input[type="checkbox"]').iCheck({
                         checkboxClass: 'icheckbox_flat-blue',
                         radioClass: 'iradio_flat-blue'
@@ -285,11 +288,9 @@
                                     if(result.errCode==0 ){
                                         var noRead = Number($(tabId+" .mes-folder .message-no-read").text())
                                         noRead--;
-                                        // $(tabId+" .mes-folder .message-no-read").text(noRead)
-                                        $(".message-no-read").text(noRead)
-                                        // if(noRead<=0){
-                                        //     $(".messages-menu .message-no-read").remove();
-                                        // }
+                                        if(noRead>=0){
+                                            $(".message-no-read").text(noRead)
+                                        }
                                         $(".menu-top-message").html(result.data)
                                     }
                                 })

@@ -139,4 +139,20 @@ class ProjectController extends BaseController{
         }
         return false;
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2019-01-07 15:48:18 
+     * @Desc: 根据指定项目id修改报价和成本
+     */    
+    function updateCostUser($project_id,$ouser_id,$cuser_id){
+        $offerCom = A('Component/ProjectOffer');
+        $costCom =  A('Component/ProjectCost');
+        $param = [
+            'where' => ['project_id'=>$project_id],
+            'data' => ['user_id'=>$ouser_id]
+        ];
+        $offerCom->update($param);
+        $param['data']['user_id'] = $cuser_id;
+        $costCom->update($param);
+    }
 }

@@ -116,15 +116,18 @@
     <script>
         var poPanel = "";
         var poItem = "";
+        var pcDel = [];
         var pcost_control_initInfo = function(gettype,result) {
             //从后端获取poPanel 模板
             // poPanel = result.panel;
             // poItem = result.item;
+            poDel = [];
             if(gettype == "Add"){
                 poPanel = result.panel;
                 poItem = result.item;
                 init_chosen("{$url}","getOptionList",".global-modal");
             }
+            pcost_project_auth()
             // init_chosen("{$url}","getOptionList",".global-modal");
         }
         //搜索
@@ -137,9 +140,18 @@
             poPanel = info.panel;
             poItem = info.item;
             ['project_id','tax_rate','flag'].forEach(element => {
+                if('project_id' == element){
+                    init_chosen("{$url}","getOptionList",$(tabId+" .global-modal").find(" .modal-info[name='"+element+"']").parent());
+                }
                 $(tabId+" .global-modal").find(" .modal-info[name='"+element+"']").val(info[element])
-                $(tabId+" .global-modal").find(" .modal-info[name='"+element+"']").prop("disabled",true)
+                if("{$nodeAuth}" < 7 && !in_array(info['status'],[0,3,10] )){
+                    $(tabId+" .global-modal").find(" .modal-info[name='"+element+"']").prop("disabled",true)
+                }else if("{$nodeAuth}" >= 7 && 'project_id' == element ){
+                    $(tabId+" .global-modal").find(" .modal-info[name='project_id']").prop("disabled",true)
+                }
+                
             });
+            $(tabId+" .global-modal").find(" .modal-info[name='project_id']").prop("disabled",true)
             $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val(info['id'])
             $(tabId+" .global-modal").find(".modal-footer .modal-info[name='oid']").val(info['oid'])
 
@@ -165,17 +177,30 @@
                     poPanelObj.find(".cost-class-alpha").text(alpha(subElement['class_sort']))
                     poPanelObj.find(".cost_class_div").addClass('none')
                     // poPanelObj.find(".add-costItem").removeClass('none')
-                
-                    poPanelObj.find(".cost_chosen").remove()
-                    poPanelObj.find(".cost_chosen_del").remove()
-                    if(subElement['read_type'] < 2){
-                        poPanelObj.find(".add-costItem").remove()
-                        poPanelObj.find(".class-rowspan").remove()
-                    }else{
-                        poPanelObj.removeClass('box-info')
-                        poPanelObj.addClass('box-primary');
+                    if(in_array(info['status'],[0,3,10]) && in_array("{$Think.session.userId}",[info['ouser_id'],info['puser_id']])){
                         poPanelObj.find(".add-costItem").removeClass('none') 
+                    }else{
+                        if(subElement['read_type'] < 2){
+                            poPanelObj.find(".cost_chosen").remove()
+                            poPanelObj.find(".cost_chosen_del").remove()
+                            poPanelObj.find(".add-costItem").addClass('none') 
+                            poPanelObj.find(".class-rowspan").remove()
+
+                        }else{
+                            poPanelObj.removeClass('box-info')
+                            poPanelObj.addClass('box-primary');
+                            poPanelObj.find(".add-costItem").removeClass('none') 
+                        }
                     }
+                    
+                    // if(subElement['read_type'] < 2){
+                    //     poPanelObj.find(".add-costItem").remove()
+                    //     poPanelObj.find(".class-rowspan").remove()
+                    // }else{
+                    //     poPanelObj.removeClass('box-info')
+                    //     poPanelObj.addClass('box-primary');
+                    //     poPanelObj.find(".add-costItem").removeClass('none') 
+                    // }
                     
                     poPanelObj.find(".modal-info[name='class_sort']").val(subElement['class_sort'])
                     poPanelObj.find(".modal-info[name='cost_class']").val(subElement['cost_class'])
@@ -194,10 +219,12 @@
                     }else{
                         poItemOjc.find(".modal-info[name='"+modalName+"']").val(subElement[modalName])
                     }
-                    if(modalName!="auth_user_id"){
+                    if(modalName!="auth_user_id" && "{$nodeAuth}" < 7 && !in_array(info['status'],[0,3,10] ) ){
                         poItemOjc.find(".modal-info[name='"+modalName+"']").prop("disabled",true)
                     }
-                    
+                    if(in_array(info['status'],[0,3,10]) && !in_array("{$Think.session.userId}",[info['ouser_id'],info['puser_id']]) && subElement['read_type'] < 2){
+                        poItemOjc.find(".modal-info[name='"+modalName+"']").prop("disabled",true)
+                    }
                 });
                 // console.log(subElement['scompany_id'])
                 //供应商和供应商联系人
@@ -254,10 +281,12 @@
                 $(tabId+" .global-modal .box-group ").find(".panel").eq(key).find('.profit-class-count').text(float_format(profitCount));
                 $(tabId+" .global-modal .box-group ").find(".panel").eq(key).find('.profitrat-class-count').text(float_format(profitratCount));
             }
-            if((info['status'] > 0 && info['status'] !=3 && "{$nodeAuth}"<7)){    
-                $(tabId+" .global-modal").find(".modal-footer .save-info").remove()
-            }
-            if(( info['status'] > 0 ) && "{$nodeAuth}" < 7 && info['status'] !=3){
+            // if((info['status'] > 0 && info['status'] !=3 && "{$nodeAuth}"<7)){    
+            //     $(tabId+" .global-modal").find(".modal-footer .save-info").remove()
+            // }
+            if(( (info['status'] > 0 && info['status'] != 10) || !in_array("{$Think.session.userId}",[info['user_id'],info['puser_id']]) ) && "{$nodeAuth}"<7 && info['status'] !=3){
+            // if(( info['status'] > 0 || info['cuser_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3){
+                
                 $(tabId+" .global-modal").find('.modal-info').prop("disabled",true)
                 $(tabId+" .global-modal").find(".add-costClass").remove()
                 $(tabId+" .global-modal").find(".box-title .cost_chosen_del").remove()
@@ -328,7 +357,7 @@
             datas["data"]['id'] = $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val();
             datas["data"]['oid'] = $(tabId+" .global-modal").find(".modal-footer .modal-info[name='oid']").val();
             datas["data"]['list'] = []
-
+            
             $(tabId+" .global-modal").find(".panel").each(function(){
                 
                 var class_sort = $(this).find(".modal-info[name='class_sort']").val();
@@ -351,7 +380,7 @@
                             var val =$(this).text().replace(/^[A-Z]*/,'');
                         }else{
                             var val =$(this).val();
-                            if(name=="class_notes"){
+                            if(name == "class_notes"){
                                 class_notes = val
                             }
                         }
@@ -368,7 +397,9 @@
                             notice(110,title,"输入异常");
                             throw title
                         }else{
-                            if(name == "id" || (temp['id'] == 0 && name != "id") || (temp['id'] > 0 && in_array(name,['cost_price','cost_total','total','scompany_id','scompany_cid','auth_user_id']))){
+                            if("{$nodeAuth}" == 7 || read_type == 2){
+                                temp[name] = val;
+                            }else if(name == "id" || (temp['id'] == 0 && name != "id") || (temp['id'] > 0 && in_array(name,['cost_price','cost_total','total','scompany_id','scompany_cid','auth_user_id']))){
                                 temp[name] = val;
                             }
                         }
@@ -376,6 +407,24 @@
                     datas["data"]['list'].push(temp)
                 })
             })
+            if(pcDel.length > 0){
+                datas["dels"] = pcDel
+            }
+        }
+        var pcost_project_auth = function(){
+            var $project = $(tabId+" .global-modal").find(".modal-info[name='project_id']")
+            if($project.val()>0){
+                var offer_user = String($project.find("option:selected").data('offer')).split(",")
+                var cost_user = String($project.find("option:selected").data('cost')).split(",")
+                var user_id = $project.find("option:selected").data('user')
+                offer_user.push(user_id)
+                if(in_array("{$Think.session.userId}",offer_user)){
+                    $(tabId+" .global-modal").find(".add-costClass").eq(0).removeClass("none")
+                }else{
+                    $(tabId+" .global-modal").find(".add-costClass").eq(0).addClass("none")
+                }
+            }
+            
         }
         $(function(){
             excel_import({url:"{:U('ProjectCost/excel_import')}"})
@@ -421,7 +470,19 @@
             })
             //分类删除
             $(tabId+" .global-modal").on("click",".box-title .cost_chosen_del",function(){
+                $(this).parents(".panel").find(".modal-info[name='id']").each(function(){
+                    pcDel.push($(this).val())
+                })
                 $(this).parents(".panel").remove()
+                $(tabId+" .global-modal").find(".panel").each(function(index,panel){
+                    var alphas = alpha(Number(index))
+                    $(panel).find('.cost-class-alpha').text(alphas);
+                    $(panel).find(".modal-info[name='class_sort']").val(index);
+                    $(panel).find("tbody tr").each(function(sort,tr){
+                        $(tr).find("td:first-child").find(".modal-info[name='sort']").text(alphas+(Number(sort) + 1))
+                    })
+                })
+                cost_compute_count()
             })
             //添加子项事件
             $(tabId+" .global-modal").on("click",".box-title .add-costItem,tbody .class-rowspan",function(){
@@ -457,11 +518,13 @@
             })
             //删除子项
             $(tabId+" .global-modal").on("click","table .cost_item_del",function(){
+                pcDel.push($(this).parents("tr").find(".modal-info[name='id']").val())
                 var $parents = $(this).parents(".panel");
                 var $prevAll = $(this).parents("tr").prevAll()
                 var $nextr = $(this).parents("tr").next()
                 var tdNum = $(this).parents("tr").find('td').length
                 var curRowspan = $(this).parents("tr").find('td').eq(1).attr('rowspan')
+                var class_notes = $(this).parents("tr").find(".modal-info[name='class_notes']").val();
                 $(this).parents("tr").remove()
                 $parents.find("tbody tr").each(function(sort,tr){
                     var alpha = $(this).parents(".panel").find('.cost-class-alpha').text();
@@ -490,9 +553,10 @@
                         if(curRowspan > 2){
                             $nextr.find('td').eq(1).prop("rowspan",Number(curRowspan)-1)
                         }
+                        $nextr.find(".modal-info[name='class_notes']").val(class_notes);
                     }
                 }
-                
+                cost_compute_count()
             })
             //合计金额计算
             $(tabId+" .global-modal").on("input",".modal-info[name='num'],.modal-info[name='act_num'],.modal-info[name='price'],.modal-info[name='cost_price']",function(){ 
@@ -554,6 +618,10 @@
                 }
                 $authUser.trigger("chosen:updated");
             }) 
+
+            $(tabId+" .global-modal").on("change",".modal-info[name='project_id']",function(){
+                pcost_project_auth()
+            })
         })
     </script>
 </body>

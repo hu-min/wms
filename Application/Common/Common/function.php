@@ -181,6 +181,37 @@ function status_label($defind_vars){
     // print_r($item);
     echo "<span class='label bg-{$statusLabel[$item['status']]}'>{$statusType[$item['status']]}</span>";
 }
+/** 
+ * @Author: vition 
+ * @Date: 2018-12-29 20:17:19 
+ * @Desc: 状态组 
+ */
+function status_group($param=[]){
+    if(isset($param['vars']['vars']['data'])){
+        $data = $param['vars']['vars']['data'];
+    }else{
+        return '';
+    }
+    $nodeAuth = $param['vars']['vars']['nodeAuth'];
+    $statusLabel = $param['vars']['vars']['statusLabel'];
+    $statusType = $param['vars']['vars']["statusType"];
+    $status = $data['status'];
+    echo '<div class="btn-group modal-status status-group" data-toggle="btn-toggle"><input class="modal-info"  value="'.$status.'" name="status" type="hidden">'; 
+    if($nodeAuth>=7){
+        
+        foreach ($statusLabel as $index => $scolor) {
+            if($index == $status){
+                echo '<button type="button" name="'.$index.'" class="btn btn-default btn-sm status-btn"><i class="fa fa-check-square text-'.$scolor.'"></i> '.$statusType[$index].' </button>';
+            }else{
+                echo '<button type="button" name="'.$index.'" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-'.$scolor.'"></i> '.$statusType[$index].' </button>';
+            }
+        }
+        
+    }elseif($status != ""){
+        echo '<button type="button" name="'.$status.'" class="btn btn-default btn-sm status-btn" disabled="disabled"><i class="fa fa-check-square text-'.$statusLabel[$status].'"></i> '.$statusType[$status].' </button>';
+    }
+    echo '</div>';
+}
 //各类权限按钮全局函数开始
 /** 
  * @Author: vition 
@@ -254,6 +285,7 @@ function modal_btn($defind_vars,$status=false){
         if($processAuth['level'] > 1 && ($item['status'] == 0 ||  $item['status'] == 2 ) && !in_array($userId,explode(',',$item['examine'])) || ($nodeAuth>= 7 && $gettype == "Edit") && isset($statusType[3]) && $gettype != "Add"){
             echo "<button type='button' name='3' class='btn btn-warning btn-sm status-btn'><i class='fa fa-square text-default'> {$statusType[3]} </i></button>";
         }
+
     }
     // if($processAuth['level'] > 1 && !in_array($userId,explode(',',$item['examine'])) || $item['status'] == 1 || $nodeAuth>= 7){
     //     echo "<button type='button' name='1' class='btn btn-success btn-sm status-btn'><i class='fa fa-square text-default'> $statusType[1] </i></button>";
@@ -286,13 +318,15 @@ function approve_btn($tableName,$param=[]){
     $status = isset($data['status']) ? $data['status'] : $status;
     $approved = isset($data['approve_id']) && $data['approve_id'] > 0  ? true : false;
     
-    // echo $tableName,",",$id,",",$place,",",$level,",",$status,",";
+    
 
     $all_level = 0;
     $examine = isset($data['examine']) ? $data['examine'] : (isset($param['examine']) ? $param['examine'] : "");
 
     $place = search_last_key(session('roleId'),array_unique(explode(",",$examine)));
     $place = $place !== false ? ++$place : 0;
+
+    // echo $tableName,",",$id,",",$place,",",$level,",",$status,",",$approved;
     // $place ++;
     // var_dump($examine);
     // echo $examine;
@@ -338,10 +372,15 @@ function save_btn($defind_vars,$always=false,$hide=false){
     $noModal = $defind_vars["noModal"] ? "" : "data-modal='true'";
     // echo $item["user_id"],$gettype,$processAuth['level'];
     // echo $item['status'],",",$item['user_id'],",", $userId;
-    if((($item["user_id"] == $userId || $item["user_id"] == $userId) && in_array($item['status'],[0,3])) || ($gettype == "Add" && $processAuth['level'] > 0) || $always || $nodeAuth >= 7 || ($defind_vars['data']['status'] == 1 && isset($defind_vars['data']['business']) && $defind_vars['data']['business'] == $defind_vars["userId"]) || ($item['status'] == 1 && $item['user_id'] == $userId)){
+    if((in_array($item['status'],[0,3,10]) && in_array($userId,[$item['user_id'],$item['puser_id']])) || $gettype == "Add" || $nodeAuth >= 7 || ($item['status'] == 1 && isset($item['business']) && $item['business'] == $userId) ){
+    // if(($item["user_id"] == $userId && in_array($item['status'],[0,3])) || ($gettype == "Add" && $processAuth['level'] > 0) || $always || $nodeAuth >= 7 || ($defind_vars['data']['status'] == 1 && isset($defind_vars['data']['business']) && $defind_vars['data']['business'] == $defind_vars["userId"]) || ($item['status'] == 1 && $item['user_id'] == $userId) || $item['status'] == 10){
         echo "<button type='button' class='btn btn-sm btn-primary save-info' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>{$btnTitle}</button>";
     }elseif($hide){
         echo "<button type='button' class='btn btn-sm btn-primary save-info none' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>{$btnTitle}</button>";
+    }
+    // echo $item['status'],",";
+    if((in_array($item['status'],[0,3,10]) && in_array($userId,[$item['user_id'],$item['puser_id']])) || $gettype == "Add"){
+        echo "<button type='button' class='btn btn-sm bg-maroon save-info' data-status='10' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>储存草稿</button>";
     }
     
     if(($item["user_id"] == $userId || $item["user_id"] == $userId) && $item['status'] == 1){

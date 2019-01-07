@@ -18,9 +18,9 @@ class BaseController extends \Common\Controller\BaseController{
     protected $exemption;
     protected $pageSize=30;
     // protected $statusType=[0=>"提交申请",1=>"批准",2=>"审核中",3=>"无效",4=>"删除"];
-    protected $statusType=[0=>"提交",1=>"批准",2=>"等待",3=>"驳回",4=>"删除",5=>"拒绝"];
+    protected $statusType=[0=>"提交",1=>"批准",2=>"等待",3=>"驳回",4=>"删除",5=>"拒绝",10=>'草稿'];
 
-    protected $statusLabel=[0=>"blue",1=>"green",2=>"yellow",3=>"orange ",4=>"red",5=>'black'];
+    protected $statusLabel=[0=>"blue",1=>"green",2=>"yellow",3=>"orange ",4=>"red",5=>'black',10=>'maroon'];
 
     protected $invoiceType = ["0"=>"无","1"=>"收据","2"=>"增值税普通","3"=>"增值税专用"];
     /**
@@ -149,7 +149,7 @@ class BaseController extends \Common\Controller\BaseController{
             $this->assign('statusType',$this->statusType);
             $this->assign('statusTypeJ',json_encode($this->statusType));
             $this->assign('statusLabel',$this->statusLabel);
-            $this->assign('entries',[15,30,35,40,45,50]);
+            $this->assign('entries',[15,5,10,20,30,35,40,45,50]);
             // $nodeId = getTabId(I("vtabId"));
             $this->nodeId = getTabId(I("vtabId"));
             // $this->assign('processType',$this->processType);

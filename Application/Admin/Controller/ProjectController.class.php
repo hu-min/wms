@@ -108,7 +108,7 @@ class ProjectController extends BaseController{
     }
     function project_modalOne(){
         $title = "立项/添加场次";
-        $btnTitle = "添加数据";
+        $btnTitle = "保存数据";
         $gettype = I("gettype");
         $onlydata = I("onlydata");
         $roleId = session("roleId");
@@ -128,7 +128,7 @@ class ProjectController extends BaseController{
                     "LEFT JOIN (SELECT companyId company_id,company customer_com_name FROM v_customer_company ) c ON c.company_id = customer_com",
                     "LEFT JOIN (SELECT contactId contact_id,contact customer_cont_name FROM v_customer_contact ) c2 ON c2.contact_id = customer_cont",
                     "LEFT JOIN (SELECT id field_id,name field_name,city f_city FROM v_field ) f ON f.field_id = field AND f.f_city=city",
-                    "LEFT JOIN (SELECT userId cu_user_id,userName create_user_name FROM v_user) cu ON cu.cu_user_id = create_user",
+                    "LEFT JOIN (SELECT userId cu_user_id,userName create_user_name FROM v_user) cu ON cu.cu_user_id = user_id",
                     "LEFT JOIN (SELECT userId bu_user_id,userName business_name FROM v_user) bu ON bu.bu_user_id = business",
                     "LEFT JOIN (SELECT userId lu_user_id,userName leader_name FROM v_user) lu ON lu.lu_user_id = leader",
                     "LEFT JOIN (SELECT basicId execute_sub_id,name execute_sub_name FROM v_basic WHERE class = 'execute' ) e ON e.execute_sub_id = execute_sub",
@@ -137,7 +137,7 @@ class ProjectController extends BaseController{
                     "LEFT JOIN (SELECT project_id project_sid,COUNT(projectId) session_count FROM v_project WHERE projectId = 0 GROUP BY project_id) sc ON sc.project_sid = projectId",
                     "LEFT JOIN (SELECT table_id re_id , status re_status,datas rest_datas,user_id ruser_id,FROM_UNIXTIME(add_time,'%Y-%m-%d') reset_date FROM v_reset_apply WHERE table_name='v_project' ) r ON r.re_id = projectId",
                     "LEFT JOIN (SELECT userId ruser_id,userName reset_user FROM v_user) ru ON ru.ruser_id = r.ruser_id",
-                    "LEFT JOIN (SELECT id approve_id,table_id FROM v_approve_log WHERE table_name='".$this->projectCom->tableName()."' AND status > 0 AND user_id = '".session("userId")."' ) a ON a.table_id = projectId"
+                    "LEFT JOIN (SELECT id approve_id,table_id FROM v_approve_log WHERE table_name='".$this->projectCom->tableName()."' AND status > 0 AND user_id = '".session("userId")."' AND effect = 1 ) a ON a.table_id = projectId"
                 ]
             ];
             $resultData = $this->projectCom->getOne($parameter)["list"];
@@ -246,9 +246,9 @@ class ProjectController extends BaseController{
         //OR process_level = 0 OR user_id = {$userId} OR FIND_IN_SET({$userId},examine)
 
         if(isset($data['status'])){
-            $where['status']=$data['status'];
+            $where['status'] = $data['status'];
         }else{
-            $where['_string'] = isset($where['_string']) ? $where['_string'].=" AND status < 3" : $where['_string'].=" status < 3";
+            $where['_string'] = isset($where['_string']) ? $where['_string'].=" AND ( status <= 3 OR status = 10 )" : $where['_string'].=" (status <= 3 OR status = 10 )";
         }
         $file_type="1,2";
         if($data['template'] == 'schedule'){
@@ -280,7 +280,7 @@ class ProjectController extends BaseController{
             ],
         ];
         $listResult=$this->projectCom->getProjectList($parameter);
-        $this->log($this->projectCom->M()->_sql());
+        // $this->log($this->projectCom->M()->_sql());
         // echo $this->projectCom->M()->_sql();exit;
         if( isset($data['template'])){
             $listRedis = $data['template'].'List';
@@ -325,6 +325,7 @@ class ProjectController extends BaseController{
     function manageProjectInfo(){
         $reqType=I("reqType");
         $datas=I("data");
+        $isDraft = false;
         $datas['project_id'] = $datas['project_id'] > 0? $datas['project_id'] : 0;
         if(isset($datas['earlier_user'])){
             $datas['earlier_user']=implode(",",$datas['earlier_user']);
@@ -342,9 +343,7 @@ class ProjectController extends BaseController{
                 $datas['create_time'] = time();
             }
         }
-        if(!isset($datas['create_user']) || $datas['create_user']){
-            $datas['create_user'] = session('userId');
-        }
+        
         
         
         if(isset($datas['project_time'])){
@@ -355,7 +354,10 @@ class ProjectController extends BaseController{
         if($reqType=="projectAdd"){
             $datas['addTime']=time();
             $datas['time']=strtotime($datas['time']);
-            $datas['user_id']=session('userId');
+            if(!isset($datas['user_id']) || $datas['user_id']){
+                $datas['user_id'] = session('userId');
+            }
+            // $datas['user_id']=session('userId');
             // $datas['process_level']=$this->processAuth["level"];
             //添加时必备数据
             // $process = $this->nodeCom->getProcess(I("vtabId"));
@@ -368,9 +370,17 @@ class ProjectController extends BaseController{
             $examines = getComponent('Process')->getExamine(I("vtabId"),$datas['business']);
             $datas['process_id'] = $examines["process_id"];
             $datas['examine'] = $examines["examine"];
-            $datas['process_level'] = $examines["process_level"];
-            $datas['status'] = $examines["status"];
 
+            if($datas['status'] == 10){
+                $datas['process_level'] = 0;
+                $isDraft = true;
+            }else{
+                $datas['process_level'] = $examines["process_level"];
+                $datas['status'] = $examines["status"];
+            }
+
+            
+            
             // if($rolePlace!==false){
             //     $datas['process_level']=$rolePlace+2;
             //     if(count($examineArr) <= ($rolePlace+1)){
@@ -388,13 +398,21 @@ class ProjectController extends BaseController{
             $where=["projectId"=>$datas['projectId']];
             $data=[];
             $redit = true;
+            
             $keyArray = ['project_id','amount','bid_date','contract','bid_time','bidding','brand','city','code','create_time','user_id','customer_com','customer_cont','customer_other','days','earlier_user','execute_sub','execute','field','is_bid','business','leader','name','project_time','project_id','projectType','province','scene_user','session_all','type','session_cur','stage','status','cost_budget','offer_user','cost_user'];
-            if($datas["status"]==1){
-                $projectResult =$this->projectCom->getOne(['where'=>$where,"one"=>true,"fields"=>'user_id,business,status,stage,offer_user,cost_user']);
-                if($projectResult['business'] == session('userId') && $projectResult['status'] = 1 && $projectResult['stage'] != $datas['stage']){
+            
+            $projectResult =$this->projectCom->getOne(['where'=>$where,"one"=>true,"fields"=>'user_id,business,status,stage,offer_user,cost_user']);
+            if($projectResult["status"] == 10){
+                $isDraft = true;
+                if( $datas['status'] != 10){
+                    $data['process_level'] = 1; 
+                }
+            }
+            if($datas["status"] == 1){
+                if($projectResult['business'] == session('userId') && $projectResult['status'] == 1 && $projectResult['stage'] != $datas['stage']){
                     $keyArray = ['stage'];
                     $redit = false;
-                }elseif($projectResult['user_id'] == session('userId') && $projectResult['status'] = 1 && ($projectResult['offer_user'] != $datas['offer_user'] || $projectResult['cost_user'] != $datas['cost_user'])){
+                }elseif($projectResult['user_id'] == session('userId') && $projectResult['status'] == 1 && ($projectResult['offer_user'] != $datas['offer_user'] || $projectResult['cost_user'] != $datas['cost_user'])){
                     $keyArray = ['offer_user','cost_user'];
                     $redit = false;
                 }
@@ -415,7 +433,7 @@ class ProjectController extends BaseController{
             }
             $data['upateTime']=time();
             
-            return ["where"=>$where,"data"=>$data,"redit"=>$redit];
+            return ["where"=>$where,"data"=>$data,"redit"=>$redit,'isDraft'=>$isDraft];
         }
         return "";
     }
@@ -452,18 +470,19 @@ class ProjectController extends BaseController{
                 //     $msgResult = $this->QiyeCom-> textcard($touser,"立项【{$projectInfo['name']}】",$desc,$url);
                 // }
                 // $this->ApprLogCom->createApp($this->projectCom->tableName(),$insertResult->data,session("userId"),"");
-
-                $addData = [
-                    'examine'=>$projectInfo['examine'],
-                    'title'=>"立项【{$projectInfo['name']}】",
-                    'desc'=> "<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."创建了项目【{$projectInfo['name']}】，当中@了你，来围观吧！</div>",
-                    'url'=>C('qiye_url')."/Admin/Index/Main.html?action=Project/projectItem",
-                    'tableName'=>$this->projectCom->tableName(),
-                    'tableId'=> $insertResult->data,
-                    'touser' => $touser,
-                ];
-                $this->add_push($addData);
-                
+                if($datas['status'] != 10){
+                    $addData = [
+                        'examine'=>$projectInfo['examine'],
+                        'title'=>"立项【{$projectInfo['name']}】",
+                        'desc'=> "<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."创建了项目【{$projectInfo['name']}】，当中@了你，来围观吧！</div>",
+                        'url'=>C('qiye_url')."/Admin/Index/Main.html?action=Project/projectItem",
+                        'tableName'=>$this->projectCom->tableName(),
+                        'tableId'=> $insertResult->data,
+                        'touser' => $touser,
+                    ];
+                    $this->add_push($addData);
+                }
+               
                 if($projectInfo['status']==1){
                     $this->ReceCom->createOrder($insertResult->data,session('userId'));
                 }
@@ -478,14 +497,49 @@ class ProjectController extends BaseController{
      * @Desc: 修改项目 
      */    
     function projectEdit(){
-        $projectInfo=$this->manageProjectInfo();
+        $projectInfo = $this->manageProjectInfo();
+        // $this->is_project_draft();
         $updateResult=$this->projectCom->updateProject($projectInfo);
         if(isset($updateResult->errCode) && $updateResult->errCode == 0 && $projectInfo['redit']){
-
             $this->ApprLogCom->updateStatus($this->projectCom->tableName(),$projectInfo["where"]["projectId"]);
+        }
+        if(isset($updateResult->errCode) && $updateResult->errCode == 0 && $projectInfo['data']["offer_user"] && $projectInfo['data']["cost_user"]){
+            $this->projectCom->updateCostUser($projectInfo['where']["projectId"],$projectInfo['data']["offer_user"],$projectInfo['data']["cost_user"]);
+        }
+        // $this->log($projectInfo);
+        if($projectInfo['isDraft'] || $projectInfo['redit']){
+            if($projectInfo['data']['status'] != 10){
+                $touser = "";
+                $userArray = [];
+                foreach (['leader','business','earlier_user','scene_user','offer_user','cost_user'] as $key) {
+                    if($projectInfo['data'][$key]){
+                        if(is_array($projectInfo['data'][$key])){
+                            $userArray = array_merge($userArray,$projectInfo['data'][$key]);
+                        }else{
+                            array_push($userArray,$projectInfo['data'][$key]);
+                        }
+                    }
+                }
+                $userArray = array_unique($userArray);
+                if(!empty($userArray)){
+                    $touser = $this->userCom->getQiyeId($userArray);
+                }
+
+                $addData = [
+                    'examine'=>$projectInfo['data']['examine'],
+                    'title'=>"立项【".$projectInfo['data']['name']."】",
+                    'desc'=> "<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."创建了项目【".$projectInfo['data']['name']."】，当中@了你，来围观吧！</div>",
+                    'url'=>C('qiye_url')."/Admin/Index/Main.html?action=Project/projectItem",
+                    'tableName'=>$this->projectCom->tableName(),
+                    'tableId'=> $projectInfo['where']['projectId'],
+                    'touser' => $touser,
+                ];
+                $this->add_push($addData);
+            }
         }
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
+
     /** 
      * @Author: vition 
      * @Date: 2018-05-08 20:33:48 
@@ -789,7 +843,7 @@ class ProjectController extends BaseController{
                 ]
             ];
             $resultData = $this->projectCom->getOne($parameter)["list"];
-
+            
             $resultData["project_time"] = date("Y-m-d",$resultData["project_time"]);
             $resultData["create_time"] = date("Y-m-d",$resultData["create_time"]);
             $resultData["bid_date"] = date("Y-m-d",strtotime($resultData["bid_date"]));
@@ -856,8 +910,8 @@ class ProjectController extends BaseController{
                     "LEFT JOIN (SELECT pid ,province province_name FROM v_province) pr ON pr.pid=c.provinceId",
                     "LEFT JOIN (SELECT cid,city city_name,pid FROM v_city) ci ON ci.cid=c.cityId",
                     "LEFT JOIN (SELECT basicId,name suprt_name FROM v_basic WHERE class='supType') st ON st.basicId=type",
-                    "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='v_purcha' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id",
-                    "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
+                    // "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='v_purcha' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id",
+                    // "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
                 ],
             ];
             $supplyResult = $this->purchaCom->getList($supplyParam);

@@ -8,8 +8,8 @@ namespace Admin\Controller;
  */
 class ProjectCostController extends BaseController{
     public function _initialize() {
-        $this->statusLabel[10] = 'maroon';
-        $this->statusType[10] = '草稿';
+        // $this->statusLabel[10] = 'maroon';
+        // $this->statusType[10] = '草稿';
         parent::_initialize();
         $this->projectCom=getComponent('Project');
         $this->pOfferCom=getComponent('ProjectOffer');
@@ -58,23 +58,24 @@ class ProjectCostController extends BaseController{
             $offerCostCom = $this->pOfferCom;
             $parent_id = 'parent_oid';
             $joins = [
-                "LEFT JOIN (SELECT project_id c_project_id , section c_section,flag c_flag,cost_total,profit,profit_ratio,user_id c_user_id FROM v_project_cost ) c ON c.c_project_id = project_id AND c.c_section = section AND c.c_flag = flag",
-                "LEFT JOIN (SELECT userId, userName cuser_name FROM v_user ) cu ON cu.userId = c_user_id ",
+                "LEFT JOIN (SELECT project_id c_project_id , section c_section,flag c_flag,cost_total,profit,profit_ratio,user_id cuser_id FROM v_project_cost ) c ON c.c_project_id = project_id AND c.c_section = section AND c.c_flag = flag",
+                "LEFT JOIN (SELECT userId, userName cuser_name FROM v_user ) cu ON cu.userId = c.cuser_id ",
             ];
         }else{
             $offerCostCom = $this->pCostCom;
             $parent_id = 'parent_cid';
             $joins = [
-                "LEFT JOIN (SELECT id oid,project_id o_project_id , section o_section,flag o_flag,total,tax_rate,user_id o_user_id FROM v_project_offer ) o ON o.o_project_id = project_id AND o.o_section = section AND o.o_flag = flag",
-                "LEFT JOIN (SELECT userId, userName ouser_name FROM v_user ) ou ON ou.userId = o_user_id ",
+                "LEFT JOIN (SELECT id oid,project_id o_project_id , section o_section,flag o_flag,total,tax_rate,user_id ouser_id FROM v_project_offer ) o ON o.o_project_id = project_id AND o.o_section = section AND o.o_flag = flag",
+                "LEFT JOIN (SELECT userId, userName ouser_name FROM v_user ) ou ON ou.userId = o.ouser_id ",
+
             ];
         }
+        $joins = array_merge( $joins ,["LEFT JOIN (SELECT id approve_id,table_id FROM v_approve_log WHERE table_name='".$offerCostCom->tableName()."' AND status > 0 AND user_id = '".session("userId")."' AND effect = 1 ) a ON a.table_id = id","LEFT JOIN (SELECT projectId project_pid,user_id puser_id FROM v_project ) p ON p.project_pid = project_id"]);
         $this->assign('costClassArr',$this->Com ->get_option('costClass'));
         $this->assign('moduleArr',$this->Com ->get_option('module'));
         $this->assign('unitArr',$this->Com ->get_option('unit'));
         $this->assign('projectArr',$this->Com ->get_option('project','',[$listType.'_user'=>session('userId')]));
         $this->assign('userArr',$this->Com->get_option("user"));
-
         $resultData=[];
         $id = I("id");
         $roleId = session('roleId');
@@ -89,7 +90,7 @@ class ProjectCostController extends BaseController{
                 'joins' => $joins,
             ];
             $resultData = $offerCostCom->getOne($param)['list'];
-          
+            // $this->log( $offerCostCom->_sql());
             if($listType == 'offer'){
                 $parent_idStr = ' `parent_oid` = "'.$resultData['id'].'"';
             }else{
@@ -388,18 +389,24 @@ class ProjectCostController extends BaseController{
         ];
         if($type == 'offer'){
             $offerCostCom = $this->pOfferCom;
-            $where["_string"] = "(user_id = {$user_id} OR c_user_id = {$user_id}) OR (FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0)";
+            if($nodeAuth < 7){
+                $where["_string"] = "(user_id = {$user_id} OR p_user_id = {$user_id} OR cuser_id = {$user_id}) OR (FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0)";
+            }
+            
             $joins2 = [
-                "LEFT JOIN (SELECT project_id c_project_id , section c_section,flag c_flag,cost_total,profit,profit_ratio,user_id c_user_id FROM v_project_cost ) c ON c.c_project_id = project_id AND c.c_section = section AND c.c_flag = flag",
-                "LEFT JOIN (SELECT userId, userName cuser_name FROM v_user ) cu ON cu.userId = c_user_id ",
+                "LEFT JOIN (SELECT project_id c_project_id , section c_section,flag c_flag,cost_total,profit,profit_ratio,user_id cuser_id FROM v_project_cost ) c ON c.c_project_id = project_id AND c.c_section = section AND c.c_flag = flag",
+                "LEFT JOIN (SELECT userId, userName cuser_name FROM v_user ) cu ON cu.userId = cuser_id ",
             ];
             $listTemplate = 'project_offerList';
         }else{
-            $where["_string"] = "user_id = {$user_id} OR (FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0)";
+            if($nodeAuth < 7){
+                $where["_string"] = "(user_id = {$user_id} OR p_user_id = {$user_id}) OR (FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0)";
+            }
+            
             $offerCostCom = $this->pCostCom;
             $joins2 = [
-                "LEFT JOIN (SELECT project_id o_project_id , section o_section,flag o_flag,total,tax_rate,user_id o_user_id FROM v_project_offer ) o ON o.o_project_id = project_id AND o.o_section = section AND o.o_flag = flag",
-                "LEFT JOIN (SELECT userId, userName ouser_name FROM v_user ) ou ON ou.userId = o_user_id ",
+                "LEFT JOIN (SELECT project_id o_project_id , section o_section,flag o_flag,total,tax_rate,user_id ouser_id FROM v_project_offer ) o ON o.o_project_id = project_id AND o.o_section = section AND o.o_flag = flag",
+                "LEFT JOIN (SELECT userId, userName ouser_name FROM v_user ) ou ON ou.userId = ouser_id ",
             ];
             $listTemplate = 'project_costList';
             // $joins
@@ -407,7 +414,7 @@ class ProjectCostController extends BaseController{
         $joins3 = [
             "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='".$offerCostCom->tableName()."' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=id",
             "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
-            "LEFT JOIN (SELECT id approve_id,table_id FROM v_approve_log WHERE table_name='".$offerCostCom->tableName()."' AND status > 0 AND user_id = '".session("userId")."' ) a ON a.table_id = id"
+            "LEFT JOIN (SELECT id approve_id,table_id FROM v_approve_log WHERE table_name='".$offerCostCom->tableName()."' AND status > 0 AND user_id = '".session("userId")."' AND effect = 1 ) a ON a.table_id = id"
         ];
         $joins = array_merge($joins2,$joins,$joins3);
         // if($nodeAuth < 7){
@@ -440,6 +447,7 @@ class ProjectCostController extends BaseController{
             'orderStr'=>"id DESC",
             "joins"=> $joins,
         ];
+        // $this->log($parameter);exit;
         $listResult=$offerCostCom->getList($parameter);
         // $this->log($offerCostCom->_sql());
         // echo $this->pCostCom->M()->_sql();exit;
@@ -454,7 +462,7 @@ class ProjectCostController extends BaseController{
     function project_offerMange($param){
         $reqType = $param['reqType'] ? $param['reqType'] : I("reqType");
         $datas = $param['data'] ? $param['data'] : I("data");
-
+        
         if(isset($datas['cost_total']) && $datas['cost_total']>0){
             $total = $datas['total'] > 0 ? $datas['total'] : 0;
             $datas['profit'] = round($total - $datas['cost_total'],2);
@@ -470,8 +478,8 @@ class ProjectCostController extends BaseController{
             $where=["id"=>$datas['id']];
             $data=[];
             foreach (['class_notes','class_sort','cost_class','sort','classify','item_content','num','unit','act_num','act_unit','price','total','status','class_sub','cost_price','cost_total','profit','profit_ratio','scompany_id','scompany_cid','flag','auth_user_id','read_type'] as $key) {
-                if(isset($datas[$key])){
-                    $data[$key]=$datas[$key];
+                if( isset($datas[$key])){
+                    $data[$key] = $datas[$key];
                 }
             }
             $data['update_time']=time();
@@ -485,7 +493,7 @@ class ProjectCostController extends BaseController{
         // exit;
         extract($_POST);
         $isInsert = false;
-        $pResult = $this->projectCom->getOne(['where'=>['project_id' => $data['project_id']],'fields'=>'leader,offer_user,cost_user','one'=>true]);
+        $pResult = $this->projectCom->getOne(['where'=>['projectId' => $data['project_id']],'fields'=>'leader,offer_user,cost_user,user_id','one'=>true]);
         $param = [
             'fields' => 'id',
             'where' => ['project_id' => $data['project_id']],
@@ -494,13 +502,7 @@ class ProjectCostController extends BaseController{
         $pOfferData = [];
         $offerCostCom = $this->pOfferCom;
         $parent_idStr = 'parent_oid';
-        // if($type == 'offer'){
-        //     $offerCostCom = $this->pOfferCom;
-        //     $parent_idStr = 'parent_oid';
-        // }else{
-        //     $offerCostCom = $this->pCostCom;
-        //     $parent_idStr = 'parent_cid';
-        // }
+
         $hasData = $offerCostCom->getList($param);
         
         if($hasData){
@@ -514,26 +516,44 @@ class ProjectCostController extends BaseController{
             }
         }
 
-        $pOfferData['user_id'] = session('userId');
+        $pOfferData['user_id'] = $pResult['offer_user'] ? $pResult['offer_user'] : $pResult['user_id'];
  
         $pOfferData['add_time'] = time();
-
+        $vtabId = I("vtabId");
+        if($type == "cost"){
+            $nodeResult = A('Component/Node')->getOne(['fields'=>'nodeId','where'=>['db_table'=>'v_project_cost','processIds'=>['GT',0],'is_process'=>1],'one'=>true]);
+            $vtabId = $nodeResult['nodeId'];
+        }
         //添加时审批流数据
-        $examines = getComponent('Process')->getExamine(I("vtabId"),$pResult['leader']);
+        $examines = getComponent('Process')->getExamine($vtabId,$pResult['leader']);
         $pOfferData['process_id'] = $examines["process_id"];
         $pOfferData['examine'] = $examines["examine"];
-        $pOfferData['process_level'] = $examines["process_level"];
-        $pOfferData['status'] = $examines["status"];
-        if($type=="cost"){
-            $pOfferData['process_id'] = 0;
-            $pOfferData['examine'] = '';
+        // $pOfferData['process_level'] = $examines["process_level"];
+        // $pOfferData['status'] = $examines["status"];
+
+        //判断是草稿还是直接提交
+        if($data['status'] == 10){
             $pOfferData['process_level'] = 0;
-            $pOfferData['status'] = 1;
-            $pOfferData['user_id'] = $pResult['offer_user'];
+            $pOfferData['status'] = $data['status'];
+        }else{
+            $pOfferData['process_level'] = $examines["process_level"];
+            $pOfferData['status'] = $examines["status"];
         }
-  
+
+        // if($type == "cost"){
+        //     $nodeResult = A('Component/Node')->getOne(['fields'=>'nodeId','where'=>['db_table'=>'v_project_cost','processIds'=>['GT',0],'is_process'=>1],'one'=>true]);
+        //     $examines = getComponent('Process')->getExamine(I("vtabId"),$pResult['leader']);
+        //     $pOfferData['process_id'] = $examines["process_id"];
+        //     $pOfferData['examine'] = $examines["examine"];
+
+        //     $pOfferData['examine'] = '';
+        //     $pOfferData['process_level'] = 0;
+        //     $pOfferData['status'] = 1;
+        //     $pOfferData['user_id'] = $pResult['cost_user'] ? $pResult['cost_user'] : $pResult['user_id'];
+        // }
+        // $this->log($data);
+        // $this->log($pOfferData);exit;
         $offerCostCom->startTrans();
-        // $pOfferData['status'] = $status ? $status : $pOfferData['status'];
         $pInsertResult = $offerCostCom->insert($pOfferData);
         if($type=="cost" && isset($pInsertResult->errCode) && $pInsertResult->errCode==0){
             $offerCostCom->commit();
@@ -560,19 +580,21 @@ class ProjectCostController extends BaseController{
             if($isInsert){
                 
                 // $this->ApprLogCom->createApp($offerCostCom->tableName(),$parent_id,session("userId"),"");
-                $addData = [
-                    'examine'=>$pOfferData['examine'],
-                    'title'=>session('userName')."添加了项目报价",
-                    'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."添加了项目报价，@你了，点击进入围观吧！</div>",
-                    'url'=>C('qiye_url')."/Admin/Index/Main.html?action=ProjectCost/project_offer",
-                    'tableName'=>$offerCostCom->tableName(),
-                    'tableId'=>$parent_id,
-                    'nowhite'=>"nowhite",
-                ];
-                $this->add_push($addData);
-
                 $offerCostCom->commit();
                 $this->pCostSubCom->commit();
+                if($data['status'] != 10){
+                    $addData = [
+                        'examine'=>$pOfferData['examine'],
+                        'title'=>session('userName')."添加了项目报价",
+                        'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."添加了项目报价，@你了，点击进入围观吧！</div>",
+                        'url'=>C('qiye_url')."/Admin/Index/Main.html?action=ProjectCost/project_offer",
+                        'tableName'=>$offerCostCom->tableName(),
+                        'tableId'=>$parent_id,
+                        'nowhite'=>"nowhite",
+                    ];
+                    $this->add_push($addData);
+                }
+                
             }
         }
         
@@ -582,6 +604,11 @@ class ProjectCostController extends BaseController{
     //报价编辑
     function project_offerEdit(){
         extract($_POST);
+
+        $isDraft = false;
+        $where=["id"=>$data['id']];
+        $offerResult =$this->pOfferCom->getOne(['where'=>$where,"one"=>true]);
+
         $this->pOfferCom->startTrans();
         
         $pOfferData = [
@@ -589,6 +616,7 @@ class ProjectCostController extends BaseController{
             'data' => [
                 'project_id' => $data['project_id'],
                 'tax_rate' => $data['tax_rate'],
+                'flag' => $data['flag'],
                 'total' => $data['total'],
                 'update_time' => time(),
             ]
@@ -598,8 +626,14 @@ class ProjectCostController extends BaseController{
         $this->pOfferCom->startTrans();
         $this->pCostSubCom->startTrans();
         
-        if($status){
-            $pOfferData['data']['status'] = $status;
+        $pOfferData['data']['status'] = $status;
+
+        if($offerResult["status"] == 10){
+            $isDraft = true;
+            if( $data['status'] != 10){
+                $pOfferData['data']['process_level'] = 1; 
+                $pOfferData['data']['status'] = 2;
+            }
         }
   
         $pInsertResult = $this->pOfferCom->update($pOfferData);
@@ -618,6 +652,25 @@ class ProjectCostController extends BaseController{
         }
         $this->pOfferCom->commit();
         $this->pCostSubCom->commit();
+        if($offerResult["status"] == 3 && $pOfferData['data']['status'] !=10 ){
+            $this->ApprLogCom->updateStatus($this->pOfferCom->tableName(),$pOfferData["where"]["id"]);
+        }
+        $this->log($pOfferData['data']['status']);
+        if(in_array($offerResult["status"],[3,10]) && $pOfferData['data']['status'] != 10){
+            $addData = [
+                'examine'=>$offerResult['examine'],
+                'title'=>session('userName')."添加了项目报价",
+                'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."添加了项目报价，@你了，点击进入围观吧！</div>",
+                'url'=>C('qiye_url')."/Admin/Index/Main.html?action=ProjectCost/project_offer",
+                'tableName'=>$this->pOfferCom->tableName(),
+                'tableId'=>$pOfferData["where"]["id"],
+                // 'nowhite'=>"nowhite",
+            ];
+            $this->add_push($addData);
+        }
+        if(isset($dels)){
+            $delResult = $this ->pCostSubCom->subCostDel($dels);
+        }
         $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
     }
     function  project_costControl(){
@@ -638,17 +691,20 @@ class ProjectCostController extends BaseController{
     function  pcost_control_modalOne(){
         $this->project_offer_modalOne('cost','查看/编辑成本');
     }
+
     function pcost_controlAdd(){
         $result = $this->project_offerAdd('cost');
-        $_POST['data']['id'] = $result['cid'];
-        $_POST['data']['oid'] = $result['oid'];
-        $this->pcost_controlEdit(true);
+        if($result){
+            $_POST['data']['id'] = $result['cid'];
+            $_POST['data']['oid'] = $result['oid'];
+            $this->pcost_controlEdit(true);
+        }  
     }
+
     function pcost_controlEdit($insert = false){
         extract($_POST);
- 
+        // $this->log($_POST);
         // $this->pCostCom->startTrans();
-        
         $pCostData = [
             'where' => ['id'=>$data['id']],
             'data' => [
@@ -656,6 +712,7 @@ class ProjectCostController extends BaseController{
                 'profit' => $data['total'] - $data['cost_total'],
                 'profit_ratio' => round((($data['total'] - $data['cost_total']) / $data['total'])*100,2) ,
                 'update_time' => time(),
+                'flag' => $data['flag'],
             ]
         ];
         $parent_id = $data['id'];
@@ -676,15 +733,25 @@ class ProjectCostController extends BaseController{
         // if($status){
         //     $pCostData['data']['status'] = $status;
         // }
-        $pResult = $this->projectCom->getOne(['where'=>['project_id' => $data['id']],'leader'])['list'];
+        $pResult = $this->projectCom->getOne(['where'=>['project_id' => $data['id']],'fields'=>'leader,offer_user,cost_user','one'=>true]);
         
         //添加时审批流数据
         $examines = getComponent('Process')->getExamine(I("vtabId"),$pResult['leader']);
-        $pCostData['data']['process_id'] = $examines["process_id"];
-        $pCostData['data']['examine'] = $examines["examine"];
-        $pCostData['data']['process_level'] = $examines["process_level"];
-        $pCostData['data']['status'] = $examines["status"];
-
+        if($insert){
+            $pCostData['data']['process_id'] = $examines["process_id"];
+            $pCostData['data']['examine'] = $examines["examine"];
+        }
+        
+        // $pCostData['data']['process_level'] = $examines["process_level"];
+        // $pCostData['data']['status'] = $examines["status"];
+        //判断是草稿还是直接提交
+        if($data['status'] == 10){
+            $pCostData['data']['process_level'] = 0;
+            $pCostData['data']['status'] = $data['status'];
+        }else{
+            $pCostData['data']['process_level'] = $examines["process_level"];
+            $pCostData['data']['status'] = $examines["status"];
+        }
         // print_r($pCostData);exit;
         $pInsertResult = $this->pOfferCom->update($pOfferData);
         $pInsertResult = $this->pCostCom->update($pCostData);
@@ -692,22 +759,25 @@ class ProjectCostController extends BaseController{
         foreach ($data['list'] as  $subData) {
             if( $subData['id']>0){//编辑
                 $infoData = $this->project_offerMange(['data'=>$subData,'reqType'=>'project_offerEdit']);
+                // $this->log($infoData);
                 if($infoData['data']['read_type'] == 1){
                     $infoData['data']['parent_cid'] = $parent_id;
                     $infoData['data']['parent_oid'] = $parent_oid;
                 }else{
                     $infoData['data']['parent_cid'] = $parent_id;
                 }
+                // $this->log($infoData);
                 $upateResult = $this->pCostSubCom->update($infoData);
                 // print_r($infoData);
             }else{//新增
                 $infoData = $this->project_offerMange(['data'=>$subData,'reqType'=>'project_offerAdd']);
-                if($infoData['data']['read_type'] == 1){
-                    $infoData['data']['parent_cid'] = $parent_id;
-                    $infoData['data']['parent_oid'] = $parent_oid;
+                if($infoData['read_type'] == 1){
+                    $infoData['parent_cid'] = $parent_id;
+                    $infoData['parent_oid'] = $parent_oid;
                 }else{
-                    $infoData['data']['parent_cid'] = $parent_id;
-                }               
+                    $infoData['parent_cid'] = $parent_id;
+                }
+                $this->log($infoData);
                 $upateResult = $this->pCostSubCom->insert($infoData);
                 // print_r($infoData);
             }
@@ -729,7 +799,7 @@ class ProjectCostController extends BaseController{
         if(!$insert){
             // $addData['noappr'] = 'noappr';
         }
-        $this->add_push($addData);
+        // $this->add_push($addData);
 
         $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
     }

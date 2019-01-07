@@ -158,6 +158,7 @@ function searchFun(option){
             if($idArray && $idArray.length>1){
                 $id = $idArray[1]
             }
+            
             if($id > 0){
                 $(tabId+" ."+table).find("tr .status-con").each(function(){
                     var _id =  $(this).data("id")
@@ -166,6 +167,8 @@ function searchFun(option){
                             var _con = $(this).data("con")
                             if(_con == con && $id == _id){
                                 $(this).children(".v-showmodal").trigger("click")
+                                var title = window.location.search.replace(/&id=[\d]*/,"").replace("?action=","");
+                                setUrlAction(title,title)
                                 return false;
                             }
                         })
@@ -378,6 +381,7 @@ $(document).on("click",'.save-info',function(){
     var gettype=$(this).data("gettype");
     var con=$(this).data("con");
     var isModal=$(this).data("modal");
+    var status=$(this).data("status");
     var search=con+"_search";
     // var parent=$(this).parents(".modal").attr("id")
     if($('body').hasClass('modal-open')==false && isModal){
@@ -421,7 +425,12 @@ $(document).on("click",'.save-info',function(){
     if(JSON.stringify(datas["data"])=="{}"){
         notice(110,"没有更新数据")
     }
-    
+    // console.log(datas)
+    if(status){
+        datas["data"]['status'] = status
+    }else if(datas["data"]['status'] == 10){
+        datas["data"]['status'] = 2
+    }
     post(url,datas,function(result){
         // notice(result.errCode,result.error);
         if(result.errCode==0){
@@ -702,6 +711,7 @@ $(function(){
                             allProcess = current;
                         }
                         var progress = float(current/allProcess)*100;
+                  
                         var final = " 未完成";
                         if(progress>=100){
                             progress = 100;
@@ -712,7 +722,11 @@ $(function(){
                         $("#"+apl_id+" .modal-body tbody").html(trHtml);
                         $("#"+apl_id+" .modal-body .progress .progress-bar").css("width",progress+"%");
                         if(current>0){
-                            $("#"+apl_id+" .modal-body .progress .progress-bar").text("当前进度："+current+" / "+allProcess+final);
+                            var text = current+" / "+allProcess
+                            if(progress>25){
+                                text = "当前进度："+text+final
+                            }
+                            $("#"+apl_id+" .modal-body .progress .progress-bar").text(text);
                         }
                         // setInterval(function(){
                         //     if($("#approve-log-modal").css("display") == "block"){

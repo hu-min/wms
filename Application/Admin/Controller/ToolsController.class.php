@@ -481,7 +481,7 @@ class ToolsController extends BaseController{
                 // }
                 // $examineRes = $db ->field("process_level,examine")->where([$db->getPk()=>$id])->find();
                                
-                if(isset($examine[$place-1]) && $examine[$place-1] > 0){
+                if(isset($examine[$place-1]) && $examine[$place-1] > 0 && $status == 1){
                     $touser = $this->userCom->getQiyeId($examine[$place-1],true);
                     if(!empty($touser)){
                         $desc = "<div class='gray'>".date("Y年m月d日",time())."</div> <div class='normal'>{$authName}在【{$title}】中提交的申请，".session('userName')."已经通过了审批，现在轮到您审批，点击进入审批吧！</div>";

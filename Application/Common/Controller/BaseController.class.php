@@ -53,7 +53,7 @@ class BaseController extends Controller{
            }else{
             \SeasLog::setLogger($resetPath);
            }
-           if(is_array($content)) $content = json_encode($content);
+           if(is_array($content)) $content = json_encode($content,JSON_UNESCAPED_UNICODE);
            \SeasLog::$typeFun($content); 
         }
     }

@@ -110,10 +110,12 @@
     <script>
         var poPanel = "";
         var poItem = "";
+        var poDel = [];
         var project_offer_initInfo = function(gettype,result) {
             //从后端获取poPanel 模板
             poPanel = result.panel;
             poItem = result.item;
+            poDel = [];
             init_chosen("{$url}","getOptionList",".global-modal");
         }
         //搜索
@@ -127,6 +129,9 @@
             poItem = info.item;
             ['project_id','tax_rate','flag'].forEach(element => {
                 $(tabId+" .global-modal").find(" .modal-info[name='"+element+"']").val(info[element])
+                if(element == 'project_id'){
+                    $(tabId+" .global-modal").find(" .modal-info[name='"+element+"']").prop("disabled",true)
+                }
             });
             $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val(info['id'])
             $(tabId+" .global-modal").find(".all-count").text(info['total']);
@@ -180,10 +185,10 @@
             for (var key in item_count) {
                 $(tabId+" .global-modal .box-group ").find(".panel").eq(key).find('.class-count').text(float_format(item_count[key]));
             }
-            if((info['status'] > 0 && info['status'] !=3 && "{$nodeAuth}"<7)){    
+            if((info['status'] > 0 && info['status'] !=3 && "{$nodeAuth}"<7 && info['status'] != 10)){    
                 $(tabId+" .global-modal").find(".modal-footer .save-info").remove()
             }
-            if(( info['status'] > 0 || info['ouser_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3){
+            if(( (info['status'] > 0 && info['status'] != 10) || !in_array("{$Think.session.userId}",[info['user_id'],info['puser_id']]) ) && "{$nodeAuth}"<7 && info['status'] !=3){
                 $(tabId+" .global-modal").find('.modal-info').prop("disabled",true)
                 $(tabId+" .global-modal").find(".add-costClass").remove()
                 $(tabId+" .global-modal").find(".box-title .cost_chosen_del").remove()
@@ -211,10 +216,12 @@
         }
         //获取数据
         var project_offer_getInfo = function($this){
-            datas["status"] = 2
+            // datas["status"] = 2
             if($($this).data('savetype') && $($this).data('savetype') == "draft"){
                 datas["status"] = 10;
             }
+            var status = $(tabId+" .global-modal").find(".modal-info[name='status']").val()
+            datas["status"] = status != "" ? status : 2
             datas["data"] = {};
             datas["data"]['project_id'] = $(tabId+" .global-modal").find(".modal-info[name='project_id']").val()
             if(datas["data"]['project_id']<=0){
@@ -277,9 +284,12 @@
                 })
                 
             })
-            if(JSON.stringify(datas["data"]['list']) == "[]"){
+            if(JSON.stringify(datas["data"]['list']) == "[]" && JSON.stringify(poDel) == "[]"){
                 notice(110,"请认真添加数据","输入异常");
                 throw "请认真添加数据";
+            }
+            if(poDel.length > 0){
+                datas["dels"] = poDel
             }
             // console.log(datas)
         }
@@ -319,7 +329,19 @@
             })
             //分类删除
             $(tabId+" .global-modal").on("click",".box-title .cost_chosen_del",function(){
+                $(this).parents(".panel").find(".modal-info[name='id']").each(function(){
+                    poDel.push($(this).val())
+                })
                 $(this).parents(".panel").remove()
+                $(tabId+" .global-modal").find(".panel").each(function(index,panel){
+                    var alphas = alpha(Number(index))
+                    $(panel).find('.cost-class-alpha').text(alphas);
+                    $(panel).find(".modal-info[name='class_sort']").val(index);
+                    $(panel).find("tbody tr").each(function(sort,tr){
+                        $(tr).find("td:first-child").find(".modal-info[name='sort']").text(alphas+(Number(sort) + 1))
+                    })
+                })
+                compute_count()
             })
             //添加子项事件
             $(tabId+" .global-modal").on("click",".box-title .add-costItem,tbody .class-rowspan",function(){
@@ -348,12 +370,14 @@
             })
             //删除子项
             $(tabId+" .global-modal").on("click","table .cost_item_del",function(){
+                poDel.push($(this).parents("tr").find(".modal-info[name='id']").val())
                 var $parents = $(this).parents(".panel");
                 var $prevAll = $(this).parents("tr").prevAll()
                 var $nextr = $(this).parents("tr").next()
-                console.log($nextr)
                 var tdNum = $(this).parents("tr").find('td').length
+                
                 var curRowspan = $(this).parents("tr").find('td').eq(1).attr('rowspan')
+                var class_notes = $(this).parents("tr").find(".modal-info[name='class_notes']").val();
                 $(this).parents("tr").remove()
                 $parents.find("tbody tr").each(function(sort,tr){
                     var alpha = $(this).parents(".panel").find('.cost-class-alpha').text();
@@ -381,12 +405,18 @@
                         if(curRowspan > 2){
                             $nextr.find('td').eq(1).prop("rowspan",Number(curRowspan)-1)
                         }
+                        $nextr.find(".modal-info[name='class_notes']").val(class_notes);
                     }
                 }
-                
+                compute_count()
             })
             //合计金额计算
             $(tabId+" .global-modal").on("input",".modal-info[name='num'],.modal-info[name='act_num'],.modal-info[name='num'],.modal-info[name='act_num'],.modal-info[name='price']",function(){
+                if($(this).val() < 0 || $(this).val().indexOf("-") >= 0){
+                    notice(110,"请不要输入负数","输入异常");
+                    $(this).val(1)
+                    return
+                }
                 var $tr = $(this).parents("tr")
                 var num = Number($tr.find(".modal-info[name='num']").val());
                 var act_num = Number($tr.find(".modal-info[name='act_num']").val());

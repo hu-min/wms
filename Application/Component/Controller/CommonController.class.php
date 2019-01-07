@@ -69,7 +69,7 @@ class CommonController extends \Common\Controller\BaseController{
                 }
                 $parameter=[
                     'where'=>$where,
-                    'fields'=>"projectId,name",
+                    'fields'=>"projectId,name,offer_user,cost_user,user_id",
                     'orderStr'=>"projectId DESC",
                     'pageSize'=> 99999999,
                 ];
@@ -352,5 +352,13 @@ class CommonController extends \Common\Controller\BaseController{
                 return [];
                 break;
         }
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-12-25 14:36:09 
+     * @Desc: 判断是不是草稿 
+     */    
+    function is_draft(array ...$array){
+        print_r($array);
     }
 }

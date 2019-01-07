@@ -144,120 +144,120 @@
                             </div>
                         </div>
                     </div>
-                    <div class="panel box box-danger">
-                        <div class="box-header with-border">
-                            <h4 class="box-title">
-                                <a data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#collapseTwo">
-                                项目前期基本信息
-                                </a>
-                            </h4>
-                        </div>
-                            <div id="collapseTwo" class="panel-collapse collapse">
-                            <div class="box-body">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">项目省份：</label>
-                                            <select class="form-control modal-info chosen-project chosen-select" title="项目省份" name="province" data-cname="city">
-                                                <option value="">省份</option>
-                                                <volist name="provinceArr" id="item">
-                                                    <option value="{$item['pid']}">{$item['province']}</option>
-                                                </volist>
-                                            </select>
+                        <div class="panel box box-danger">
+                            <div class="box-header with-border">
+                                <h4 class="box-title">
+                                    <a data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#collapseTwo">
+                                    项目前期基本信息
+                                    </a>
+                                </h4>
+                            </div>
+                                <div id="collapseTwo" class="panel-collapse collapse">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">项目省份：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="项目省份" name="province" data-cname="city">
+                                                    <option value="">省份</option>
+                                                    <volist name="provinceArr" id="item">
+                                                        <option value="{$item['pid']}">{$item['province']}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">项目城市：</label>
-                                            <select class="form-control modal-info chosen-project chosen-select" data-value="cid"  data-text="city" data-noupdate="true" data-pname="province" title="城市" name="city" data-cname="field">
-                                                <option value="">城市</option>
-                                            </select>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">项目城市：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" data-value="cid"  data-text="city" data-noupdate="true" data-pname="province" title="城市" name="city" data-cname="field">
+                                                    <option value="">城市</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">项目场地：</label>
-                                            <select class="form-control modal-info chosen-project chosen-select" title="项目场地" name="field" data-value="id" data-pname="city" data-text="name">
-                                                <option value="">场地</option>
-                                                <volist name="fieldArr" id="item">
-                                                    <option value="{$item['id']}">{$item['name']}</option>
-                                                </volist>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">立项日期：</label>
-                                            <div class="input-group date">
-                                                <div class="input-group-addon">
-                                                    <i class="fa fa-calendar"></i>
-                                                </div>
-                                                <input class="form-control pull-right date-input modal-info" name="create_time" type="text">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">项目场地：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="项目场地" name="field" data-value="id" data-pname="city" data-text="name">
+                                                    <option value="">场地</option>
+                                                    <volist name="fieldArr" id="item">
+                                                        <option value="{$item['id']}">{$item['name']}</option>
+                                                    </volist>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">立项人：</label>
-                                            <select class="form-control modal-info chosen-project chosen-select" title="立项人" name="create_user" data-value="userId"  data-text="userName">
-                                                <option value="">立项人</option>
-                                                <volist name="userArr" id="item">
-                                                    <option value="{$item['userId']}">【{$item['roleName']}】{$item['userName']}</option>
-                                                </volist>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">是否竞标：</label>
-                                            <select class="form-control modal-info" title="是否竞标" name="is_bid" >
-                                                <option value="1">需要</option>
-                                                <option value="0">不需要</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">竞标类型：</label>
-                                            <select class="form-control modal-info bid-group" required="required" title="竞标类型" name="bidding">
-                                                <option value="">竞标类型</option>
-                                                <option value="1">技术标</option>
-                                                <option value="2">商务标</option>
-                                                <option value="3">区域标</option>
-                                                <option value="4">其它标项</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">竞标（提案）日期：</label>
-                                            <div class="input-group date">
-                                                <div class="input-group-addon">
-                                                    <i class="fa fa-calendar"></i>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">立项日期：</label>
+                                                <div class="input-group date">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-calendar"></i>
+                                                    </div>
+                                                    <input class="form-control pull-right date-input modal-info" name="create_time" type="text">
                                                 </div>
-                                                <input class="form-control pull-right date-input modal-info bid-group" required="required"  name="bid_date" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">立项人：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="立项人" name="create_user" data-value="userId"  data-text="userName">
+                                                    <option value="">立项人</option>
+                                                    <volist name="userArr" id="item">
+                                                        <option value="{$item['userId']}">【{$item['roleName']}】{$item['userName']}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">是否竞标：</label>
+                                                <select class="form-control modal-info" title="是否竞标" name="is_bid" >
+                                                    <option value="1">需要</option>
+                                                    <option value="0">不需要</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">竞标提案时间：</label>
-                                            <div class="input-group date">
-                                                <div class="input-group-addon">
-                                                    <i class="fa fa-calendar"></i>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">竞标类型：</label>
+                                                <select class="form-control modal-info bid-group" required="required" title="竞标类型" name="bidding">
+                                                    <option value="">竞标类型</option>
+                                                    <option value="1">技术标</option>
+                                                    <option value="2">商务标</option>
+                                                    <option value="3">区域标</option>
+                                                    <option value="4">其它标项</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">竞标（提案）日期：</label>
+                                                <div class="input-group date">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-calendar"></i>
+                                                    </div>
+                                                    <input class="form-control pull-right date-input modal-info bid-group" required="required"  name="bid_date" type="text">
                                                 </div>
-                                                <input class="form-control pull-right date-input modal-info bid-group" required="required" name="bid_time" data-type="time" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">竞标提案时间：</label>
+                                                <div class="input-group date">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-calendar"></i>
+                                                    </div>
+                                                    <input class="form-control pull-right date-input modal-info bid-group" required="required" name="bid_time" data-type="time" type="text">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                         <div class="panel box box-success">
                             <div class="box-header with-border">
                                 <h4 class="box-title">
@@ -390,12 +390,14 @@
                 </div>
             <!-- /.box-body -->
             </div>
+            <div class="form-group">
+                {:status_group(['vars'=>get_defined_vars()])}
+            </div>
         </div>
-    </form>            
+    </form>
 </div>
 <div class="modal-footer">
     <input class="modal-info table-id" name="projectId" value="0" type="hidden">
-    <input class="modal-info" name="status" value="0" type="hidden">
     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
     {:save_btn(get_defined_vars())}
     {:approve_btn($tableName,['vars'=>get_defined_vars()])}
