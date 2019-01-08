@@ -427,10 +427,18 @@ $(document).on("click",'.save-info',function(){
     }
     // console.log(datas)
     if(status){
-        datas["data"]['status'] = status
-    }else if(datas["data"]['status'] == 10){
-        datas["data"]['status'] = 2
-    }
+        if(datas["status"] !==undefined){
+            datas['status'] = status
+        }else if(datas["data"]['status'] !==undefined){
+            datas["data"]['status'] = status
+        }
+    }else{
+        if(datas["status"] == 10){
+            datas['status'] = 2
+        }else if(datas["data"]['status'] == 10){
+            datas["data"]['status'] = status
+        }
+    } 
     post(url,datas,function(result){
         // notice(result.errCode,result.error);
         if(result.errCode==0){

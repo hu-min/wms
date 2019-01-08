@@ -390,12 +390,14 @@ class ProjectCostController extends BaseController{
         if($type == 'offer'){
             $offerCostCom = $this->pOfferCom;
             if($nodeAuth < 7){
+                $where["parent_oid"] = ['GT',0];
                 $where["_string"] = "(user_id = {$user_id} OR p_user_id = {$user_id} OR cuser_id = {$user_id}) OR (FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0)";
             }
             
             $joins2 = [
                 "LEFT JOIN (SELECT project_id c_project_id , section c_section,flag c_flag,cost_total,profit,profit_ratio,user_id cuser_id FROM v_project_cost ) c ON c.c_project_id = project_id AND c.c_section = section AND c.c_flag = flag",
                 "LEFT JOIN (SELECT userId, userName cuser_name FROM v_user ) cu ON cu.userId = cuser_id ",
+                "LEFT JOIN (SELECT id cid,parent_oid FROM v_project_cost_sub GROUP BY parent_oid) pc ON pc.parent_oid = id",
             ];
             $listTemplate = 'project_offerList';
         }else{
@@ -449,7 +451,7 @@ class ProjectCostController extends BaseController{
         ];
         // $this->log($parameter);exit;
         $listResult=$offerCostCom->getList($parameter);
-        // $this->log($offerCostCom->_sql());
+        $this->log($offerCostCom->_sql());
         // echo $this->pCostCom->M()->_sql();exit;
         // $this->
         // if($type == 'offer'){
@@ -693,6 +695,8 @@ class ProjectCostController extends BaseController{
     }
 
     function pcost_controlAdd(){
+        extract($_POST);
+
         $result = $this->project_offerAdd('cost');
         if($result){
             $_POST['data']['id'] = $result['cid'];
@@ -705,6 +709,19 @@ class ProjectCostController extends BaseController{
         extract($_POST);
         // $this->log($_POST);
         // $this->pCostCom->startTrans();
+        $pResult = $this->projectCom->getOne(['where'=>['projectId' => $data['project_id']],'fields'=>'leader,user_id,offer_user,cost_user,cost_budget','one'=>true]);
+        $cost_total = $this->pCostCom->M()->where(['project_id'=>$data['project_id']])->sum("cost_total");
+        
+        // $this->log($pResult['cost_budget']);
+        if($cost_total>0){
+            $pResult['cost_budget'] = $pResult['cost_budget'] - $cost_total;
+        }
+        // $this->log($pResult['cost_budget']);exit();
+        $offerResult =$this->pOfferCom->getOne(['where'=>['id'=>$data['oid']],"one"=>true,"fields"=>'examine,status']);
+        $costResult =$this->pCostCom->getOne(['where'=>['id'=>$data['id']],"one"=>true,"fields"=>'examine,status']);
+        // if($pResult['cost_budget'] > 0 && $data['cost_total'] > $pResult['cost_budget']){
+        //     $this->ajaxReturn(['errCode'=>100,'error'=>"添加的成本超过"]);
+        // }
         $pCostData = [
             'where' => ['id'=>$data['id']],
             'data' => [
@@ -733,7 +750,7 @@ class ProjectCostController extends BaseController{
         // if($status){
         //     $pCostData['data']['status'] = $status;
         // }
-        $pResult = $this->projectCom->getOne(['where'=>['project_id' => $data['id']],'fields'=>'leader,offer_user,cost_user','one'=>true]);
+        
         
         //添加时审批流数据
         $examines = getComponent('Process')->getExamine(I("vtabId"),$pResult['leader']);
@@ -745,19 +762,33 @@ class ProjectCostController extends BaseController{
         // $pCostData['data']['process_level'] = $examines["process_level"];
         // $pCostData['data']['status'] = $examines["status"];
         //判断是草稿还是直接提交
-        if($data['status'] == 10){
+        if($status == 10){
             $pCostData['data']['process_level'] = 0;
-            $pCostData['data']['status'] = $data['status'];
         }else{
             $pCostData['data']['process_level'] = $examines["process_level"];
-            $pCostData['data']['status'] = $examines["status"];
+        }
+        $pCostData['data']['status'] = $status;
+        if( in_array(session("userId"),[$pResult['offer_user'],$pResult['user_id']]) && $offerResult['status'] == 10 && $status !=10 ){
+            $pOfferData['data']['process_level'] = 0;
+            $pOfferData['data']['status'] = 2;
+        }elseif(in_array(session("userId"),[$pResult['offer_user'],$pResult['user_id']])){
+            $pOfferData['data']['process_level'] = $pCostData['data']['process_level'];
+            $pOfferData['data']['status'] = $pCostData['data']['status'];
         }
         // print_r($pCostData);exit;
-        $pInsertResult = $this->pOfferCom->update($pOfferData);
-        $pInsertResult = $this->pCostCom->update($pCostData);
+        $pOfferUpdate = $this->pOfferCom->update($pOfferData);
+        $costNoApply = false;
+     
+        if($pResult['cost_budget'] > 0 && $data['cost_total'] <= $pResult['cost_budget'] && $status != 10 ){
+            //成本没超过预算成本，不需要审核
+            $pCostData['data']['process_level'] = count(explode(",",$costResult['examine']));
+            $pCostData['data']['status'] = 1;
+            $costNoApply = true;
+        }
+        $pCostUpdate = $this->pCostCom->update($pCostData);
 
         foreach ($data['list'] as  $subData) {
-            if( $subData['id']>0){//编辑
+            if( $subData['id'] > 0 ){//编辑
                 $infoData = $this->project_offerMange(['data'=>$subData,'reqType'=>'project_offerEdit']);
                 // $this->log($infoData);
                 if($infoData['data']['read_type'] == 1){
@@ -777,7 +808,6 @@ class ProjectCostController extends BaseController{
                 }else{
                     $infoData['parent_cid'] = $parent_id;
                 }
-                $this->log($infoData);
                 $upateResult = $this->pCostSubCom->insert($infoData);
                 // print_r($infoData);
             }
@@ -787,18 +817,47 @@ class ProjectCostController extends BaseController{
         $this->pOfferCom->commit();
         $this->pCostCom->commit();
         $this->pCostSubCom->commit();
-        $addData = [
-            'examine'=>$pCostData['data']['examine'],
-            'title'=>session('userName')."添加了项目报价成本",
-            'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."添加了项目报价成本，@你了，点击进入审批吧！</div>",
-            'url'=>C('qiye_url')."/Admin/Index/Main.html?action=ProjectCost/project_costContrast",
-            'tableName'=>$this->pCostCom->tableName(),
-            'tableId'=>$parent_id,
-            'nowhite' => 'nowhite',
-        ];
-        if(!$insert){
-            // $addData['noappr'] = 'noappr';
+        if($costNoApply){
+            $parameter=[
+                "table_name" => $this->pCostCom->tableName(),
+                "table_id" => $pCostData['where']['id'],
+                "add_time" => time(),
+                "user_id" => session("userId"),
+                "status" => 1, //审批流程里的状态是实际状态
+                "remark" => '成本少于或等于预算，不需要审批',
+            ];
+            $this->ApprLogCom->insert($parameter);
+        }else{
+            if($costResult['status'] == 10 && $pCostData['data']['status'] !=10 ){
+                $addData = [
+                    'examine'=>$costResult['examine'],
+                    'title'=>session('userName')."添加了项目报价成本",
+                    'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."添加了项目报价成本，@你了，点击进入审批吧！</div>",
+                    'url'=>C('qiye_url')."/Admin/Index/Main.html?action=ProjectCost/project_costControl",
+                    'tableName'=>$this->pCostCom->tableName(),
+                    'tableId'=>$parent_id,
+                    'nowhite' => 'nowhite',
+                ];
+                $this->add_push($addData);
+            }
         }
+        
+        if($offerResult['status'] == 10 && (isset($pOfferData['data']['status']) && $pOfferData['data']['status'] != 10) ){
+            $addData = [
+                'examine'=>$offerResult['examine'],
+                'title'=>session('userName')."添加了项目报价",
+                'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."添加了项目报价，@你了，点击进入审批吧！</div>",
+                'url'=>C('qiye_url')."/Admin/Index/Main.html?action=ProjectCost/project_offer",
+                'tableName'=>$this->pOfferCom->tableName(),
+                'tableId'=>$parent_oid,
+                'nowhite' => 'nowhite',
+            ];
+            $this->add_push($addData);
+        }
+        
+        // if(!$insert){
+        //     // $addData['noappr'] = 'noappr';
+        // }
         // $this->add_push($addData);
 
         $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);

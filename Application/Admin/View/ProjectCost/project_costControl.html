@@ -621,6 +621,8 @@
 
             $(tabId+" .global-modal").on("change",".modal-info[name='project_id']",function(){
                 pcost_project_auth()
+                $(tabId+" .global-modal .box-group ").find(".panel").remove();
+                pcDel = [];
             })
         })
     </script>
