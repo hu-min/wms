@@ -151,7 +151,7 @@ class UserController extends BaseController{
             $error = "密码和原密码一致，无需修改";
         }
         $samePhone = $this->userCom->getOne(['where' => ['phone'=>$userInfo["phone"]],"fields"=>"userId"]);
-        if($samePhone){
+        if($samePhone && $samePhone['userId'] != $userInfo["userId"]){
             $this->ajaxReturn(['errCode'=>100,'error'=>'手机号码已存在！','reqType'=>$reqType]);
         }
         $updateResult = $this->userCom->updateUser($userInfo);
