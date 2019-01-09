@@ -177,6 +177,7 @@
                     poPanelObj.find(".cost-class-alpha").text(alpha(subElement['class_sort']))
                     poPanelObj.find(".cost_class_div").addClass('none')
                     // poPanelObj.find(".add-costItem").removeClass('none')
+                    // console.log()
                     if(in_array(info['status'],[0,3,10]) && in_array("{$Think.session.userId}",[info['ouser_id'],info['puser_id']])){
                         poPanelObj.find(".add-costItem").removeClass('none') 
                     }else{
@@ -187,16 +188,21 @@
                             poPanelObj.find(".class-rowspan").remove()
 
                         }else{
-                            poPanelObj.removeClass('box-info')
-                            poPanelObj.addClass('box-primary');
                             poPanelObj.find(".add-costItem").removeClass('none') 
                         }
+                    }
+                    if(subElement['read_type'] > 1){
+                        poPanelObj.removeClass('box-info')
+                        poPanelObj.addClass('box-primary');
+                    }
+                    if("{$nodeAuth}" >= 7){
+                        poPanelObj.find(".add-costItem").removeClass('none') 
                     }
                     
                     // if(subElement['read_type'] < 2){
                     //     poPanelObj.find(".add-costItem").remove()
                     //     poPanelObj.find(".class-rowspan").remove()
-                    // }else{
+                    // }else{cost_item_del
                     //     poPanelObj.removeClass('box-info')
                     //     poPanelObj.addClass('box-primary');
                     //     poPanelObj.find(".add-costItem").removeClass('none') 
@@ -222,7 +228,7 @@
                     if(modalName!="auth_user_id" && "{$nodeAuth}" < 7 && !in_array(info['status'],[0,3,10] ) ){
                         poItemOjc.find(".modal-info[name='"+modalName+"']").prop("disabled",true)
                     }
-                    if(in_array(info['status'],[0,3,10]) && !in_array("{$Think.session.userId}",[info['ouser_id'],info['puser_id']]) && subElement['read_type'] < 2){
+                    if(in_array(info['status'],[0,3,10]) && !in_array("{$Think.session.userId}",[info['ouser_id'],info['puser_id']]) && subElement['read_type'] < 2 ){
                         poItemOjc.find(".modal-info[name='"+modalName+"']").prop("disabled",true)
                     }
                 });
@@ -263,7 +269,10 @@
                 }else if(subElement['class_sub'] == 0){
                     poItemOjc.find('td').eq(1).remove();
                 }
-                poItemOjc.find('.cost_item_del').remove();
+                if("{$nodeAuth}" < 7){
+                    poItemOjc.find('.cost_item_del').remove();
+                }
+                
                 if(subElement['read_type'] < 2){
                     poItemOjc.find(".class-rowspan").remove()
                 }
@@ -334,11 +343,12 @@
         }
         //获取数据
         var pcost_control_getInfo = function($this){
-            datas["status"] = 2
-            if($($this).data('savetype') && $($this).data('savetype') == "draft"){
-                datas["status"] = 10;
-            }
             datas["data"] = {};
+            datas['data']["status"] = 2
+            if($($this).data('savetype') && $($this).data('savetype') == "draft"){
+                datas['data']["status"] = 10;
+            }
+            
             datas["data"]['project_id'] = $(tabId+" .global-modal").find(".modal-info[name='project_id']").val();
             if(datas["data"]['project_id']<=0){
                 notice(110,"请选择项目","输入异常");
@@ -418,7 +428,8 @@
                 var cost_user = String($project.find("option:selected").data('cost')).split(",")
                 var user_id = $project.find("option:selected").data('user')
                 offer_user.push(user_id)
-                if(in_array("{$Think.session.userId}",offer_user)){
+               
+                if(in_array("{$Think.session.userId}",offer_user) || "{$nodeAuth}" < 7){
                     $(tabId+" .global-modal").find(".add-costClass").eq(0).removeClass("none")
                 }else{
                     $(tabId+" .global-modal").find(".add-costClass").eq(0).addClass("none")
@@ -623,6 +634,13 @@
                 pcost_project_auth()
                 $(tabId+" .global-modal .box-group ").find(".panel").remove();
                 pcDel = [];
+            })
+            //更改税率
+            $(tabId+" .global-modal").on("input",".modal-info[name='tax_rate']",function(){
+                var tax_rate = $(this).val();
+                if(tax_rate>0){
+                    cost_compute_count();
+                }
             })
         })
     </script>

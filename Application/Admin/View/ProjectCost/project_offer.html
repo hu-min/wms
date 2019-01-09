@@ -217,12 +217,13 @@
         //获取数据
         var project_offer_getInfo = function($this){
             // datas["status"] = 2
+            datas["data"] = {};
             if($($this).data('savetype') && $($this).data('savetype') == "draft"){
-                datas["status"] = 10;
+                datas['data']["status"] = 10;
             }
             var status = $(tabId+" .global-modal").find(".modal-info[name='status']").val()
-            datas["status"] = status != "" ? status : 2
-            datas["data"] = {};
+            datas['data']["status"] = status != "" ? status : 2
+            
             datas["data"]['project_id'] = $(tabId+" .global-modal").find(".modal-info[name='project_id']").val()
             if(datas["data"]['project_id']<=0){
                 notice(110,"请选择项目","输入异常");

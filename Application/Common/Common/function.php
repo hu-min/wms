@@ -203,7 +203,9 @@ function status_group($param=[]){
             if($index == $status){
                 echo '<button type="button" name="'.$index.'" class="btn btn-default btn-sm status-btn"><i class="fa fa-check-square text-'.$scolor.'"></i> '.$statusType[$index].' </button>';
             }else{
-                echo '<button type="button" name="'.$index.'" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-'.$scolor.'"></i> '.$statusType[$index].' </button>';
+                if($index != 10){
+                    echo '<button type="button" name="'.$index.'" class="btn btn-default btn-sm status-btn"><i class="fa fa-square text-'.$scolor.'"></i> '.$statusType[$index].' </button>';
+                }
             }
         }
         
@@ -361,6 +363,7 @@ function approve_btn($tableName,$param=[]){
  */
 function save_btn($defind_vars,$always=false,$hide=false){
     $processAuth = $defind_vars["processAuth"];
+    
     $nodeAuth = $defind_vars["nodeAuth"];
     $controlName = $defind_vars["controlName"];
     $tableName = $defind_vars["tableName"];
@@ -379,7 +382,7 @@ function save_btn($defind_vars,$always=false,$hide=false){
         echo "<button type='button' class='btn btn-sm btn-primary save-info none' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>{$btnTitle}</button>";
     }
     // echo $item['status'],",";
-    if((in_array($item['status'],[0,3,10]) && in_array($userId,[$item['user_id'],$item['puser_id']])) || $gettype == "Add"){
+    if((in_array($item['status'],[0,3,10]) && in_array($userId,[$item['user_id'],$item['puser_id']])) || $gettype == "Add" || $nodeAuth >= 7){
         echo "<button type='button' class='btn btn-sm bg-maroon save-info' data-status='10' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>储存草稿</button>";
     }
     
