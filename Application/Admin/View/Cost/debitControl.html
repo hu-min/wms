@@ -240,7 +240,10 @@
                     $(tabId+" .global-modal").find(".common-info[name='section']").trigger("chosen:updated")
                 }
             });
-            project_debit_set(info.list);
+            if(info.list){
+                project_debit_set(info.list);
+            }
+            // project_debit_set(info.list);
             pedbit_compute()
 
             

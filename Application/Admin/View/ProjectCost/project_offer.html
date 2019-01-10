@@ -76,6 +76,7 @@
                                 <th>报价</th>
                                 <th>增值税率</th>
                                 <th>含税报价</th> 
+                                <th>实际报价</th> 
                                 <th>审批备注</th>         
                                 <th>审批记录</th>
                                 <th>状态</th>
@@ -135,6 +136,10 @@
             });
             $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val(info['id'])
             $(tabId+" .global-modal").find(".all-count").text(info['total']);
+            if(!info['actual_money']){
+                info['actual_money'] = info['total']
+            }
+            $(tabId+" .global-modal").find(".modal-info[name='actual_money']").val(info['actual_money']);
             $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(info['tax_rate']/100))*info['total']));
 
             if(info['status'] == 1){
@@ -209,6 +214,7 @@
             })
             // console.log($allCount)
             $(tabId+" .global-modal").find(".all-count").text(float_format($allCount));
+            $(tabId+" .global-modal").find(".modal-info[name='actual_money']").val(float_format($allCount));
 
             var taxRate = $(tabId+" .global-modal").find(".tax-rate").val(); 
             // console.log(taxRate)
@@ -237,6 +243,7 @@
             }
             datas["data"]['tax_rate'] = $(tabId+" .global-modal").find(".modal-info[name='tax_rate']").val();
             datas["data"]['total'] = $(tabId+" .global-modal").find(".all-count").text();
+            datas["data"]['actual_money'] = $(tabId+" .global-modal").find(".modal-info[name='actual_money']").val();
             datas["data"]['id'] = $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val();
             datas["data"]['list'] = []
             

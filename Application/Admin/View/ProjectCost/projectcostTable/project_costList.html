@@ -8,6 +8,7 @@
         <td>{$item['user_name']}</td>
         <td>{$item['add_time']}</td>
         <td>{$item['total']}</td>
+        <td>{$item['actual_money']|default=$item['total']}</td>
         <if condition="$listType eq 'cost' or $listType eq 'contrast'">
             <td>{$item['cost_total']|default=0}</td>
         </if>

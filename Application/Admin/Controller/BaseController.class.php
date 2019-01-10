@@ -449,7 +449,9 @@ class BaseController extends \Common\Controller\BaseController{
             if($seniorResult->errCode!==0){
                 $this->ajaxReturn(['errCode'=>$seniorResult->errCode,'error'=>$seniorResult->error]);
             }
-            if($db!='v_purcha'){
+            if($db == 'v_project'){
+                getComponent('Project')->delRelation($id);
+            }else if($db!='v_purcha'){
                 $conResult=$dbObject->where([$dbObject->getPk()=>$id])->delete();
             }else{
                 $id = $id ? $id : 0;

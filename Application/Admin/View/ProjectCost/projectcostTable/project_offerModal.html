@@ -50,9 +50,10 @@
                         
                     </div>
                     <div class="row" style="text-align: right;font-size: 1.2em;font-weight: bold;padding-right: 50px;">
-                        报价总计：<span class="all-count">0</span> | 
+                        报价总计：<span class="all-count" style="cursor:pointer;">0</span> | 
                         增值税率：<span ><input class="tax-rate modal-info" name="tax_rate" type="text" placeholder="税率" value="6" /> % </span> | 
-                        报价含税总计：<span class="taxed-count">0</span>
+                        报价含税总计：<span class="taxed-count">0</span> | 
+                        实际报价：<input class="modal-info" style="width: 100px;" name="actual_money" value="0" type="text">
                         <if condition="$listType eq 'cost' or $listType eq 'contrast'">
                             |    成本总计：<span class="cost-all-count">0</span>
                             |    利润：<span class="profit-all-count">0</span>

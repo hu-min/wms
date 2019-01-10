@@ -155,4 +155,13 @@ class ProjectController extends BaseController{
         $param['data']['user_id'] = $cuser_id;
         $costCom->update($param);
     }
+    /** 
+     * @Author: vition 
+     * @Date: 2019-01-10 16:19:42 
+     * @Desc: 删除项目相关 
+     */    
+    function delRelation($project_id){
+        // $debitCom = A('Component/Debit');
+        // $expenseCom =  A('Component/Expense');
+    }
 }

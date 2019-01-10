@@ -79,6 +79,7 @@
                                 <th>成本编辑</th>
                                 <th>报价时间</th>
                                 <th>报价</th>
+                                <th>实际报价</th>
                                 <th>成本</th>
                                 <th>增值税率</th>
                                 <th>含税报价</th>
@@ -156,11 +157,16 @@
             $(tabId+" .global-modal").find(".modal-footer .modal-info[name='oid']").val(info['oid'])
 
             $(tabId+" .global-modal").find(".all-count").text(info['total']);
+            if(!info['actual_money']){
+                info['actual_money'] = info['total']
+            }
+            $(tabId+" .global-modal").find(".modal-info[name='actual_money']").val(info['actual_money']);
+            
             $(tabId+" .global-modal").find(".cost-all-count").text(info['cost_total'] ? info['cost_total'] : "0.00");
-            $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(info['tax_rate']/100))*info['total']));
+            $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(info['tax_rate']/100))*info['actual_money']));
 
-            var profitAllCount = float(float(info['total']) - float(info['cost_total']));
-            var profitratAllCount = float(profitAllCount / float(info['total'])*100);
+            var profitAllCount = float(float(info['actual_money']) - float(info['cost_total']));
+            var profitratAllCount = float(profitAllCount / float(info['actual_money'])*100);
             $(tabId+" .global-modal").find(".profit-all-count").text(float_format(profitAllCount));
             $(tabId+" .global-modal").find(".profitrat-all-count").text(float_format(profitratAllCount));
 
@@ -317,11 +323,19 @@
             })
             // console.log($allCount)
             $(tabId+" .global-modal").find(".all-count").text(float_format($allCount));
+            $(tabId+" .global-modal").find(".modal-info[name='actual_money']").val(float_format($allCount));
 
             var taxRate = $(tabId+" .global-modal").find(".tax-rate").val(); 
             // console.log(taxRate)
             $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(taxRate/100))*$allCount));
+            cost_compute_profit($allCount)
+            
 
+            // var taxRate = $(tabId+" .global-modal").find(".tax-rate").val(); 
+            // console.log(taxRate)
+            // $(tabId+" .global-modal").find(".taxed-count").text(float((1+float(taxRate/100))*$allCount));
+        }
+        var cost_compute_profit = function ($allCount){
             $costAllCount = 0
             $(tabId+" .global-modal").find(".cost-class-count").each(function(){
                 var count = $(this).text()
@@ -336,10 +350,6 @@
             var allProfitRat = (float(allProfit)/float($allCount))*100;
             $(tabId+" .global-modal").find(".profit-all-count").text(float_format(allProfit));
             $(tabId+" .global-modal").find(".profitrat-all-count").text(float_format(allProfitRat));
-
-            // var taxRate = $(tabId+" .global-modal").find(".tax-rate").val(); 
-            // console.log(taxRate)
-            // $(tabId+" .global-modal").find(".taxed-count").text(float((1+float(taxRate/100))*$allCount));
         }
         //获取数据
         var pcost_control_getInfo = function($this){
@@ -363,6 +373,7 @@
             }
             
             datas["data"]['total'] = $(tabId+" .global-modal").find(".all-count").text();
+            datas["data"]['actual_money'] = $(tabId+" .global-modal").find(".modal-info[name='actual_money']").val();
             datas["data"]['cost_total'] = $(tabId+" .global-modal").find(".cost-all-count").text();
             datas["data"]['id'] = $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val();
             datas["data"]['oid'] = $(tabId+" .global-modal").find(".modal-footer .modal-info[name='oid']").val();
@@ -615,6 +626,14 @@
                 $tr.find(".modal-info[name='profit_ratio']").val(float_format(profit_ratio));
                 cost_compute_count()
             })
+            $(tabId+" .global-modal").on("input",".modal-info[name='actual_money']",function(){ 
+                cost_compute_profit($(this).val())
+            })
+            $(tabId+" .global-modal").on("click",".all-count",function(){ 
+                cost_compute_profit($(this).text())
+                $(tabId+" .global-modal").find(".modal-info[name='actual_money']").val($(this).text());
+            })
+            
             //供应商选择
             $(tabId+" .global-modal").on("change",".modal-info[name='scompany_id']",function(){
                 var $authUser = $(this).parents("tr").find(".modal-info[name='auth_user_id']")

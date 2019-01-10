@@ -11,7 +11,8 @@
             <td>{$item['cost_total']|default=0}</td>
         </if>
         <td>{$item['tax_rate']}</td>
-        <td>{:round($item['total']*(1+$item['tax_rate']/100),2)}</td>  
+        <td>{:round($item['total']*(1+$item['tax_rate']/100),2)}</td>
+        <td>{$item['actual_money']|default=$item['total']}</td>
         <if condition="$listType eq 'contrast'">
             <td>{$item['profit']|default=0}</td>
             <td>{$item['profit_ratio']|default=0}</td>

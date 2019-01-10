@@ -65,7 +65,7 @@ class ProjectCostController extends BaseController{
             $offerCostCom = $this->pCostCom;
             $parent_id = 'parent_cid';
             $joins = [
-                "LEFT JOIN (SELECT id oid,project_id o_project_id , section o_section,flag o_flag,total,tax_rate,user_id ouser_id FROM v_project_offer ) o ON o.o_project_id = project_id AND o.o_section = section ",
+                "LEFT JOIN (SELECT id oid,project_id o_project_id , section o_section,flag o_flag,total,actual_money,tax_rate,user_id ouser_id FROM v_project_offer ) o ON o.o_project_id = project_id AND o.o_section = section ",
                 "LEFT JOIN (SELECT userId, userName ouser_name FROM v_user ) ou ON ou.userId = o.ouser_id ",
             ];
         }
@@ -406,7 +406,7 @@ class ProjectCostController extends BaseController{
             
             $offerCostCom = $this->pCostCom;
             $joins2 = [
-                "LEFT JOIN (SELECT project_id o_project_id , section o_section,flag o_flag,total,tax_rate,user_id ouser_id FROM v_project_offer ) o ON o.o_project_id = project_id AND o.o_section = section ",
+                "LEFT JOIN (SELECT project_id o_project_id , section o_section,flag o_flag,total,actual_money,tax_rate,user_id ouser_id FROM v_project_offer ) o ON o.o_project_id = project_id AND o.o_section = section ",
                 "LEFT JOIN (SELECT userId, userName ouser_name FROM v_user ) ou ON ou.userId = ouser_id ",
             ];
             $listTemplate = 'project_costList';
@@ -738,6 +738,7 @@ class ProjectCostController extends BaseController{
                 'total' => $data['total'],
                 'tax_rate' => $data['tax_rate'],
                 'flag' => $data['flag'],
+                'actual_money' => $data['actual_money'],
                 'update_time' => time(),
             ]
         ];
