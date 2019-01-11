@@ -143,7 +143,7 @@ class UserController extends BaseController{
             if($wxResult['errcode']!=0){
                 $this->ajaxReturn(['errCode'=>$wxResult['errcode'],'error'=>$wxResult['error']]);
             }
-            $userInfo['qiye_id'] = $userInfo['qiye_id'];
+            $userInfo['qiye_id'] = $wxResult['qiye_id'];
         }
         $samePwd = $this->userCom->getOne(['where' => ['userId'=>$userInfo["userId"],"password"=>$userInfo['password']],"fields"=>"userId"]);
         $error = getError(100);
