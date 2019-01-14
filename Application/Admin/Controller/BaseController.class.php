@@ -868,6 +868,7 @@ class BaseController extends \Common\Controller\BaseController{
         }
         $nowhite = isset($param['nowhite']) ? false : true; // 默认判断白名单
         $noappr = isset($param['noappr']) ? false : true; //默认发送审批记录
+        $remark = isset($param['remark']) ? $param['remark'] : '';
         $limitWhite = false;
         if($nowhite){
             $limitWhite = $this->whiteCom->limitWhite(session('roleId'),$touserRoleId,true);
@@ -897,10 +898,10 @@ class BaseController extends \Common\Controller\BaseController{
         if($noappr){
             if($tableIds){
                 foreach ($tableIds as $tid) {
-                    $this->ApprLogCom->createApp($tableName,$tid,session("userId"),"");
+                    $this->ApprLogCom->createApp($tableName,$tid,session("userId"),$remark);
                 }
             }else{
-                $this->ApprLogCom->createApp($tableName,$tableId,session("userId"),"");
+                $this->ApprLogCom->createApp($tableName,$tableId,session("userId"),$remark);
             }
             
 

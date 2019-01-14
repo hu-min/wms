@@ -611,6 +611,7 @@ class ProjectCostController extends BaseController{
                 $offerCostCom->commit();
                 $this->pCostSubCom->commit();
                 if($data['status'] != 10){
+                    $remark  = $pOfferData['status'] == 1 ? '直接操作状态为审批' : '';
                     $addData = [
                         'examine'=>$pOfferData['examine'],
                         'title'=>session('userName')."添加了项目报价",
@@ -619,6 +620,7 @@ class ProjectCostController extends BaseController{
                         'tableName'=>$offerCostCom->tableName(),
                         'tableId'=>$parent_id,
                         'nowhite'=>"nowhite",
+                        'remark' => $remark,
                     ];
                     $this->add_push($addData);
                 }
@@ -692,6 +694,7 @@ class ProjectCostController extends BaseController{
             $this->ApprLogCom->updateStatus($this->pOfferCom->tableName(),$pOfferData["where"]["id"]);
         }
         if(in_array($offerResult["status"],[3,10]) && $pOfferData['data']['status'] != 10){
+            $remark  = $pOfferData['data']['status'] == 1 ? '直接操作状态为审批' : '';
             $addData = [
                 'examine'=>$offerResult['examine'],
                 'title'=>session('userName')."添加了项目报价",
@@ -699,6 +702,7 @@ class ProjectCostController extends BaseController{
                 'url'=>C('qiye_url')."/Admin/Index/Main.html?action=ProjectCost/project_offer",
                 'tableName'=>$this->pOfferCom->tableName(),
                 'tableId'=>$pOfferData["where"]["id"],
+                'remark' => $remark,
                 // 'nowhite'=>"nowhite",
             ];
             $this->add_push($addData);
@@ -902,6 +906,7 @@ class ProjectCostController extends BaseController{
             // $this->ApprLogCom->insert($parameter);
         }else{
             if($costResult['status'] == 10 && $pCostData['data']['status'] !=10 ){
+                $remark  = $pCostData['data']['status'] == 1 ? '直接操作状态为审批' : '';
                 $addData = [
                     'examine'=>$costResult['examine'],
                     'title'=>session('userName')."添加了项目报价成本",
@@ -910,12 +915,14 @@ class ProjectCostController extends BaseController{
                     'tableName'=>$this->pCostCom->tableName(),
                     'tableId'=>$parent_id,
                     'nowhite' => 'nowhite',
+                    'remark' => $remark,
                 ];
                 $this->add_push($addData);
             }
         }
         
         if(($offerResult['status'] == 10 && (isset($pOfferData['data']['status']) && $pOfferData['data']['status'] != 10)) || ($insert && $pOfferData['data']['status'] != 10) ){
+            $remark  = $pOfferData['data']['status'] == 1 ? '直接操作状态为审批' : '';
             $addData = [
                 'examine'=>$offerResult['examine'],
                 'title'=>session('userName')."添加了项目报价",
@@ -924,6 +931,7 @@ class ProjectCostController extends BaseController{
                 'tableName'=>$this->pOfferCom->tableName(),
                 'tableId'=>$parent_oid,
                 'nowhite' => 'nowhite',
+                'remark' => $remark,
             ];
             $this->add_push($addData);
         }

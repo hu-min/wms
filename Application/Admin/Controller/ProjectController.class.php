@@ -517,6 +517,7 @@ class ProjectController extends BaseController{
                 // }
                 // $this->ApprLogCom->createApp($this->projectCom->tableName(),$insertResult->data,session("userId"),"");
                 if($datas['status'] != 10){
+                    $remark  = $projectInfo['status'] == 1 ? '直接操作状态为审批' : '';
                     $addData = [
                         'examine'=>$projectInfo['examine'],
                         'title'=>"立项【{$projectInfo['name']}】",
@@ -525,6 +526,7 @@ class ProjectController extends BaseController{
                         'tableName'=>$this->projectCom->tableName(),
                         'tableId'=> $insertResult->data,
                         'touser' => $touser,
+                        'remark' => $remark,
                     ];
                     $this->add_push($addData);
                 }
@@ -589,7 +591,7 @@ class ProjectController extends BaseController{
                 if(!empty($userArray)){
                     $touser = $this->userCom->getQiyeId($userArray);
                 }
-
+                $remark  = $projectInfo['data']['status'] == 1 ? '直接操作状态为审批' : '';
                 $addData = [
                     'examine'=>$projectInfo['data']['examine'],
                     'title'=>"立项【".$projectInfo['data']['name']."】",
@@ -598,6 +600,7 @@ class ProjectController extends BaseController{
                     'tableName'=>$this->projectCom->tableName(),
                     'tableId'=> $projectInfo['where']['projectId'],
                     'touser' => $touser,
+                    'remark' => $remark,
                 ];
                 $this->add_push($addData);
             }
