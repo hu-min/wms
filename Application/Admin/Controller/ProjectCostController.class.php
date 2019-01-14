@@ -15,7 +15,7 @@ class ProjectCostController extends BaseController{
         $this->pOfferCom=getComponent('ProjectOffer');
         $this->pCostCom=getComponent('ProjectCost');
         $this->pCostSubCom=getComponent('ProjectCostSub');
-        
+        $this->pDPlaceCom=getComponent('ProjectDatePlace');
 
         // $this->supplierCom=getComponent('Supplier');
         // $this->purchaCom=getComponent('Purcha');
@@ -205,8 +205,31 @@ class ProjectCostController extends BaseController{
                 "LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct ON ct.ctid = p.city AND ct.cpid =  p.province",
             ]
         ];
+        if($con != "project_offer"){
+            array_push($param['joins'],"LEFT JOIN (SELECT project_id o_project_id , section o_section,flag o_flag,total,actual_money,tax_rate,user_id ouser_id FROM v_project_offer ) o ON o.o_project_id = project_id AND o.o_section = section ");
+        }
         $projectCostData = $offerCostCom ->getOne($param);
         $newFileName = $projectCostData['project_name'].$nameEX ;
+
+        $dparam = [
+            'fields' => "start_date,end_date,city_id,city_name",
+            'where' => ['project_id' => $projectCostData['project_id']],
+            'joins' => [
+                'LEFT JOIN (SELECT cid,city city_name FROM v_city) c ON c.cid = city_id',
+            ]
+        ];
+        $datePlaceResult = $this->pDPlaceCom->getList($dparam);
+        $projectCostData['citys'] = "";
+        $projectCostData['dates'] = "";
+        if($datePlaceResult){
+            $projectCostData['citys'] = implode(",",array_column($datePlaceResult['list'],"city_name"));
+            foreach ($datePlaceResult['list'] as $dateInfo) {
+                $projectCostData['dates'] .= date("Y/m/d",$dateInfo['start_date'])."-".date("Y/m/d",$dateInfo['end_date']).";";
+            }
+        }
+        
+
+
         // if($con == "pcost_control" || $con == "project_costCon"){
         //     $projectCostData = $this->pCostCom->getOne($param);
         //     $newFileName = $projectCostData['project_name']."【成本对照】".date('Ymd', time()) ;
@@ -220,8 +243,8 @@ class ProjectCostController extends BaseController{
         $objActSheet->setCellValue ( 'D1', $projectCostData['customer_com_name']);
         $objActSheet->setCellValue ( 'D3', date("Y/m/d") );
         $objActSheet->setCellValue ( 'D5', $projectCostData['project_name'] );
-        $objActSheet->setCellValue ( 'D6', $projectCostData['project_date'].'-'.$projectCostData['end_date'] );
-        $objActSheet->setCellValue ( 'D7', $projectCostData['province_name'].'-'.$projectCostData['city_name'] );
+        $objActSheet->setCellValue ( 'D6', $projectCostData['dates'] );
+        $objActSheet->setCellValue ( 'D7', $projectCostData['citys'] );
         $objActSheet->setCellValue ( 'B9', $projectCostData['project_name']);
         $cost_class = "";
         $item_count = [];
@@ -339,6 +362,11 @@ class ProjectCostController extends BaseController{
         $sRow++;
         $objActSheet->setCellValue("J{$sRow}",'总计');
         $objActSheet->setCellValue("K{$sRow}",round($all_count+$all_rateCount,2));
+        if($projectCostData['actual_money'] > 0 && $projectCostData['actual_money']!=$all_count){
+            $sRow++;
+            $objActSheet->setCellValue("J{$sRow}",'优惠价');
+            $objActSheet->setCellValue("K{$sRow}",round($projectCostData['actual_money'],2));
+        }
     }
     function pcost_control_import(){
         exit;
