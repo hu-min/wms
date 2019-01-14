@@ -20,130 +20,161 @@
                                     </a>
                                 </h4>
                             </div>
-                        <div id="collapseOne" class="panel-collapse collapse in">
-                            <div class="box-body">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label >立项或添加项目场次：</label>
-                                            <select class="form-control modal-info chosen-project chosen-select" title="立项或添加场次" data-value="projectId"  data-text="name" name="project_id">
-                                                <option value="">立项</option>
-                                                <volist name="projectArr" id="item">
-                                                    <option value="{$item['projectId']}">{$item['name']}</option>
-                                                </volist>
-                                            </select>
+                            <div id="collapseOne" class="panel-collapse collapse in">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label >立项或添加项目场次：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="立项或添加场次" data-value="projectId"  data-text="name" name="project_id">
+                                                    <option value="">立项</option>
+                                                    <volist name="projectArr" id="item">
+                                                        <option value="{$item['projectId']}">{$item['name']}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">项目名称：</label>
+                                                <input class="form-control modal-info datetime" name="name" title="项目名称" required="required" placeholder="项目名称" type="text">
+                                            </div>                        
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label >品牌：</label>
+                                                <select class="form-control modal-info chosen-project required="required" chosen-select" title="品牌" data-value="basicId"  data-text="name" name="brand">
+                                                    <option value="">选择品牌</option>
+                                                    <volist name="brandArr" id="item">
+                                                        <option value="{$item['basicId']}">{$item['name']}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">项目名称：</label>
-                                            <input class="form-control modal-info datetime" name="name" title="项目名称" required="required" placeholder="项目名称" type="text">
-                                        </div>                        
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label >品牌：</label>
-                                            <select class="form-control modal-info chosen-project required="required" chosen-select" title="品牌" data-value="basicId"  data-text="name" name="brand">
-                                                <option value="">选择品牌</option>
-                                                <volist name="brandArr" id="item">
-                                                    <option value="{$item['basicId']}">{$item['name']}</option>
-                                                </volist>
-                                            </select>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">签约公司：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" data-value="companyId" required="required"  data-text="company" data-cname="customer_cont" title="签约公司" name="customer_com">
+                                                    <option value="" >选择签约公司</option>
+                                                    <volist name="cusComArr" id="item">
+                                                        <option value="{$item['companyId']}">{$item['company']}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">客户担当：</label>
+                                                <select class="form-control modal-info chosen-project chosen-select" title="客户担当" data-value="contactId"  data-text="contact" data-pname="customer_com" name="customer_cont">
+                                                    <option value="">客户</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">项目编号：</label>
+                                                <input class="form-control modal-info datetime" name="code" title="项目编号" required="required" value="" placeholder="项目编号" type="text">
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">签约公司：</label>
-                                            <select class="form-control modal-info chosen-project chosen-select" data-value="companyId" required="required"  data-text="company" data-cname="customer_cont" title="签约公司" name="customer_com">
-                                                <option value="" >选择签约公司</option>
-                                                <volist name="cusComArr" id="item">
-                                                    <option value="{$item['companyId']}">{$item['company']}</option>
-                                                </volist>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">客户担当：</label>
-                                            <select class="form-control modal-info chosen-project chosen-select" title="客户担当" data-value="contactId"  data-text="contact" data-pname="customer_com" name="customer_cont">
-                                                <option value="">客户</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">项目编号：</label>
-                                            <input class="form-control modal-info datetime" name="code" title="项目编号" required="required" value="" placeholder="项目编号" type="text">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">项目日期：</label>
-                                            <div class="input-group date">
-                                                <div class="input-group-addon">
-                                                    <i class="fa fa-calendar"></i>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">项目日期：</label>
+                                                <div class="input-group date">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-calendar"></i>
+                                                    </div>
+                                                    <input class="form-control pull-right date-input modal-info" name="project_time" type="text">
                                                 </div>
-                                                <input class="form-control pull-right date-input modal-info" name="project_time" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">项目天数：</label>
+                                                <input class="form-control modal-info datetime" name="days" title="项目天数" placeholder="项目天数" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">总场次：</label>
+                                                <input class="form-control modal-info datetime" value="1" name="session_all" title="总场次" placeholder="总场次" type="text">
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">项目天数：</label>
-                                            <input class="form-control modal-info datetime" name="days" title="项目天数" placeholder="项目天数" type="text">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">当前场次：</label>
+                                                <input class="form-control modal-info datetime" value="1" readonly name="session_cur" title="当前场次" placeholder="当前场次" type="text">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">总场次：</label>
-                                            <input class="form-control modal-info datetime" value="1" name="session_all" title="总场次" placeholder="总场次" type="text">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">合同金额：</label>
+                                                <input class="form-control modal-info datetime" required="required" name="amount" title="合同金额" placeholder="合同金额" type="text">
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">当前场次：</label>
-                                            <input class="form-control modal-info datetime" value="1" readonly name="session_cur" title="当前场次" placeholder="当前场次" type="text">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">合同金额：</label>
-                                            <input class="form-control modal-info datetime" required="required" name="amount" title="合同金额" placeholder="合同金额" type="text">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">客户其他人员：</label>
-                                            <input class="form-control modal-info datetime" name="customer_other" title="当前场次" placeholder="当前场次" type="text">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">上传合同：</label>
-                                            <div class="input-group">
-                                                <input class="form-control modal-info upload-file" name="contract" type="text">
-                                                <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">客户其他人员：</label>
+                                                <input class="form-control modal-info datetime" name="customer_other" title="客户其他人员" placeholder="客户其他人员" type="text">
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="info-title">成本预算：</label>
-                                            <input class="form-control modal-info" name="cost_budget" title="成本预算" placeholder="成本预算" type="text">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">上传合同：</label>
+                                                <div class="input-group">
+                                                    <input class="form-control modal-info upload-file" name="contract" type="text">
+                                                    <span class="input-group-addon show-media"><i class="fa fa-eye"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="info-title">成本预算：</label>
+                                                <input class="form-control modal-info" name="cost_budget" title="成本预算" placeholder="成本预算" type="text">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                        <div class="panel box box-info">
+                            <div class="box-header with-border">
+                                <h4 class="box-title">
+                                    <a data-toggle="collapse" data-parent="#{$vtabId}-accordion" href="#collapseFour">
+                                    项目时间及场地
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseFour" class="panel-collapse collapse">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <button type="button" class="btn btn-info btn-xs add-dateplace"><i class="fa fa-plus-square"></i> <span> 添加时间及场地 </span> </button>
+                                        </div>
+                                    </div>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>活动日期</th>
+                                                <th>项目省份</th>
+                                                <th>项目城市</th>
+                                                <th>项目场地</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="dateplace-table">
+                                            
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                         <div class="panel box box-danger">
                             <div class="box-header with-border">
                                 <h4 class="box-title">
@@ -155,7 +186,7 @@
                                 <div id="collapseTwo" class="panel-collapse collapse">
                                 <div class="box-body">
                                     <div class="row">
-                                        <div class="col-md-4">
+                                        <!-- <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="info-title">项目省份：</label>
                                                 <select class="form-control modal-info chosen-project chosen-select" title="项目省份" name="province" data-cname="city">
@@ -184,7 +215,7 @@
                                                     </volist>
                                                 </select>
                                             </div>
-                                        </div>
+                                        </div> -->
                                     </div>
                                     <div class="row">
                                         <div class="col-md-4">

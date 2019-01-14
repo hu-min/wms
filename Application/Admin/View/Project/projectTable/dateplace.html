@@ -1,0 +1,24 @@
+<tr>
+    <td>
+        <input type="hidden" class="modal-dateplace-info" name="id" value="0">
+        <input class="form-control pull-right input-sm date-input modal-dateplace-info" data-range="true" name="place_date" style="font-size:12px;" type="text">
+    </td>
+    <td>
+        <select class="form-control modal-dateplace-info chosen-project chosen-select" title="项目省份" data-type="province" name="province_id" data-cname="city_id">
+            <option value="">省份</option>
+            <volist name="provinceArr" id="item">
+                <option value="{$item['pid']}">{$item['province']}</option>
+            </volist>
+        </select>
+    </td>
+    <td>
+        <select class="form-control modal-dateplace-info chosen-project chosen-select" data-value="cid"  data-text="city" data-noupdate="true" data-pname="province_id" title="城市" name="city_id" data-type="city" data-cname="place_id">
+            <option value="">城市</option>
+        </select>
+    </td>
+    <td>
+        <select class="form-control modal-dateplace-info chosen-project chosen-select" title="项目场地" name="place_id" data-value="id" data-type="qplace" data-gpname="province_id" data-pname="city_id" reqtype="text" data-text="title" data-extra="lat,lng">
+            <option value="">场地</option>
+        </select>
+    </td>
+</tr>

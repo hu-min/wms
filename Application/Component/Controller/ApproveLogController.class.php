@@ -54,7 +54,7 @@ class ApproveLogController extends BaseController{
             if(isset($updateRes->errCode) && $updateRes->errCode == 0){
                 
                 $db->startTrans();
-                $db -> where([$db->getPk()=>$id])->save(["status"=>0,"process_level"=>1]);
+                $db -> where([$db->getPk()=>$id])->save(["status"=>2,"process_level"=>1]);
                 $this->commit();
                 $db->commit();  
             }else{

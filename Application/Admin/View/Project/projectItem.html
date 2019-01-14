@@ -130,7 +130,9 @@
     </div>
     <!-- date-range-picker -->
     <script>
+        var dateplace = "";
         var  project_file_initInfo = function(){
+            
             upload({url:"{:U('Project/upload_filesAdd')}"})
             $(tabId+" .files-modal").offon("click",".add-filecom",function(){
                 var fileCom = $(tabId+" .files-modal .demo").clone()
@@ -164,6 +166,28 @@
                 throw "没有添加任何文件";
             }
         };
+        var project_appInfo = function(){
+            datas['data']["dateplace"] = []
+            $(tabId+" .global-modal").find(".dateplace-table tr").each(function(){
+                var temp = {}
+                $(this).find(".modal-dateplace-info").each(function(){
+                    var name = $(this).attr("name");
+                    var title = $(this).attr("title");
+                    var val = $(this).val();
+                    if(val != ""){
+                        temp[name] = val
+                    }
+                    if(name=="place_id"){
+                        temp["place"] = $(this).find("option:selected").text();
+                        temp["lat"] = $(this).find("option:selected").data("lat");
+                        temp["lng"] = $(this).find("option:selected").data("lng");
+                    }
+                })
+                if(temp['place_id']>0 && temp['place_date'] !="" ){
+                    datas['data']["dateplace"].push(temp);
+                }
+            })
+        }
         $(function(){
             init_chosen("{$url}","getOptionList",".search-body");
             // upload({url:"{:U('Project/upload_filesAdd')}"})
@@ -217,18 +241,31 @@
                     $(tabId+" .global-modal .bid-group").prop("required",false);
                 }
             })
+            $(tabId+" .global-modal").on("click",".add-dateplace",function(){ 
+                $(tabId+" .global-modal .dateplace-table").append(dateplace);
+                var parent_ele = $(tabId+" .global-modal .dateplace-table").find("tr").last()
+                init_chosen("{$url}","getOptionList",parent_ele);
+                init_date(false,parent_ele);
+            })
         })
-        function project_initInfo(){
-            init_chosen("{$url}","getOptionList",".global-modal");
-            upload({url:"{:U('Project/upload_filesAdd')}"})
-            init_date();
-            var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
+        function project_initInfo(gettype,data){
+            
+            upload({url:"{:U('Project/upload_filesAdd')}"});
+            
+            // var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
             if(gettype == "Add"){
                 $(tabId+" .global-modal").find(".approve-group").remove();
+                dateplace = data['dateplace']
+                // console.log(dateplace)
+                $(tabId+" .global-modal .dateplace-table").html(dateplace);
+                init_chosen("{$url}","getOptionList",".global-modal");
+                init_date();
             }
+            
         }
 
         function project_setInfo(info){
+            dateplace = info['dateplace']
             //立项和场次
             if(info["project_id"] == 0){
                 $(tabId+" .chosen-select[name='project_id']").find("option[value='']").prop("selected",true);
@@ -255,11 +292,11 @@
                 if(info[element]>0){
                     if(select.find("option[value='"+info[element]+"']").length==0){
                         if(element=="city"){
-                            var city_optoin = '<option value="">城市</option>'
-                            info["citys"].forEach(city => {
-                                city_optoin+='<option value="'+city["cid"]+'">'+city["city"]+'</option>'
-                            });
-                            select.html(city_optoin);
+                            // var city_optoin = '<option value="">城市</option>'
+                            // info["citys"].forEach(city => {
+                            //     city_optoin+='<option value="'+city["cid"]+'">'+city["city"]+'</option>'
+                            // });
+                            // select.html(city_optoin);
                         }else{
                             select.append("<option value='"+info[element]+"'>"+info[element+"_name"]+"</option>")
                         }
@@ -314,14 +351,35 @@
                     // }
                 }
             });
-            // console.log(info['process_level'])
-            // console.log(info['status'])
-            // console.log("{$nodeAuth}")
-            // console.log("{$gettype}")
-            // console.log(info['user_id'])
-            // console.log("{$Think.session.userId}")
+            init_chosen("{$url}","getOptionList",".global-modal");
+            init_date();
+            info['dateplaceList'].forEach(placeInfo =>{
+                $dateplace = $(dateplace);
+
+                var city_optoin = '<option value="">城市</option>';
+                placeInfo["citys"].forEach(city => {
+                    city_optoin += '<option value="'+city["cid"]+'">'+city["city"]+'</option>';
+                });
+
+                $dateplace.find(".modal-dateplace-info[name='city_id']").html(city_optoin);
+
+                var place_optoin = '<option data-lat="'+placeInfo['lat']+'" data-lng="'+placeInfo['lng']+'" value="'+placeInfo['place_id']+'">'+placeInfo['place']+'</option>';
+                $dateplace.find(".modal-dateplace-info[name='place_id']").append(place_optoin);
+
+                ['id','province_id','city_id','place_date','place_id'].forEach(key => {
+                    $dateplace.find(".modal-dateplace-info[name='"+key+"']").val(placeInfo[key]);
+                });
+
+                $(tabId+" .global-modal .dateplace-table").append($dateplace);
+                var parent_ele = $(tabId+" .global-modal .dateplace-table").find("tr").last();
+                init_chosen("{$url}","getOptionList",parent_ele);
+                init_date(false,parent_ele);
+            });
             if(( (info['status'] != 10 && info['status'] > 0) || info['user_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3){
-                $(tabId+" .modal-info").prop("disabled",true)
+                $(tabId+" .global-modal").find(".modal-info").prop("disabled",true)
+                $(tabId+" .global-modal").find(".modal-dateplace-info").prop("disabled",true)
+                $(tabId+" .global-modal").find('.chosen-select').trigger("chosen:updated");
+                $(tabId+" .global-modal").find(".add-dateplace").addClass("none");
             }
             // //设置审批按钮状态
             // console.log(info['process_level'])
@@ -331,14 +389,14 @@
 
             if(info['process_level'] > info['place'] || info['status'] ==3){
                 // console.log(info);
-                if(info["user_id"] == "{$Think.session.userId}"){
-                    $(tabId+" .global-modal").find(".approve-group .approve-con").remove();
-                }else{
-                    $(tabId+" .global-modal").find(".approve-group .approve-con").addClass("disabled");
-                    $(tabId+" .global-modal").find(".approve-group .approve-con").prop("disabled",true);
-                }
+                // if(info["user_id"] == "{$Think.session.userId}"){
+                //     $(tabId+" .global-modal").find(".approve-group .approve-con").remove();
+                // }else{
+                //     $(tabId+" .global-modal").find(".approve-group .approve-con").addClass("disabled");
+                //     $(tabId+" .global-modal").find(".approve-group .approve-con").prop("disabled",true);
+                // }
             }else if(info['place']==0){
-                $(tabId+" .global-modal").find(".approve-group .approve-con").remove();
+                // $(tabId+" .global-modal").find(".approve-group .approve-con").remove();
             }
             if(info['status'] == 1 && in_array("{$Think.session.userId}",[info['business'],info['user_id']])){
                 if("{$Think.session.userId}" == info['business']){
@@ -347,7 +405,7 @@
                     $(tabId+" .global-modal").find(".modal-info[name='offer_user']").prop("disabled",false);
                     $(tabId+" .global-modal").find(".modal-info[name='cost_user']").prop("disabled",false);
                 }
-                
+                $(tabId+" .global-modal").find('.chosen-select').trigger("chosen:updated");
             }else if(info['status'] == 1){
                 // $(tabId+" .global-modal .modal-footer").find(".save-info").reomve();
             }

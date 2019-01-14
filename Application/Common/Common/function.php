@@ -753,7 +753,28 @@ function chinese_num($num){
     }
     return $chinesNum;
 }
+/** 
+ * @Author: vition 
+ * @Date: 2019-01-11 09:18:18 
+ * @Desc: 数字转字母 
+ */
 function num_alpha($num){
     $alphas = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
     return $alphas[$num];
 }
+/** 
+ * @Author: vition 
+ * @Date: 2019-01-11 09:19:46 
+ * @Desc: get 获取数据 
+ */
+function curlGet($url){
+    $ch = curl_init(); // 创建一个 cURL 资源 
+    curl_setopt($ch, CURLOPT_URL, $url); // CURLOPT_URL 目标 url 地址 
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE); 
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // CURLOPT_RETURNTRANSFER 返回原生的（Raw）输出 
+    $output = curl_exec($ch); 
+    curl_close($ch);
+
+    return $output;
+} 

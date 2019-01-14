@@ -1,6 +1,6 @@
 var datas={};
 var filesData={};
-var uploadData = {}
+var uploadData = {};
 var tempFiles = {};
 var tabId="";//定义当前tab指定的id
 var delList = null;//定义要删除的列表位置
@@ -109,7 +109,7 @@ $(document).on("click",".search-list,.vpage,.excel-export",function(){
     datas.reqType=reqtype;
 
     if(fun_is_exits(con+"_searchInfo")){
-        eval(con+"_searchInfo()")//对不同的id设置不同的发送数据
+        (new Function(con+"_searchInfo()"))();
     }else{
         datas['data']={}
         $(tabId+" .search-info").each(function(){
@@ -146,7 +146,8 @@ function searchFun(option){
             $(tabId+" ."+page).html(result.page);
             $(tabId+" ."+count).html(result.count);
             if(fun_is_exits(callfun+"")){
-                eval(callfun+"(result.data)")//
+                (new Function("param1",callfun+"(param1)"))(result.data);
+                // eval(callfun+"(result.data)")//
             }
             var noData = result.table == '<tr><td colspan="'+tdNum+'">无数据</td></tr>' ? true : false
             // console.log(tabId+" ."+table)
@@ -278,7 +279,8 @@ $(document).on("click",".v-showmodal",function(){
     datas.con = con
     datas.reqType = con+"_modalOne"
     if(fun_is_exits(con+"_showInfo")){
-        eval(con+"_showInfo(this)");//对不同的模块设置不同的响应数据
+        (new Function("param1",con+"_showInfo(param1)"))(this);
+        // eval(con+"_showInfo(this)");//对不同的模块设置不同的响应数据
     }
     // var hasData = $(tabId+" "+vtarget+" .modal-content").find(".modal-footer .save-info").data("gettype");
     // if(hasData !== undefined && datas.gettype  == 'Add' && hasData == "Add"){
@@ -298,12 +300,13 @@ $(document).on("click",".v-showmodal",function(){
                 
                 // $("[required='required']").before('<span class="required"></span>');
                 if(fun_is_exits(con+"_setInfo")){
-                    eval(con+"_setInfo(result.data)");//对不同的模块设置不同的响应数据
+                    (new Function("param1",con+"_setInfo(param1)"))(result.data);
+                    // eval(con+"_setInfo(result.data)");//对不同的模块设置不同的响应数据
                 }
             }
             if(fun_is_exits(con+"_initInfo")){
-                // console.log(gettype)
-                eval(con+"_initInfo(gettype,result.data)");//
+                (new Function("param1","param2",con+"_initInfo(param1,param2)"))(gettype,result.data);
+                // eval(con+"_initInfo(gettype,result.data)");//
             }
         }
     },false)
@@ -359,7 +362,8 @@ $(document).on("click",'.search-refresh',function(){
     })
     var con=$(this).data("con")
     if(fun_is_exits(con+"_resetInfo")){
-	    eval(con+"_resetInfo()");//弥补不足
+        (new Function(con+"_resetInfo()"))();
+	    // eval(con+"_resetInfo()");//弥补不足
     }
 })
 /** 
@@ -390,7 +394,8 @@ $(document).on("click",'.save-info',function(){
     datas.reqType=con+gettype;
     
     if(fun_is_exits(con+"_getInfo")){
-    	eval(con+"_getInfo(this)");//对不同的id设置不同的发送数据
+        (new Function("param1",con+"_getInfo(param1)"))(this);
+    	// eval(con+"_getInfo(this)");//对不同的id设置不同的发送数据
     }else{
         datas["data"]={}
         var global_modal = ""
@@ -411,6 +416,7 @@ $(document).on("click",'.save-info',function(){
             }else{
                 var val =$(this).val();
             }
+            console.log(name+":"+val)
             if(required && (val=="" || val == "0")){
                 notice(110,title,"输入异常");
                 throw title
@@ -418,6 +424,10 @@ $(document).on("click",'.save-info',function(){
                 datas["data"][name]=val;
             }
         })
+        if(fun_is_exits(con+"_appInfo")){
+            (new Function("param1",con+"_appInfo(param1)"))(this);
+            // eval(con+"_appInfo(this)");//
+        }
     }
     if(JSON.stringify(filesData)!="{}"){
         datas['filesData']=filesData //存在文件上传
@@ -425,7 +435,6 @@ $(document).on("click",'.save-info',function(){
     if(JSON.stringify(datas["data"])=="{}"){
         notice(110,"没有更新数据")
     }
-    // console.log(datas)
     if(status){
         if(datas["status"] !==undefined){
             datas['status'] = status
@@ -436,7 +445,7 @@ $(document).on("click",'.save-info',function(){
         if(datas["status"] == 10){
             datas['status'] = 2
         }else if(datas["data"]['status'] == 10){
-            datas["data"]['status'] = status
+            datas["data"]['status'] = 2
         }
     } 
     post(url,datas,function(result){
@@ -456,7 +465,8 @@ $(document).on("click",'.save-info',function(){
             var count=con+"-count";
             datas.reqType=reqtype;
             if(fun_is_exits(con+"_searchInfo")){
-                eval(con+"_searchInfo(result)")//对不同的id设置不同的发送数据
+                (new Function("param1",con+"_searchInfo(param1)"))(result);
+                // eval(con+"_searchInfo(result)")//对不同的id设置不同的发送数据
             }else{
                 datas['data']={}
                 $(tabId+" .search-info").each(function(){
@@ -568,7 +578,8 @@ $(document).on("click",".submit-status",function(){
         notice(result.errCode,result.error);
         if(result.errCode==0){
             if(fun_is_exits(con+"_searchInfo")){
-                eval(con+"_searchInfo(result)")//对不同的id设置不同的发送数据
+                (new Function("param1",con+"_searchInfo(param1)"))(result);
+                // eval(con+"_searchInfo(result)")//对不同的id设置不同的发送数据
             }else{
                 datas['data']={}
                 $(tabId+" .search-info").each(function(){
@@ -944,7 +955,8 @@ $(function(){
                         var count=con+"-count";
                         datas.reqType=reqtype;
                         if(fun_is_exits(con+"_searchInfo")){
-                            eval(con+"_searchInfo(result)")//对不同的id设置不同的发送数据
+                            (new Function("param1",con+"_searchInfo(param1)"))(result);
+                            // eval(con+"_searchInfo(result)")//对不同的id设置不同的发送数据
                         }else{
                             datas['data']={}
                             $(tabId+" .search-info").each(function(){
@@ -1074,7 +1086,7 @@ function formatDate(date){
 function fun_is_exits(funcName){
     try {
         if (typeof(eval(funcName)) == "function") {
- 	   return true;
+ 	        return true;
         }
    } catch(e) {}
    return false;

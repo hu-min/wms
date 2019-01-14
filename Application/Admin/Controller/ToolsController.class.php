@@ -304,7 +304,7 @@ class ToolsController extends BaseController{
                         "add_time" => time(),
                         "user_id" => $examineRes['user_id'],
                         "status" => $status, //审批流程里的状态是实际状态
-                        "remark" => '审批者(角色)与申请者(角色)一致自动审批',
+                        "remark" => '审批者(角色)与申请者/编辑者(角色)一致自动审批',
                     ];
 
                     if($tableIds){

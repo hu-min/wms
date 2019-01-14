@@ -21,6 +21,7 @@ class ProjectController extends BaseController{
         $this->InvoiceCom=getComponent('Invoice');
         $this->payCom=getComponent('Pay');
         $this->moneyAccCom=getComponent('MoneyAccount');
+        $this->pDPlaceCom=getComponent('ProjectDatePlace');
         $this->processArr=["0"=>"沟通","1"=>"完结","2"=>"裁决","3"=>"提案","4"=>"签约","5"=>"LOST","6"=>"筹备","7"=>"执行","8"=>"完成"];
         $this->dateArr=["0"=>"立项日期","1"=>"提案日期","2"=>"项目日期","3"=>"结束日期"];
 
@@ -147,15 +148,16 @@ class ProjectController extends BaseController{
             $resultData["bid_date"] = date("Y-m-d",$resultData["bid_date"]);
             $resultData["bid_time"] = date("H:i:s",$resultData["bid_time"]);
             $resultData["end_date"] = date("Y-m-d",strtotime($resultData["project_time"]." +".$resultData["days"]."day"));
-            $resultData["citys"] = $this->basicCom->get_citys($resultData["province"]);
+
+            // $resultData["citys"] = $this->basicCom->get_citys($resultData["province"]);
             
-            $parameter=[
-                'where'=>$where,
-                'fields'=>"basicId,name",
-                'orderStr'=>"basicId DESC",
-            ];
-            $result=$this->basicCom->getBasicList($parameter);
-            $resultData["execute_subs"] = $this->basicCom->get_citys($resultData["province"]);
+            // $parameter=[
+            //     'where'=>$where,
+            //     'fields'=>"basicId,name",
+            //     'orderStr'=>"basicId DESC",
+            // ];
+            // $result=$this->basicCom->getBasicList($parameter);
+            // $resultData["execute_subs"] = $this->basicCom->get_citys($resultData["province"]);
             $parameter=[
                 'where'=>["userId"=>["IN",array_unique(explode(",",$resultData["earlier_user"].",".$resultData["scene_user"]))]],
                 'fields'=>"userId,userName,roleName",
@@ -164,6 +166,22 @@ class ProjectController extends BaseController{
             ];
             $result=$this->userCom->getUserList($parameter);
             $resultData["user_ids"]=$result["list"];
+
+            $dparam = [
+                'where' => ['project_id' => $id],
+            ];
+            $resultData['dateplaceList'] = [];
+            $datePlaceResult = $this->pDPlaceCom->getList($dparam);
+            foreach ($datePlaceResult['list'] as $dplaceInfo) {
+                $dplaceInfo['citys'] = $this->basicCom->get_citys($dplaceInfo["province_id"]);
+                $dplaceInfo['place_date'] = "";
+                if(date("Y-m-d",$dplaceInfo['start_date']) != "1970-01-01"){
+                    $dplaceInfo['place_date'] = date("Y-m-d",$dplaceInfo['start_date'])." - ".date("Y-m-d",$dplaceInfo['end_date']);
+                }
+                unset($dplaceInfo['start_date'],$dplaceInfo['end_date']);
+                array_push($resultData['dateplaceList'],$dplaceInfo);
+            }
+            unset($datePlaceResult);
         }
         if($this->nodeAuth[CONTROLLER_NAME.'/'.ACTION_NAME] >= 7 || ($resultData['business'] == session('userId')) || ($resultData['user_id'] == session('userId')) ){
             
@@ -173,6 +191,7 @@ class ProjectController extends BaseController{
         if($onlydata){
             $this->ajaxReturn(["data"=>$resultData]);
         }
+        $resultData['dateplace'] = $this->fetch('Project/projectTable/dateplace');
         $modalPara=[
             "data"=>$resultData,
             "title"=>$title,
@@ -324,7 +343,8 @@ class ProjectController extends BaseController{
      */    
     function manageProjectInfo(){
         $reqType=I("reqType");
-        $datas=I("data");
+        $datas = I("data");
+
         $isDraft = false;
         $datas['project_id'] = $datas['project_id'] > 0? $datas['project_id'] : 0;
         if(isset($datas['earlier_user'])){
@@ -397,11 +417,15 @@ class ProjectController extends BaseController{
         }else if($reqType=="projectEdit"){
             $where=["projectId"=>$datas['projectId']];
             $data=[];
-            $redit = true;
             
             $keyArray = ['project_id','amount','bid_date','contract','bid_time','bidding','brand','city','code','create_time','user_id','customer_com','customer_cont','customer_other','days','earlier_user','execute_sub','execute','field','is_bid','business','leader','name','project_time','project_id','projectType','province','scene_user','session_all','type','session_cur','stage','status','cost_budget','offer_user','cost_user'];
             
-            $projectResult =$this->projectCom->getOne(['where'=>$where,"one"=>true,"fields"=>'user_id,business,status,stage,offer_user,cost_user']);
+            $projectResult =$this->projectCom->getOne(['where'=>$where,"one"=>true,"fields"=>'user_id,business,status,stage,offer_user,cost_user,process_level']);
+            if($projectResult["status"] == 3 && $projectResult["user_id"] == session('userId')){
+                $redit = true;
+            }else{
+                $redit = false;
+            }
             if($projectResult["status"] == 10){
                 $isDraft = true;
                 if( $datas['status'] != 10){
@@ -424,7 +448,14 @@ class ProjectController extends BaseController{
                 }
             }
             if(isset($datas['status'])){
-                $data['status'] = $datas['status'] == 3 ? 0 : $datas['status'];
+
+                $data['status'] = !in_array(session('userId'),[$projectResult["user_id"]]) ? ( ($projectResult['status'] == 10 && $data['status'] == 2) ? $projectResult['status'] : $data['status']) : (in_array($projectResult['status'],[3,10] && $data['status'] != 10 ) ? 2 : $data['status']);
+
+                if($data['status'] != 10 && $projectResult['process_level'] == 0){
+                    $data['process_level'] = 1;
+                }elseif($data['status'] == 10 && $projectResult['process_level'] > 0){
+                    $data['process_level'] = 0;
+                }
                 // $parameter=[
                 //     'where'=>["projectId"=>$datas['projectId']],
                 // ];
@@ -443,8 +474,10 @@ class ProjectController extends BaseController{
      * @Desc: 项目添加 
      */    
     function projectAdd(){
-        $datas=I("data");
-        $projectInfo=$this->manageProjectInfo();
+        $datas = I("data");
+        $projectInfo = $this->manageProjectInfo();
+        unset($projectInfo['dateplace']);
+        $dateplace = $datas['dateplace'];
         // print_r($projectInfo);exit;
         $touser = "";
         if($projectInfo){
@@ -464,6 +497,19 @@ class ProjectController extends BaseController{
             }
             $insertResult=$this->projectCom->insertProject($projectInfo);
             if($insertResult && $insertResult->errCode==0){
+                //插入时间和场地数据
+                foreach ($dateplace as $dplceInfo) {
+                    $dplceInfo['project_id'] = $insertResult->data;
+                    $placeDataArr = explode(" - ",$dplceInfo['place_date']);
+                    $dplceInfo['start_date'] = strtotime($placeDataArr[0]);
+                    $dplceInfo['end_date'] = strtotime($placeDataArr[1]);
+                    $dplceInfo['add_time'] = time();
+                    unset($dplceInfo['place_date']); 
+                    unset($dplceInfo['id']); 
+                    $this->pDPlaceCom->insert($dplceInfo);
+                }
+                
+
                 // if(!empty($touser)){
                 //     $desc = "<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."创建了项目【{$projectInfo['name']}】，当中@了你，来围观吧！</div>";
                 //     $url = C('qiye_url')."/Admin/Index/Main.html?action=Project/projectItem";
@@ -499,7 +545,25 @@ class ProjectController extends BaseController{
     function projectEdit(){
         $projectInfo = $this->manageProjectInfo();
         // $this->is_project_draft();
+        if($projectInfo['redit']){
+            $projectInfo['data']['process_level'] = 1;
+        }
         $updateResult=$this->projectCom->updateProject($projectInfo);
+        $datas = I("data");
+        foreach ($datas['dateplace'] as $dplceInfo) {
+            $dplceInfo['project_id'] = $projectInfo["where"]["projectId"];
+            $placeDataArr = explode(" - ",$dplceInfo['place_date']);
+            $dplceInfo['start_date'] = strtotime($placeDataArr[0]);
+            $dplceInfo['end_date'] = strtotime($placeDataArr[1]);
+            unset($dplceInfo['place_date']); 
+            if($dplceInfo['id']>0){
+                $dplceInfo['update_time'] = time();
+                $updateResult = $this->pDPlaceCom->update(['where'=>['id'=>$dplceInfo['id']],'data'=>$dplceInfo]);
+            }else{
+                $dplceInfo['add_time'] = time();
+                $updateResult = $this->pDPlaceCom->insert($dplceInfo);
+            }
+        }
         if(isset($updateResult->errCode) && $updateResult->errCode == 0 && $projectInfo['redit']){
             $this->ApprLogCom->updateStatus($this->projectCom->tableName(),$projectInfo["where"]["projectId"]);
         }
@@ -508,6 +572,7 @@ class ProjectController extends BaseController{
         }
         // $this->log($projectInfo);
         if($projectInfo['isDraft'] || $projectInfo['redit']){
+            
             if($projectInfo['data']['status'] != 10){
                 $touser = "";
                 $userArray = [];

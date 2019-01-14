@@ -186,6 +186,7 @@ class CommonController extends \Common\Controller\BaseController{
                 break;
             //用户
             case 'user': case 'create_user': case 'business': case 'leader': case 'earlier_user': case 'scene_user': case 'user_id' : case 'to_user' :
+                $where["status"] = 1;
                 if($key!=""){
                     $where["userName"]=["LIKE","%{$key}%"];
                 }
@@ -347,6 +348,22 @@ class CommonController extends \Common\Controller\BaseController{
                 if($result){
                     return $result["list"];
                 }               
+                break;
+            case 'qplace':
+                $region = I("ptext");
+                if($key == ""){
+                    $key  = $region;
+                }
+                $url = C("qapis")."?region={$region}&keyword={$key}&key=".C("qmap_key");
+                $suggestion = json_decode(curlGet($url),true);
+                if($suggestion['status'] === 0){
+                    foreach ($suggestion['data'] as $key => $value) {
+                        $suggestion['data'][$key] = array_merge($value,$value['location']);
+                        unset($suggestion['data'][$key]['location']);
+                    }
+                    return $suggestion['data'];
+                }
+                return [];
                 break;
             default:
                 return [];

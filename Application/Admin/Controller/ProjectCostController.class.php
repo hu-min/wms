@@ -609,6 +609,8 @@ class ProjectCostController extends BaseController{
         $where=["id"=>$data['id']];
         $offerResult =$this->pOfferCom->getOne(['where'=>$where,"one"=>true]);
 
+        $projectResult =$this->projectCom->getOne(['where'=>["projectId"=>$data['project_id']],"one"=>true,"fields"=>'user_id,business,status,stage,offer_user,cost_user']);
+
         $this->pOfferCom->startTrans();
         
         $pOfferData = [
@@ -628,14 +630,20 @@ class ProjectCostController extends BaseController{
         
         $pOfferData['data']['status'] = $data['status'];
 
-        if($offerResult["status"] == 10){
+        if($offerResult["status"] == 10 && in_array(session('userId'),[$projectResult["user_id"],$projectResult["offer_user"]])){
             $isDraft = true;
             if( $data['status'] != 10){
                 $pOfferData['data']['process_level'] = 1; 
                 $pOfferData['data']['status'] = 2;
             }
         }
-  
+        $pOfferData['data']['status'] = !in_array(session('userId'),[$projectResult["user_id"],$projectResult["offer_user"]]) ? ( ($offerResult['status'] == 10 && $data['status'] == 2) ? $offerResult['status'] : $data['status']) : (in_array($offerResult['status'],[3,10] && $data['status'] != 10 ) ? 2 : $data['status']);
+
+        if($pOfferData['data']['status'] != 10 && $offerResult['process_level'] == 0){
+            $pOfferData['data']['process_level'] = 1;
+        }elseif($pOfferData['data']['status'] == 10 && $offerResult['process_level'] > 0){
+            $pOfferData['data']['process_level'] = 0;
+        }
         $pInsertResult = $this->pOfferCom->update($pOfferData);
 
         foreach ($data['list'] as  $subData) {
@@ -714,8 +722,8 @@ class ProjectCostController extends BaseController{
             $pResult['cost_budget'] = $pResult['cost_budget'] - $cost_total;
         }
         // $this->log($pResult['cost_budget']);exit();
-        $offerResult =$this->pOfferCom->getOne(['where'=>['id'=>$data['oid']],"one"=>true,"fields"=>'user_id,examine,status']);
-        $costResult =$this->pCostCom->getOne(['where'=>['id'=>$data['id']],"one"=>true,"fields"=>'user_id,examine,status']);
+        $offerResult =$this->pOfferCom->getOne(['where'=>['id'=>$data['oid']],"one"=>true,"fields"=>'user_id,examine,status,process_level']);
+        $costResult =$this->pCostCom->getOne(['where'=>['id'=>$data['id']],"one"=>true,"fields"=>'user_id,examine,status,process_level']);
         // if($pResult['cost_budget'] > 0 && $data['cost_total'] > $pResult['cost_budget']){
         //     $this->ajaxReturn(['errCode'=>100,'error'=>"添加的成本超过"]);
         // }
@@ -760,31 +768,71 @@ class ProjectCostController extends BaseController{
         
         // $pCostData['data']['process_level'] = $examines["process_level"];
         // $pCostData['data']['status'] = $examines["status"];
-        //判断是草稿还是直接提交
-        if($data['status'] == 10){
-            $pCostData['data']['process_level'] = 0;
+        //如果当前用户是立项人或者报价编辑者
+        if(in_array(session("userId"),[$pResult['offer_user'],$pResult['user_id']])){
+            if(in_array($pResult['status'],[3,10] && $data['status'] != 10 )){
+                $pOfferData['data']['status'] = 2;
+            }else{
+                $pOfferData['data']['status'] = $data['status'];
+            }
         }else{
-            $pCostData['data']['process_level'] = $examines["process_level"];
+            if($offerResult['status'] == 10 && $data['status'] == 2 ){
+                $pOfferData['data']['status'] = $offerResult['status'];
+            }else{
+                $pOfferData['data']['status'] = $data['status'];
+            }
         }
-        $pCostData['data']['status'] = $data['status'];
-        if( in_array(session("userId"),[$pResult['offer_user'],$pResult['user_id']]) && $offerResult['status'] == 10 && $data['status'] !=10 ){
+        if($pOfferData['data']['status'] != 10 && $offerResult['process_level'] == 0){
             $pOfferData['data']['process_level'] = 1;
-            $pOfferData['data']['status'] = 2;
-        }elseif(in_array(session("userId"),[$pResult['offer_user'],$pResult['user_id']])){
-            $pOfferData['data']['process_level'] = $pCostData['data']['process_level'];
-            $pOfferData['data']['status'] = $pCostData['data']['status'];
+        }elseif($pOfferData['data']['status'] == 10 && $offerResult['process_level'] > 0){
+            $pOfferData['data']['process_level'] = 0;
         }
+        //如果当前用户是立项人或者成本编辑者
+        if(in_array(session("userId"),[$pResult['cost_user'],$pResult['user_id']])){
+            if(in_array($pResult['status'],[3,10] && $data['status'] != 10 )){
+                $pCostData['data']['status'] = 2;
+            }else{
+                $pCostData['data']['status'] = $data['status'];
+            }
+        }else{
+            if($costResult['status'] == 10 && $data['status'] == 2 ){
+                $pCostData['data']['status'] = $costResult['status'];
+            }else{
+                $pCostData['data']['status'] = $data['status'];
+            }
+        }
+        if($pCostData['data']['status'] != 10 && $costResult['process_level'] == 0){
+            $pCostData['data']['process_level'] = 1;
+        }elseif($pCostData['data']['status'] == 10 && $costResult['process_level'] > 0){
+            $pCostData['data']['process_level'] = 0;
+        }
+        //判断是草稿还是直接提交
+        // if($data['status'] == 10){
+        //     $pCostData['data']['process_level'] = 0;
+        // }else{
+        //     $pCostData['data']['process_level'] = $examines["process_level"];
+        // }
+
+        // $pCostData['data']['status'] = $data['status'];
+        // if( in_array(session("userId"),[$pResult['offer_user'],$pResult['user_id']]) && $offerResult['status'] == 10 && $data['status'] !=10 ){
+        //     $pOfferData['data']['process_level'] = 1;
+        //     $pOfferData['data']['status'] = 2;
+        // }elseif(in_array(session("userId"),[$pResult['offer_user'],$pResult['user_id']])){
+        //     $pOfferData['data']['process_level'] = $pCostData['data']['process_level'];
+        //     $pOfferData['data']['status'] = $pCostData['data']['status'];
+        // }
         // print_r($pCostData);exit;
-        $this->log($pOfferData);
+        // $this->log($pOfferData);
         $pOfferUpdate = $this->pOfferCom->update($pOfferData);
         $costNoApply = false;
      
-        if($pResult['cost_budget'] > 0 && $data['cost_total'] <= $pResult['cost_budget'] && $data['status'] != 10 ){
+        if(in_array(session("userId"),[$pResult['cost_user'],$pResult['user_id']]) && $pResult['cost_budget'] > 0 && $data['cost_total'] <= $pResult['cost_budget'] && $data['status'] != 10 ){
             //成本没超过预算成本，不需要审核
             $pCostData['data']['process_level'] = count(explode(",",$costResult['examine']));
             $pCostData['data']['status'] = 1;
             $costNoApply = true;
         }
+        // print_r($pCostData);exit;
         $pCostUpdate = $this->pCostCom->update($pCostData);
 
         foreach ($data['list'] as  $subData) {
@@ -811,6 +859,9 @@ class ProjectCostController extends BaseController{
                 $upateResult = $this->pCostSubCom->insert($infoData);
                 // print_r($infoData);
             }
+        }
+        if(in_array(session("userId"),[$pResult['cost_user'],$pResult['user_id']]) && $costResult['status'] == 3 && in_array($pCostData['data']['status'],[0,1,2])){
+            $this->ApprLogCom->updateStatus($this->pCostCom->tableName(),$pCostData["where"]["id"]);
         }
         // exit;
         // $this->ApprLogCom->updateStatus($this->pCostCom->tableName(),$data['id']);
