@@ -172,6 +172,10 @@
                         poItemOjc.find(".modal-info[name='"+modalName+"']").val(subElement[modalName])
                     }
                 });
+                if(subElement['costed']>0){
+                    poItemOjc.find(".cost_item_del").addClass("none")
+                    $(tabId+" .global-modal .box-group ").find(".panel").last().find(".cost_chosen_del").addClass("none")
+                }
                 if(item_count[subElement['class_sort']] !=undefined){
                     item_count[subElement['class_sort']] += float(subElement['total'])
                 }else{

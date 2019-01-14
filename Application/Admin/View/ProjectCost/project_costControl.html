@@ -228,7 +228,7 @@
                 var poItemOjc = $(poItem);
                 // console.log(poItemOjc.find(".cost_item_del"))
                 // poItemOjc.find(".cost_item_del").remove()
-                ['id','class_notes','classify','sort','item_content','num','unit','act_num','act_unit','price','total','cost_total','profit','profit_ratio','auth_user_id'].forEach(modalName => { 
+                ['id','class_notes','classify','sort','item_content','num','unit','act_num','act_unit','price','total','cost_total','profit','profit_ratio','auth_user_id'].forEach(modalName => {
                     if(modalName == 'sort'){
                         poItemOjc.find(".modal-info[name='"+modalName+"']").text(alpha(subElement['class_sort'])+subElement[modalName])
                     }else{
@@ -241,6 +241,10 @@
                         poItemOjc.find(".modal-info[name='"+modalName+"']").prop("disabled",true)
                     }
                 });
+                if(subElement['costed']>0){
+                    poItemOjc.find(".cost_item_del").addClass("none")
+                    $(tabId+" .global-modal .box-group ").find(".panel").last().find(".cost_chosen_del").addClass("none")
+                }
                 // console.log(subElement['scompany_id'])
                 //供应商和供应商联系人
                 var option = "<option value=''>没有供应商</option>";
