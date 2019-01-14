@@ -542,6 +542,7 @@ class PurchaController extends BaseController{
             $redisName="purapplyList";
             $parameter=[
                 'fields'=>"*,FROM_UNIXTIME(sign_date,'%Y-%m-%d') sign_date ",
+                'one' => true,
                 'where'=>['id'=>$id],
                 "joins"=>[
                     'LEFT JOIN (SELECT id s_id , read_type s_read_type , parent_cid s_parent_cid , class_sort s_class_sort , cost_class s_cost_class , class_sub s_class_sub , class_notes s_class_notes , classify s_classify , sort s_sort , item_content s_item_content , num s_num , unit s_unit , price s_price , act_num s_act_num , act_unit s_act_unit , total s_total , cost_price s_cost_price ,SUM(cost_total) s_cost_total , profit s_profit , profit_ratio s_profit_ratio , remark s_remark , ouser_id s_ouser_id , cuser_id s_cuser_id , add_time s_add_time , update_time s_update_time , status s_status , scompany_id s_scompany_id , scompany_cid s_scompany_cid,COUNT(id) item_num FROM v_project_cost_sub WHERE scompany_id > 0 GROUP BY parent_cid,scompany_cid) pcs ON pcs.s_parent_cid = cost_id AND pcs.s_scompany_id = supplier_id',
@@ -556,7 +557,7 @@ class PurchaController extends BaseController{
                     // 'LEFT JOIN (SELECT id wid , cost_id,supplier_id,contract_file FROM v_wouldpay) w ON w.cost_id = pcs.s_parent_id AND w.supplier_id = pcs.s_scompany_id',
                 ],
             ];
-            $resultData = $this->wouldpayCom->getOne($parameter)['list'];
+            $resultData = $this->wouldpayCom->getOne($parameter);
             if($resultData['module']){
                 $param = [
                     'fields'=>"GROUP_CONCAT(name) modules",
@@ -571,12 +572,18 @@ class PurchaController extends BaseController{
                 }
             }
             $resultData["tableData"] = [];
+            $resultData["tableData"]["cost-list"] = ["list"=>$this->pCostSubCom->getList(["where"=>["parent_cid"=>$resultData['cost_id'],"scompany_id"=>$resultData['supplier_id']],"fields"=>"cost_class,cost_class_name,class_notes,classify,module_name,item_content,num,cost_price,cost_total",'joins'=>['LEFT JOIN (SELECT basicId mid, name module_name FROM v_basic WHERE class ="module" ) mo ON mo.mid = classify','LEFT JOIN (SELECT basicId, name cost_class_name FROM v_basic WHERE class ="costClass" ) bc ON bc.basicId = cost_class',]])["list"]];
+
             $resultData["tableData"]["suprpay-list"] = ["list"=>$this->payCom->getList(["where"=>["purcha_id"=>$id,"insert_type"=>1],"fields"=>"*,FROM_UNIXTIME(pay_date,'%Y-%m-%d') pay_date"])["list"]];
             // $resultData["tableData"]["suprfina-list"] = ["list"=>$this->payCom->getList(["where"=>["purcha_id"=>$id,"insert_type"=>2],"fields"=>"*,FROM_UNIXTIME(pay_date,'%Y-%m-%d') pay_date"])["list"],"template"=>$this->fetch('Purcha/purchaTable/suprfinapayLi')];
             $resultData["tableData"]["invoice-list"] = ["list"=>$this->InvoiceCom->getList(["where"=>["relation_id"=>$id,"relation_type"=>1],"fields"=>"*,FROM_UNIXTIME(invoice_date,'%Y-%m-%d') invoice_date"])["list"]];
+
+
         }
+        $resultData['costLiItem'] = $this->fetch('Purcha/purchaTable/costLi');
         $resultData['getSuprpayLiItem'] = $this->fetch('Purcha/purchaTable/suprpayitem');
         $resultData['suprInvoiceLiItem'] = $this->fetch('Purcha/purchaTable/invoiceLi');
+        
 
         $modalPara=[
             "data"=>$resultData,
