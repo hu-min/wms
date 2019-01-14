@@ -62,6 +62,51 @@ class BasicController extends BaseController{
         }else{
             return $cityList;
         }
+    }
+    /** 
+     * @Author: vition 
+     * @Date: 2018-05-24 06:43:12 
+     * @Desc: 获取费用类型节点 
+     */ 
+    function getFeeTypeTree(){
+        Vendor("levelTree.levelTree");
+        $levelTree=new \levelTree();
+        $parameter=[
+            'where'=>["class"=>"feeType"],
+            'page'=>0,
+            'pageSize'=>999999,
+            'orderStr'=>'level DESC',
+        ];
+        $feeTypeResult=$this->getList($parameter);
+        $feeTypeTree=[];
+        $level=[];
         
+        $feeTypeArray=$feeTypeResult["list"];
+        foreach ($feeTypeArray AS $key => $feeTypeInfo) {
+            $level[$feeTypeInfo["level"]][$feeTypeInfo["Pid"]][]= $feeTypeInfo;
+            unset($feeTypeArray[$key]);
+        }
+        $this->Redis->set("feeTypeArray",json_encode($feeTypeResult["list"]),3600);
+        asort($level);
+        
+        $levelTree->setKeys(["idName"=>"basicId","pidName"=>"pId"]);
+        $levelTree->setReplace(["name"=>"text","basicId"=>"id"]);
+        $levelTree->switchOption(["beNode"=>false,"idAsKey"=>false]);
+        $feeTypeTree=$levelTree->createTree($feeTypeResult["list"]);
+        return $feeTypeTree;
+    }
+    function getfeeType($element,$level){
+        $option="";
+        $strs="";
+        for ($i=0; $i < $level; $i++) { 
+            $strs.="——";
+        }
+        if(is_array($element["nodes"])){
+            $level++;
+            foreach ($element["nodes"] as $key => $value) {
+                $option.= $this->getfeeType($value,$level);
+            }
+        }
+        return '<option value="'.$element["id"].'">'.$strs.$element["text"].'</option>'.$option;
     }
 }

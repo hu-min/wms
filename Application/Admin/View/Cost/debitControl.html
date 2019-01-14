@@ -143,7 +143,7 @@
         var pdebit_getInfo = function(){
             datas["data"] = {};
             var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
-            ['id','project_id','section','require_date','account_type','account','debit_money'].forEach(key => {
+            ['id','project_id','section','require_date','account_type','account','debit_money','debit_cause'].forEach(key => {
                 var required = $(tabId+" .global-modal").find(".common-info[name='"+key+"']").attr("required");
                 var title = $(tabId+" .global-modal").find(".common-info[name='"+key+"']").attr("title");
                 var val = $(tabId+" .global-modal").find(".common-info[name='"+key+"']").val()
@@ -156,6 +156,8 @@
                 }
                 datas["data"][key] = val
             });
+            var status = $(tabId+" .global-modal").find(".modal-info[name='status']").val()
+            datas['data']["status"] = status != "" ? status : 2
             datas["data"]['list'] = [];
             $(tabId+" .global-modal .box-solid ").find(".table-items tr").each(function(){
                 var temp ={};
@@ -174,6 +176,7 @@
             if(gettype == "Add"){
                 if(datas["data"]["list"].length == 0 || float(datas["data"]['debit_money']) <= 0 ){
                     notice(110,'没有数据啊',"输入异常");
+                    throw '没有数据啊'
                 }
             }
             
@@ -212,7 +215,7 @@
                 }
             })
             var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
-            if(( info['status'] > 0 || info['user_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3 && gettype !="Add"){
+            if(( (info['status'] != 10 && info['status'] > 0) || info['user_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3 && gettype !="Add"){
                 $(tabId+" .modal-info").prop("disabled",true)
             }
         }
@@ -226,7 +229,7 @@
             pdebitItem = info.item;
             init_chosen("{$url}","getOptionList",".global-modal");
             var gettype = $(tabId+" .global-modal .modal-footer").find(".save-info").data("gettype");
-            ['id','project_id','section','require_date','account_type','account','debit_money'].forEach(key => {
+            ['id','project_id','section','require_date','account_type','account','debit_money','debit_cause'].forEach(key => {
                 $(tabId+" .global-modal").find(".common-info[name='"+key+"']").val(info[key])
                 if(in_array(key,['project_id'])){
                     if(gettype == "Edit"){
@@ -247,7 +250,7 @@
             pedbit_compute()
 
             
-            if(( info['status'] > 0 || info['user_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3 && gettype !="Add"){
+            if(( (info['status'] != 10 && info['status'] > 0) || info['user_id'] != "{$Think.session.userId}") && "{$nodeAuth}"<7 && info['status'] !=3 && gettype !="Add"){
                 $(tabId+" .global-modal").find(".modal-info").prop("disabled",true)
                 $(tabId+" .global-modal").find(".common-info").prop("disabled",true)
                 $(tabId+" .global-modal").find(".chosen-select").trigger("chosen:updated");

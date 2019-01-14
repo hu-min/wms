@@ -913,27 +913,13 @@ class BasicController extends BaseController{
             "template"=>"feeTypeModal",
         ];
         $option='<option value="0">根Root</option>';
-        foreach ($this->getFeeTypeTree() as $key => $value) {
+        foreach ($this->basicCom->getFeeTypeTree() as $key => $value) {
             // print_r($value);
-            $option.=$this->getfeeType($value,0);
+            $option.=$this->basicCom->getfeeType($value,0);
         }
         // print_r($option);
         $this->assign("pidoption",$option);
         $this->modalOne($modalPara);
-    }
-    function getfeeType($element,$level){
-        $option="";
-        $strs="";
-        for ($i=0; $i < $level; $i++) { 
-            $strs.="——";
-        }
-        if(is_array($element["nodes"])){
-            $level++;
-            foreach ($element["nodes"] as $key => $value) {
-                $option.= $this->getfeeType($value,$level);
-            }
-        }
-        return '<option value="'.$element["id"].'">'.$strs.$element["text"].'</option>'.$option;
     }
     // function feeTypeOne(){
     //     $basicId = I("basicId");
@@ -1094,37 +1080,7 @@ class BasicController extends BaseController{
      * @Desc: 返回费用类型的节点 
      */    
     function basic_feeTypeList(){
-        $this->ajaxReturn(["tree"=>$this->getFeeTypeTree()]);
-    }
-    /** 
-     * @Author: vition 
-     * @Date: 2018-05-24 06:43:12 
-     * @Desc: 获取费用类型节点 
-     */    
-    function getFeeTypeTree(){
-        $parameter=[
-            'where'=>["class"=>"feeType"],
-            'page'=>0,
-            'pageSize'=>999999,
-            'orderStr'=>'level DESC',
-        ];
-        $feeTypeResult=$this->basicCom->getBasicList($parameter);
-        $feeTypeTree=[];
-        $level=[];
-        
-        $feeTypeArray=$feeTypeResult["list"];
-        foreach ($feeTypeArray AS $key => $feeTypeInfo) {
-            $level[$feeTypeInfo["level"]][$feeTypeInfo["Pid"]][]= $feeTypeInfo;
-            unset($feeTypeArray[$key]);
-        }
-        $this->Redis->set("feeTypeArray",json_encode($feeTypeResult["list"]),3600);
-        asort($level);
-        
-        $this->levelTree->setKeys(["idName"=>"basicId","pidName"=>"pId"]);
-        $this->levelTree->setReplace(["name"=>"text","basicId"=>"id"]);
-        $this->levelTree->switchOption(["beNode"=>false,"idAsKey"=>false]);
-        $feeTypeTree=$this->levelTree->createTree($feeTypeResult["list"]);
-        return $feeTypeTree;
+        $this->ajaxReturn(["tree"=>$this->basicCom->getFeeTypeTree()]);
     }
     //费用类别管理结束
     //承接模块管理开始

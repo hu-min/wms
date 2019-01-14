@@ -127,9 +127,9 @@ class CostController extends BaseController{
             "template"=>"debitModal",
         ];
         $option='<option value="0">费用类别</option>';
-        // print_r(A("Basic")->getFeeTypeTree());exit;
-        foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
-            $option.=A("Basic")->getfeeType($value,0);
+        // print_r($this->basicCom->getFeeTypeTree());exit;
+        foreach ($this->basicCom->getFeeTypeTree() as $key => $value) {
+            $option.=$this->basicCom->getfeeType($value,0);
         }
         $this->assign("pidoption",$option);
         $this->modalOne($modalPara);
@@ -186,9 +186,9 @@ class CostController extends BaseController{
             "template"=>$template,
         ];
         // $option='<option value="0">费用类别</option>';
-        // // print_r(A("Basic")->getFeeTypeTree());exit;
-        // foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
-        //     $option.=A("Basic")->getfeeType($value,0);
+        // // print_r($this->basicCom->getFeeTypeTree());exit;
+        // foreach ($this->basicCom->getFeeTypeTree() as $key => $value) {
+        //     $option.=$this->basicCom->getfeeType($value,0);
         // }
         // $this->assign("pidoption",$option);
         $this->modalOne($modalPara);
@@ -210,9 +210,9 @@ class CostController extends BaseController{
             ];
             $pCostResult = $this->pCostCom->getOne($param);
             $where =[
-                'parent_id'=>$pCostResult['id'],
+                'parent_cid'=>$pCostResult['id'],
                 'auth_user_id' => [["EQ",session('userId')],["EQ",0],"OR"],
-                '_string' => '(cost_total > 0 AND cost_total <> costed)',
+                '_string' => '(cost_total > 0 AND cost_total != costed)',
             ];
             $sParam =[
                 'fields'=>'*',
@@ -220,7 +220,7 @@ class CostController extends BaseController{
                 'orderStr'=>"class_sort ASC , sort ASC",
                 'joins' => [
                     'LEFT JOIN (SELECT basicId, name cost_class_name FROM v_basic WHERE class ="costClass" ) bc ON bc.basicId = cost_class',
-                    'LEFT JOIN (SELECT classify module_id , GROUP_CONCAT(companyId) scompany_ids , GROUP_CONCAT(company) scompany_names FROM (SELECT classify FROM v_project_cost_sub WHERE `parent_id` = "'.$pCostResult['id'].'" AND `read_type` >= 1) pc LEFT JOIN (SELECT module,companyId,company FROM v_supplier_company) sc ON FIND_IN_SET(pc.classify,sc.module) GROUP BY pc.classify) m ON m.module_id = classify',
+                    'LEFT JOIN (SELECT classify module_id , GROUP_CONCAT(companyId) scompany_ids , GROUP_CONCAT(company) scompany_names FROM (SELECT classify FROM v_project_cost_sub WHERE `parent_cid` = "'.$pCostResult['id'].'" AND `read_type` >= 1) pc LEFT JOIN (SELECT module,companyId,company FROM v_supplier_company) sc ON FIND_IN_SET(pc.classify,sc.module) GROUP BY pc.classify) m ON m.module_id = classify',
                     // 'LEFT JOIN (SELECT contactId,companyId,contact scontact_name FROM v_supplier_contact ) suc ON suc.companyId = scompany_id AND suc.contactId = scompany_cid ',
                     // 'LEFT JOIN (SELECT basicId unit_id, name unit_name FROM v_basic WHERE class ="unit" ) un ON un.unit_id = unit',
                     // 'LEFT JOIN (SELECT basicId aunit_id, name aunit_name FROM v_basic WHERE class ="unit" ) aun ON aun.aunit_id = act_unit',
@@ -244,6 +244,7 @@ class CostController extends BaseController{
         $num = count($data["list"]);
         $updateNum = 0;
         $debitData = $this->manageDebitInfo($data,'debitAdd');
+        
         unset($debitData['list']);
         $this->debitCom->startTrans();
         $this->debitSubCom->startTrans();
@@ -281,15 +282,18 @@ class CostController extends BaseController{
             $this->debitCom->commit();
             $this->debitSubCom->commit();
             $this->pCostSubCom->commit();
-            $addData = [
-                'examine'=>$debitData['examine'],
-                'title'=>session('userName')."申请了借支",
-                'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."申请借支，@你了，点击进入审批吧！</div>",
-                'url'=>C('qiye_url')."/Admin/Index/Main.html?action=Cost/debitControl",
-                'tableName'=>$this->debitCom->tableName(),
-                'tableId'=>$insertResult->data,
-            ];
-            $this->add_push($addData);
+            if( $debitData['status'] != 10){
+                $addData = [
+                    'examine'=>$debitData['examine'],
+                    'title'=>session('userName')."申请了借支",
+                    'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."申请借支，@你了，点击进入审批吧！</div>",
+                    'url'=>C('qiye_url')."/Admin/Index/Main.html?action=Cost/debitControl",
+                    'tableName'=>$this->debitCom->tableName(),
+                    'tableId'=>$insertResult->data,
+                ];
+                $this->add_push($addData);
+            }
+            
 
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
         }else{
@@ -303,7 +307,7 @@ class CostController extends BaseController{
         $reqType=I("reqType");
         extract($_POST);
         $debitData = $this->manageDebitInfo($data,'debitEdit');
-
+        // print_r($debitData );exit;
         $num = count($data["list"]);
         $updateNum = 0;
         $this->debitCom->startTrans();
@@ -352,7 +356,24 @@ class CostController extends BaseController{
             $this->debitCom->commit();
             $this->debitSubCom->commit();
             $this->pCostSubCom->commit();
-            $this->ApprLogCom->updateStatus($this->debitCom->tableName(),$debitData["where"]["id"]);
+
+            if( $debitData['redit'] ){
+                $this->ApprLogCom->updateStatus($this->debitCom->tableName(),$debitData["where"]["id"]); 
+            }
+            if(( $debitData['isDraft'] || $debitData['redit']) && $debitData['data']['status'] != 10){
+                $remark  = $debitData['data']['status'] == 1 ? '直接操作状态为审批' : '';
+                $addData = [
+                    'examine'=>$debitData['data']['examine'],
+                    'title'=>session('userName')."申请了借支",
+                    'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."申请借支，@你了，点击进入审批吧！</div>",
+                    'url'=>C('qiye_url')."/Admin/Index/Main.html?action=Cost/debitControl",
+                    'tableName'=>$this->debitCom->tableName(),
+                    'tableId'=>$debitData["where"]["id"],
+                    'remark' => $remark,
+                ];
+                $this->add_push($addData);
+            }
+            // $this->ApprLogCom->updateStatus($this->debitCom->tableName(),$debitData["where"]["id"]);
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
         }else{
             $this->debitCom->rollback();
@@ -393,17 +414,23 @@ class CostController extends BaseController{
                 $datas[$date]=strtotime($datas[$date]);
             }
         }
+        $examines = getComponent('Process')->getExamine(I("vtabId"),$datas['leader']);
         if($reqType=="debitAdd"){
             $datas['add_time']=time();
             $datas['debit_date']=time();
             $datas['user_id']=session('userId');
 
             //添加时审批流数据
-            $examines = getComponent('Process')->getExamine(I("vtabId"),$datas['leader']);
             $datas['process_id'] = $examines["process_id"];
             $datas['examine'] = $examines["examine"];
-            $datas['process_level'] = $examines["process_level"];
-            $datas['status'] = $examines["status"];
+
+            if($datas['status'] == 10){
+                $datas['process_level'] = 0;
+                $isDraft = true;
+            }else{
+                $datas['process_level'] = $examines["process_level"];
+                $datas['status'] = $examines["status"];
+            }
 
             // if($datas["project_id"]>0){
             //     unset($datas['leader']);
@@ -438,12 +465,41 @@ class CostController extends BaseController{
                     $data[$key]=$datas[$key];
                 }
             }
-            if(isset($datas['status'])){
-                $data['status'] = $datas['status'] == 3 ? 0 : $datas['status'];
+            $where=["id"=>$datas['id']];
+            $debitResult =$this->debitCom->getOne(['where'=>$where,"one"=>true]);
+            $data['examine'] = $debitResult['examine'];
+            if(in_array(session("userId"),[$debitResult['user_id']])){
+                if(in_array($debitResult['status'],[3,10] && $datas['status'] != 10 )){
+                    $data['status'] = 2;
+                }else{
+                    $data['status'] = $datas['status'];
+                }
+            }else{
+                if($debitResult['status'] == 10 && $datas['status'] == 2 ){
+                    $data['status'] = $debitResult['status'];
+                }else{
+                    $data['status'] = $datas['status'];
+                }
+            }
+            if($data['status'] != 10 && $debitResult['process_level'] == 0){
+                $data['process_level'] = $examines["process_level"];
+            }elseif($datas['status'] == 10 && $debitResult['process_level'] > 0){
+                $data['process_level'] = 0;
+            }
+            // if(isset($datas['status'])){
+            //     $data['status'] = $datas['status'] == 3 ? 0 : $datas['status'];
+            // }
+            $redit = false;
+            $isDraft = false;
+            if($debitResult["status"] == 3 && $data['status'] !=10 ){
+                $redit = true;
+            }
+            if($debitResult["status"] == 10 && in_array($data['status'],[0,1,2])){
+                $isDraft = true;;
             }
             $data['upate_time']=time();
             
-            return ["where"=>$where,"data"=>$data];
+            return ["where"=>$where,"data"=>$data,'redit' => $redit ,'isDraft'=> $isDraft];
         }
         return "";
     }
@@ -457,7 +513,7 @@ class CostController extends BaseController{
         // print_r($info);exit;
         if($info){
             $insertResult=$this->debitCom->insert($info);
-            if(isset($insertResult->errCode) && $insertResult->errCode==0){
+            if(isset($insertResult->errCode) && $insertResult->errCode==0 ){
                 //检查下一个审批者是否存在白名单中，和当前用户判断，如果当前用户在白名单中，指定用户未在白名单中将不会发送信息
                 // $touserRoleId = explode(',',$info['examine'])[0];
                 // $limitWhite = $this->whiteCom->limitWhite(session('roleId'),$touserRoleId,true);
@@ -472,15 +528,17 @@ class CostController extends BaseController{
                 //     }
                 // }
                 // $this->ApprLogCom->createApp($this->debitCom->tableName(),$insertResult->data,session("userId"),"");
-                $addData = [
-                    'examine'=>$info['examine'],
-                    'title'=>session('userName')."申请了借支",
-                    'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."申请借支，@你了，点击进入审批吧！</div>",
-                    'url'=>C('qiye_url')."/Admin/Index/Main.html?action=Cost/debitControl",
-                    'tableName'=>$this->debitCom->tableName(),
-                    'tableId'=>$insertResult->data,
-                ];
-                $this->add_push($addData);
+                if( $info['status'] != 10){
+                    $addData = [
+                        'examine'=>$info['examine'],
+                        'title'=>session('userName')."申请了借支",
+                        'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."申请借支，@你了，点击进入审批吧！</div>",
+                        'url'=>C('qiye_url')."/Admin/Index/Main.html?action=Cost/debitControl",
+                        'tableName'=>$this->debitCom->tableName(),
+                        'tableId'=>$insertResult->data,
+                    ];
+                    $this->add_push($addData);
+                }
                 $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
             }
         }
@@ -493,9 +551,24 @@ class CostController extends BaseController{
      */    
     function debitEdit(){
         $updateInfo=$this->manageDebitInfo();
+        
+        // print_r($updateInfo);exit();
         $updateResult=$this->debitCom->update($updateInfo);
-        if(isset($updateResult->errCode) && $updateResult->errCode == 0){
+        if(isset($updateResult->errCode) && $updateResult->errCode == 0 && $updateInfo['redit'] ){
             $this->ApprLogCom->updateStatus($this->debitCom->tableName(),$updateInfo["where"]["id"]); 
+        }
+        if(( $updateInfo['isDraft'] || $updateInfo['redit']) && $updateInfo['data']['status'] != 10){
+            $remark  = $updateInfo['data']['status'] == 1 ? '直接操作状态为审批' : '';
+            $addData = [
+                'examine'=>$updateInfo['data']['examine'],
+                'title'=>session('userName')."申请了借支",
+                'desc'=>"<div class=\"gray\">".date("Y年m月d日",time())."</div> <div class=\"normal\">".session('userName')."申请借支，@你了，点击进入审批吧！</div>",
+                'url'=>C('qiye_url')."/Admin/Index/Main.html?action=Cost/debitControl",
+                'tableName'=>$this->debitCom->tableName(),
+                'tableId'=>$updateInfo["where"]["id"],
+                'remark' => $remark,
+            ];
+            $this->add_push($addData);
         }
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
@@ -587,9 +660,9 @@ class CostController extends BaseController{
         $resultData=[];
         $id = I("id");
         $option='<option value="0">费用类别</option>';
-        // print_r(A("Basic")->getFeeTypeTree());exit;
-        foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
-            $option.=A("Basic")->getfeeType($value,0);
+        // print_r($this->basicCom->getFeeTypeTree());exit;
+        foreach ($this->basicCom->getFeeTypeTree() as $key => $value) {
+            $option.=$this->basicCom->getfeeType($value,0);
         }
         $this->assign("pidoption",$option);
         $this->assign("controlName","finance_debit");
@@ -636,8 +709,8 @@ class CostController extends BaseController{
         $id = I("id");
         $this->assign("provinceArr",$this->basicCom->get_provinces());
         $option='<option value="0">费用类别</option>';
-        foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
-            $option.=A("Basic")->getfeeType($value,0);
+        foreach ($this->basicCom->getFeeTypeTree() as $key => $value) {
+            $option.=$this->basicCom->getfeeType($value,0);
         }
         $this->assign("pidoption",$option);
         
@@ -1014,8 +1087,8 @@ class CostController extends BaseController{
        
         $this->assign("provinceArr",$this->basicCom->get_provinces());
         $option='<option value="0">费用类别</option>';
-        foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
-            $option.=A("Basic")->getfeeType($value,0);
+        foreach ($this->basicCom->getFeeTypeTree() as $key => $value) {
+            $option.=$this->basicCom->getfeeType($value,0);
         }
         $this->assign("pidoption",$option);
         // print_r($process);
@@ -1056,8 +1129,8 @@ class CostController extends BaseController{
         $rows = I("rows");
         $this->assign("provinceArr",$this->basicCom->get_provinces());
         $option='<option value="0">费用类别</option>';
-        foreach (A("Basic")->getFeeTypeTree() as $key => $value) {
-            $option.=A("Basic")->getfeeType($value,0);
+        foreach ($this->basicCom->getFeeTypeTree() as $key => $value) {
+            $option.=$this->basicCom->getfeeType($value,0);
         }
         $this->assign("pidoption",$option);
         $this->assign('rows',$rows);

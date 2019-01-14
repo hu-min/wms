@@ -18,9 +18,9 @@ class BaseController extends \Common\Controller\BaseController{
     protected $exemption;
     protected $pageSize=30;
     // protected $statusType=[0=>"提交申请",1=>"批准",2=>"审核中",3=>"无效",4=>"删除"];
-    protected $statusType=[0=>"提交",1=>"批准",2=>"等待",3=>"驳回",4=>"删除",5=>"拒绝",10=>'草稿'];
+    protected $statusType = [0=>"提交",1=>"批准",2=>"等待",3=>"驳回",4=>"删除",5=>"拒绝",10=>'草稿'];
 
-    protected $statusLabel=[0=>"blue",1=>"green",2=>"yellow",3=>"orange ",4=>"red",5=>'black',10=>'maroon'];
+    protected $statusLabel = [0=>"blue",1=>"green",2=>"yellow",3=>"orange ",4=>"red",5=>'black',10=>'maroon'];
 
     protected $invoiceType = ["0"=>"无","1"=>"收据","2"=>"增值税普通","3"=>"增值税专用"];
     /**
@@ -898,31 +898,32 @@ class BaseController extends \Common\Controller\BaseController{
         if($noappr){
             if($tableIds){
                 foreach ($tableIds as $tid) {
-                    $this->ApprLogCom->createApp($tableName,$tid,session("userId"),$remark);
+                    $cResult = $this->ApprLogCom->createApp($tableName,$tid,session("userId"),$remark);
                 }
             }else{
-                $this->ApprLogCom->createApp($tableName,$tableId,session("userId"),$remark);
+                $cResult =  $this->ApprLogCom->createApp($tableName,$tableId,session("userId"),$remark);
             }
             
-
-            if($touserRoleIds[0] == $roleId){
-                $parameter=[
-                    "table_name" => $tableName,
-                    "table_id" => $tableId,
-                    "add_time" => time(),
-                    "user_id" => session("userId"),
-                    "status" => 1, //审批流程里的状态是实际状态
-                    "remark" => '审批者(角色)与申请者(角色)一致自动审批',
-                ];
-                if($tableIds){
-                    foreach ($tableIds as $tid) {
-                        $parameter['table_id'] = $tid;
+            if($cResult){
+                if($touserRoleIds[0] == $roleId){
+                    $parameter=[
+                        "table_name" => $tableName,
+                        "table_id" => $tableId,
+                        "add_time" => time(),
+                        "user_id" => session("userId"),
+                        "status" => 1, //审批流程里的状态是实际状态
+                        "remark" => '审批者(角色)与申请者(角色)一致自动审批',
+                    ];
+                    if($tableIds){
+                        foreach ($tableIds as $tid) {
+                            $parameter['table_id'] = $tid;
+                            $this->ApprLogCom->insert($parameter);
+                        }
+                    }else{
                         $this->ApprLogCom->insert($parameter);
                     }
-                }else{
-                    $this->ApprLogCom->insert($parameter);
+                    
                 }
-                
             }
         }
         

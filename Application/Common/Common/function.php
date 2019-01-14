@@ -192,10 +192,11 @@ function status_group($param=[]){
     }else{
         return '';
     }
+
     $nodeAuth = $param['vars']['vars']['nodeAuth'];
     $statusLabel = $param['vars']['vars']['statusLabel'];
     $statusType = $param['vars']['vars']["statusType"];
-    $status = $data['status'];
+    $status = $data['status'] ? $data['status'] : 0;
     echo '<div class="btn-group modal-status status-group" data-toggle="btn-toggle"><input class="modal-info"  value="'.$status.'" name="status" type="hidden">'; 
     if($nodeAuth>=7){
         
@@ -374,8 +375,8 @@ function save_btn($defind_vars,$always=false,$hide=false){
     $url = $defind_vars["url"];
     $noModal = $defind_vars["noModal"] ? "" : "data-modal='true'";
     // echo $item["user_id"],$gettype,$processAuth['level'];
-    // echo $item['status'],",",$item['user_id'],",", $userId;
-    if((in_array($item['status'],[0,3,10]) && in_array($userId,[$item['user_id'],$item['puser_id']])) || $gettype == "Add" || $nodeAuth >= 7 || ($item['status'] == 1 && isset($item['business']) && $item['business'] == $userId) ){
+    // echo $item['status'],",",$item['user_id'],",", $userId,$gettype,$processAuth['level'];
+    if((in_array($item['status'],[0,3,10]) && in_array($userId,[$item['user_id'],$item['puser_id']])) || $gettype == "Add" || $nodeAuth >= 7 || ($item['status'] == 1 && isset($item['business']) && $item['business'] == $userId) || $always ){
     // if(($item["user_id"] == $userId && in_array($item['status'],[0,3])) || ($gettype == "Add" && $processAuth['level'] > 0) || $always || $nodeAuth >= 7 || ($defind_vars['data']['status'] == 1 && isset($defind_vars['data']['business']) && $defind_vars['data']['business'] == $defind_vars["userId"]) || ($item['status'] == 1 && $item['user_id'] == $userId) || $item['status'] == 10){
         echo "<button type='button' class='btn btn-sm btn-primary save-info' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>{$btnTitle}</button>";
     }elseif($hide){

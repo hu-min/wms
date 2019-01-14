@@ -639,8 +639,8 @@ class ProjectCostController extends BaseController{
         $where=["id"=>$data['id']];
         $offerResult =$this->pOfferCom->getOne(['where'=>$where,"one"=>true]);
 
-        $projectResult =$this->projectCom->getOne(['where'=>["projectId"=>$data['project_id']],"one"=>true,"fields"=>'user_id,business,status,stage,offer_user,cost_user']);
-
+        $projectResult =$this->projectCom->getOne(['where'=>["projectId"=>$data['project_id']],"one"=>true,"fields"=>'user_id,business,status,stage,offer_user,cost_user,leader']);
+        $examines = getComponent('Process')->getExamine($vtabId,$projectResult['leader']);
         $this->pOfferCom->startTrans();
         
         $pOfferData = [
@@ -663,14 +663,17 @@ class ProjectCostController extends BaseController{
         if($offerResult["status"] == 10 && in_array(session('userId'),[$projectResult["user_id"],$projectResult["offer_user"]])){
             $isDraft = true;
             if( $data['status'] != 10){
-                $pOfferData['data']['process_level'] = 1; 
+                $nodeResult = A('Component/Node')->getOne(['fields'=>'nodeId','where'=>['db_table'=>'v_project_offer','processIds'=>['GT',0],'is_process'=>1],'one'=>true]);
+                $pvtabId = $nodeResult['nodeId'];
+                $pexamines = getComponent('Process')->getExamine($pvtabId,$pResult['leader']);
+                $pOfferData['data']['process_level'] = $pexamines['process_level']; 
                 $pOfferData['data']['status'] = 2;
             }
         }
         $pOfferData['data']['status'] = !in_array(session('userId'),[$projectResult["user_id"],$projectResult["offer_user"]]) ? ( ($offerResult['status'] == 10 && $data['status'] == 2) ? $offerResult['status'] : $data['status']) : (in_array($offerResult['status'],[3,10] && $data['status'] != 10 ) ? 2 : $data['status']);
 
         if($pOfferData['data']['status'] != 10 && $offerResult['process_level'] == 0){
-            $pOfferData['data']['process_level'] = 1;
+            $pOfferData['data']['process_level'] = $examines['process_level'];
         }elseif($pOfferData['data']['status'] == 10 && $offerResult['process_level'] > 0){
             $pOfferData['data']['process_level'] = 0;
         }
@@ -815,7 +818,7 @@ class ProjectCostController extends BaseController{
             }
         }
         if($pOfferData['data']['status'] != 10 && $offerResult['process_level'] == 0){
-            $pOfferData['data']['process_level'] = 1;
+            $pOfferData['data']['process_level'] = $examines['process_level'];
         }elseif($pOfferData['data']['status'] == 10 && $offerResult['process_level'] > 0){
             $pOfferData['data']['process_level'] = 0;
         }
@@ -834,7 +837,7 @@ class ProjectCostController extends BaseController{
             }
         }
         if($pCostData['data']['status'] != 10 && $costResult['process_level'] == 0){
-            $pCostData['data']['process_level'] = 1;
+            $pCostData['data']['process_level'] = $examines['process_level'];
         }elseif($pCostData['data']['status'] == 10 && $costResult['process_level'] > 0){
             $pCostData['data']['process_level'] = 0;
         }

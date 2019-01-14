@@ -436,9 +436,9 @@ $(document).on("click",'.save-info',function(){
         notice(110,"没有更新数据")
     }
     if(status){
-        if(datas["status"] !==undefined){
+        if(datas["status"] !== undefined){
             datas['status'] = status
-        }else if(datas["data"]['status'] !==undefined){
+        }else if(datas["data"]['status'] !== undefined){
             datas["data"]['status'] = status
         }
     }else{

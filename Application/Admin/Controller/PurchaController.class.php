@@ -610,9 +610,9 @@ class PurchaController extends BaseController{
             }
         }
 
-        if(!isset($data) || !is_array($data)){ 
-            $this->ajaxReturn(['errCode'=>114,'error'=>getError(114)]);
-        }
+        // if(!isset($data) || !is_array($data)){ 
+        //     $this->ajaxReturn(['errCode'=>114,'error'=>getError(114)]);
+        // }
 
         // print_r($dataInfo);exit;
 

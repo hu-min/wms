@@ -61,16 +61,12 @@
                 
             </div>
             <div class="form-group">
-                <div class="btn-group modal-status status-group" data-toggle="btn-toggle">
-                    <input class="modal-info" value="0" name="status" type="hidden">
-                    {:modal_btn(get_defined_vars())}
-                </div>
+                {:status_group(['vars'=>get_defined_vars()])}
             </div>
         </div>
     </form>            
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-    <input class="modal-info" name="status" value="0" type="hidden">
     {:save_btn(get_defined_vars())}
 </div>
