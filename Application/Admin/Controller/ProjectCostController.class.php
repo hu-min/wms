@@ -762,12 +762,13 @@ class ProjectCostController extends BaseController{
         // if($pResult['cost_budget'] > 0 && $data['cost_total'] > $pResult['cost_budget']){
         //     $this->ajaxReturn(['errCode'=>100,'error'=>"添加的成本超过"]);
         // }
+        $profit = $data['total'] - $data['cost_total'];
         $pCostData = [
             'where' => ['id'=>$data['id']],
             'data' => [
                 'cost_total' => $data['cost_total'],
-                'profit' => $data['total'] - $data['cost_total'],
-                'profit_ratio' => round((($data['total'] - $data['cost_total']) / $data['total'])*100,2) ,
+                'profit' => $profit,
+                'profit_ratio' => $profit > 0 ? round((($data['total'] - $data['cost_total']) / $data['total'])*100,2) : 0 ,
                 'update_time' => time(),
                 'flag' => $data['flag'],
             ]
