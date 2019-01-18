@@ -355,6 +355,11 @@ class CommonController extends \Common\Controller\BaseController{
                     $key  = $region;
                 }
                 $url = C("qapis")."?region={$region}&keyword={$key}&key=".C("qmap_key");
+                $has = $this->redisCom->rget(md5($url));
+                if($has){
+                    return [];
+                }
+                $this->redisCom->rset(md5($url),True,20);
                 $suggestion = json_decode(curlGet($url),true);
                 if($suggestion['status'] === 0){
                     foreach ($suggestion['data'] as $key => $value) {
