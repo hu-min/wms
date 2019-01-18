@@ -100,7 +100,7 @@ class ProjectCostController extends BaseController{
                 '_string' => $parent_idStr,
                 'read_type' => 1,
             ];
-            if($listType == "cost"){
+            if(in_array($listType,["cost",'contrast'])){
                 $where['read_type'] = ['EGT',1];
             }
             $sParam =[
