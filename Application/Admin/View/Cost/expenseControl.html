@@ -246,7 +246,7 @@
             datas["data"]['list'] = [];
             $(tabId+" .global-modal").find(".modal-expense-table tr").each(function(){
                 var temp ={};
-                ['id','happen_date','expense_type','province','city','fee_type','cost_desc','expen_vouch_type','money','remark','vouch_file','invoice_money'].forEach(key=>{
+                ['id','happen_date','expense_type','province','city','fee_type','cost_desc','expen_vouch_type','money','remark','vouch_file','invoice_money','status'].forEach(key=>{
                     var name = $(this).find(".modal-info[name='"+key+"']").attr("name");
                     var val = $(this).find(".modal-info[name='"+key+"']").val();
                     var required = $(this).find(".modal-info[name='"+key+"']").attr("required");

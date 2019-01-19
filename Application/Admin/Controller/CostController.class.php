@@ -781,6 +781,7 @@ class CostController extends BaseController{
         foreach (["happen_date"] as $key) {
             $datas[$key] = isset($datas[$key]) && !empty($datas[$key]) ? strtotime($datas[$key]) : time();
         }
+        $examines = getComponent('Process')->getExamine(I("vtabId"),$datas['leader']);
         if($reqType=="expenseAdd"){
             $datas['add_time']=time();
             $datas['user_id']=session('userId');

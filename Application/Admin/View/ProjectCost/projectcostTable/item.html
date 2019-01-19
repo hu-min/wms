@@ -20,33 +20,33 @@
             </volist>
         </select>
     </td>
-    <td style="min-width: 300px;">
+    <td style="min-width: 150px;">
         <input type="text" class="form-control modal-info" name="item_content" placeholder="子项的内容说明">
     </td>
-    <td style="width: 50px;text-align: center;">
+    <td style="width: 50px;text-align: center;min-width:50px;">
         <input type="text" class="form-control modal-info" style="text-align: center;" name="num" placeholder="项的数量">
     </td>
-    <td style="width: 50px;text-align: center;">
+    <td style="width: 50px;text-align: center;min-width:50px;">
         <select class="form-control modal-info chosen-select" title="单位" data-value="basicId" data-req="getOptionList" data-text="name" name="unit" >
             <volist name="unitArr" id="item">
                 <option value="{$item['basicId']}">{$item['name']}</option>
             </volist>
         </select>
     </td>
-    <td style="width: 50px;text-align: center;">
+    <td style="width: 50px;text-align: center;min-width:50px;">
         <input type="text" class="form-control modal-info" name="act_num" style="text-align: center;" placeholder="重复项数量，默认1" value="1">
     </td>
-    <td style="width: 100px;">
+    <td style="width: 50px;min-width:50px;">
         <select class="form-control modal-info chosen-select" title="单位" data-value="basicId" data-req="getOptionList" data-text="name" name="act_unit" >
             <volist name="unitArr" id="item">
                 <option value="{$item['basicId']}">{$item['name']}</option>
             </volist>
         </select>
     </td>
-    <td style="width: 150px;">
+    <td style="width: 50px;min-width:50px;">
         <input type="text" class="form-control modal-info" name="price" value="0" placeholder="单价金额">
     </td>
-    <td style="width: 150px;">
+    <td style="width: 50px;min-width:50px;">
         <input type="text" class="form-control modal-info" readonly="readonly" name="total" placeholder="金额合计">
     </td>
     <if condition="$listType eq 'cost' or $listType eq 'contrast'">

@@ -30,7 +30,7 @@
     <div id="{$vtabId}-panel" class="panel-collapse collapse">
         <div class="box-body">
             <div class="col-sm-12 table-outbox" style="z-index: 1;">
-                <div style="font-size:0.95em;overflow: auto;">
+                <div class="table-test" style="font-size:0.95em;overflow: auto;">
                     <div class="count-div {$controlName}-count" >
                         
                         
@@ -38,14 +38,14 @@
                     <table class="table table-bordered table-hover">
                         <thead>
                             <tr>
-                                <th class="serial_num">排序</th>
-                                <th >分类说明</th>
-                                <th class="">分类</th>
-                                <th class="">项目内容</th>
-                                <th class="">数量（单项）</th>
-                                <th class="">单位（单项）</th>
-                                <th class="">数量（重复项）</th>
-                                <th class="">单位（重复项）</th>
+                                <th class="serial_num frozen">排序</th>
+                                <th class="frozen">分类说明</th>
+                                <th class="frozen">分类</th>
+                                <th class="frozen">项目内容</th>
+                                <th class="" style="width: 50px;min-width:50px;">数量</th>
+                                <th class="" style="width: 50px;min-width:50px;">单位</th>
+                                <th class="" style="width: 50px;min-width:50px;">数量</th>
+                                <th class="" style="width: 50px;min-width:50px;">单位</th>
                                 <th class="">单价</th>
                                 <th class="">合计</th>
                                 <if condition="$listType eq 'cost' or $listType eq 'contrast'">

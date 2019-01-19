@@ -550,6 +550,7 @@ class ProjectController extends BaseController{
         if($projectInfo['redit']){
             $projectInfo['data']['process_level'] = 1;
         }
+        print_r($projectInfo);exit();
         $updateResult=$this->projectCom->updateProject($projectInfo);
         $datas = I("data");
         foreach ($datas['dateplace'] as $dplceInfo) {

@@ -362,7 +362,7 @@ function approve_btn($tableName,$param=[]){
  * @Date: 2018-06-10 00:42:43 
  * @Desc: 新增保存按钮权限 
  */
-function save_btn($defind_vars,$always=false,$hide=false){
+function save_btn($defind_vars,$always=false,$hide=false,$hasDraft = true){
     $processAuth = $defind_vars["processAuth"];
     
     $nodeAuth = $defind_vars["nodeAuth"];
@@ -383,7 +383,7 @@ function save_btn($defind_vars,$always=false,$hide=false){
         echo "<button type='button' class='btn btn-sm btn-primary save-info none' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>{$btnTitle}</button>";
     }
     // echo $item['status'],",";
-    if((in_array($item['status'],[0,3,10]) && in_array($userId,[$item['user_id'],$item['puser_id']])) || $gettype == "Add" || $nodeAuth >= 7){
+    if(((in_array($item['status'],[0,3,10]) && in_array($userId,[$item['user_id'],$item['puser_id']])) || $gettype == "Add" || $nodeAuth >= 7) && $hasDraft){
         echo "<button type='button' class='btn btn-sm bg-maroon save-info' data-status='10' data-con='{$controlName}' data-gettype='{$gettype}' data-url='{$url}' {$noModal}>储存草稿</button>";
     }
     
