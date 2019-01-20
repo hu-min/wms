@@ -201,6 +201,7 @@
                 $(tabId+" .global-modal").find(".project-info[name='"+key+"']").val(info[key]);
             });
             $(tabId+" .project-info[name='all_invoice']").val(info["contract_money"]);
+            console.log(info["tableData"]['cost-list']);
             if (info["tableData"]['cost-list'] != null){
                 info["tableData"]['cost-list']["list"].forEach(function(listData,rows){
                     $costLiItem = $(info['costLiItem']);
@@ -214,7 +215,7 @@
                     })
                     $(tabId+" .global-modal .cost-list tbody").append($costLiItem);
                 });
-            }
+            };
             
             ["suprpay-list","invoice-list"].forEach(element => {
                 
