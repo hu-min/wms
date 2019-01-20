@@ -201,18 +201,21 @@
                 $(tabId+" .global-modal").find(".project-info[name='"+key+"']").val(info[key]);
             });
             $(tabId+" .project-info[name='all_invoice']").val(info["contract_money"]);
-            info["tableData"]['cost-list']["list"].forEach(function(listData,rows){
-                $costLiItem = $(info['costLiItem']);
-                ['class_notes','item_content','num','cost_price','cost_total'].forEach(name=>{
-                    var text = listData[name];
-                    if(name == 'class_notes'){
-                        text = text !="" ? text+"-"+listData['module_name'] : text; 
-                        text = listData['cost_class_name']+"-"+text
-                    }
-                    $costLiItem.find(".cost-info[name='"+name+"']").text(text);
-                })
-                $(tabId+" .global-modal .cost-list tbody").append($costLiItem);
-            });
+            if (info["tableData"]['cost-list']){
+                info["tableData"]['cost-list']["list"].forEach(function(listData,rows){
+                    $costLiItem = $(info['costLiItem']);
+                    ['class_notes','item_content','num','cost_price','cost_total'].forEach(name=>{
+                        var text = listData[name];
+                        if(name == 'class_notes'){
+                            text = text !="" ? text+"-"+listData['module_name'] : text; 
+                            text = listData['cost_class_name']+"-"+text
+                        }
+                        $costLiItem.find(".cost-info[name='"+name+"']").text(text);
+                    })
+                    $(tabId+" .global-modal .cost-list tbody").append($costLiItem);
+                });
+            }
+            
             ["suprpay-list","invoice-list"].forEach(element => {
                 
                 if(info["tableData"][element]["list"]){
