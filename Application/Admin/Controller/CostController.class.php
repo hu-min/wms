@@ -824,9 +824,11 @@ class CostController extends BaseController{
 
         $this->expenseCom->startTrans();
         $this->expenseSubCom->startTrans();
-
+        // print_r($data["list"]);exit();
         $insertResult = $this->expenseCom->insert($expInfo);
-        // print_r($debitData);
+        // $this->log($this->expenseCom->_sql());
+        $insertNum = 0;
+        $num = count($data["list"]);
         if(isset($insertResult->errCode) && $insertResult->errCode==0){
             $subData = [
                 'parent_id' => $insertResult->data,
@@ -836,11 +838,14 @@ class CostController extends BaseController{
                 $subData = array_merge($subData,$subInfo);
                 $subData['happen_date'] = strtotime($subData['happen_date']);
                 $inresult = $this->expenseSubCom->insert($subData);
+                // $this->log($this->expenseSubCom->_sql());
                 if($inresult){
                     $insertNum++;
                 }
             }
         }
+        // $this->log($num);
+        // $this->log($insertNum);
         if($num > 0 && $num == $insertNum){
 
             $this->expenseCom->commit();
