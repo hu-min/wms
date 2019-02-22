@@ -787,6 +787,9 @@ class ProjectCostController extends BaseController{
             ]
         ];
         // $this->pCostCom->getOne($pCostData);
+        if(isset($dels)){
+            $delResult = $this ->pCostSubCom->subCostDel($dels);
+        }
         $this->pOfferCom->startTrans();
         $this->pCostCom->startTrans();
         $this->pCostSubCom->startTrans();
