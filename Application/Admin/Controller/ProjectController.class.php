@@ -411,7 +411,6 @@ class ProjectController extends BaseController{
             // }else{
             //     $datas['process_level']=$examines["place"] > 0 ? $examines["place"] : 1;
             // }
-
             unset($datas['projectId']);
             return $datas;
         }else if($reqType=="projectEdit"){
@@ -463,7 +462,9 @@ class ProjectController extends BaseController{
                 // $data = $this->status_update($result,$datas["status"],$data);
             }
             $data['upateTime']=time();
-            
+            if(is_null($datas["status"])){
+                unset($datas["status"]);
+            }
             return ["where"=>$where,"data"=>$data,"redit"=>$redit,'isDraft'=>$isDraft];
         }
         return "";
