@@ -212,7 +212,7 @@ class CostController extends BaseController{
             $where =[
                 'parent_cid'=>$pCostResult['id'],
                 'auth_user_id' => [["EQ",session('userId')],["EQ",0],"OR"],
-                '_string' => '(cost_total > 0 AND cost_total != costed)',
+                '_string' => '(cost_total > 0 AND cost_total != costed) AND scompany_id = 0',
             ];
             $sParam =[
                 'fields'=>'*',
@@ -228,7 +228,7 @@ class CostController extends BaseController{
                 ],
             ];
             $pCostResult["list"] = $this->pCostSubCom->getList($sParam)['list'];
-            $this->ajaxReturn(['data'=> $pCostResult,'sql'=>$this->pCostSubCom->_sql()]); 
+            $this->ajaxReturn(['data'=> $pCostResult]); 
         } 
         $this->ajaxReturn(['errCode'=>408,'error'=>getError(408)]);       
     }
