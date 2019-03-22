@@ -248,7 +248,7 @@ class CommonController extends \Common\Controller\BaseController{
             //承接模块下的供应商列表
             case 'module_supplier':
                 $pid=I("pid");
-                if($pid){
+                if($pid && $pid < 999999999){
                     $where["_string"] = "FIND_IN_SET({$pid},module)";
                 }
                 if ($key!=""){

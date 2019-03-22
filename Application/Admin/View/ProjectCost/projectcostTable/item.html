@@ -13,8 +13,8 @@
         </div>
     </td>
     <td style="min-width:100px;max-width:200px;">
-        <select class="form-control modal-info chosen-select" title="承接模块" data-value="basicId" data-req="getOptionList" data-text="name" data-type="module" name="classify"  >
-            <!-- <option value="999999999">全部承接模块</option> -->
+        <select class="form-control modal-info chosen-select" title="承接模块" data-value="basicId" data-req="getOptionList" data-text="name" data-type="module" name="classify" data-cname="scompany_id" >
+            <option value="999999999">全部承接模块</option>
             <volist name="moduleArr" id="item">
                 <option value="{$item['basicId']}">{$item['name']}</option>
             </volist>
