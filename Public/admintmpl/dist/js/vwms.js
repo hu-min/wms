@@ -1289,32 +1289,15 @@ function init_chosen(url,reqType,parental){
         }
     })
 }
-function float(num,place) {
-    if(num == -Infinity){
-        num = 0;
+function float(num,place){
+    if(num == -Infinity || isNaN(num)){
+    return false;
     }
-    var result = parseFloat(num);
-    if (isNaN(result)) {
-    //   alert('传递参数错误，请检查！');
-      return false;
-    }
-    result = Math.round(num * 100) / 100;
-    var s_x = result.toString();
-    if(place==0){
-        return Number(s_x.split(".")[0])
-    }
-    var pos_decimal = s_x.indexOf('.');
-    if (pos_decimal < 0) {
-      pos_decimal = s_x.length;
-      s_x += '.';
-    }
-    place = place > 0 ? place : 2 
-    while (s_x.length <= pos_decimal + place) {
-      s_x += '0';
-    }
-    return Math.round(s_x*Math.pow(10, place))/Math.pow(10, place);
-    // return parseFloat(s_x);
-  }
+    place = place ? place : place === 0 ? 0 : 2;
+    var num_float = parseFloat(parseFloat(num).toFixed(place));
+    var num_str = num_float.toString().split('.');
+    return num_float
+}
 function float_format(num,place){
     if(num == -Infinity){
         num = 0;

@@ -163,7 +163,8 @@
             $(tabId+" .global-modal").find(".modal-info[name='actual_money']").val(info['actual_money']);
             
             $(tabId+" .global-modal").find(".cost-all-count").text(info['cost_total'] ? info['cost_total'] : "0.00");
-            $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(info['tax_rate']/100))*info['actual_money']));
+        
+            $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(info['tax_rate']/100,5))*info['actual_money']));
 
             var profitAllCount = float(float(info['actual_money']) - float(info['cost_total']));
             var profitratAllCount = float(profitAllCount / float(info['actual_money'])*100);
@@ -334,7 +335,7 @@
 
             var taxRate = $(tabId+" .global-modal").find(".tax-rate").val(); 
             // console.log(taxRate)
-            $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(taxRate/100))*$allCount));
+            $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(taxRate/100,5))*$allCount));
             cost_compute_profit($allCount)
             
 

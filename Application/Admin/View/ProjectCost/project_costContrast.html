@@ -134,7 +134,7 @@
             $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val(info['id'])
             $(tabId+" .global-modal").find(".all-count").text(info['total']);
             $(tabId+" .global-modal").find(".cost-all-count").text(info['cost_total']);
-            $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(info['tax_rate']/100))*info['total']));
+            $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(info['tax_rate']/100,5))*info['total']));
             if(info['id']){
                 $(tabId+" .global-modal").find(".modal-footer .approve-group").data("id",info['id'])
             }

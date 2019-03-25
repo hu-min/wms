@@ -122,7 +122,7 @@
             });
             $(tabId+" .global-modal").find(".modal-footer .modal-info[name='id']").val(info['id'])
             $(tabId+" .global-modal").find(".all-count").text(info['total']);
-            $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(info['tax_rate']/100))*info['total']));
+            $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(info['tax_rate']/100,5))*info['total']));
 
             if(info['status'] == 1){
                 $(tabId+" .global-modal").find(".modal-footer .draft-btn").remove();
@@ -198,7 +198,7 @@
 
             var taxRate = $(tabId+" .global-modal").find(".tax-rate").val(); 
             // console.log(taxRate)
-            $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(taxRate/100))*$allCount));
+            $(tabId+" .global-modal").find(".taxed-count").text(float_format((1+float(taxRate/100,5))*$allCount));
         }
         //获取数据
         var project_offer_getInfo = function($this){
