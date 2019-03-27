@@ -58,8 +58,9 @@ function post(url,indata,callBack){
         data:indata,
         async:asyncs,
     }).done(function(result) {
-        if(in_array(result.errCode,[405,407])){datas={};window.location.reload();}callBack(result);
-    }).always(function() {if(load){setLoad();}datas={};})
+        datas={};
+        if(in_array(result.errCode,[405,407])){window.location.reload();}callBack(result);
+    }).always(function() {datas={};if(load){setLoad();}})
 }
 //enter-input class的输入框键盘回车事件
 $(document).on("keypress",".enter-input",function(e){
