@@ -35,7 +35,7 @@ var get = function(url,indata,callBack){
         data:indata,
         async:asyncs,
     }).done(function(result) {
-        if(in_array(result.errCode,[405,407])){window.location.reload();}callBack(result);
+        if(in_array(result.errCode,[405,407])){datas={};window.location.reload();}callBack(result);
     }).always(function() { if(load){setLoad();}datas={};})
 }
 /** 
