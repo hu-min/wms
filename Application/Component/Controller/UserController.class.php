@@ -308,6 +308,7 @@ class UserController extends BaseController{
                 array_push($qiye_arr,$value['qiye_id']);
             }
         }
+        $this->log($qiye_arr);
         //为了测试默认推送微信信息到开发者微信id
         // $qiye_arr = in_array($_SERVER["HTTP_HOST"],['inner.vwms.com']) ? ["1000000999"] : $qiye_arr;
         return implode("|",$qiye_arr);

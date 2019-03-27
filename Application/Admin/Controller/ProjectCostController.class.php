@@ -720,7 +720,6 @@ class ProjectCostController extends BaseController{
         $this->assign("controlName","pcost_control");
         $this->assign("listType","cost");
         $this->assign("tableName",$this->pCostCom->tableName());
-        
         if($reqType){
             $this->$reqType();
         }else{

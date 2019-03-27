@@ -251,6 +251,14 @@ class ToolsController extends BaseController{
         if(count($diff)>1 && $status ==1 ){
             $this->approveCom->commit();//如果同一个角色多个审批者必须要达到所有审批者都审核通过才可以执行下面一步，必须是状态为批准，
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
+        }elseif( $status == 5 ){
+            //拒绝的情况下执行一些东西
+            switch ($table) {
+                case 'v_debit':
+                
+                break;
+            }
+            $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
         }
         $db ->startTrans();
 
@@ -258,7 +266,7 @@ class ToolsController extends BaseController{
             $examineRes = $db ->field("user_id,process_level,examine")->where([$db->getPk()=>$id])->find();
             $uparam = [
                 'fields' => 'roleId,userName',
-                'where' => ['userId'=>$examineRes['user_id']],
+                'where' => ['userId' => $examineRes['user_id']],
                 'one' => true,
             ];
             $authorResult = $this->userCom->getOne($uparam);
@@ -315,6 +323,17 @@ class ToolsController extends BaseController{
                     }else{
                         $insertRes = $this->approveCom->insert($parameter);
                     }
+                    //这里需要判断下一个审批角色是否存在多个审批者
+                    // $userParam = [
+                    //     'fields' => 'userId,roleId,userName,roleName',
+                    //     'where' => ['roleId'=>$roleId,'status'=>1],
+                    //     'joins' => [
+                    //         'LEFT JOIN (SELECT roleId role_id,roleName FROM v_role WHERE status = 1) r ON r.role_id = roleId'
+                    //     ]
+                    // ];
+                    // $userResult = $this->userCom->getList($userParam);
+                    // $userIds = $userResult ? array_column($userResult['list'],'userId') : [];
+
                     // $insertRes = $this->approveCom->insert($parameter);
                     
                     for ($place ; $place <= count($examine) ; $place++) { 
