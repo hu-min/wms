@@ -677,6 +677,9 @@ class ProjectCostController extends BaseController{
         }elseif($pOfferData['data']['status'] == 10 && $offerResult['process_level'] > 0){
             $pOfferData['data']['process_level'] = 0;
         }
+        if($pOfferData['data']['status'] == null){
+            unset($pOfferData['data']['status']);
+        }
         $pInsertResult = $this->pOfferCom->update($pOfferData);
 
         foreach ($data['list'] as  $subData) {
@@ -861,6 +864,9 @@ class ProjectCostController extends BaseController{
         // }
         // print_r($pCostData);exit;
         // $this->log($pOfferData);
+        if($pOfferData['data']['status'] == null){
+            unset($pOfferData['data']['status']);
+        }
         $pOfferUpdate = $this->pOfferCom->update($pOfferData);
         $costNoApply = false;
      
@@ -871,6 +877,9 @@ class ProjectCostController extends BaseController{
             $costNoApply = true;
         }
         // print_r($pCostData);exit;
+        if($pCostData['data']['status'] == null){
+            unset($pCostData['data']['status']);
+        }
         $pCostUpdate = $this->pCostCom->update($pCostData);
 
         foreach ($data['list'] as  $subData) {
