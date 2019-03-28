@@ -552,6 +552,9 @@ class ProjectController extends BaseController{
             $projectInfo['data']['process_level'] = 1;
         }
         // print_r($projectInfo);exit();
+        if(is_null($projectInfo['data']['status'])){
+            unset($projectInfo['data']['status']);
+        }
         $updateResult=$this->projectCom->updateProject($projectInfo);
         $datas = I("data");
         foreach ($datas['dateplace'] as $dplceInfo) {
