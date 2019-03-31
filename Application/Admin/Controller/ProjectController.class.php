@@ -288,7 +288,7 @@ class ProjectController extends BaseController{
                 "LEFT JOIN (SELECT userId lu_user_id,userName leader_name FROM v_user) lu ON lu.lu_user_id = leader",
                 "LEFT JOIN (SELECT basicId stage_id,name stage_name FROM v_basic WHERE class = 'stage' ) s ON s.stage_id = stage",
                 "LEFT JOIN (SELECT basicId type_id,name type_name FROM v_basic WHERE class = 'projectType' ) t ON t.type_id = type",
-                "LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct ON ct.ctid = city AND ct.cpid = province",
+                // "LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct ON ct.ctid = city AND ct.cpid = province",
                 "LEFT JOIN (SELECT project_id fproject_id , count(id) file_num FROM v_project_files WHERE file_type IN ({$file_type}) GROUP BY fproject_id) f ON f.fproject_id = projectId ",
                 "LEFT JOIN (SELECT project_id rproject_id ,advance radvance,surplus rsurplus FROM v_receivable ) r ON r.rproject_id = projectId",
                 "LEFT JOIN (SELECT project_id pproject_id,SUM(contract_amount) pcontract_amount FROM v_purcha  WHERE status = 1 GROUP BY pproject_id) pu ON pu.pproject_id = projectId",
@@ -296,6 +296,7 @@ class ProjectController extends BaseController{
                 "LEFT JOIN (SELECT project_id eproject_id,SUM(money) emoney  FROM v_expense_sub LEFT JOIN (SELECT id exId,project_id FROM v_expense WHERE `status`=1 {$whiteWhere} ) m1 ON m1.exId=parent_id WHERE clear_status = 1) ex ON ex.eproject_id = projectId",
                 "LEFT JOIN (SELECT table_id tid , SUBSTRING_INDEX( GROUP_CONCAT(user_id),',',-1) tuserid,SUBSTRING_INDEX(GROUP_CONCAT(remark),',',-1) aremark FROM v_approve_log WHERE status > 0 AND effect = 1 AND table_name ='".$this->projectCom->tableName()."' GROUP BY table_id ORDER BY add_time DESC) ap ON ap.tid=projectId",
                 "LEFT JOIN (SELECT userId auser_id,userName approve_name FROM v_user) au ON au.auser_id = ap.tuserid",
+                "LEFT JOIN (SELECT project_id dpp_id , GROUP_CONCAT(city_name) city_name FROM v_project_date_place LEFT JOIN (SELECT cid ctid ,city city_name,pid cpid FROM v_city ) ct on ct.ctid = city_id  GROUP BY project_id) dp ON dpp_id = projectId "
             ],
         ];
         $listResult=$this->projectCom->getProjectList($parameter);

@@ -27,7 +27,7 @@
         <input type="text" class="form-control modal-info" style="text-align: center;" name="num" placeholder="项的数量">
     </td>
     <td style="width: 50px;text-align: center;min-width:50px;">
-        <select class="form-control modal-info chosen-select" title="单位" data-value="basicId" data-req="getOptionList" data-text="name" name="unit" >
+        <select class="form-control modal-info chosen-select" title="单位1" data-value="basicId" data-req="getOptionList" data-text="name" name="unit" >
             <volist name="unitArr" id="item">
                 <option value="{$item['basicId']}">{$item['name']}</option>
             </volist>
@@ -37,7 +37,7 @@
         <input type="text" class="form-control modal-info" name="act_num" style="text-align: center;" placeholder="重复项数量，默认1" value="1">
     </td>
     <td style="width: 50px;min-width:50px;">
-        <select class="form-control modal-info chosen-select" title="单位" data-value="basicId" data-req="getOptionList" data-text="name" name="act_unit" >
+        <select class="form-control modal-info chosen-select" title="单位2" data-value="basicId" data-req="getOptionList" data-text="name" name="act_unit" >
             <volist name="unitArr" id="item">
                 <option value="{$item['basicId']}">{$item['name']}</option>
             </volist>

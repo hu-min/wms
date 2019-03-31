@@ -200,7 +200,7 @@
                     }
                     if(subElement['read_type'] > 1){
                         poPanelObj.removeClass('box-info')
-                        poPanelObj.addClass('box-primary');
+                        poPanelObj.addClass('box-danger');
                     }
                     if("{$nodeAuth}" >= 7){
                         poPanelObj.find(".cost_chosen").removeClass('none')
@@ -214,7 +214,7 @@
                     //     poPanelObj.find(".class-rowspan").remove()
                     // }else{cost_item_del
                     //     poPanelObj.removeClass('box-info')
-                    //     poPanelObj.addClass('box-primary');
+                    //     poPanelObj.addClass('box-danger');
                     //     poPanelObj.find(".add-costItem").removeClass('none') 
                     // }
                     
@@ -471,7 +471,7 @@
                 poPanelObj.find(".modal-info[name='read_type']").val(type)
                 if(type>1){
                     poPanelObj.removeClass('box-info')
-                    poPanelObj.addClass('box-primary');
+                    poPanelObj.addClass('box-danger');
                 }
                 var idstr = poPanelObj.find(".cost-class-title").attr("href")
                 poPanelObj.find(".cost-class-title").attr("href",idstr+num)
@@ -556,38 +556,68 @@
                 var $nextr = $(this).parents("tr").next()
                 var tdNum = $(this).parents("tr").find('td').length
                 var curRowspan = $(this).parents("tr").find('td').eq(1).attr('rowspan')
+
                 var class_notes = $(this).parents("tr").find(".modal-info[name='class_notes']").val();
-                $(this).parents("tr").remove()
+                
                 $parents.find("tbody tr").each(function(sort,tr){
                     var alpha = $(this).parents(".panel").find('.cost-class-alpha').text();
                     $(tr).find("td:first-child").find(".modal-info[name='sort']").text(alpha+(Number(sort) + 1))
                 })
-                if(tdNum > 0 && tdNum < 12){
-                    $prevAll.each(function(){
+                // console.log(curRowspan)   
+                if(curRowspan){
+                    //如果被删除的是第一行自己
+                    if(curRowspan>1){
                         
-                        var rowspan = $(this).find('td').eq(1).attr('rowspan')
-                        if(rowspan){
-                            if(rowspan==1){
-                                $(this).find('td').eq(1).prop("rowspan",false)
-                            }else{
-                                $(this).find('td').eq(1).prop("rowspan",Number(rowspan)-1)
+                        var poItemOjc = $(poItem);
+                        $nextr.find('td').eq(0).after(poItemOjc.find('td').eq(1))
+                        $nextr.find(".modal-info[name='class_notes']").val(class_notes);
+                        $nextr.find('td').eq(1).prop("rowspan",Number(curRowspan)-1)
+                    }
+                }else{
+                    //得出当前tr在table中的位置
+                    curTrIndex = $(this).parents("table").find('tr').index($(this).parents("tr"))
+                    $(this).parents("tr").prevAll().each(function(){
+                        curRowspan = $(this).find('td').eq(1).attr('rowspan')
+                        if(curRowspan){
+                            // 得出上一个合并单位tr在table中的位置
+                            prTrIndex =  $(this).parents("table").find('tr').index($(this))
+                            TrLimit = prTrIndex + Number(curRowspan)
+                            if(curTrIndex < TrLimit){
+                                $(this).find('td').eq(1).prop('rowspan',Number(curRowspan)-1)
                             }
                             return false
                         }
                     })
-                }else{
-                    tdNum = $nextr.find('td').length
-                    if(tdNum > 0 && tdNum < 12){
-                        if(curRowspan > 1){
-                            var poItemOjc = $(poItem);
-                            $nextr.find('td').eq(0).after(poItemOjc.find('td').eq(1))
-                        }
-                        if(curRowspan > 2){
-                            $nextr.find('td').eq(1).prop("rowspan",Number(curRowspan)-1)
-                        }
-                        $nextr.find(".modal-info[name='class_notes']").val(class_notes);
-                    }
                 }
+                
+                // console.log(tdNum)
+                // if(tdNum > 0 && tdNum < 12){
+                //     $prevAll.each(function(){
+                        
+                //         var rowspan = $(this).find('td').eq(1).attr('rowspan')
+                //         if(rowspan){
+                //             if(rowspan==1){
+                //                 $(this).find('td').eq(1).prop("rowspan",false)
+                //             }else{
+                //                 $(this).find('td').eq(1).prop("rowspan",Number(rowspan)-1)
+                //             }
+                //             return false
+                //         }
+                //     })
+                // }else{
+                //     tdNum = $nextr.find('td').length
+                //     if(tdNum > 0 && tdNum < 12){
+                //         if(curRowspan > 1){
+                //             var poItemOjc = $(poItem);
+                //             $nextr.find('td').eq(0).after(poItemOjc.find('td').eq(1))
+                //         }
+                //         if(curRowspan > 2){
+                //             $nextr.find('td').eq(1).prop("rowspan",Number(curRowspan)-1)
+                //         }
+                //         $nextr.find(".modal-info[name='class_notes']").val(class_notes);
+                //     }
+                // }
+                $(this).parents("tr").remove()
                 cost_compute_count()
             })
             //合计金额计算
@@ -626,10 +656,10 @@
                 
                 var profit =  float(total) - float(cost_total);
                 $tr.find(".modal-info[name='profit']").val(float_format(profit));
-                var profit_ratio =  (float(profit)/float(total))*100;
+                var profit_ratio =  (float(profit,5)/float(total,5))*100;
                 
-                var classProfit = float(classCount) - float(costCount)
-                var classProfitRat = (float(classProfit)/float(classCount))*100;
+                var classProfit = float(classCount,5) - float(costCount,5)
+                var classProfitRat = (float(classProfit)/float(classCount,5))*100;
                 $(this).parents(".panel").find(".profit-class-count").text(float_format(classProfit));
                 $(this).parents(".panel").find(".profitrat-class-count").text(float_format(classProfitRat));
 

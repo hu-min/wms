@@ -364,7 +364,7 @@ class ProjectCostController extends BaseController{
         $objActSheet->setCellValue("K{$sRow}",round($all_count+$all_rateCount,2));
         if($projectCostData['actual_money'] > 0 && $projectCostData['actual_money']!=$all_count){
             $sRow++;
-            $objActSheet->setCellValue("J{$sRow}",'优惠价');
+            $objActSheet->setCellValue("J{$sRow}",'实际报价');
             $objActSheet->setCellValue("K{$sRow}",round($projectCostData['actual_money'],2));
         }
     }
@@ -494,7 +494,7 @@ class ProjectCostController extends BaseController{
         if(isset($datas['cost_total']) && $datas['cost_total']>0){
             $total = $datas['total'] > 0 ? $datas['total'] : 0;
             $datas['profit'] = round($total - $datas['cost_total'],2);
-            $datas['profit_ratio'] = $total == 0 ? -100 : round($datas['profit'] / $total,2)*100;
+            $datas['profit_ratio'] = $total == 0 ? -100 : round($datas['profit'] / $total,5)*100;
         }
         if($reqType=="project_offerAdd"){
             $datas['status']=1;
@@ -696,6 +696,10 @@ class ProjectCostController extends BaseController{
         }
         $this->pOfferCom->commit();
         $this->pCostSubCom->commit();
+        if($pOfferData['data']['status'] == 1){
+            $nodeResult = A('Component/Node')->getOne(['fields'=>'nodeId','where'=>['db_table'=>'v_project_cost','processIds'=>['GT',0],'is_process'=>1],'one'=>true]);
+            $this->pOfferCom->toCost($pOfferData["where"]["id"],$nodeResult['nodeId']);
+        }
         if($offerResult["status"] == 3 && $pOfferData['data']['status'] !=10 ){
             $this->ApprLogCom->updateStatus($this->pOfferCom->tableName(),$pOfferData["where"]["id"]);
         }

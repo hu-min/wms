@@ -436,14 +436,15 @@ class BaseController extends \Common\Controller\BaseController{
         if($db == 'v_float_capital_log' && ($statusType=="del" || $statusType=="deepDel")){
             getComponent('FlCapLog')->computeFloat($id,true);
         }
-        if($statusType=="del"){
-            if($db!='v_purcha'){
-                $conResult=$dbObject->save([$dbObject->getPk()=>$id,"status"=>$status]);
-            }else{
-                $conResult=$dbObject->where(['project_id'=>$id])->save(["status"=>$status]);
-            }
-            // echo $dbObject->getPk();exit;
-        }else if($statusType=="deepDel"){
+        // if($statusType=="del"){
+        //     if($db!='v_purcha'){
+        //         $conResult=$dbObject->save([$dbObject->getPk()=>$id,"status"=>$status]);
+        //     }else{
+        //         $conResult=$dbObject->where(['project_id'=>$id])->save(["status"=>$status]);
+        //     }
+        //     // echo $dbObject->getPk();exit;
+        // }else 
+        if($statusType=="deepDel" || $statusType=="del"){
             $logType = 6;
             $seniorResult=$this->userCom->checkSeniorPwd(session("userId"),$seniorPwd);
             if($seniorResult->errCode!==0){

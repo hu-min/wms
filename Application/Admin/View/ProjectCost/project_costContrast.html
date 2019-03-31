@@ -73,13 +73,16 @@
                                 <th>报价批次</th>
                                 <th>报价标识</th>
                                 <th>报价者</th>
+                                <th>成本编辑</th>
                                 <th>报价时间</th>
                                 <th>报价</th>
+                                <th>实际报价</th>
                                 <th>成本</th>
                                 <th>增值税率</th>
                                 <th>含税报价</th>
                                 <th>利润</th>
                                 <th>利润率</th>
+                                <th>审批备注</th>
                                 <th>审批记录</th>
                                 <th>状态</th>
                                 <th>操作</th>
@@ -162,6 +165,10 @@
     
                     $(tabId+" .global-modal .box-group ").append(poPanelObj);
                     cost_class = subElement['class_sort']+"-"+subElement['cost_class']
+                }
+                if(subElement['read_type'] > 1){
+                    poPanelObj.removeClass('box-info')
+                    poPanelObj.addClass('box-danger');
                 }
                 var poItemOjc = $(poItem);
                 // console.log(poItemOjc.find(".cost_item_del"))
