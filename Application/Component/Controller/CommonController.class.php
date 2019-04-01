@@ -249,7 +249,7 @@ class CommonController extends \Common\Controller\BaseController{
             case 'module_supplier':
                 $pid=I("pid");
                 if($pid && $pid < 999999999){
-                    $where["_string"] = "FIND_IN_SET({$pid},module)";
+                    $where["_string"] = "FIND_IN_SET({$pid},module) OR FIND_IN_SET(999999999,module)";
                 }
                 if ($key!=""){
                     $where["company"]=["LIKE","%{$key}%"];
