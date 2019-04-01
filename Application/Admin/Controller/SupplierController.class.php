@@ -321,14 +321,19 @@ class SupplierController extends BaseController{
         }
         // print_r($resultData);exit;
         if($resultData['module']){
+            $moduleList = explode(",",$resultData['module']);
             $parameter=[
-                'where'=>["class"=>"module",'basicId'=>["IN",explode(",",$resultData['module'])]],
+                'where'=>["class"=>"module",'basicId'=>["IN",$moduleList]],
                 'fields'=>'basicId,name',
                 'page'=>1,
                 'pageSize'=>9999,
                 'orderStr'=>"basicId DESC",
             ];
             $basicResult=$this->basicCom->getList($parameter);
+            
+            // if(in_array(999999999,$moduleList)){
+            //     array_push($basicResult['list'],['basicId'=>999999999,'name'=>'全部承接模块']);
+            // }
             $resultData['modules']=$basicResult['list'];
         }
         $modalPara=[
@@ -501,6 +506,7 @@ class SupplierController extends BaseController{
      */    
     function sup_companyEdit(){
         $companyInfo=$this->manageCompanyInfo();
+        print_r($companyInfo);
         $updateResult=$this->supplierCom->updateCompany($companyInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
@@ -804,14 +810,14 @@ class SupplierController extends BaseController{
         if ($key!=""){
             $where["name"]=["LIKE","%{$key}%"];
         }
-        if ($pid!=""){
+        if ($pid!="" && $pid != '888888888'){
             $where["pId"] = $pid;
         }
         $parameter=[
             'where'=>$where,
             'fields'=>'basicId,name',
             'page'=>1,
-            'pageSize'=>20,
+            'pageSize'=>9999999,
             'orderStr'=>"basicId DESC",
         ];
         $basicResult=$this->basicCom->getBasicList($parameter);

@@ -172,11 +172,12 @@
             datas["pid"]=supr_type
             get("{$url}",datas,function(result){
                 if(result.data){
-                    var moduleOption='<option value="999999999">全部</option>';
+                    var moduleOption='<option value="999999999">全部承接模块</option>';
                     
                     result.data.forEach(ele => {
                         moduleOption+='<option value="'+ele.basicId+'">'+ele.name+'</option>'
                     })
+                    console.log(moduleOption)
                     whereModule.html(moduleOption)
                     // whereModule.trigger("chosen:updated");
                 }
@@ -218,7 +219,7 @@
             // $(tabId+" .modal-info[name='alias']").val(info['alias']);
             // $(tabId+" .modal-info[name='address']").val(info['address']);
             // $(tabId+" .modal-info[name='remarks']").val(info['remarks']);
-
+            
             if(info['supr_type']>0){
                 if($(tabId+" .modal-info[name='supr_type']").find("option[value='"+info['supr_type']+"']").length==0 && info['supr_type'] && info['typeName']){
                     $(tabId+" .modal-info[name='supr_type']").append('<option value="'+info['supr_type']+'">'+info['typeName']+'</option>');
