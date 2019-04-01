@@ -74,7 +74,7 @@
         <td style="min-width: 150px;">
             <select class="form-control modal-info chosen-select" title="选择内部员工" data-value="userId"  data-text="userName" name="auth_user_id" data-type="create_user" >
                 <option value="0">默认不选择</option>
-                <option value="999999999">允许所有</option>
+                <option value="999999999">允许全员工借</option>
                 <volist name="userArr" id="item">
                     <option value="{$item['userId']}">{$item['userName']}</option>
                 </volist>
