@@ -175,9 +175,12 @@
                     var moduleOption='<option value="999999999">全部承接模块</option>';
                     
                     result.data.forEach(ele => {
-                        moduleOption+='<option value="'+ele.basicId+'">'+ele.name+'</option>'
+                        
+                        if(ele.name != '全部承接模块'){
+                            moduleOption+='<option value="'+ele.basicId+'">'+ele.name+'</option>'
+                        }
                     })
-                    console.log(moduleOption)
+                    // console.log(moduleOption)
                     whereModule.html(moduleOption)
                     // whereModule.trigger("chosen:updated");
                 }

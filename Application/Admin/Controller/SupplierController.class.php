@@ -506,7 +506,7 @@ class SupplierController extends BaseController{
      */    
     function sup_companyEdit(){
         $companyInfo=$this->manageCompanyInfo();
-        print_r($companyInfo);
+        // print_r($companyInfo);
         $updateResult=$this->supplierCom->updateCompany($companyInfo);
         $this->ajaxReturn(['errCode'=>$updateResult->errCode,'error'=>$updateResult->error]);
     }
