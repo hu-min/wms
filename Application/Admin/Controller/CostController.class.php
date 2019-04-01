@@ -211,7 +211,8 @@ class CostController extends BaseController{
             $pCostResult = $this->pCostCom->getOne($param);
             $where =[
                 'parent_cid'=>$pCostResult['id'],
-                'auth_user_id' => [["EQ",session('userId')],["EQ",0],"OR"],
+                // 'auth_user_id' => [["EQ",session('userId')],["EQ",0],"OR"],
+                'auth_user_id' => session('userId'),
                 '_string' => '(cost_total > 0 AND cost_total != costed) AND scompany_id = 0',
             ];
             $sParam =[
