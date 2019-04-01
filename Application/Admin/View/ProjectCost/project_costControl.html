@@ -678,6 +678,7 @@
             $(tabId+" .global-modal").on("change",".modal-info[name='scompany_id']",function(){
                 var $authUser = $(this).parents("tr").find(".modal-info[name='auth_user_id']")
                 if($(this).val()>0){
+                    $authUser.find("option[value='0']").prop('selected',true)
                     $authUser.prop("disabled",true)
                 }else{
                     var scompany_cid = $(this).parents("tr").find(".modal-info[name='scompany_cid']")
