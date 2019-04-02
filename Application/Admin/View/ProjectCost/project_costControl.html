@@ -252,18 +252,14 @@
                 if(subElement['scompany_ids']){
                     var option = "<option value=''>选择供应商</option>";
                     scompany_name = subElement['scompany_names'].split(",")
-                    options = []
+                    
                     subElement['scompany_ids'].split(",").forEach(function(company,index) {
-                        if(!in_array(company,options)){
-                            if(subElement['scompany_id'] > 0 && company == subElement['scompany_id']){
-                                // console.log(subElement['scompany_id']+":"+company+":"+)
-                                option += '<option value="'+company+'" selected="selected">'+scompany_name[index]+'</option>'
-                            }else{
-                                option += '<option value="'+company+'">'+scompany_name[index]+'</option>'
-                            }
-                            options.push(company)
+                        // console.log(subElement['scompany_id'])
+                        if(subElement['scompany_id'] > 0 && company == subElement['scompany_id']){
+                            option += '<option value="'+company+'" selected="selected">'+scompany_name[index]+'</option>'
+                        }else{
+                            option += '<option value="'+company+'">'+scompany_name[index]+'</option>'
                         }
-                        
                     });
                     poItemOjc.find(".modal-info[name='scompany_id']").html(option);
                 }
