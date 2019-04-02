@@ -1291,8 +1291,8 @@ function init_chosen(url,reqType,parental){
     })
 }
 function float(num,place){
-    if(num == -Infinity || isNaN(num)){
-    return false;
+    if(num == -Infinity || isNaN(num) || num === ""){
+        return 0;
     }
     place = place ? place : place === 0 ? 0 : 2;
     var num_float = parseFloat(parseFloat(num).toFixed(place));
