@@ -244,9 +244,12 @@ class CostController extends BaseController{
         }
         $num = count($data["list"]);
         $updateNum = 0;
+        $data['leader'] = $this->projectCom->getProject($data["project_id"],'leader')['leader'];
+
         $debitData = $this->manageDebitInfo($data,'debitAdd');
-        
+        // print_r($debitData);exit();
         unset($debitData['list']);
+        unset($debitData['leader']);
         $this->debitCom->startTrans();
         $this->debitSubCom->startTrans();
         $this->pCostSubCom->startTrans();
