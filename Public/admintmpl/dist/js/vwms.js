@@ -698,7 +698,7 @@ $(function(){
             }
             if($(this).hasClass("approve-log")){
                 var title = "审批记录"
-                var body = '<p class="text-yellow" style="font-weight: bold;">下一个审批者：<span class="next-examine"></span></p><table class="table table-bordered"><thead><tr><th>操作人</th><th>职务</th><th>状态</th><th>时间</th><th>备注</th></tr></thead><tbody></tbody></table><div><div class="progress progress-striped active"><div class="progress-bar progress-bar-primary" style="width: 0%"></div></div></div>'
+                var body = '<p>审批明细：<p class="process-detail"></p></p><p class="text-yellow" style="font-weight: bold;">下一个审批者：<span class="next-examine"></span></p><table class="table table-bordered"><thead><tr><th>操作人</th><th>职务</th><th>状态</th><th>时间</th><th>备注</th></tr></thead><tbody></tbody></table><div><div class="progress progress-striped active"><div class="progress-bar progress-bar-primary" style="width: 0%"></div></div></div>'
             }else{
                 $(tabId+" .modal").css("position","static")
                 var title = "审批操作"
@@ -748,6 +748,8 @@ $(function(){
                             }
                             $("#"+apl_id+" .modal-body .progress .progress-bar").text(text);
                         }
+                        $("#"+apl_id+" .modal-body .process-detail").html(result.proDetail);
+                        
                         // setInterval(function(){
                         //     if($("#approve-log-modal").css("display") == "block"){
                         //         $("#approve-log-modal .modal-close").click();

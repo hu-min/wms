@@ -31,6 +31,7 @@ class ToolsController extends BaseController{
         if(!$id){
             $this->ajaxReturn(['errCode'=>115,'error'=>getError(115)."；id不存在哦！"]);
         }
+        // $process_level = 1;
         $nodeId = getTabId($vtabId);
         $processResult = $this->nodeCom->getOne(["fields"=>"processIds,processOption","where"=>["nodeId"=> $nodeId],"joins"=>["LEFT JOIN (SELECT processId,processOption FROM v_process) p ON p.processId = processIds"] ]);
         $allProcess = 1;
@@ -63,6 +64,15 @@ class ToolsController extends BaseController{
         $db = M($table,NULL);
         $examineRes = $db ->field("process_level,examine,status")->where([$db->getPk()=>$id])->find();
         $examine = explode(",",$examineRes["examine"]);
+        // print_r($examine);exit();
+        if(count($examine)>0 && $examine[0] > 0){
+            $userAndRole = M()->query("SELECT userName,role_name,roleId FROM v_user LEFT JOIN (SELECT roleId role_id,roleName role_name FROM v_role) r ON r.role_id = roleId WHERE roleId IN (".$examineRes["examine"].")");
+        }else{
+            $userAndRole = [];
+        }
+        
+        
+        // print_r($proDetail);exit();
         $allProcess = count($examine);
         
         $allApprove = $this->userCom->getList(['where'=>['roleId'=>['IN',$examine]]])['count'];
@@ -147,10 +157,29 @@ class ToolsController extends BaseController{
         }
         
         // $this->log($nextExamine);
-        if($resultData && !empty($resultData["list"])){
-            $this->ajaxReturn(['errCode'=>0,'error'=>getError(0),"data"=>$resultData["list"],"allProcess"=>$allProcess,"nextExamine"=>$nextExamine,'allApprove'=>$allApprove]);
+        $proDetail = "";
+        foreach ($examine as $iplace => $role_id) {
+            foreach ($userAndRole as $key => $urrs) {
+                if($role_id == $urrs['roleId']){
+                    
+                    if(($examineRes["process_level"]-1) == $iplace && $nextExamine !='已完成'){
+                        $proDetail.="<span style='font-weight:800;color:#0070C0;'>【".$urrs['role_name']."】".$urrs['userName']."-></span>";
+                    }else{
+                        if($iplace<$examineRes["process_level"] || $nextExamine =='已完成'){
+                            $proDetail.="<span style='color:#00A65A;'>【".$urrs['role_name']."】".$urrs['userName']."-></span>";
+                        }else{
+                            $proDetail.="<span style='color:#cccccc;'>【".$urrs['role_name']."】".$urrs['userName']."-></span>";
+                        }
+                    }
+                    unset($userAndRole[$key]);
+                }
+            }
         }
-        $this->ajaxReturn(['errCode'=>115,'error'=>getError(115)."；可能是系统生成所以无记录","allProcess"=>$allProcess,"nextExamine"=>$nextExamine,'allApprove'=>$allApprove]);
+        $proDetail = rtrim($proDetail,"-></span>");
+        if($resultData && !empty($resultData["list"])){
+            $this->ajaxReturn(['errCode'=>0,'error'=>getError(0),"data"=>$resultData["list"],"allProcess"=>$allProcess,"nextExamine"=>$nextExamine,'allApprove'=>$allApprove,'proDetail'=>$proDetail]);
+        }
+        $this->ajaxReturn(['errCode'=>115,'error'=>getError(115)."；可能是系统生成所以无记录","allProcess"=>$allProcess,"nextExamine"=>$nextExamine,'allApprove'=>$allApprove,'proDetail'=>$proDetail]);
         
     }
     /** 
