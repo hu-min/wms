@@ -47,7 +47,7 @@ class ToolsController extends BaseController{
             "where" => ["table_name"=>$table,"table_id"=>$id,"effect"=>1],
             "fields" => "*, FROM_UNIXTIME(add_time,'%Y-%m-%d %H:%i:%s') add_time,CASE status {$statusSql} ELSE '无效' END state",
             "joins" => [
-                "LEFT JOIN (SELECT userId,userName user_name,roleId FROM v_user) u ON u.userId = user_id",
+                "LEFT JOIN (SELECT userId,userName user_name,roleId FROM v_user WHERE status = 1) u ON u.userId = user_id",
                 "LEFT JOIN (SELECT roleId role_id,roleName role_name FROM v_role) r ON r.role_id = u.roleId",
             ],
             "orderStr" => "add_time DESC",
@@ -66,7 +66,7 @@ class ToolsController extends BaseController{
         $examine = explode(",",$examineRes["examine"]);
         // print_r($examine);exit();
         if(count($examine)>0 && $examine[0] > 0){
-            $userAndRole = M()->query("SELECT userName,role_name,roleId FROM v_user LEFT JOIN (SELECT roleId role_id,roleName role_name FROM v_role) r ON r.role_id = roleId WHERE roleId IN (".$examineRes["examine"].")");
+            $userAndRole = M()->query("SELECT userName,role_name,roleId FROM v_user LEFT JOIN (SELECT roleId role_id,roleName role_name FROM v_role) r ON r.role_id = roleId WHERE `status` = 1 AND roleId IN (".$examineRes["examine"].")");
         }else{
             $userAndRole = [];
         }
@@ -75,7 +75,7 @@ class ToolsController extends BaseController{
         // print_r($proDetail);exit();
         $allProcess = count($examine);
         
-        $allApprove = $this->userCom->getList(['where'=>['roleId'=>['IN',$examine]]])['count'];
+        $allApprove = $this->userCom->getList(['where'=>['roleId'=>['status'=>1,'IN',$examine]]])['count'];
         // $this->log($this->userCom->_sql());
         if(in_array($examineRes["status"],[3,5])){
             $nextExamine = "已".$this->statusType[$examineRes["status"]];
@@ -295,7 +295,7 @@ class ToolsController extends BaseController{
             $examineRes = $db ->field("user_id,process_level,examine")->where([$db->getPk()=>$id])->find();
             $uparam = [
                 'fields' => 'roleId,userName',
-                'where' => ['userId' => $examineRes['user_id']],
+                'where' => ['userId' => $examineRes['user_id'],'status'=>1],
                 'one' => true,
             ];
             $authorResult = $this->userCom->getOne($uparam);
@@ -412,7 +412,7 @@ class ToolsController extends BaseController{
                 ];
                 $MAresult = $this->moneyAccCom->getOne($param);
 
-                $debitResult = $db ->field("*")->where([$db->getPk()=>$id])->join("LEFT JOIN (SELECT projectId, code project_code,name project_name FROM v_project ) p ON p.projectId = project_id ")->join('LEFT JOIN (SELECT userId,userName user_name FROM v_user) u ON u.userId = user_id')->find();
+                $debitResult = $db ->field("*")->where([$db->getPk()=>$id])->join("LEFT JOIN (SELECT projectId, code project_code,name project_name FROM v_project ) p ON p.projectId = project_id ")->join('LEFT JOIN (SELECT userId,userName user_name FROM v_user WHERE status = 1) u ON u.userId = user_id')->find();
                 if($debitResult['debit_money']>$MAresult['cash_stock']){
                     $this->approveCom->rollback();
                     $this->ajaxReturn(['errCode'=>100,'error'=>'当前现金库存金额不足【'.$MAresult['cash_stock'].'元】，无法操作']);
@@ -615,7 +615,7 @@ class ToolsController extends BaseController{
 
         $examineRes = $db ->field("process_level,examine,status")->where([$db->getPk()=>$id])->find();
         
-        $allApprove = $this->userCom->getList(['fields'=>'userId','where'=>['roleId'=>explode(",",$examineRes['examine'])[$place-1]]]);
+        $allApprove = $this->userCom->getList(['fields'=>'userId','where'=>['status'=>1,'roleId'=>explode(",",$examineRes['examine'])[$place-1]]]);
         $userIds = array_column($allApprove['list'],"userId");
         // $this->log($allApprove);
         $appResult = $this ->approveCom ->getList(['where'=>["table_name"=>$table,"table_id"=>$id,"effect"=>1,'user_id' => ["IN",$userIds]]]);
