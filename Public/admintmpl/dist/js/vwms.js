@@ -749,6 +749,7 @@ $(function(){
                             $("#"+apl_id+" .modal-body .progress .progress-bar").text(text);
                         }
                         $("#"+apl_id+" .modal-body .process-detail").html(result.proDetail);
+                        $("#"+apl_id+" .modal-title").html(title+result.projectName)
                         
                         // setInterval(function(){
                         //     if($("#approve-log-modal").css("display") == "block"){

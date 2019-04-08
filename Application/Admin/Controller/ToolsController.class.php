@@ -62,7 +62,20 @@ class ToolsController extends BaseController{
             }
         }
         $db = M($table,NULL);
-        $examineRes = $db ->field("process_level,examine,status")->where([$db->getPk()=>$id])->find();
+        $pidStr = "";
+        $projectName = "";
+        if($db->getField('project_id')){
+            $pidStr = "project_id,";
+        }elseif($table == 'v_project'){
+            $pidStr = "projectId,";
+        }
+        $examineRes = $db ->field($pidStr."process_level,examine,status")->where([$db->getPk()=>$id])->find();
+        if($pidStr && $examineRes[rtrim($pidStr,",")] > 0){ 
+            $projectName = M('v_project',NULL)->field("name")->where([$db->getPk()=>$examineRes[rtrim($pidStr,",")]])->find()['name'];
+            
+            $nodeTitle = M('v_node',NULL)->field('nodeTitle')->where(['_string'=>'FIND_IN_SET(4,nodeType) > 0','db_table'=>$table])->find()['nodeTitle'];
+            $projectName = "<span style='font-size:13px;color:#ff851b;'>  【{$projectName}】-【{$nodeTitle}】</span>";
+        }
         $examine = explode(",",$examineRes["examine"]);
         // print_r($examine);exit();
         if(count($examine)>0 && $examine[0] > 0){
@@ -177,9 +190,9 @@ class ToolsController extends BaseController{
         }
         $proDetail = rtrim($proDetail,"-></span>");
         if($resultData && !empty($resultData["list"])){
-            $this->ajaxReturn(['errCode'=>0,'error'=>getError(0),"data"=>$resultData["list"],"allProcess"=>$allProcess,"nextExamine"=>$nextExamine,'allApprove'=>$allApprove,'proDetail'=>$proDetail]);
+            $this->ajaxReturn(['errCode'=>0,'error'=>getError(0),"data"=>$resultData["list"],"allProcess"=>$allProcess,"nextExamine"=>$nextExamine,'allApprove'=>$allApprove,'proDetail'=>$proDetail,'projectName'=>$projectName]);
         }
-        $this->ajaxReturn(['errCode'=>115,'error'=>getError(115)."；可能是系统生成所以无记录","allProcess"=>$allProcess,"nextExamine"=>$nextExamine,'allApprove'=>$allApprove,'proDetail'=>$proDetail]);
+        $this->ajaxReturn(['errCode'=>115,'error'=>getError(115)."；可能是系统生成所以无记录","allProcess"=>$allProcess,"nextExamine"=>$nextExamine,'allApprove'=>$allApprove,'proDetail'=>$proDetail,'projectName'=>$projectName]);
         
     }
     /** 
