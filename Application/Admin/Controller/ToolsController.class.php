@@ -70,9 +70,9 @@ class ToolsController extends BaseController{
             $pidStr = "projectId,";
         }
         $examineRes = $db ->field($pidStr."process_level,examine,status")->where([$db->getPk()=>$id])->find();
+        
         if($pidStr && $examineRes[rtrim($pidStr,",")] > 0){ 
-            $projectName = M('v_project',NULL)->field("name")->where([$db->getPk()=>$examineRes[rtrim($pidStr,",")]])->find()['name'];
-            
+            $projectName = M('v_project',NULL)->field("name")->where([M('v_project',NULL)->getPk()=>$examineRes[rtrim($pidStr,",")]])->find()['name'];
             $nodeTitle = M('v_node',NULL)->field('nodeTitle')->where(['_string'=>'FIND_IN_SET(4,nodeType) > 0','db_table'=>$table])->find()['nodeTitle'];
             $projectName = "<span style='font-size:13px;color:#ff851b;'>  【{$projectName}】-【{$nodeTitle}】</span>";
         }
