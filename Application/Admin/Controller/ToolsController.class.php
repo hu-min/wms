@@ -293,14 +293,23 @@ class ToolsController extends BaseController{
         if(count($diff)>1 && $status ==1 ){
             $this->approveCom->commit();//如果同一个角色多个审批者必须要达到所有审批者都审核通过才可以执行下面一步，必须是状态为批准，
             $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
-        }elseif( $status == 5 ){
+        }elseif(in_array($status,[3,5]) ){
+            //3驳回 5 拒绝
             //拒绝的情况下执行一些东西
             switch ($table) {
                 case 'v_debit':
-                
+                    $debitCom = getComponent('Debit');
+                    $debitCom->pdebit_rollback($id);
                 break;
             }
-            $this->ajaxReturn(['errCode'=>100,'error'=>getError(100)]);
+            $dbData = ["status" => $status];
+            if($tableIds){
+                $updateRes = $db ->where([$db->getPk()=>["IN",$tableIds]])->save($dbData);
+            }else{
+                $updateRes = $db ->where([$db->getPk()=>$id])->save($dbData);
+            }
+            $this->approveCom->commit();
+            $this->ajaxReturn(['errCode'=>0,'error'=>getError(0)]);
         }
         $db ->startTrans();
 

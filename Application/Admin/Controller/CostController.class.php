@@ -340,18 +340,20 @@ class CostController extends BaseController{
                             'where' =>['id'=>$debitSub['cost_id']],
                         ];
                         $costResult = $this->pCostSubCom->getOne(array_merge($costParam,['one'=>true]));
-                        
+                        $dateUpdate = [
+                            'where' =>['id'=>$debitSub['cost_id']],
+                            'data' => [],
+                        ];
                         if($subInfo['debit_money']<$debitSub['debit_money']){
-                            $costParam['data'] = ['costed'=>($costResult['costed'] -( $debitSub['debit_money'] - $subInfo['debit_money']))];
+                            $dateUpdate['data'] = ['costed'=>($costResult['costed'] -( $debitSub['debit_money'] - $subInfo['debit_money']))];
                         }elseif($subInfo['debit_money']>$debitSub['debit_money']){
-                            $costParam['data'] = ['costed'=>($costResult['costed'] + ( $subInfo['debit_money'] - $debitSub['debit_money']))];
+                            $dateUpdate['data'] = ['costed'=>($costResult['costed'] + ( $subInfo['debit_money'] - $debitSub['debit_money']))];
                         }
                         $updateResult = $this->pCostSubCom->update($dateUpdate);
                         if($updateResult){
                             $updateNum++;
                         }
                     }
-                    
                 }
             }
         }
