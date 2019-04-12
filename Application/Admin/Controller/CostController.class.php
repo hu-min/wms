@@ -498,6 +498,7 @@ class CostController extends BaseController{
             $redit = false;
             $isDraft = false;
             if($debitResult["status"] == 3 && $data['status'] !=10 ){
+                $data['process_level'] = $debitResult['process_level'];
                 $redit = true;
             }
             if($debitResult["status"] == 10 && in_array($data['status'],[0,1,2])){

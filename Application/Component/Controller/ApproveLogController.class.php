@@ -50,11 +50,11 @@ class ApproveLogController extends BaseController{
         if($hasRefute && $itemResult['user_id'] == session('userId')){
              
             $this->startTrans();
-            $updateRes = $this->update(["where"=>["table_name"=>$table,"table_id"=>$id,"status"=>["IN",[1,3]]],"data"=>["effect"=>0]]);
+            $updateRes = $this->update(["where"=>["table_name"=>$table,"table_id"=>$id,"status"=>3],"data"=>["effect"=>0]]);
             if(isset($updateRes->errCode) && $updateRes->errCode == 0){
                 
                 $db->startTrans();
-                $db -> where([$db->getPk()=>$id])->save(["status"=>2,"process_level"=>1]);
+                $db -> where([$db->getPk()=>$id])->save(["status"=>2]);
                 $this->commit();
                 $db->commit();  
             }else{

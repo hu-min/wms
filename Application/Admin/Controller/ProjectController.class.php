@@ -549,9 +549,6 @@ class ProjectController extends BaseController{
     function projectEdit(){
         $projectInfo = $this->manageProjectInfo();
         // $this->is_project_draft();
-        if($projectInfo['redit']){
-            $projectInfo['data']['process_level'] = 1;
-        }
         // print_r($projectInfo);exit();
         if(is_null($projectInfo['data']['status'])){
             unset($projectInfo['data']['status']);
