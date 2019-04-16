@@ -481,7 +481,7 @@ class ProjectCostController extends BaseController{
         ];
         // $this->log($parameter);exit;
         $listResult=$offerCostCom->getList($parameter);
-        echo $offerCostCom->_sql();exit;
+        // echo $offerCostCom->_sql();exit;
         // $this->
         // if($type == 'offer'){
         //     $listTemplate = 'project_offerList';
