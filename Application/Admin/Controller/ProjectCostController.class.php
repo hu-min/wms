@@ -431,12 +431,16 @@ class ProjectCostController extends BaseController{
             $listTemplate = 'project_offerList';
         }else{
             $offerCostCom = $this->pCostCom;
+            
             if($nodeAuth < 7){
+                $ww = [];
+                $ww["_string"] = "(user_id = {$user_id} OR p_user_id = {$user_id}) OR (FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0)";
 
-                $where["_string"] = "(user_id = {$user_id} OR p_user_id = {$user_id}) OR (FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0)";
                 $hasDebit = $offerCostCom -> getList(['where'=>['id'=>['GT','0']],'fields'=>'id','joins'=>"RIGHT JOIN (SELECT project_id e_project_id, section e_section FROM v_debit WHERE FIND_IN_SET({$roleId},examine)) e ON e.e_project_id = project_id AND e.e_section = section",'pageSize'=>1410065407]);
                 if($hasDebit){
-                    $where["id"] = ['IN',array_column($hasDebit['list'],'id')] ;
+                    $ww["id"] = ['IN',array_column($hasDebit['list'],'id')] ;
+                    $ww['_logic'] = 'or';
+                    $where['_complex'] =  $ww;
                 }
             }
             
