@@ -428,7 +428,7 @@
                             notice(110,title,"输入异常");
                             throw title
                         }else{
-                            if("{$nodeAuth}" == 7 || read_type == 2 || "{$nodeAuth}" == 10){
+                            if("{$nodeAuth}" == 7 || read_type == 2 || status == 10){
                                 temp[name] = val;
                             }else if(name == "id" || (temp['id'] == 0 && name != "id") || (temp['id'] > 0 && in_array(name,['cost_price','cost_total','total','scompany_id','scompany_cid','auth_user_id']))){
                                 temp[name] = val;
