@@ -438,6 +438,7 @@ class ProjectCostController extends BaseController{
             $joins2 = [
                 "LEFT JOIN (SELECT project_id o_project_id , section o_section,flag o_flag,total,actual_money,tax_rate,user_id ouser_id FROM v_project_offer ) o ON o.o_project_id = project_id AND o.o_section = section ",
                 "LEFT JOIN (SELECT userId, userName ouser_name FROM v_user ) ou ON ou.userId = ouser_id ",
+                "LEFT JOIN (SELECT project_id e_project_id , section e_section FROM v_debit WHERE FIND_IN_SET({$roleId},examine)) e ON e.e_project_id = project_id AND e.e_section = section",
             ];
             $listTemplate = 'project_costList';
             // $joins
