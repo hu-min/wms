@@ -430,13 +430,18 @@ class ProjectCostController extends BaseController{
             ];
             $listTemplate = 'project_offerList';
         }else{
+            $offerCostCom = $this->pCostCom;
             if($nodeAuth < 7){
+
                 $where["_string"] = "(user_id = {$user_id} OR p_user_id = {$user_id}) OR (FIND_IN_SET({$roleId},examine) <= process_level AND FIND_IN_SET({$roleId},examine) > 0)";
+                $hasDebit = $offerCostCom -> getList(['where'=>['id'=>['GT','0']],'fields'=>'id','joins'=>"RIGHT JOIN (SELECT project_id e_project_id, section e_section FROM v_debit WHERE FIND_IN_SET({$roleId},examine)) e ON e.e_project_id = project_id AND e.e_section = section",'pageSize'=>1410065407]);
+                if($hasDebit){
+                    $where["id"] = ['IN',array_column($hasDebit['list'],'id')] ;
+                }
             }
             
-            $offerCostCom = $this->pCostCom;
+            
             $joins2 = [
-                "RIGHT JOIN (SELECT project_id e_project_id , section e_section FROM v_debit WHERE FIND_IN_SET({$roleId},examine)) e ON e.e_project_id = project_id AND e.e_section = section",
                 "LEFT JOIN (SELECT project_id o_project_id , section o_section,flag o_flag,total,actual_money,tax_rate,user_id ouser_id FROM v_project_offer ) o ON o.o_project_id = project_id AND o.o_section = section ",
                 "LEFT JOIN (SELECT userId, userName ouser_name FROM v_user ) ou ON ou.userId = ouser_id ",
             ];
