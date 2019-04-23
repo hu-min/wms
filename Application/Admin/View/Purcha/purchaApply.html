@@ -110,10 +110,12 @@
     </div>
     <script>
         var purcha_template = {}
+        var paDel = [];
         function purcha_apply_initInfo(gettype){
             // init_date();
             // init_chosen("{$url}","getProjectOne",".global-modal");
             // init_chosen("{$url}","getProjectOne",".global-modal");
+            paDel = [];
             init_chosen("{$url}","getOptionList",".global-modal");
             init_date();
             upload({url:"{:U('Project/upload_filesAdd')}"})
@@ -287,6 +289,9 @@
                 })
                 
             });
+            if(paDel.length > 0){
+                datas["dels"] = paDel
+            }
         }
         var invoive_compute =function(){
             var invoiveMoney = 0
@@ -316,7 +321,14 @@
                     // })
                 })
                 $(tabId).offon("click",".global-modal ."+element[2]+" .supr-remove",function(){
+                    paDel.push($(this).parent('td').children('.modal-info').val())
                     $(this).parents("tr").remove();
+                    var amount = $(tabId+" .global-modal").find("input[name='contract_money']").val();
+                    $(tabId+" .global-modal").find(".suprpay-list tbody tr").each(function(){
+                        var money = $(this).find('input[name="pay_money"]').val()
+                        $(this).find('input[name="pay_ratio"]').val(float((float(money)/float(amount))*100))
+                    })
+                    
                 })
             });
             //支付比例计算
