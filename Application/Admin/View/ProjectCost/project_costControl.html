@@ -175,6 +175,7 @@
             var item_count = {};
             var item_cost_count = {};
             info['list'].forEach(subElement => {
+                // console.log(subElement)
                 // console.log(subElement['class_sort']+"-"+subElement['cost_class'])
                 if(cost_class != subElement['class_sort']+"-"+subElement['cost_class']){
                     var poPanelObj = $(poPanel)
@@ -183,6 +184,7 @@
                     poPanelObj.find(".cost-class-title").text(subElement['cost_class_name'])
                     poPanelObj.find(".cost-class-alpha").text(alpha(subElement['class_sort']))
                     poPanelObj.find(".cost_class_div").addClass('none')
+                    poPanelObj.addClass('panel-'+alpha(subElement['class_sort']).toLowerCase());
                     // poPanelObj.find(".add-costItem").removeClass('none')
                     // console.log()
                     if(in_array(info['status'],[0,3,10]) && in_array("{$Think.session.userId}",[info['ouser_id'],info['puser_id']])){
@@ -290,8 +292,8 @@
                 if(subElement['read_type'] < 2){
                     poItemOjc.find(".class-rowspan").remove()
                 }
-
-                $(tabId+" .global-modal .box-group ").find(".panel").eq(subElement['class_sort']).find(".table-items").append(poItemOjc);
+                // console.log(poItemOjc)
+                $(tabId+" .global-modal .box-group ").find(".panel.panel-"+alpha(subElement['class_sort']).toLowerCase()).find(".table-items").append(poItemOjc);
                 init_chosen("{$url}","getOptionList",poItemOjc);
                 // $this.find(".table-items").append(poItemOjc);
             });
