@@ -145,11 +145,11 @@
             if(info['status'] == 1){
                 $(tabId+" .global-modal").find(".modal-footer .draft-btn").remove();
             }
-            var cost_class = "";
+            var cost_class = [];
             var item_count = {};
             info['list'].forEach(subElement => {
                 // console.log(subElement['class_sort']+"-"+subElement['cost_class'])
-                if(cost_class != subElement['class_sort']+"-"+subElement['cost_class']){
+                if($.inArray(subElement['read_type']+subElement['class_sort'],cost_class) < 0){
                     var poPanelObj = $(poPanel)
                     var idstr = poPanelObj.find(".cost-class-title").attr("href")
                     poPanelObj.find(".cost-class-title").attr("href",idstr+subElement['class_sort'])
@@ -160,10 +160,11 @@
                     poPanelObj.find(".modal-info[name='class_sort']").val(subElement['class_sort'])
                     poPanelObj.find(".modal-info[name='cost_class']").val(subElement['cost_class'])
                     poPanelObj.find(idstr).attr("id",poPanelObj.find(idstr).attr("id")+subElement['class_sort'])
-                    poPanelObj.addClass('panel-'+alpha(subElement['class_sort']).toLowerCase());
+                    poPanelObj.addClass('panel-'+subElement['read_type']+alpha(subElement['class_sort']).toLowerCase());
     
                     $(tabId+" .global-modal .box-group ").append(poPanelObj);
-                    cost_class = subElement['class_sort']+"-"+subElement['cost_class']
+                    // cost_class = subElement['class_sort']+"-"+subElement['cost_class']
+                    cost_class.push(subElement['read_type']+subElement['class_sort'])
                 }
                 var poItemOjc = $(poItem);
                 ['id','class_notes','classify','sort','item_content','num','unit','act_num','act_unit','price','total'].forEach(modalName => { 
@@ -189,7 +190,7 @@
                     poItemOjc.find('td').eq(1).remove();
                 }
                 // console.info($(tabId+" .global-modal .box-group").find(".panel"))
-                $(tabId+" .global-modal .box-group ").find(".panel.panel-"+alpha(subElement['class_sort']).toLowerCase()).find(".table-items").append(poItemOjc);
+                $(tabId+" .global-modal .box-group ").find(".panel.panel-"+subElement['read_type']+alpha(subElement['class_sort']).toLowerCase()).find(".table-items").append(poItemOjc);
                 // $(tabId+" .global-modal .box-group").find(".panel").eq(subElement['class_sort']).find(".table-items").append(poItemOjc);
                 // $this.find(".table-items").append(poItemOjc);
             });
