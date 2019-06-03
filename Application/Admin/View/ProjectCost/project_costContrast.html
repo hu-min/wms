@@ -162,6 +162,7 @@
                     poPanelObj.find(".modal-info[name='class_sort']").val(subElement['class_sort'])
                     poPanelObj.find(".modal-info[name='cost_class']").val(subElement['cost_class'])
                     poPanelObj.find(idstr).attr("id",poPanelObj.find(idstr).attr("id")+subElement['class_sort'])
+                    poPanelObj.addClass('panel-'+alpha(subElement['class_sort']).toLowerCase());
     
                     $(tabId+" .global-modal .box-group ").append(poPanelObj);
                     cost_class = subElement['class_sort']+"-"+subElement['cost_class']
@@ -198,7 +199,8 @@
                 }
                 poItemOjc.find('.cost_item_del').remove();
                 
-                $(tabId+" .global-modal .box-group ").find(".panel").eq(subElement['class_sort']).find(".table-items").append(poItemOjc);
+                // $(tabId+" .global-modal .box-group ").find(".panel").eq(subElement['class_sort']).find(".table-items").append(poItemOjc);
+                $(tabId+" .global-modal .box-group ").find(".panel.panel-"+alpha(subElement['class_sort']).toLowerCase()).find(".table-items").append(poItemOjc);
                 // $this.find(".table-items").append(poItemOjc);
             });
             // console.log(item_count)
