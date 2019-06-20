@@ -508,20 +508,20 @@ class ToolsController extends BaseController{
                             }
                             
                             break;
-                        case in_array($table,C('finan_table')):
-                            $data = [
-                                'account_id' => $monacc_id,
-                                'float_type' => 2,
-                                'happen_time' => date("Y-m-d H:i:s"),
-                                'inner_detail' => $debitResult['debit_cause'],
-                                'log_type' => 2,
-                                'money' => $debitResult['debit_money'],
-                                'object' =>  $debitResult['user_name'],
-                                'project_code' => $debitResult['project_code'],
-                                'project_id' =>$debitResult['project_id'],
-                            ];
-                            getComponent('FlCapLog')->flo_cap_logAdd($data,true);
-                            break;
+                        // case in_array($table,C('finan_table')):
+                            // $data = [
+                            //     'account_id' => $monacc_id,
+                            //     'float_type' => 2,
+                            //     'happen_time' => date("Y-m-d H:i:s"),
+                            //     'inner_detail' => $debitResult['debit_cause'],
+                            //     'log_type' => 2,
+                            //     'money' => $debitResult['debit_money'],
+                            //     'object' =>  $debitResult['user_name'],
+                            //     'project_code' => $debitResult['project_code'],
+                            //     'project_id' =>$debitResult['project_id'],
+                            // ];
+                            // getComponent('FlCapLog')->flo_cap_logAdd($data,true);
+                            // break;
                         case 'v_project_offer':
                             $nodeResult = A('Component/Node')->getOne(['fields'=>'nodeId','where'=>['db_table'=>'v_project_cost','processIds'=>['GT',0],'is_process'=>1],'one'=>true]);
                             getComponent('ProjectOffer')->toCost($tableId,$nodeResult['nodeId']);
